@@ -1,0 +1,64 @@
+# ╔════════════════════════════════╦═══════╦═════════════════════════════════╗ #
+# ╠════════════════════════════════╣ Emacs ╠═════════════════════════════════╣ #
+# ╠════════════════════════════════╝       ╚═════════════════════════════════╣ #
+
+
+# [2022-03-23] Lovingly stolen from Doom Emacs.
+#   - https://github.com/hlissner/doom-emacs
+
+.DS_Store
+tmp/
+*~
+*.*~
+\#*
+.\#*
+.extension/
+*.cache*
+*.log
+/modules/private
+
+# emacs tempfiles that shouldn't be there
+.dap-breakpoints
+.org-id-locations
+.tern-port
+.yas-compiled-snippets.el
+auto-save-list/
+cask/
+ede-projects.el
+elpa/
+straight/
+eln-cache/
+network-security.data
+places
+semanticdb
+server/
+smex-items
+tramp
+transient/
+var/
+
+# compiled files
+*.elc
+*.lib
+*.fas
+*.dat
+*.eld
+
+# ╠════════════════════════════════╗       ╔═════════════════════════════════╣ #
+# ╠════════════════════════════════╣ Emacs ╠═════════════════════════════════╣ #
+# ╠════════════════════════════════╩═══════╩═════════════════════════════════╣ #
+# ║                                                                          ║ #
+# ╠═══════════════════════════════╦══════════╦═══════════════════════════════╣ #
+# ╠═══════════════════════════════╣ Personal ╠═══════════════════════════════╣ #
+# ╠═══════════════════════════════╝          ╚═══════════════════════════════╣ #
+
+# [2023-05-02] Currently, not all my packages are separate repos...
+# So just ignore these that _are_ their own Git repos:
+/packages/user/smudge
+/packages/user/groot
+
+
+
+# ╠═══════════════════════════════╗          ╔═══════════════════════════════╣ #
+# ╠═══════════════════════════════╣ Personal ╠═══════════════════════════════╣ #
+# ╚═══════════════════════════════╩══════════╩═══════════════════════════════╝ #
