@@ -1,14 +1,89 @@
+;;; init.el --- Init, innit? -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2025-03-13
+;; Timestamp:  2025-03-13
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Init package systems:
+;;   - Emacs package stuff (e.g. `package.el').
+;;   - `use-package'
+;;   - `straight'
+;;
+;; Oh, and `innit:package:upgrade'.
+;; Now we're the Postal Upgrade Service.
+;;
+;;; Code:
 
+
+;;------------------------------------------------------------------------------
+;; Packages
+;;------------------------------------------------------------------------------
 
 (require 'package)
+
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+
 (package-initialize)
 
+(unless package-archive-contents
+  (message "[%s] %s"
+   "init.el"
+   "Update packages list...")
+  (package-refresh-contents))
+
+;;------------------------------
+;; `use-package'
+;;------------------------------
+
+(require 'use-package)
 (require 'use-package-ensure)
-(setq use-package-always-ensure t)
+
+;; Automatically install package if not found.
+;;   https://github.com/jwiegley/use-package#package-installation
+;; NOTE: Does not keep anything up-to-date. For that you would use package
+;; `auto-package-update' or something similar.
+(customize-set-variable use-package-always-ensure t)
+
+;; 'When using :hook omit the "-hook" suffix if you specify the hook
+;; explicitly, as this is appended by default.
+;;
+;; [...]
+;;
+;; If you do not like this behaviour, set use-package-hook-name-suffix to
+;; nil. By default the value of this variable is "-hook".'
+;;   - https://github.com/jwiegley/use-package#hooks
+;;
+;; Need to override this to allow naming hooks something other than
+;; `*-hook'.
+(customize-set-variable use-package-hook-name-suffix nil)
+
+;;---
+;; Debugging Settings:
+;;---
+;; TODO
+;; (setq use-package-compute-statistics    innit:debug?
+;;       use-package-verbose               innit:debug?
+;;       use-package-minimum-reported-time (if innit:debug? 0 0.1)
+;;       use-package-expand-minimally      innit:interactive?)
+
+;; TODO
+;; TODO
+;; TODO no-littering package
+;; TODO
+;; TODO
+
 
 ;;------------------------------------------------------------------------------
 ;; Chrome: Theme
