@@ -265,6 +265,61 @@
 
 
 
+;;------------------------------------------------------------------------------
+;; AI: ChatGPT
+;;------------------------------------------------------------------------------
+
+;; https://github.com/karthink/gptel
+(use-package gptel
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (defvar --/gptel/directive/default
+    (string-join
+     '("You are a large language model living in Emacs and a helpful assistant."
+       "Respond concisely and provide reference links or code examples."
+       ""
+       "Default to C# for code."
+       "There are 2 important .NET versions in use:"
+       "1. .NET Framework 4.8.1 (latest release of .NET Framework)"
+       "2. .NET 8 (latest LTS release of .NET (Core))")
+     "\n")
+    "For adding to alist `gptel-directives' and/or var `gptel--system-message'.")
+
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+  (gptel-mode-hook . visual-line-mode)
+
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  (gptel-api-key (plist-get --/secret/key/openai :key))
+
+  (gptel-model "gpt-4o")
+
+  ;; Customize prompt.
+  (gptel--system-message --/gptel/directive/default)
+
+  ;; Default: `markdown-mode' if available, else `text-mode'
+  ;; ...why would you ever not use org?
+  (gptel-default-mode 'org-mode)
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; `default' doesn't provide examples as often as I want.
+  (push (cons '--/gptel/directive/default --/gptel/directive/default)
+        gptel-directives))
+
+
 
 
 
