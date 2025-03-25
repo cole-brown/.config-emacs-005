@@ -1,0 +1,48 @@
+
+
+* my code
+
+** imp
+
+TODO: Start [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/emacs/imp/init.el][here]]
+
+
+** repo buffernames
+
+
+
+* settings
+
+** file timestamp auto-update
+
+mantle/config/dev-env/languages/emacs-lisp.el
+163     (emacs-lisp-mode-hook . mantle:hook:time-stamp:settings)
+
+[[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el]]
+
+[[file:init.el::;; PRIORITY: Everything: Emacs Settings]]
+;; TODO: More from: file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el
+;; (add-hook 'before-save-hook 'time-stamp)
+
+
+
+** titlebar
+
+
+* install: packages
+
+** org shit
+
+I wanna have a dir for it.
+I wanna use imp. Debugging is a bit easier.
+  - [[*imp][imp]]
+
+
+
+** yasnippets
+
+Need my begin_src...
+
+
+** evil
+
