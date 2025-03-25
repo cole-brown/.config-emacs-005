@@ -24,6 +24,40 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Init Settings
+;;------------------------------------------------------------------------------
+
+;; (defvar --/init/debugging nil
+;;   "Flag for extra output during init.")
+
+;; (defvar --/init/log/level
+;;   '((debug . t)
+;;     ...todo
+;;     )
+;;   "todo")
+
+;; (defun --/init/message/debug (format-string &rest args)
+;;   "If `--/init/debugging' is non-nil, output via `message'."
+;;   (when --/init/debugging
+;;     (message format-string args)))
+
+;; (--/init/message "%s: %b" '--/init/debugging --/init/debugging)
+
+
+;;------------------------------------------------------------------------------
+;; External Requirements
+;;------------------------------------------------------------------------------
+
+(defun --/assert/exe (exe)
+  "Assert `exe' can be found by Emacs."
+  (cl-assert (executable-find exe)
+	     t
+	     "Emacs cannot find required exe: `%s'"))
+
+(--/assert/exe "git")
+
+    
+;;------------------------------------------------------------------------------
 ;; Packages
 ;;------------------------------------------------------------------------------
 
