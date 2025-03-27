@@ -335,7 +335,7 @@
 
   (gptel-api-key (plist-get --/secret/key/openai :key))
 
-  (gptel-model "gpt-4o")
+  (gptel-model 'gpt-4o)
 
   ;; Customize prompt.
   (gptel--system-message --/gptel/directive/default)
@@ -350,8 +350,8 @@
   ;;------------------------------
 
   ;; `default' doesn't provide examples as often as I want.
-  (push (cons '--/gptel/directive/default --/gptel/directive/default)
-        gptel-directives))
+  (add-to-list gptel-directives
+	       (cons '--/gptel/directive/default --/gptel/directive/default)))
 
 
 
