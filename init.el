@@ -88,7 +88,7 @@
 ;;   https://github.com/jwiegley/use-package#package-installation
 ;; NOTE: Does not keep anything up-to-date. For that you would use package
 ;; `auto-package-update' or something similar.
-(customize-set-variable use-package-always-ensure t)
+(customize-set-variable 'use-package-always-ensure t)
 
 ;; 'When using :hook omit the "-hook" suffix if you specify the hook
 ;; explicitly, as this is appended by default.
@@ -101,7 +101,7 @@
 ;;
 ;; Need to override this to allow naming hooks something other than
 ;; `*-hook'.
-(customize-set-variable use-package-hook-name-suffix nil)
+(customize-set-variable 'use-package-hook-name-suffix nil)
 
 ;;---
 ;; Debugging Settings:
