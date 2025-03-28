@@ -38,70 +38,62 @@
 ;;
 ;;; Code:
 
-
-
-  ;; imp/provide-with-emacs
-  ;; imp/path-root-set
-  ;; imp--load-parse
-  ;;
-  ;; ...oh wait test functions...
-  ;; ...those ones got wild...
-  ;; test<imp/load>::helper::imp--load-parse
+(require 'cl-macs)
 
 ;;------------------------------------------------------------------------------
-;; Function for to Load our Files...
+;; Function for to Load our own Files...
 ;;------------------------------------------------------------------------------
 
-(defun imp--init-load (filename)
-  "Load a FILENAME relative to the current file."
-  (let (file-name-handler-alist)
-    (load (expand-file-name
-           filename
-           (directory-file-name
-            (file-name-directory
-             (cond ((bound-and-true-p byte-compile-current-file))
-                   (load-file-name)
-                   ((stringp (car-safe current-load-list))
-                    (car current-load-list))
-                   (buffer-file-name)
-                   ((error "Cannot find filepath for filename '%s'"))))))
-          nil
-          ;; NOTE: Commenting out this `nomessage' can help debug Emacs start-up.
-          'nomessage)))
+(cl-flet ((imp--init-load (path-relative)
+            ;; Given PATH-RELATIVE, find the absolute path and load the file.
+            (let (file-name-handler-alist)
+              (load (expand-file-name
+                     filename
+                     (directory-file-name
+                      (file-name-directory
+                       (cond ((bound-and-true-p byte-compile-current-file))
+                             (load-file-name)
+                             ((stringp (car-safe current-load-list))
+                              (car current-load-list))
+                             (buffer-file-name)
+                             ((error "Cannot find filepath for filename '%s'"))))))
+                    nil
+                    ;; NOTE: Commenting out this `nomessage' can help debug Emacs start-up.
+                    'nomessage))))
 
 
-;;------------------------------------------------------------------------------
-;; Load our files...
-;;------------------------------------------------------------------------------
+  ;;------------------------------------------------------------------------------
+  ;; Load our files...
+  ;;------------------------------------------------------------------------------
 
-;;------------------------------
-;; Required by debug.
-;;------------------------------
-;; Try not to have too many things here.
-(imp--init-load "error")
-
-
-;;------------------------------
-;; Debug ASAP!..
-;;------------------------------
-(imp--init-load "debug")
-(imp--debug-init)
+  ;;------------------------------
+  ;; Required by debug.
+  ;;------------------------------
+  ;; Try not to have too many things here.
+  (imp--init-load "error")
 
 
-;;------------------------------
-;; Order matters.
-;;------------------------------
-(imp--init-load "feature")
-(imp--init-load "alist")
-(imp--init-load "tree")
-(imp--init-load "path")
-(imp--init-load "+flag")   ;; Currently optional but always loaded. Could make fully optional or required.
-(imp--init-load "+timing") ;; Optional, but always load it - it'll time or not time based on settings.
-(imp--init-load "provide")
-(imp--init-load "load")
-(imp--init-load "require")
-(imp--init-load "package")
-(imp--init-load "commands")
+  ;;------------------------------
+  ;; Debug ASAP!..
+  ;;------------------------------
+  (imp--init-load "debug")
+  (imp--debug-init)
+
+
+  ;;------------------------------
+  ;; Order matters.
+  ;;------------------------------
+  (imp--init-load "feature")
+  (imp--init-load "alist")
+  (imp--init-load "tree")
+  (imp--init-load "path")
+  (imp--init-load "+flag")   ;; Currently optional but always loaded. Could make fully optional or required.
+  (imp--init-load "+timing") ;; Optional, but always load it - it'll time or not time based on settings.
+  (imp--init-load "provide")
+  (imp--init-load "load")
+  (imp--init-load "require")
+  (imp--init-load "package")
+  (imp--init-load "commands"))
 
 
 ;;------------------------------------------------------------------------------
