@@ -61,16 +61,16 @@
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; imp:require
+;; imp/require
 ;;------------------------------
 
-(ert-deftest test<imp/require>::imp:require ()
-  "Test that `imp:require' behaves appropriately."
+(ert-deftest test<imp/require>::imp/require ()
+  "Test that `imp/require' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/require>::imp:require"
+      "test<imp/require>::imp/require"
       nil
       nil
 
@@ -91,14 +91,14 @@
     ;; Supply a root:
     ;;---
     ;; For testing that it can load something it knows about but that hasn't been required.
-    (imp:path:root/set test<imp>:feature:loading
+    (imp/path-root-set test<imp>:feature:loading
                        test<imp>:path:root:loading)
 
     ;;---
     ;; Require a feature:
     ;;---
     ;; For testing that nothing happens when it's already required.
-    (imp:provide test<imp>:feature:loading:dont-load)
+    (imp/provide test<imp>:feature:loading:dont-load)
 
     ;;---
     ;; Set up variables:
@@ -115,19 +115,19 @@
     ;; If feature is alredy required, nothing should happen.
     ;;---
     (should-not test<imp>:loading:dont-load:loaded)
-    ;; Call `imp:require on it's feature; shouldn't be loaded since we've required it already.
-    (should (imp:require test<imp>:feature:loading:dont-load))
+    ;; Call `imp/require on it's feature; shouldn't be loaded since we've required it already.
+    (should (imp/require test<imp>:feature:loading:dont-load))
     (should-not test<imp>:loading:dont-load:loaded)
 
     ;;---
     ;; If we know the base feature, we should be able to load the file by the feature name.
     ;;---
     (should-not test<imp>:loading:load:loaded)
-    (should (imp:require test<imp>:feature:loading:load))
+    (should (imp/require test<imp>:feature:loading:load))
     (should test<imp>:loading:load:loaded)
     (should test<imp>:file:loading?)
     ;; And it should now be provided.
-    (should (imp:provided? test<imp>:feature:loading:load))
+    (should (imp/provided? test<imp>:feature:loading:load))
 
     ;;------------------------------
     ;; Errors:
@@ -137,7 +137,7 @@
     ;; Know the base feature, but can't find anything to load.
     ;;---
     (should-error test<imp>:loading:load:doesnt-exist)
-    (should-error (imp:require test<imp>:feature:loading:doesnt-exist))
+    (should-error (imp/require test<imp>:feature:loading:doesnt-exist))
     (should-error test<imp>:loading:load:doesnt-exist)
 
     ;;---
@@ -145,4 +145,4 @@
     ;;---
     ;; We fallback to asking Emacs to `require' it, but it doesn't know anything about this either.
     ;; This won't error; it'll just return nil.
-    (should-not (imp:require 'something-that-doesnt-exist-in-emacs))))
+    (should-not (imp/require 'something-that-doesnt-exist-in-emacs))))

@@ -47,14 +47,14 @@
 
 
 ;;------------------------------
-;; int<imp>:test/load:parse
+;; imp--test-load-parse
 ;;------------------------------
 
 ;;---
 ;; Test Helper:
 ;;---
-(defun test<imp/test>::helper::int<imp>:test/load:parse (test-name marker-name in expected)
-  "Helper for testing `int<imp>:test/load:parse'.
+(defun test<imp/test>::helper::imp--test-load-parse (test-name marker-name in expected)
+  "Helper for testing `imp--test-load-parse'.
 
 MARKER-NAME should be a string for marking this sub-test.
 
@@ -100,7 +100,7 @@ EXPECTED should be a plist with keys:
          (out:supplied:path         (plist-get expected :path))
          (out:expected:path         (if (file-name-absolute-p out:supplied:path) ;; Always should be an absolute path.
                                         out:supplied:path
-                                      (imp:path:join path:current-dir out:supplied:path)))
+                                      (imp/path-join path:current-dir out:supplied:path)))
          (out:expected:error        (if (memq :error in:plist) ;; `in:error' if provided, else default is `t'.
                                         in:error
                                       t))
@@ -132,7 +132,7 @@ EXPECTED should be a plist with keys:
     ;;---
     ;; Shouldn't error.
     ;;---
-    (setq out:plist (int<imp>:test/load:parse test-name
+    (setq out:plist (imp--test-load-parse test-name
                                               path:current-dir
                                               plist-symbol-name
                                               in:plist))
@@ -182,7 +182,7 @@ EXPECTED should be a plist with keys:
 
          (t
           (should-not
-           (format (concat "test<imp/test>::helper::int<imp>:test/load:parse:"
+           (format (concat "test<imp/test>::helper::imp--test-load-parse-"
                            "unknown input key: %S")
                    key)))))
 
@@ -239,13 +239,13 @@ EXPECTED should be a plist with keys:
 ;; Tests:
 ;;---
 
-(ert-deftest test<imp/test>::int<imp>:test/load:parse ()
-  "Test that `int<imp>:test/load:parse' behaves appropriately."
+(ert-deftest test<imp/test>::imp--test-load-parse ()
+  "Test that `imp--test-load-parse' behaves appropriately."
   (test<imp>:fixture
    ;;===
    ;; Test name, setup & teardown func.
    ;;===
-   "test<imp/test>::int<imp>:test/load:parse"
+   "test<imp/test>::imp--test-load-parse"
    nil
    nil
 
@@ -259,7 +259,7 @@ EXPECTED should be a plist with keys:
    ;; Supply all.
    ;;   `:filename' nil
    ;;   `:error'    nil
-   (test<imp/test>::helper::int<imp>:test/load:parse
+   (test<imp/test>::helper::imp--test-load-parse
     test-name
     "filename-nil-and-error-nil"
     ;; Inputs:
@@ -278,7 +278,7 @@ EXPECTED should be a plist with keys:
 
    ;; Do not supply `:feature:pre'.
    ;;   `:error'    nil
-   (test<imp/test>::helper::int<imp>:test/load:parse
+   (test<imp/test>::helper::imp--test-load-parse
     test-name
     "error-nil"
     ;; Inputs:
@@ -293,7 +293,7 @@ EXPECTED should be a plist with keys:
           ))
 
    ;; Do not supply `:error'.
-   (test<imp/test>::helper::int<imp>:test/load:parse
+   (test<imp/test>::helper::imp--test-load-parse
     test-name
     "error-dne"
     ;; Inputs:
@@ -312,21 +312,21 @@ EXPECTED should be a plist with keys:
    ;; Errors:
    ;;------------------------------
    ;; Invalid input list (not a plist).
-   (should-error (int<imp>:test/load:parse test-name
+   (should-error (imp--test-load-parse test-name
                                            test<imp>:path:root:test
                                            "in:plist"
                                            nil))
-   (should-error (int<imp>:test/load:parse test-name
+   (should-error (imp--test-load-parse test-name
                                            test<imp>:path:root:test
                                            "in:plist"
                                            '(42)))
-   (should-error (int<imp>:test/load:parse test-name
+   (should-error (imp--test-load-parse test-name
                                            test<imp>:path:root:test
                                            "in:plist"
                                            '(:filename "hello" :path)))
 
    ;; Unknown key in input plist.
-   (should-error (int<imp>:test/load:parse test-name
+   (should-error (imp--test-load-parse test-name
                                            test<imp>:path:root:test
                                            "in:plist"
                                            '(:feature  :greeting ;; `:feature:pre' / `:feature:post' expected
@@ -334,7 +334,7 @@ EXPECTED should be a plist with keys:
                                              :path     "path/to")))
 
    ;; Duplicate key in input plist.
-   (should-error (int<imp>:test/load:parse test-name
+   (should-error (imp--test-load-parse test-name
                                            test<imp>:path:root:test
                                            "in:plist"
                                            '(:feature:post :greeting
@@ -343,7 +343,7 @@ EXPECTED should be a plist with keys:
                                              :feature      :greeting)))
 
    ;; No path in plist and no path:current-dir.
-   (should-error (int<imp>:test/load:parse test-name
+   (should-error (imp--test-load-parse test-name
                                            nil
                                            "in:plist"
                                            '(:feature:pre :greeting
@@ -351,16 +351,16 @@ EXPECTED should be a plist with keys:
 
 
 ;;------------------------------
-;; imp:test:load
+;; imp/test-load
 ;;------------------------------
 
-(ert-deftest test<imp/test>::imp:test:load ()
-  "Test that `imp:test:load' behaves appropriately."
+(ert-deftest test<imp/test>::imp/test-load ()
+  "Test that `imp/test-load' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/test>::imp:test:load"
+      "test<imp/test>::imp/test-load"
       nil
       nil
 
@@ -376,13 +376,13 @@ EXPECTED should be a plist with keys:
     ;; Load feature & root.
     ;;------------------------------
 
-    ;; NOTE: `imp:test:load' doesn't care about `imp:path:roots', so don't bother supplying one.
+    ;; NOTE: `imp/test-load' doesn't care about `imp/path-roots', so don't bother supplying one.
 
     ;;---
     ;; Load a feature:
     ;;---
-    ;; `imp:test:load' should load again even if already provided.
-    (imp:provide test<imp>:feature:loading:dont-load)
+    ;; `imp/test-load' should load again even if already provided.
+    (imp/provide test<imp>:feature:loading:dont-load)
 
     ;;---
     ;; Set up variables:
@@ -400,10 +400,10 @@ EXPECTED should be a plist with keys:
     ;;---
     (let (result)
       (should-not test<imp>:loading:dont-load:loaded)
-      (should (file-exists-p (imp:path:join test<imp>:path:root:loading
+      (should (file-exists-p (imp/path-join test<imp>:path:root:loading
                                             (concat test<imp>:file:loading:dont-load ".el"))))
-      ;; Call `imp:test:load on it's feature...
-      (setq result (imp:test:load :feature:post test<imp>:feature:loading:dont-load
+      ;; Call `imp/test-load on it's feature...
+      (setq result (imp/test-load :feature:post test<imp>:feature:loading:dont-load
                                   :path         test<imp>:path:root:loading
                                   :filename     test<imp>:file:loading:dont-load
                                   :error        nil))
@@ -416,8 +416,8 @@ EXPECTED should be a plist with keys:
     ;;---
     (let (result)
       (should-not test<imp>:loading:load:loaded)
-      ;; Call `imp:test:load on it's feature...
-      (setq result (imp:test:load :feature:post test<imp>:feature:loading:load
+      ;; Call `imp/test-load on it's feature...
+      (setq result (imp/test-load :feature:post test<imp>:feature:loading:load
                                   :path         test<imp>:path:root:loading
                                   :filename     test<imp>:file:loading:load
                                   :error        nil))
@@ -429,14 +429,14 @@ EXPECTED should be a plist with keys:
     ;; Errors:
     ;;------------------------------
     ;; Expecting wrong feature.
-    (should-not (imp:test:load :feature:post test<imp>:feature:loading:doesnt-exist
+    (should-not (imp/test-load :feature:post test<imp>:feature:loading:doesnt-exist
                                :path         test<imp>:path:root:loading
                                :filename     test<imp>:file:loading:load
                                :error        nil))
-    (should-error (imp:test:load :feature:post test<imp>:feature:loading:doesnt-exist
+    (should-error (imp/test-load :feature:post test<imp>:feature:loading:doesnt-exist
                                  :path         test<imp>:path:root:loading
                                  :filename     test<imp>:file:loading:load
                                  :error        t))
-    (should-error (imp:test:load :feature:post test<imp>:feature:loading:doesnt-exist
+    (should-error (imp/test-load :feature:post test<imp>:feature:loading:doesnt-exist
                                  :path         test<imp>:path:root:loading
                                  :filename     test<imp>:file:loading:load))))

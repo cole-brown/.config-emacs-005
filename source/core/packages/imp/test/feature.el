@@ -31,27 +31,27 @@
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; `imp:features'
+;; `imp/features'
 ;;------------------------------
 
 (defvar test<imp/feature>:features:backup nil
-  "Backup `imp:features' so we can test it and then restore to its actual values.")
+  "Backup `imp/features' so we can test it and then restore to its actual values.")
 
 
 (defvar test<imp/feature>:features:test nil
-  "Save `imp:features' after a test so we can check it for debugging if needed.")
+  "Save `imp/features' after a test so we can check it for debugging if needed.")
 
 
 ;;------------------------------
-;; `imp:features:at'
+;; `imp/features-at'
 ;;------------------------------
 
 (defvar test<imp/feature/at>:features:created nil
-  "Backup `imp:features' so we can test it and then restore to its actual values.")
+  "Backup `imp/features' so we can test it and then restore to its actual values.")
 
 
 (defvar test<imp/feature/at>:features:root nil
-  "Path to temp dir for files for testing `imp:feature:at'.")
+  "Path to temp dir for files for testing `imp/feature-at'.")
 
 
 ;;------------------------------
@@ -100,23 +100,23 @@ the same index in SEQUENCE:EXPECTED."
 ;;------------------------------
 
 (defun test<imp/feature>:setup (_)
-  "Backup `imp:features' and clear it out for 'feature.el' testing."
-  (setq test<imp/feature>:features:backup      imp:features
-        imp:features                           nil
+  "Backup `imp/features' and clear it out for 'feature.el' testing."
+  (setq test<imp/feature>:features:backup      imp/features
+        imp/features                           nil
         test<imp/feature>:features:test nil))
 
 
 (defun test<imp/feature>:teardown (test-name)
-  "Restore `imp:features'."
+  "Restore `imp/features'."
   ;; Save whatever testing did to `test<imp/feature>:features:test'
-  (setq test<imp/feature>:features:test   imp:features
-        ;; Restore `imp:features'.
-        imp:features                      test<imp/feature>:features:backup
+  (setq test<imp/feature>:features:test   imp/features
+        ;; Restore `imp/features'.
+        imp/features                      test<imp/feature>:features:backup
         test<imp/feature>:features:backup nil))
 
 
 ;;------------------------------
-;; Test Helpers: `imp:feature:at'
+;; Test Helpers: `imp/feature-at'
 ;;------------------------------
 
 (defun test<imp/feature/at>:delete (test-name path:root)
@@ -143,7 +143,7 @@ the same index in SEQUENCE:EXPECTED."
   "Create PATHS files for FEATURES at ROOT path."
   (let ((func/name "test<imp/feature/at>:create"))
     (test<imp>:should:marker test-name func/name)
-    (int<imp>:debug func/name
+    (imp--debug func/name
                     '("inputs:\n"
                       "  root:     %s\n"
                       "  features: %S\n"
@@ -154,13 +154,13 @@ the same index in SEQUENCE:EXPECTED."
                     paths
                     (car (last paths)))
 
-    (let ((path:final (imp:path:join root (car (last paths)))))
+    (let ((path:final (imp/path-join root (car (last paths)))))
       (test<imp>:should:marker:small (format "path:final: %s" path:final))
       (dolist (path paths)
-        (let ((path:full (imp:path:join root path)))
+        (let ((path:full (imp/path-join root path)))
           (test<imp>:should:marker:small (format "Create path '%s'..."
                                                  path:full))
-          (int<imp>:debug func/name
+          (imp--debug func/name
                           "Create path '%s'..."
                           path:full)
           ;; Create the file at path.
@@ -172,22 +172,22 @@ the same index in SEQUENCE:EXPECTED."
               (test<imp>:should:marker:small (format "Write file var: '%s'..."
                                                      path:full))
               (insert (format "(setq test<imp/feature/at>::%s t)\n"
-                              (imp:feature:normalize:imp->emacs features))))
+                              (imp/feature-normalize-imp->emacs features))))
 
             ;; Put our feature definition in the last file in the list?
             (when (string= path:full path:final)
               (with-current-buffer buffer
-                (test<imp>:should:marker:small (format "Write `imp:provide': %s: '%s'..."
+                (test<imp>:should:marker:small (format "Write `imp/provide': %s: '%s'..."
                                                        features
                                                        path:full))
-                (insert (format "\n(imp:provide %s)\n"
+                (insert (format "\n(imp/provide %s)\n"
                                 (mapconcat (lambda (feature-symbol)
                                              ;; Quote symbols, leave keywords alone.
                                              (concat (if (keywordp feature-symbol)
                                                          ""
                                                        "'")
                                                      (symbol-name feature-symbol)))
-                                           (int<imp>:feature:normalize features)
+                                           (imp--feature-normalize features)
                                            " ")))))
 
             ;; Finish up.
@@ -197,7 +197,7 @@ the same index in SEQUENCE:EXPECTED."
 
 
 (defun test<imp/feature/at>:init (test-name feature:base path:root &rest features:at)
-  "Initialize a feature root and feature list for testing `imp:feature:at'.
+  "Initialize a feature root and feature list for testing `imp/feature-at'.
 
 FEATURE:BASE should be the base feature name (`:feature').
 
@@ -237,7 +237,7 @@ Example:
     ;; Sanity Check Params.
     ;;------------------------------
     (test<imp>:should:marker test-name func/name)
-    (int<imp>:debug func/name
+    (imp--debug func/name
                     '("inputs:\n"
                       "  test-name:    %s\n"
                       "  path:root:    %s\n"
@@ -301,22 +301,22 @@ Example:
     ;;------------------------------
     ;; Register root.
     ;;------------------------------
-    (test<imp>:should:marker:small (format "`(imp:path:root/set %S %s)'..."
+    (test<imp>:should:marker:small (format "`(imp/path-root-set %S %s)'..."
                                            feature:base
                                            path:root))
     (setq test<imp/feature/at>:features:root path:root)
     (message "path:root:                          %s" path:root)
     (message "test<imp/feature/at>:features:root: %s" test<imp/feature/at>:features:root)
 
-    (should (imp:path:root/set feature:base path:root))
+    (should (imp/path-root-set feature:base path:root))
 
     ;;------------------------------
-    ;; Register with `imp:feature:at'.
+    ;; Register with `imp/feature-at'.
     ;;------------------------------
-    (test<imp>:should:marker:small (format "`imp:feature:at'..."
+    (test<imp>:should:marker:small (format "`imp/feature-at'..."
                                            feature:base
                                            path:root))
-    (let ((features:at:created (imp:feature:at feature:base
+    (let ((features:at:created (imp/feature-at feature:base
                                                features:at)))
       (should features:at:created)
       ;; (pp features:at:created)
@@ -326,24 +326,24 @@ Example:
 
 
 ;;------------------------------
-;; Set-Up / Tear-Down: `imp:feature:at'
+;; Set-Up / Tear-Down: `imp/feature-at'
 ;;------------------------------
 
 (defun test<imp/feature/at>:setup (name feature:base path:root features:at)
-  "Run `test<imp/feature>:setup' and make `imp:feature:at' test dir & files."
+  "Run `test<imp/feature>:setup' and make `imp/feature-at' test dir & files."
   ;; First: Normal set-up.
   (test<imp/feature>:setup name)
 
-  ;; Next: `imp:feature:at' set-up.
+  ;; Next: `imp/feature-at' set-up.
   ;; 1) Make temp dir & files.
   ;; 2) Initialize `feature:base':
-  ;;    a) `imp:path:root'
-  ;;    b) `imp:feature:at'
+  ;;    a) `imp/path-root'
+  ;;    b) `imp/feature-at'
   (apply #'test<imp/feature/at>:init name feature:base path:root features:at))
 
 
 (defun test<imp/feature/at>:teardown (name)
-  "Delete the `imp:feature:at' test dir then run `test<imp/feature>:teardown'."
+  "Delete the `imp/feature-at' test dir then run `test<imp/feature>:teardown'."
   ;; Clean up our temp data.
   (when test<imp/feature/at>:features:root
     (test<imp/feature/at>:delete name
@@ -369,16 +369,16 @@ Example:
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; imp:feature:exists?
+;; imp/feature-exists?
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::imp:feature:exists? ()
-  "Test that `imp:feature:exists?' behaves appropriately."
+(ert-deftest test<imp/feature>::imp/feature-exists? ()
+  "Test that `imp/feature-exists?' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::imp:feature:exists?"
+      "test<imp/feature>::imp/feature-exists?"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -390,50 +390,50 @@ Example:
     ;; Need to have some features available to test for.
     ;;------------------------------
 
-    (should (int<imp>:feature:add '(:test exists here)))
-    (should (int<imp>:feature:add '(:test exists too)))
-    (should (int<imp>:feature:add '(:test foo bar baz)))
-    (should (int<imp>:feature:add '(:test foo qux quux)))
-    (should (int<imp>:feature:add '(:test foo qux qox qix qex qax)))
+    (should (imp--feature-add '(:test exists here)))
+    (should (imp--feature-add '(:test exists too)))
+    (should (imp--feature-add '(:test foo bar baz)))
+    (should (imp--feature-add '(:test foo qux quux)))
+    (should (imp--feature-add '(:test foo qux qox qix qex qax)))
 
     ;;------------------------------
     ;; Exists?
     ;;------------------------------
 
-    (should (imp:feature:exists? '(:test)))
-    (should (imp:feature:exists? '(:test exists)))
-    (should (imp:feature:exists? '(:test exists here)))
-    (should (imp:feature:exists? '(:test exists too)))
+    (should (imp/feature-exists? '(:test)))
+    (should (imp/feature-exists? '(:test exists)))
+    (should (imp/feature-exists? '(:test exists here)))
+    (should (imp/feature-exists? '(:test exists too)))
 
-    (should (imp:feature:exists? '(:test foo)))
-    (should (imp:feature:exists? '(:test foo bar)))
-    (should (imp:feature:exists? '(:test foo bar baz)))
-    (should (imp:feature:exists? '(:test foo qux)))
-    (should (imp:feature:exists? '(:test foo qux quux)))
-    (should (imp:feature:exists? '(:test foo qux qox)))
-    (should (imp:feature:exists? '(:test foo qux qox qix)))
-    (should (imp:feature:exists? '(:test foo qux qox qix qex)))
-    (should (imp:feature:exists? '(:test foo qux qox qix qex qax)))
+    (should (imp/feature-exists? '(:test foo)))
+    (should (imp/feature-exists? '(:test foo bar)))
+    (should (imp/feature-exists? '(:test foo bar baz)))
+    (should (imp/feature-exists? '(:test foo qux)))
+    (should (imp/feature-exists? '(:test foo qux quux)))
+    (should (imp/feature-exists? '(:test foo qux qox)))
+    (should (imp/feature-exists? '(:test foo qux qox qix)))
+    (should (imp/feature-exists? '(:test foo qux qox qix qex)))
+    (should (imp/feature-exists? '(:test foo qux qox qix qex qax)))
 
     ;;------------------------------
     ;; Doesn't Exist?
     ;;------------------------------
-    (should-not (imp:feature:exists? '(:imp)))
-    (should-not (imp:feature:exists? '(:jeff)))
-    (should-not (imp:feature:exists? '(:test foo baz)))
-    (should-not (imp:feature:exists? '(:test qux)))))
+    (should-not (imp/feature-exists? '(:imp)))
+    (should-not (imp/feature-exists? '(:jeff)))
+    (should-not (imp/feature-exists? '(:test foo baz)))
+    (should-not (imp/feature-exists? '(:test qux)))))
 
 
-(ert-deftest test<imp/feature>::imp:feature:exists?::regression:no-features-error ()
-  "Test that `imp:feature:exists?' behaves appropriately when `imp:features' is nil.
+(ert-deftest test<imp/feature>::imp/feature-exists?::regression:no-features-error ()
+  "Test that `imp/feature-exists?' behaves appropriately when `imp/features' is nil.
 
-Bug was that it `int<imp>:tree:contains?' would raise an error when trying to
-look for the features chain if `imp:features' was nil."
+Bug was that it `imp--tree-contains?' would raise an error when trying to
+look for the features chain if `imp/features' was nil."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::imp:feature:exists?"
+      "test<imp/feature>::imp/feature-exists?"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -442,8 +442,8 @@ look for the features chain if `imp:features' was nil."
     ;;===
 
     ;; Should just get `nil' when we have no features at all.
-    (should-not imp:features)
-    (should-not (imp:feature:exists? '(:test)))))
+    (should-not imp/features)
+    (should-not (imp/feature-exists? '(:test)))))
 
 
 
@@ -452,16 +452,16 @@ look for the features chain if `imp:features' was nil."
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; int<imp>:feature:name:normalize
+;; imp--feature-name-normalize
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::int<imp>:feature:name:normalize ()
-  "Test that `int<imp>:feature:name:normalize' correctly normalizes to a string."
+(ert-deftest test<imp/feature>::imp--feature-name-normalize ()
+  "Test that `imp--feature-name-normalize' correctly normalizes to a string."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::int<imp>:feature:name:normalize"
+      "test<imp/feature>::imp--feature-name-normalize"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -470,49 +470,49 @@ look for the features chain if `imp:features' was nil."
     ;;===
 
     ;; Test stringify.
-    (should (string= (int<imp>:feature:name:normalize "foo")
+    (should (string= (imp--feature-name-normalize "foo")
                      "foo"))
-    (should (string= (int<imp>:feature:name:normalize :foo)
+    (should (string= (imp--feature-name-normalize :foo)
                      "foo"))
-    (should (string= (int<imp>:feature:name:normalize 'foo)
-                     (int<imp>:feature:name:normalize :foo)))
+    (should (string= (imp--feature-name-normalize 'foo)
+                     (imp--feature-name-normalize :foo)))
 
-    (should (string= (int<imp>:feature:name:normalize "foo-bar")
+    (should (string= (imp--feature-name-normalize "foo-bar")
                      "foo-bar"))
-    (should (string= (int<imp>:feature:name:normalize :foo-bar)
+    (should (string= (imp--feature-name-normalize :foo-bar)
                      "foo-bar"))
-    (should (string= (int<imp>:feature:name:normalize 'foo-bar)
-                     (int<imp>:feature:name:normalize :foo-bar)))
+    (should (string= (imp--feature-name-normalize 'foo-bar)
+                     (imp--feature-name-normalize :foo-bar)))
 
     ;; Also, it should replace some things according to
-    ;; `int<imp>:feature:replace:rx'.
-    (should (string= (int<imp>:feature:name:normalize "foo:bar")
+    ;; `imp--feature-replace-rx'.
+    (should (string= (imp--feature-name-normalize "foo:bar")
                      "foobar"))
-    (should (string= (int<imp>:feature:name:normalize :foo:bar)
+    (should (string= (imp--feature-name-normalize :foo:bar)
                      "foobar"))
-    (should (string= (int<imp>:feature:name:normalize 'foo:bar)
-                     (int<imp>:feature:name:normalize :foo:bar)))
+    (should (string= (imp--feature-name-normalize 'foo:bar)
+                     (imp--feature-name-normalize :foo:bar)))
 
-    (should (string= (int<imp>:feature:name:normalize "+foo:bar")
+    (should (string= (imp--feature-name-normalize "+foo:bar")
                      "foobar"))
-    (should (string= (int<imp>:feature:name:normalize :+foo:bar)
+    (should (string= (imp--feature-name-normalize :+foo:bar)
                      "foobar"))
-    (should (string= (int<imp>:feature:name:normalize '+foo+bar)
-                     (int<imp>:feature:name:normalize :+foo:bar)))))
+    (should (string= (imp--feature-name-normalize '+foo+bar)
+                     (imp--feature-name-normalize :+foo:bar)))))
 
 
 ;;------------------------------
-;; int<imp>:feature:normalize:string
+;; imp--feature-normalize-string
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::int<imp>:feature:normalize:string ()
-  "Test that `int<imp>:feature:normalize:string' correctly normalizes inputs
+(ert-deftest test<imp/feature>::imp--feature-normalize-string ()
+  "Test that `imp--feature-normalize-string' correctly normalizes inputs
 to a list of string."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::int<imp>:feature:normalize:string"
+      "test<imp/feature>::imp--feature-normalize-string"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -520,161 +520,161 @@ to a list of string."
     ;; Run the test.
     ;;===
 
-    ;; NOTE: `int<imp>:feature:normalize:string' returns the list in reverse order.
+    ;; NOTE: `imp--feature-normalize-string' returns the list in reverse order.
 
     ;; Test stringify.
     (test<imp/feature>:assert:seq-equal #'string=
-                                        (int<imp>:feature:normalize:string "foo")
+                                        (imp--feature-normalize-string "foo")
                                         '("foo"))
     (test<imp/feature>:assert:seq-equal #'string=
-                                        (int<imp>:feature:normalize:string :foo)
+                                        (imp--feature-normalize-string :foo)
                                         '("foo"))
     (test<imp/feature>:assert:seq-equal #'string=
-                                        (int<imp>:feature:normalize:string 'foo)
-                                        (int<imp>:feature:normalize:string :foo))
+                                        (imp--feature-normalize-string 'foo)
+                                        (imp--feature-normalize-string :foo))
 
     (test<imp/feature>:assert:seq-equal #'string=
-                                        (int<imp>:feature:normalize:string "foo" "bar")
+                                        (imp--feature-normalize-string "foo" "bar")
                                         ;; Expect reverse order.
                                         '("bar" "foo"))
     (test<imp/feature>:assert:seq-equal #'string=
-                                        (int<imp>:feature:normalize:string :foo-bar "baz")
+                                        (imp--feature-normalize-string :foo-bar "baz")
                                         '("baz" "foo-bar"))
     (test<imp/feature>:assert:seq-equal #'string=
                                         ;; Expect it to flatten the inputs into one output list.
-                                        (int<imp>:feature:normalize:string :foo-bar "baz" '(qux ((quux))))
+                                        (imp--feature-normalize-string :foo-bar "baz" '(qux ((quux))))
                                         '("quux" "qux" "baz" "foo-bar"))
 
     ;; Also, it should replace some things according to
-    ;; `int<imp>:feature:replace:rx'.
+    ;; `imp--feature-replace-rx'.
     (test<imp/feature>:assert:seq-equal #'string=
-                                        (int<imp>:feature:normalize:string "foo" "b:a:r")
+                                        (imp--feature-normalize-string "foo" "b:a:r")
                                         ;; Expect reverse order.
                                         '("bar" "foo"))
     (test<imp/feature>:assert:seq-equal #'string=
-                                        (int<imp>:feature:normalize:string :foo-bar "+baz")
+                                        (imp--feature-normalize-string :foo-bar "+baz")
                                         '("baz" "foo-bar"))
     (test<imp/feature>:assert:seq-equal #'string=
                                         ;; Expect it to flatten the inputs into one output list.
-                                        (int<imp>:feature:normalize:string :foo-bar "baz" '(:qux ((qu+ux))))
+                                        (imp--feature-normalize-string :foo-bar "baz" '(:qux ((qu+ux))))
                                         '("quux" "qux" "baz" "foo-bar"))))
 
 
 ;;------------------------------
-;; int<imp>:feature:normalize
+;; imp--feature-normalize
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::int<imp>:feature:normalize ()
-  "Test that `int<imp>:feature:normalize' behaves appropriately."
+(ert-deftest test<imp/feature>::imp--feature-normalize ()
+  "Test that `imp--feature-normalize' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::int<imp>:feature:normalize"
+      "test<imp/feature>::imp--feature-normalize"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
     ;;===
     ;; Run the test.
     ;;===
-    ;; Only difference between `int<imp>:feature:normalize' and `imp:feature:normalize':
+    ;; Only difference between `imp--feature-normalize' and `imp/feature-normalize':
     ;; Always get a list back, even for single feature.
 
     (should (equal '(:imp)
-                   (int<imp>:feature:normalize :imp)))
+                   (imp--feature-normalize :imp)))
 
     (should (equal '(:imp test symbols)
-                   (int<imp>:feature:normalize :imp 'test 'symbols)))
+                   (imp--feature-normalize :imp 'test 'symbols)))
 
     (should (equal '(:imp provide)
-                   (int<imp>:feature:normalize :imp 'provide)))
+                   (imp--feature-normalize :imp 'provide)))
 
     ;; First item in returned list should be a keyword; rest should be symbols.
     (should (equal '(:imp strings are stringy)
-                   (int<imp>:feature:normalize "imp" "strings" :are '+stringy)))))
+                   (imp--feature-normalize "imp" "strings" :are '+stringy)))))
 
 
 ;;------------------------------
-;; imp:feature:normalize:imp->emacs
+;; imp/feature-normalize-imp->emacs
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::imp:feature:normalize:imp->emacs ()
-  "Test that `imp:feature:normalize:imp->emacs' behaves appropriately."
+(ert-deftest test<imp/feature>::imp/feature-normalize-imp->emacs ()
+  "Test that `imp/feature-normalize-imp->emacs' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::imp:feature:normalize:imp->emacs"
+      "test<imp/feature>::imp/feature-normalize-imp->emacs"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
     ;;===
     ;; Run the test.
     ;;===
-    (should (equal 'imp:test:symbols
-                   (imp:feature:normalize:imp->emacs '(:imp test symbols))))
+    (should (equal 'imp/test-symbols
+                   (imp/feature-normalize-imp->emacs '(:imp test symbols))))
 
-    (should (equal 'imp:test:symbols
-                   (imp:feature:normalize:imp->emacs '(:imp test) 'symbols)))
+    (should (equal 'imp/test-symbols
+                   (imp/feature-normalize-imp->emacs '(:imp test) 'symbols)))
 
-    (should (equal 'imp:provide
-                   (imp:feature:normalize:imp->emacs '(:imp provide))))
+    (should (equal 'imp/provide
+                   (imp/feature-normalize-imp->emacs '(:imp provide))))
 
-    (should (equal (imp:feature:normalize:imp->emacs '(:imp provide))
-                   (imp:feature:normalize:imp->emacs :imp 'provide)))
+    (should (equal (imp/feature-normalize-imp->emacs '(:imp provide))
+                   (imp/feature-normalize-imp->emacs :imp 'provide)))
 
-    (should (equal (imp:feature:normalize:imp->emacs '(:imp provide))
-                   (imp:feature:normalize:imp->emacs '(((:imp))) '((provide)))))
+    (should (equal (imp/feature-normalize-imp->emacs '(:imp provide))
+                   (imp/feature-normalize-imp->emacs '(((:imp))) '((provide)))))
 
-    (should (equal 'imp:strings
-                   (imp:feature:normalize:imp->emacs '("imp" "strings"))))))
+    (should (equal 'imp/strings
+                   (imp/feature-normalize-imp->emacs '("imp" "strings"))))))
 
 
 ;;------------------------------
-;; imp:feature:normalize
+;; imp/feature-normalize
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::imp:feature:normalize ()
-  "Test that `imp:feature:normalize' behaves appropriately."
+(ert-deftest test<imp/feature>::imp/feature-normalize ()
+  "Test that `imp/feature-normalize' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::imp:feature:normalize"
+      "test<imp/feature>::imp/feature-normalize"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
     ;;===
     ;; Run the test.
     ;;===
-    ;; Main difference between `int<imp>:feature:normalize' and `imp:feature:normalize':
+    ;; Main difference between `imp--feature-normalize' and `imp/feature-normalize':
     ;; Get a single symbol back if gave a single feature keyword/symbol.
 
     (should (equal :imp
-                   (imp:feature:normalize :imp)))
+                   (imp/feature-normalize :imp)))
 
     (should (equal '(:imp test symbols)
-                   (imp:feature:normalize :imp 'test 'symbols)))
+                   (imp/feature-normalize :imp 'test 'symbols)))
 
     (should (equal '(:imp provide)
-                   (imp:feature:normalize :imp 'provide)))
+                   (imp/feature-normalize :imp 'provide)))
 
     ;; First item in returned list should be a keyword; rest should be symbols.
     (should (equal '(:imp strings are stringy)
-                   (imp:feature:normalize "imp" "strings" :are '+stringy)))))
+                   (imp/feature-normalize "imp" "strings" :are '+stringy)))))
 
 
 ;;------------------------------
-;; int<imp>:feature:add
+;; imp--feature-add
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::int<imp>:feature:add ()
-  "Test that `int<imp>:feature:add' behaves appropriately."
+(ert-deftest test<imp/feature>::imp--feature-add ()
+  "Test that `imp--feature-add' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::int<imp>:feature:add"
+      "test<imp/feature>::imp--feature-add"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -683,37 +683,37 @@ to a list of string."
     ;;===
     (let (features)
       ;; We should have nothing right now.
-      (should-not imp:features)
-      (should (equal features imp:features))
+      (should-not imp/features)
+      (should (equal features imp/features))
 
       ;; Add a feature.
       (setq features '((:imp (test (symbols)))))
       (should (equal features
-                     (int<imp>:feature:add '(:imp test symbols))))
-      (should (equal features imp:features))
+                     (imp--feature-add '(:imp test symbols))))
+      (should (equal features imp/features))
 
       ;; Another feature.
       (setq features '((:imp (provide) (test (symbols)))))
       (should (equal features
-                     (int<imp>:feature:add '(:imp provide))))
-      (should (equal features imp:features))
+                     (imp--feature-add '(:imp provide))))
+      (should (equal features imp/features))
 
       ;; And another?
-      ;; Errors because features should be normalized before calling `int<imp>:feature:add'.
-      (should-error (int<imp>:feature:add '("imp" "strings"))))))
+      ;; Errors because features should be normalized before calling `imp--feature-add'.
+      (should-error (imp--feature-add '("imp" "strings"))))))
 
 
 ;;------------------------------
-;; imp:feature:assert
+;; imp/feature-assert
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::imp:feature:assert ()
-  "Test that `imp:feature:assert' behaves appropriately."
+(ert-deftest test<imp/feature>::imp/feature-assert ()
+  "Test that `imp/feature-assert' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::imp:feature:assert"
+      "test<imp/feature>::imp/feature-assert"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -724,56 +724,56 @@ to a list of string."
     ;;------------------------------
     ;; Need to have some features available to test for.
     ;;------------------------------
-    (should (int<imp>:feature:add '(:test exists here)))
-    (should (int<imp>:feature:add '(:test exists too)))
-    (should (int<imp>:feature:add '(:test foo bar baz)))
-    (should (int<imp>:feature:add '(:test foo qux quux)))
-    (should (int<imp>:feature:add '(:test foo qux qox qix qex qax)))
+    (should (imp--feature-add '(:test exists here)))
+    (should (imp--feature-add '(:test exists too)))
+    (should (imp--feature-add '(:test foo bar baz)))
+    (should (imp--feature-add '(:test foo qux quux)))
+    (should (imp--feature-add '(:test foo qux qox qix qex qax)))
 
     ;;------------------------------
     ;; Ok if a feature.
     ;;------------------------------
-    (should (imp:feature:assert :test))
-    (should (imp:feature:assert :test 'exists))
-    (should (imp:feature:assert :test 'exists 'here))
-    (should (imp:feature:assert :test 'exists 'too))
+    (should (imp/feature-assert :test))
+    (should (imp/feature-assert :test 'exists))
+    (should (imp/feature-assert :test 'exists 'here))
+    (should (imp/feature-assert :test 'exists 'too))
 
-    (should (imp:feature:assert :test 'foo))
-    (should (imp:feature:assert :test 'foo 'bar))
-    (should (imp:feature:assert :test 'foo 'bar 'baz))
+    (should (imp/feature-assert :test 'foo))
+    (should (imp/feature-assert :test 'foo 'bar))
+    (should (imp/feature-assert :test 'foo 'bar 'baz))
 
-    (should (imp:feature:assert :test 'foo 'qux))
-    (should (imp:feature:assert :test 'foo 'qux 'quux))
-    (should (imp:feature:assert :test 'foo 'qux 'qox))
-    (should (imp:feature:assert :test 'foo 'qux 'qox 'qix))
-    (should (imp:feature:assert :test 'foo 'qux 'qox 'qix 'qex))
-    (should (imp:feature:assert :test 'foo 'qux 'qox 'qix 'qex 'qax))
+    (should (imp/feature-assert :test 'foo 'qux))
+    (should (imp/feature-assert :test 'foo 'qux 'quux))
+    (should (imp/feature-assert :test 'foo 'qux 'qox))
+    (should (imp/feature-assert :test 'foo 'qux 'qox 'qix))
+    (should (imp/feature-assert :test 'foo 'qux 'qox 'qix 'qex))
+    (should (imp/feature-assert :test 'foo 'qux 'qox 'qix 'qex 'qax))
 
     ;;------------------------------
     ;; Error if not a feature.
     ;;------------------------------
-    (should-error (imp:feature:assert :imp))
-    (should-error (imp:feature:assert :jeff))
-    (should-error (imp:feature:assert :test 'foo 'baz))
-    (should-error (imp:feature:assert :test 'qux))))
+    (should-error (imp/feature-assert :imp))
+    (should-error (imp/feature-assert :jeff))
+    (should-error (imp/feature-assert :test 'foo 'baz))
+    (should-error (imp/feature-assert :test 'qux))))
 
 
 ;;------------------------------
-;; imp:feature:at
+;; imp/feature-at
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::imp:feature:at::features-register ()
-  "Test that `imp:feature:at' can find a load path for a feature registered with it."
-  (let ((path:root (imp:path:join test<imp>:path:root:loading
+(ert-deftest test<imp/feature>::imp/feature-at--features-register ()
+  "Test that `imp/feature-at' can find a load path for a feature registered with it."
+  (let ((path:root (imp/path-join test<imp>:path:root:loading
                                   "features")))
     (test<imp>:fixture
         ;;===
         ;; Test name, setup & teardown func.
         ;;===
-        "test<imp/feature>::imp:feature:at::features-register"
-        ;; Normal setup (we'll do `imp:features:at' set-up ourself).
+        "test<imp/feature>::imp/feature-at--features-register"
+        ;; Normal setup (we'll do `imp/features-at' set-up ourself).
         #'test<imp/feature>:setup
-        ;; Tear down the `imp:features:at' set-up we did.
+        ;; Tear down the `imp/features-at' set-up we did.
         #'test<imp/feature/at>:teardown
 
       ;;===
@@ -799,9 +799,9 @@ to a list of string."
             features:created)
 
         ;;------------------------------
-        ;; Initialize `imp:features:at'.
+        ;; Initialize `imp/features-at'.
         ;;------------------------------
-        ;; Create files for testing load, and add FEATURE:BASE/FEATURES:AT to `imp:features:locate'.
+        ;; Create files for testing load, and add FEATURE:BASE/FEATURES:AT to `imp/features-locate'.
         (setq features:created (apply #'test<imp/feature/at>:init
                                       test-name
                                       feature:base
@@ -810,7 +810,7 @@ to a list of string."
         (test<imp>:should:marker test-name "features:created")
         (should features:created)
 
-        ;; Verify `imp:feature:at' entry created correctly.
+        ;; Verify `imp/feature-at' entry created correctly.
         (dolist (expected features:expected)
           (test<imp>:should:marker:small (format "expected: %S" expected))
           (let* ((feature:expect (car expected))
@@ -829,12 +829,12 @@ to a list of string."
 
 
 ;;------------------------------
-;; int<imp>:feature:paths
+;; imp--feature-paths
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::int<imp>:feature:paths ()
-  "Test that `int<imp>:feature:paths' creates paths correctly."
-  (let ((path:root (imp:path:join test<imp>:path:root:loading
+(ert-deftest test<imp/feature>::imp--feature-paths ()
+  "Test that `imp--feature-paths' creates paths correctly."
+  (let ((path:root (imp/path-join test<imp>:path:root:loading
                                   "features"))
         (feature:base :feature)
         (features:at (list (list :feature
@@ -858,10 +858,10 @@ to a list of string."
         ;;===
         ;; Test name, setup & teardown func.
         ;;===
-        "test<imp/feature>::int<imp>:feature:paths"
+        "test<imp/feature>::imp--feature-paths"
         ;; Set-up with our variables.
         (lambda (name)
-          "Set-up for testing `imp:feature:at' paths."
+          "Set-up for testing `imp/feature-at' paths."
           (test<imp/feature/at>:setup name
                                       feature:base
                                       path:root
@@ -875,14 +875,14 @@ to a list of string."
       ;;------------------------------
       ;; Requirements:
       ;;   1. Must be a feature.
-      ;;   2. Must have a root in `imp:path:roots'.
-      ;;   3. Must have an entry in `imp:features:locate'.
+      ;;   2. Must have a root in `imp/path-roots'.
+      ;;   3. Must have an entry in `imp/features-locate'.
       ;;------------------------------
       ;;
       ;; 1. Features
       (dolist (entry features:expected)
         (let ((feature:expected (car entry)))
-          (should (int<imp>:feature:add feature:expected))))
+          (should (imp--feature-add feature:expected))))
 
       ;; 2. Roots
       ;;    - Expect it to be provided by set-up.
@@ -898,7 +898,7 @@ to a list of string."
       (dolist (entry features:expected)
         (let* ((feature:expected (car entry))
                (paths:expected (cdr entry))
-               (result (int<imp>:feature:paths feature:expected)))
+               (result (imp--feature-paths feature:expected)))
           ;; Should have a list as a result.
           (should result)
           (should (listp result))

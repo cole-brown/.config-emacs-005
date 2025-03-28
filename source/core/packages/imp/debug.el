@@ -37,28 +37,28 @@
 ;; Debugging Toggle
 ;;------------------------------------------------------------------------------
 
-(defvar int<imp>:debugging? nil
+(defvar imp--debugging? nil
   "Debug flag boolean.")
 
 
-(defun imp:debug (enabled?)
+(defun imp/debug (enabled?)
   "Set imp debugging flag.
 
 Turns on debugging if ENABLED? is non-nil.
 Turns off debugging if ENABLED? is nil."
-  (setq int<imp>:debugging? (not (null enabled?))))
+  (setq imp--debugging? (not (null enabled?))))
 
 
-(defun imp:debug:toggle ()
+(defun imp/debug-toggle ()
   "Toggle debugging for imp."
   (interactive)
-  (setq int<imp>:debugging? (not int<imp>:debugging?))
-  (imp:debug:status (if int<imp>:debugging?
+  (setq imp--debugging? (not imp--debugging?))
+  (imp/debug-status (if imp--debugging?
                         "Enabled debug flag."
                       "Disabled debug flag.")))
 
 
-(defun imp:debug:status (&optional msg)
+(defun imp/debug-status (&optional msg)
   "Print debugging status for imp.
 
 If MSG is non-nil, it is output just before the status but in the same
@@ -67,7 +67,7 @@ If MSG is non-nil, it is output just before the status but in the same
 
   (let* ((line "────────────────────────────────")
          (status (list "Debug Feature Flag:    %s"
-                   "`int<imp>:debugging?': %s"
+                   "`imp--debugging?': %s"
                    line
                    " %s")))
     ;;---
@@ -94,26 +94,26 @@ If MSG is non-nil, it is output just before the status but in the same
                         status
                         "\n")
              ;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
-             ;; "debug.el" is loaded before "flag.el" so can't use `imp:flag?' here.
+             ;; "debug.el" is loaded before "flag.el" so can't use `imp/flag?' here.
              (if (and (fboundp 'featurep!)
                       (featurep! +debug))
                  "[FEATURE]"
                "[-------]")
-             (if int<imp>:debugging?
+             (if imp--debugging?
                  "[FLAGGED]"
                "[-------]")
-             (if (int<imp>:debug:enabled?)
+             (if (imp--debug-enabled?)
                  "[ENABLED]"
                "[disabled]"))))
-;; (imp:debug:status)
-;; (imp:debug:status "Toggled a bit via solar radiation.")
+;; (imp/debug-status)
+;; (imp/debug-status "Toggled a bit via solar radiation.")
 
 
 ;;------------------------------------------------------------------------------
 ;; Debugging Functions
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:debug:init ()
+(defun imp--debug-init ()
   "Initialize `imp' debugging based on Emacs' variables.
 
 Checks:
@@ -121,7 +121,7 @@ Checks:
   - `debug-on-error'
 
 Return non-nil if debugging."
-  (let ((func/name "int<imp>:debug:init"))
+  (let ((func/name "imp--debug-init"))
     ;; Set our debug variable based on inputs.
     (cond
      ;;---
@@ -130,23 +130,23 @@ Return non-nil if debugging."
      ((and (getenv-internal "DEBUG")
            (not init-file-debug)
            (not debug-on-error))
-      (setq int<imp>:debugging? (getenv-internal "DEBUG"))
+      (setq imp--debugging? (getenv-internal "DEBUG"))
 
-      (int<imp>:debug
+      (imp--debug
        func/name
-       "Enable `int<imp>:debugging?' from environment variable DEBUG: %S"
-       int<imp>:debugging?))
+       "Enable `imp--debugging?' from environment variable DEBUG: %S"
+       imp--debugging?))
 
      ;;---
      ;; CLI Flag: "--debug-init"
      ;;---
      (init-file-debug
-      (setq int<imp>:debugging? init-file-debug)
+      (setq imp--debugging? init-file-debug)
 
-      (int<imp>:debug
+      (imp--debug
        func/name
-       "Enable `int<imp>:debugging?' from '--debug-init' CLI flag: %S"
-       int<imp>:debugging?))
+       "Enable `imp--debugging?' from '--debug-init' CLI flag: %S"
+       imp--debugging?))
 
      ;;---
      ;; Interactive Flag?
@@ -154,12 +154,12 @@ Return non-nil if debugging."
      ;; How did you get this set and not `init-file-debug'? Debugging some small
      ;; piece of init, maybe?
      (debug-on-error
-      (setq int<imp>:debugging? debug-on-error)
+      (setq imp--debugging? debug-on-error)
 
-      (int<imp>:debug
+      (imp--debug
        func/name
-       "Enable `int<imp>:debugging?' from `debug-on-error' variable: %S"
-       int<imp>:debugging?))
+       "Enable `imp--debugging?' from `debug-on-error' variable: %S"
+       imp--debugging?))
 
      ;;---
      ;; _-NOT-_ Debugging
@@ -168,34 +168,34 @@ Return non-nil if debugging."
       ;; Do nothing.
       ))
 
-    ;; Return what the `int<imp>:debugging?' setting is now.
-    int<imp>:debugging?))
+    ;; Return what the `imp--debugging?' setting is now.
+    imp--debugging?))
 
 
-(defun int<imp>:debug:enabled? ()
+(defun imp--debug-enabled? ()
   "Return non-nil if one or more debug flags are enabled.
 
 Flags:
   - `+debug' feature flag in `doom!' macro in user's \"<doom-dir>/init.el\".
-  - `int<imp>:debugging' toggle variable."
+  - `imp--debugging' toggle variable."
   ;; Is a debug flag enabled?
   (cond
    ;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
    ;; The `+debug' flag in the `doom!' macro in user's "<doom-dir>/init.el".
-   ;; "debug.el" is loaded before "flag.el" so can't use `imp:flag?' here.
+   ;; "debug.el" is loaded before "flag.el" so can't use `imp/flag?' here.
    ((and (fboundp 'featurep!)
          (featurep! +debug))
     t)
 
    ;; `:imp' debugging boolean: Return its value if not nil.
-   (int<imp>:debugging?)
+   (imp--debugging?)
 
    ;; Fallthrough: debugging is not enabled.
    (t
     nil)))
 
 
-(defun int<imp>:debug (caller string &rest args)
+(defun imp--debug (caller string &rest args)
   "Print out a debug message if debugging is enabled.
 
 CALLER should be the calling function's name.
@@ -204,22 +204,22 @@ STRING should be a string, which can have formatting info in it (see `format'),
 and will be printed as the debug message.
 
 ARGS should be args for formatting the STRING."
-  (when (int<imp>:debug:enabled?)
-    (int<imp>:output :debug
+  (when (imp--debug-enabled?)
+    (imp--output :debug
                      caller
                      string
                      args)))
-;; (int<imp>:debug "test_func" "test")
+;; (imp--debug "test_func" "test")
 
 
-(defun int<imp>:debug:newline ()
+(defun imp--debug-newline ()
   "Prints an empty debug line if debugging."
-  (when t ;; (int<imp>:debug:enabled?)
-    (int<imp>:output :blank
+  (when t ;; (imp--debug-enabled?)
+    (imp--output :blank
                      nil
                      " "
                      nil)))
-;; (int<imp>:debug:newline)
+;; (imp--debug-newline)
 
 ;;------------------------------------------------------------------------------
 ;; The End.

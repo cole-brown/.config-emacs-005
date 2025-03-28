@@ -72,31 +72,31 @@
 
 
 ;;------------------------------
-;; `imp:features' & `imp:path:roots'
+;; `imp/features' & `imp/path-roots'
 ;;------------------------------
 
 (defvar test<imp>:features:backup nil
-  "Backup `imp:features' so we can test it and then restore to its actual values.")
+  "Backup `imp/features' so we can test it and then restore to its actual values.")
 
 
 (defvar test<imp>:features:test nil
-  "Save `imp:features' after a test so we can check it for debugging if needed.")
+  "Save `imp/features' after a test so we can check it for debugging if needed.")
 
 
 (defvar test<imp>:features:locate:backup nil
-  "Backup `imp:features:locate' so we can test it and then restore to its actual values.")
+  "Backup `imp/features-locate' so we can test it and then restore to its actual values.")
 
 
 (defvar test<imp>:features:locate:test nil
-  "Save `imp:features:locate' after a test so we can check it for debugging if needed.")
+  "Save `imp/features-locate' after a test so we can check it for debugging if needed.")
 
 
 (defvar test<imp>:path:roots:backup nil
-  "Backup `imp:path:roots' so we can test it and then restore to its actual values.")
+  "Backup `imp/path-roots' so we can test it and then restore to its actual values.")
 
 
 (defvar test<imp>:path:roots:test nil
-  "Save `imp:path:roots' after a test so we can check it for debugging if needed.")
+  "Save `imp/path-roots' after a test so we can check it for debugging if needed.")
 
 
 ;;------------------------------
@@ -115,7 +115,7 @@
 (defvar test<imp>:file:loading:init "imp-init.el"
   "The filename (or filepath) for our 'imp/test/loading/imp-init.el' file.
 
-NOTE: Should be `imp:path:filename:init', but can't load/require 'path.el' here.")
+NOTE: Should be `imp/path-filename-init', but can't load/require 'path.el' here.")
 
 
 (defvar test<imp>:feature:loading :loading
@@ -127,7 +127,7 @@ NOTE: Provided by `test<imp>:file:loading:init'.")
 (defvar test<imp>:file:loading:features "imp-features.el"
   "The filename (or filepath) for our 'imp/test/loading/imp-features.el' file.
 
-NOTE: Should be `imp:path:filename:features', but can't load/require 'path.el' here.")
+NOTE: Should be `imp/path-filename-features', but can't load/require 'path.el' here.")
 
 
 (defvar test<imp>:feature:loading:features '(:loading features)
@@ -289,11 +289,11 @@ Search for \"[MARK-\[0-9\]+]:\"."
 
 
 (defun test<imp>:setup/root:loading ()
-  "Puts the 'test/loading' stuff into `imp:path:roots'."
+  "Puts the 'test/loading' stuff into `imp/path-roots'."
   ;; Need to have 'imp/path.el' functions, obviously, so do not use in tests
   ;; before 'imp/path.el' has been tested.
   (test<imp>:init:load "../path")
-  (imp:path:root/set test<imp>:feature:loading
+  (imp/path-root-set test<imp>:feature:loading
                      test<imp>:path:root:loading
                      test<imp>:file:loading:init
                      test<imp>:file:loading:features))
@@ -326,18 +326,18 @@ FUNC/TEARDOWN will run as first step in tear-down."
 (defun test<imp>:setup/vars ()
   "Any setup of consts/vars needed per test."
   ;; Generally, reset vars at start of test so they can be manually inspected
-  ;; after a test is run. Except `imp:features', `imp:features:locate' &
-  ;; `imp:path:roots', which needs to be reverted back to valid after every
+  ;; after a test is run. Except `imp/features', `imp/features-locate' &
+  ;; `imp/path-roots', which needs to be reverted back to valid after every
   ;; test.
   ;;   - In that case, save the test's values off to `test<imp>:[...]:test'.
 
-  ;; Backup `imp:features' & `imp:path:roots' and clear it out for any tests that need to use it.
-  (setq test<imp>:features:backup        imp:features
-        test<imp>:features:locate:backup imp:features:locate
-        test<imp>:path:roots:backup      imp:path:roots
-        imp:features                     nil
-        imp:features:locate              nil
-        imp:path:roots                   nil
+  ;; Backup `imp/features' & `imp/path-roots' and clear it out for any tests that need to use it.
+  (setq test<imp>:features:backup        imp/features
+        test<imp>:features:locate:backup imp/features-locate
+        test<imp>:path:roots:backup      imp/path-roots
+        imp/features                     nil
+        imp/features-locate              nil
+        imp/path-roots                   nil
         test<imp>:features:test          nil
         test<imp>:features:locate:test   nil
         test<imp>:path:roots:test        nil)
@@ -378,7 +378,7 @@ TYPE should be `:top' or `:bottom'."
          (padding:right (make-string (floor width:padding:centered)   ? ))
          ;; Top/Bottom with room for connection to Type
          (border:fill:top/bottom (make-string (- width:header 3) ?═ :multibyte)))
-    (int<imp>:debug caller
+    (imp--debug caller
                     '("\n\n" ;; decent amount of space from previous output
                       ;; "" or top type - no hard-coded "\n" in case of "".
                       "%s"
@@ -454,19 +454,19 @@ FUNC/SETUP and FUNC/TEARDOWN will be run during set-up/tear-down if provided."
   "Clear out/clean up vars used during testing so next test or normal Emacs
 usage isn't affected."
   ;; Generally, reset vars at start of test so they can be manually inspected
-  ;; after a test is run. Except `imp:features', `imp:features:locate' &
-  ;; `imp:path:roots', which needs to be reverted back to valid after every
+  ;; after a test is run. Except `imp/features', `imp/features-locate' &
+  ;; `imp/path-roots', which needs to be reverted back to valid after every
   ;; test.
   ;;   - In that case, save the test's values off to `test<imp>:[...]:test'.
 
-  ;; Restore `imp:path:roots', but save whatever testing did to the `test<imp>:path:roots:test' var.
-  (setq test<imp>:features:test          imp:features
-        test<imp>:features:locate:test   imp:features:locate
-        test<imp>:path:roots:test        imp:path:roots
-        ;; Restore `imp:features' & `imp:path:roots'.
-        imp:features                     test<imp>:features:backup
-        imp:features:locate              test<imp>:features:locate:backup
-        imp:path:roots                   test<imp>:path:roots:backup
+  ;; Restore `imp/path-roots', but save whatever testing did to the `test<imp>:path:roots:test' var.
+  (setq test<imp>:features:test          imp/features
+        test<imp>:features:locate:test   imp/features-locate
+        test<imp>:path:roots:test        imp/path-roots
+        ;; Restore `imp/features' & `imp/path-roots'.
+        imp/features                     test<imp>:features:backup
+        imp/features-locate              test<imp>:features:locate:backup
+        imp/path-roots                   test<imp>:path:roots:backup
         test<imp>:features:backup        nil
         test<imp>:features:locate:backup nil
         test<imp>:path:roots:backup      nil))

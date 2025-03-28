@@ -19,31 +19,40 @@
 ;;
 ;; Require
 ;; ------
-;; (imp:require <symbol/keyword0> ...)
+;; (imp/require <symbol/keyword0> ...)
 ;;   - If a root is set for <symbol/keyword0>, this can (try to) find the file
 ;;     required.
 ;;
 ;; Provide
 ;; -------
-;; (imp:provide <symbol/keyword0> ...)            ; Provide via imp only.
-;; (imp:provide:with-emacs <symbol/keyword0> ...) ; Provide via imp and Emacs.
+;; (imp/provide <symbol/keyword0> ...)            ; Provide via imp only.
+;; (imp/provide-with-emacs <symbol/keyword0> ...) ; Provide via imp and Emacs.
 ;;
 ;; (Optional) Set-Up:
 ;; ------
-;; (imp:path:root/set <symbol/keyword0>
+;; (imp/path-root-set <symbol/keyword0>
 ;;                    <path-to-root-dir-absolute>
 ;;                    &optional <path-to-root-file-relative-or-absolute>)
-;;   - Setting a root for <symbol/keyword0> allows later `imp:require' calls to
+;;   - Setting a root for <symbol/keyword0> allows later `imp/require' calls to
 ;;     try to find the file if not already provided.
 ;;
 ;;; Code:
 
 
+
+  ;; imp/provide-with-emacs
+  ;; imp/path-root-set
+  ;; imp--load-parse
+  ;;
+  ;; ...oh wait test functions...
+  ;; ...those ones got wild...
+  ;; test<imp/load>::helper::imp--load-parse
+
 ;;------------------------------------------------------------------------------
 ;; Function for to Load our Files...
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:init:load (filename)
+(defun imp--init-load (filename)
   "Load a FILENAME relative to the current file."
   (let (file-name-handler-alist)
     (load (expand-file-name
@@ -69,30 +78,30 @@
 ;; Required by debug.
 ;;------------------------------
 ;; Try not to have too many things here.
-(int<imp>:init:load "error")
+(imp--init-load "error")
 
 
 ;;------------------------------
 ;; Debug ASAP!..
 ;;------------------------------
-(int<imp>:init:load "debug")
-(int<imp>:debug:init)
+(imp--init-load "debug")
+(imp--debug-init)
 
 
 ;;------------------------------
 ;; Order matters.
 ;;------------------------------
-(int<imp>:init:load "feature")
-(int<imp>:init:load "alist")
-(int<imp>:init:load "tree")
-(int<imp>:init:load "path")
-(int<imp>:init:load "+flag")   ;; Currently optional but always loaded. Could make fully optional or required.
-(int<imp>:init:load "+timing") ;; Optional, but always load it - it'll time or not time based on settings.
-(int<imp>:init:load "provide")
-(int<imp>:init:load "load")
-(int<imp>:init:load "require")
-(int<imp>:init:load "package")
-(int<imp>:init:load "commands")
+(imp--init-load "feature")
+(imp--init-load "alist")
+(imp--init-load "tree")
+(imp--init-load "path")
+(imp--init-load "+flag")   ;; Currently optional but always loaded. Could make fully optional or required.
+(imp--init-load "+timing") ;; Optional, but always load it - it'll time or not time based on settings.
+(imp--init-load "provide")
+(imp--init-load "load")
+(imp--init-load "require")
+(imp--init-load "package")
+(imp--init-load "commands")
 
 
 ;;------------------------------------------------------------------------------
@@ -101,9 +110,9 @@
 
 ;; These are needed earlier than provide, so now that everything is ready, let
 ;; them provide their feature and do other set-up.
-(int<imp>:path:init)
-(int<imp>:flag:init)
-(int<imp>:load:init)
+(imp--path-init)
+(imp--flag-init)
+(imp--load-init)
 
 
 ;;------------------------------------------------------------------------------
@@ -111,5 +120,5 @@
 ;;------------------------------------------------------------------------------
 ;; Not strictly necessary to provide to emacs, since provide and require both
 ;; provide to emacs as well, but does help when requiring via Emacs.
-(imp:provide:with-emacs :imp)
+(imp/provide-with-emacs :imp)
 ;;; imp/init.el ends here

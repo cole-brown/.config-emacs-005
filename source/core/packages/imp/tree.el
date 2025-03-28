@@ -27,14 +27,14 @@
 ;; Constants & Variables
 ;;--------------------------------------------------------------------------------
 
-(defvar int<imp>:tree:debug:flag nil
-  "Allow `int<imp>:tree:debug' to call `int<imp>:debug'?")
+(defvar imp--tree-debug-flag nil
+  "Allow `imp--tree-debug' to call `imp--debug'?")
 
 
-(defun int<imp>:tree:debug (caller string &rest args)
+(defun imp--tree-debug (caller string &rest args)
   "Debug function for tree, so it can be disabled normally."
-  (when int<imp>:tree:debug:flag
-    (apply #'int<imp>:debug
+  (when imp--tree-debug-flag
+    (apply #'imp--debug
            caller
            string
            args)))
@@ -44,7 +44,7 @@
 ;; Predicates: Types
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:tree:node? (node)
+(defun imp--tree-node? (node)
   "Retuns t if NODE is a node; nil otherwise (including if NODE is a
 tree or nil)."
   ;; A node is:
@@ -56,11 +56,11 @@ tree or nil)."
        (not (null (car node)))
        (not (listp (car node)))
        (symbolp (car node))))
-;; (int<imp>:tree:node? :root)
-;; (int<imp>:tree:node? '(:root))
+;; (imp--tree-node? :root)
+;; (imp--tree-node? '(:root))
 
 
-(defun int<imp>:tree:tree? (tree)
+(defun imp--tree-tree? (tree)
   "Retuns t if TREE is a tree; nil otherwise (including if TREE is a node)."
   ;; A tree is:
   ;;   - A list...
@@ -70,18 +70,18 @@ tree or nil)."
       nil
     ;; Each item in list must be a node.
     (not
-     (seq-contains-p (mapcar #'int<imp>:tree:node? tree)
+     (seq-contains-p (mapcar #'imp--tree-node? tree)
                      nil))))
 ;; symbol: no
-;;   (int<imp>:tree? :root)
+;;   (imp--tree? :root)
 ;; node: no
-;;   (int<imp>:tree? '(:root))
+;;   (imp--tree? '(:root))
 ;; list of node: yes
-;;   (int<imp>:tree? '((:root)))
-;;   (int<imp>:tree? '((:root :ignored) (:root02) (:root03)))
+;;   (imp--tree? '((:root)))
+;;   (imp--tree? '((:root :ignored) (:root02) (:root03)))
 
 
-(defun int<imp>:tree:chain? (chain &optional rooted)
+(defun imp--tree-chain? (chain &optional rooted)
   "Retuns t if CHAIN is a chain of tree keys; nil otherwise (including if CHAIN
 is nil)."
   (let (is-chain
@@ -104,31 +104,31 @@ is nil)."
     ;; Chain?
     (and is-chain is-rooted)))
 ;; symbol: no
-;;   (int<imp>:tree:chain? :root)
+;;   (imp--tree-chain? :root)
 ;; list: yes
-;;   (int<imp>:tree:chain? '(:root))
-;;   (int<imp>:tree:chain? '(root))
-;;   (int<imp>:tree:chain? '(:root) t)
+;;   (imp--tree-chain? '(:root))
+;;   (imp--tree-chain? '(root))
+;;   (imp--tree-chain? '(:root) t)
 ;; list, but not rooted: no
-;;   (int<imp>:tree:chain? '(root) t)
+;;   (imp--tree-chain? '(root) t)
 
 
-(defun int<imp>:tree:key/exists? (key tree)
+(defun imp--tree-key-exists? (key tree)
   "Returns non-nil if key exists in tree, even if it has no children.
 
 Return value is KEY's entry in TREE, or nil if KEY does not exist."
-  (int<imp>:alist:get/pair key tree))
-;; (int<imp>:tree:key/exists? :root1 (int<imp>:tree:update '(:root1) nil (int<imp>:tree:create '(:root0 :one :two) :leaf)))
+  (imp--alist-get-pair key tree))
+;; (imp--tree-key-exists? :root1 (imp--tree-update '(:root1) nil (imp--tree-create '(:root0 :one :two) :leaf)))
 
 
 ;;------------------------------------------------------------------------------
 ;; Helper Functions
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:tree:chain (chain value)
+(defun imp--tree-chain (chain value)
   "Create an alist entry for a tree from CHAIN and VALUE."
   (unless (listp chain) ;; nil ok too
-    (int<imp>:error "int<imp>:tree:chain"
+    (imp--error "imp--tree-chain"
                     "Chain cannot be created - expected list, got: %S"
                     chain))
   ;; Set-up: Need to build in reverse.
@@ -142,9 +142,9 @@ Return value is KEY's entry in TREE, or nil if KEY does not exist."
          (link (cadr backwards))
          (remaining (cddr backwards)))
 
-    (int<imp>:tree:debug "int<imp>:tree:chain" "entry:     %S" entry)
-    (int<imp>:tree:debug "int<imp>:tree:chain" "link:      %S" link)
-    (int<imp>:tree:debug "int<imp>:tree:chain" "remaining: %S" remaining)
+    (imp--tree-debug "imp--tree-chain" "entry:     %S" entry)
+    (imp--tree-debug "imp--tree-chain" "link:      %S" link)
+    (imp--tree-debug "imp--tree-chain" "remaining: %S" remaining)
 
     ;; Grow entry by remaining links.
     (while link
@@ -156,55 +156,55 @@ Return value is KEY's entry in TREE, or nil if KEY does not exist."
 
     ;; Return the chain of alists for chain/value.
     entry))
-;; (int<imp>:tree:chain '(:root) nil)
-;; (int<imp>:tree:chain '(:root :one :two :three) :leaf-node)
-;; (alist-get :root (list (int<imp>:tree:chain '(:root :one :two :three) :leaf-node)))
-;; (alist-get :one (alist-get :root (list (int<imp>:tree:chain '(:root :one :two :three) :leaf-node))))
-;; (alist-get :two (alist-get :one (alist-get :root (list (int<imp>:tree:chain '(:root :one :two :three) :leaf-node)))))
-;; (alist-get :three (alist-get :two (alist-get :one (alist-get :root (list (int<imp>:tree:chain '(:root :one :two :three) :leaf-node))))))
+;; (imp--tree-chain '(:root) nil)
+;; (imp--tree-chain '(:root :one :two :three) :leaf-node)
+;; (alist-get :root (list (imp--tree-chain '(:root :one :two :three) :leaf-node)))
+;; (alist-get :one (alist-get :root (list (imp--tree-chain '(:root :one :two :three) :leaf-node))))
+;; (alist-get :two (alist-get :one (alist-get :root (list (imp--tree-chain '(:root :one :two :three) :leaf-node)))))
+;; (alist-get :three (alist-get :two (alist-get :one (alist-get :root (list (imp--tree-chain '(:root :one :two :three) :leaf-node))))))
 
 
-(defun int<imp>:tree:create (chain value)
+(defun imp--tree-create (chain value)
   "Creates a TREE with CHAIN and VALUE as the starting content."
-  (list (int<imp>:tree:chain chain value)))
-;; (int<imp>:tree:create '(:root :one :two :three) :leaf-node)
+  (list (imp--tree-chain chain value)))
+;; (imp--tree-create '(:root :one :two :three) :leaf-node)
 
 
-(defun int<imp>:tree:branch/update (entry branch)
+(defun imp--tree-branch-update (entry branch)
   "Add ENTRY to BRANCH.
 
 ENTRY must be an alist entry for a tree; e.g. a return value from
-`int<imp>:tree:chain'.
+`imp--tree-chain'.
 
 BRANCH must be a tree - an alist of alists. ENTRY will be added to root of
 BRANCH."
-  (int<imp>:tree:debug "int<imp>:tree:branch/update" "->entry:  %S" entry)
-  (int<imp>:tree:debug "int<imp>:tree:branch/update" "->branch: %S" branch)
+  (imp--tree-debug "imp--tree-branch-update" "->entry:  %S" entry)
+  (imp--tree-debug "imp--tree-branch-update" "->branch: %S" branch)
   (let* ((key (car entry))
          ;; Need the entry, not the alist, of key's children.
          ;; Need '(:value), not '((:value)).
          (value (cadr entry))
-         (siblings (int<imp>:alist:get/value key branch)))
-    (int<imp>:tree:debug "int<imp>:tree:branch/update" "  key:      %S" key)
-    (int<imp>:tree:debug "int<imp>:tree:branch/update" "  vaule:    %S" value)
-    (int<imp>:tree:debug "int<imp>:tree:branch/update" "  siblings: %S" siblings)
+         (siblings (imp--alist-get-value key branch)))
+    (imp--tree-debug "imp--tree-branch-update" "  key:      %S" key)
+    (imp--tree-debug "imp--tree-branch-update" "  vaule:    %S" value)
+    (imp--tree-debug "imp--tree-branch-update" "  siblings: %S" siblings)
 
     ;; Add new value to its new siblings, update branch and done.
     (push value siblings)
-    (int<imp>:tree:debug "int<imp>:tree:branch/update" "updated siblings: %S" siblings)
-    (setq branch (int<imp>:alist:update key siblings branch))
-    (int<imp>:tree:debug "int<imp>:tree:branch/update" "updated branch: %S" branch)
+    (imp--tree-debug "imp--tree-branch-update" "updated siblings: %S" siblings)
+    (setq branch (imp--alist-update key siblings branch))
+    (imp--tree-debug "imp--tree-branch-update" "updated branch: %S" branch)
     branch))
-;; (int<imp>:tree:branch/update '(:two (:leaf-node1)) '((:two (:three (:leaf-node0)))))
-;; (alist-get :two (int<imp>:tree:branch/update '(:two (:leaf-node1)) '((:two (:three (:leaf-node0))))))
-;; (alist-get :leaf-node1 (alist-get :two (int<imp>:tree:branch/update '(:two (:leaf-node1)) '((:two (:three (:leaf-node0)))))))
+;; (imp--tree-branch-update '(:two (:leaf-node1)) '((:two (:three (:leaf-node0)))))
+;; (alist-get :two (imp--tree-branch-update '(:two (:leaf-node1)) '((:two (:three (:leaf-node0))))))
+;; (alist-get :leaf-node1 (alist-get :two (imp--tree-branch-update '(:two (:leaf-node1)) '((:two (:three (:leaf-node0)))))))
 
 
 ;;------------------------------------------------------------------------------
 ;; API for imp:
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:tree:update/helper (chain value tree)
+(defun imp--tree-update-helper (chain value tree)
   "Adds CHAIN with final VALUE to TREE.
 
 CHAIN should be a list of symbols and/or keywords.
@@ -220,13 +220,13 @@ Returns an updated copy of tree."
   ;;------------------------------
   ;; Don't allow a null chain.
   (when (or (null chain)
-            (not (int<imp>:tree:chain? chain)))
-    (int<imp>:error "int<imp>:tree:update" "CHAIN is not a chain: %S" chain))
+            (not (imp--tree-chain? chain)))
+    (imp--error "imp--tree-update" "CHAIN is not a chain: %S" chain))
 
   ;; Valid tree?
   (when (and (not (null tree)) ;; We can deal with a tree of nil.
-             (not (int<imp>:tree:tree? tree))) ;; We can't deal with an invalid tree.
-    (int<imp>:error "int<imp>:tree:update" "TREE is not a tree: %S" tree))
+             (not (imp--tree-tree? tree))) ;; We can't deal with an invalid tree.
+    (imp--error "imp--tree-update" "TREE is not a tree: %S" tree))
 
   ;;------------------------------
   ;; Create or update?
@@ -235,7 +235,7 @@ Returns an updated copy of tree."
       ;;------------------------------
       ;; Create a tree with chain.
       ;;------------------------------
-      (int<imp>:tree:create chain value)
+      (imp--tree-create chain value)
 
     ;;------------------------------
     ;; Update tree with chain.
@@ -256,18 +256,18 @@ Returns an updated copy of tree."
         ;; 'parent-branch' for the 'parent-link' should include the link as an key
         ;; - we need it for easier updating on the way back up to the root.
         (push branch parent-branches)
-        (setq branch (int<imp>:alist:get/value link branch))
+        (setq branch (imp--alist-get-value link branch))
         (push link parent-links)
-        (int<imp>:tree:debug "int<imp>:tree:update" "%S = %S" parent-links parent-branches)
+        (imp--tree-debug "imp--tree-update" "%S = %S" parent-links parent-branches)
 
         ;; Update link/remaining for next round.
         (setq link (car remaining))
         (setq remaining (cdr remaining)))
 
-      (int<imp>:tree:debug "int<imp>:tree:update" "found final branch:")
-      (int<imp>:tree:debug "int<imp>:tree:update" "  branch:    %S" branch)
-      (int<imp>:tree:debug "int<imp>:tree:update" "  remaining: %S" remaining)
-      (int<imp>:tree:debug "int<imp>:tree:update" "  link:      %S" link)
+      (imp--tree-debug "imp--tree-update" "found final branch:")
+      (imp--tree-debug "imp--tree-update" "  branch:    %S" branch)
+      (imp--tree-debug "imp--tree-update" "  remaining: %S" remaining)
+      (imp--tree-debug "imp--tree-update" "  link:      %S" link)
 
       ;;------------------------------
       ;; Error Check: Invalid chain after all?
@@ -276,36 +276,36 @@ Returns an updated copy of tree."
 
       ;; link and branch should now be at the end of the known existing chain in
       ;; tree. Need to add whatever the rest is to this branch now.
-      (let ((entry (int<imp>:tree:chain (cons link remaining) value))
+      (let ((entry (imp--tree-chain (cons link remaining) value))
             branch-update)
 
         ;;------------------------------
         ;; New Branch or Add Here?
         ;;------------------------------
-        (if (int<imp>:alist:get/value link branch)
+        (if (imp--alist-get-value link branch)
             ;;------------------------------
             ;; Add Here.
             ;;------------------------------
-            (setq branch-update (int<imp>:tree:branch/update entry branch))
+            (setq branch-update (imp--tree-branch-update entry branch))
 
           ;;------------------------------
           ;; New Branch.
           ;;------------------------------
-          (int<imp>:tree:debug "int<imp>:tree:update" "branch: %S" branch)
-          (int<imp>:tree:debug "int<imp>:tree:update" "link: %S" link)
-          (int<imp>:tree:debug "int<imp>:tree:update" "new: %S" entry)
-          (int<imp>:tree:debug "int<imp>:tree:update" "  key:   %S" (car entry))
-          (int<imp>:tree:debug "int<imp>:tree:update" "  value: %S" (cdr entry))
-          (setq branch-update (int<imp>:alist:update (car entry)
+          (imp--tree-debug "imp--tree-update" "branch: %S" branch)
+          (imp--tree-debug "imp--tree-update" "link: %S" link)
+          (imp--tree-debug "imp--tree-update" "new: %S" entry)
+          (imp--tree-debug "imp--tree-update" "  key:   %S" (car entry))
+          (imp--tree-debug "imp--tree-update" "  value: %S" (cdr entry))
+          (setq branch-update (imp--alist-update (car entry)
                                                      (cdr entry)
                                                      branch)))
 
         ;;------------------------------
         ;; Finish by updating tree.
         ;;------------------------------
-        (int<imp>:tree:debug "int<imp>:tree:update" "branch-update: %S" branch-update)
+        (imp--tree-debug "imp--tree-update" "branch-update: %S" branch-update)
 
-        (int<imp>:tree:debug "int<imp>:tree:update" "Branch found/updated. Walk update up to root...\n")
+        (imp--tree-debug "imp--tree-update" "Branch found/updated. Walk update up to root...\n")
 
         ;; Now backtrack up the tree to the root - have to update every branch
         ;; along the way to save the new value.
@@ -320,32 +320,32 @@ Returns an updated copy of tree."
           (setq parent-links (cdr parent-links))
           (setq branch (car parent-branches))
           (setq parent-branches (cdr parent-branches))
-          (int<imp>:tree:debug "int<imp>:tree:update" "link: %S" link)
-          (int<imp>:tree:debug "int<imp>:tree:update" "branch: %S" branch)
+          (imp--tree-debug "imp--tree-update" "link: %S" link)
+          (imp--tree-debug "imp--tree-update" "branch: %S" branch)
 
           ;; Push updated branch of tree into place.
-          (setq branch-update (int<imp>:alist:update link branch-update branch))
-          (int<imp>:tree:debug "int<imp>:tree:update" "branch-update: %S" branch-update))
+          (setq branch-update (imp--alist-update link branch-update branch))
+          (imp--tree-debug "imp--tree-update" "branch-update: %S" branch-update))
         branch-update))))
 ;; Chain splits from tree:
-;;   (int<imp>:tree:update '(:root :one :two :free) :leaf-node1 (int<imp>:tree:create '(:root :one :two :three) :leaf-node0))
+;;   (imp--tree-update '(:root :one :two :free) :leaf-node1 (imp--tree-create '(:root :one :two :three) :leaf-node0))
 ;; Tree doesn't exist:
-;;   (int<imp>:tree:update '(:root :one :two :free) :leaf-node1 nil)
+;;   (imp--tree-update '(:root :one :two :free) :leaf-node1 nil)
 ;; Chain doesn't exist in tree:
-;;   (int<imp>:tree:update '(:root1 :won :too :free) :leaf-node1 (int<imp>:tree:create '(:root0 :one :two :three) :leaf-node0))
+;;   (imp--tree-update '(:root1 :won :too :free) :leaf-node1 (imp--tree-create '(:root0 :one :two :three) :leaf-node0))
 ;; Chain pre-exists in tree:
-;;   (int<imp>:tree:update '(:root :one :two) :leaf-node1 (int<imp>:tree:create '(:root :one :two :three) :leaf-node0))
+;;   (imp--tree-update '(:root :one :two) :leaf-node1 (imp--tree-create '(:root :one :two :three) :leaf-node0))
 ;; Reach end of tree before end of chain:
-;;   (int<imp>:tree:update '(:root :one :two :three :four) :leaf-node1 (int<imp>:tree:create '(:root :one :two :three) :leaf-node0))
+;;   (imp--tree-update '(:root :one :two :three :four) :leaf-node1 (imp--tree-create '(:root :one :two :three) :leaf-node0))
 ;; Chain w/ null value:
-;;   (int<imp>:tree:update '(:root :one :two :free) nil (int<imp>:tree:create '(:root :one :two :three) :leaf-node0))
-;; This func does not update the variable; use `int<imp>:tree:update' for that.
+;;   (imp--tree-update '(:root :one :two :free) nil (imp--tree-create '(:root :one :two :three) :leaf-node0))
+;; This func does not update the variable; use `imp--tree-update' for that.
 ;;   (setq test<imp>:tree nil)
-;;   (int<imp>:tree:update/helper '(:foo bar baz) 'qux test<imp>:tree)
+;;   (imp--tree-update-helper '(:foo bar baz) 'qux test<imp>:tree)
 ;;   test<imp>:tree
 
 
-(defmacro int<imp>:tree:update (chain value tree)
+(defmacro imp--tree-update (chain value tree)
   "Adds CHAIN with final VALUE to TREE.
 
 CHAIN should be a list of symbols and/or keywords.
@@ -358,37 +358,37 @@ If VALUE is nil, just adds chain - does not add a nil child."
      (cond
       ((listp macro<imp>:tree)
        (setq ,tree
-             (int<imp>:tree:update/helper ,chain ,value ,tree)))
+             (imp--tree-update-helper ,chain ,value ,tree)))
       ((symbolp macro<imp>:tree)
        (set macro<imp>:tree
-            (int<imp>:tree:update/helper ,chain ,value (eval macro<imp>:tree))))
+            (imp--tree-update-helper ,chain ,value (eval macro<imp>:tree))))
 
       (t
-       (int<imp>:error "int<imp>:tree:update"
+       (imp--error "imp--tree-update"
                        "Unable to update tree: not a list or a symbol: %S (type: %S)"
                        macro<imp>:tree
                        (typeof macro<imp>:tree))))))
 ;; (setq test<imp>:tree nil)
-;; (int<imp>:tree:update '(:foo bar baz) 'qux test<imp>:tree)
+;; (imp--tree-update '(:foo bar baz) 'qux test<imp>:tree)
 ;; test<imp>:tree
 
 
-(defun int<imp>:tree:contains? (chain tree)
+(defun imp--tree-contains? (chain tree)
   "Returns non-nil if TREE contains the CHAIN of symbols/keywords."
   ;;------------------------------
   ;; Error Checking
   ;;------------------------------
   ;; Don't allow a null chain.
   (when (or (null chain)
-            (not (int<imp>:tree:chain? chain)))
-    (int<imp>:error "int<imp>:tree:contains" "CHAIN is not a chain: %S" chain))
+            (not (imp--tree-chain? chain)))
+    (imp--error "imp--tree-contains" "CHAIN is not a chain: %S" chain))
 
   ;; Valid tree?
   (when (or (null tree)
-            (not (int<imp>:tree:tree? tree)))
-    (int<imp>:error "int<imp>:tree:contains" "TREE is not a tree: %S" tree))
+            (not (imp--tree-tree? tree)))
+    (imp--error "imp--tree-contains" "TREE is not a tree: %S" tree))
 
-  (int<imp>:tree:debug "int<imp>:tree:contains?" "CHAIN and TREE verified as valid.\n  chain: %S\n  tree:\n    %S"
+  (imp--tree-debug "imp--tree-contains?" "CHAIN and TREE verified as valid.\n  chain: %S\n  tree:\n    %S"
                   chain tree)
 
   ;;------------------------------
@@ -397,23 +397,23 @@ If VALUE is nil, just adds chain - does not add a nil child."
   (let ((branch tree) ;; Start at root of the tree.
         entry)
     (dolist (link chain)
-      (int<imp>:tree:debug "int<imp>:tree:contains?" "  link:   %S" link)
-      (int<imp>:tree:debug "int<imp>:tree:contains?" "  branch: %S" branch)
-      (setq entry (int<imp>:tree:key/exists? link branch))
-      (int<imp>:tree:debug "int<imp>:tree:contains?" "  entry: %S" entry)
+      (imp--tree-debug "imp--tree-contains?" "  link:   %S" link)
+      (imp--tree-debug "imp--tree-contains?" "  branch: %S" branch)
+      (setq entry (imp--tree-key-exists? link branch))
+      (imp--tree-debug "imp--tree-contains?" "  entry: %S" entry)
       ;; Next branch will be entry's children.
       (setq branch (cdr entry)))
 
     ;; Final entry:
-    (int<imp>:tree:debug "int<imp>:tree:contains?" "final entry for link '%S': %S"
+    (imp--tree-debug "imp--tree-contains?" "final entry for link '%S': %S"
                     (car (last chain)) entry)
-    (int<imp>:tree:debug "int<imp>:tree:contains?" "final branch: %S"
+    (imp--tree-debug "imp--tree-contains?" "final branch: %S"
                     branch)
 
     ;; Return whatever we found after walking that whole chain. Will be either
     ;; a tree entry or nil, so that satisfies our predicate nature.
     entry))
-;; (int<imp>:tree:contains? '(:root :one :two) (int<imp>:tree:create '(:root :one :two :three) :leaf-node0))
-;; (int<imp>:tree:contains? '(:root :one :two :free) (int<imp>:tree:create '(:root :one :two :three) :leaf-node0))
-;; (int<imp>:tree:contains? '(:root1 :one :two) (int<imp>:tree:create '(:root :one :two :three) :leaf-node0))
-;; (int<imp>:tree:contains? '(:imp test) '((:imp (ort (something (here))) (test))))
+;; (imp--tree-contains? '(:root :one :two) (imp--tree-create '(:root :one :two :three) :leaf-node0))
+;; (imp--tree-contains? '(:root :one :two :free) (imp--tree-create '(:root :one :two :three) :leaf-node0))
+;; (imp--tree-contains? '(:root1 :one :two) (imp--tree-create '(:root :one :two :three) :leaf-node0))
+;; (imp--tree-contains? '(:imp test) '((:imp (ort (something (here))) (test))))

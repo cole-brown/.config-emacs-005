@@ -42,23 +42,23 @@
 
 
 (defvar test<imp/timing>:buffer:name:backup nil
-  "Backup `imp:timing:enabled?' so we can test it and then restore it.")
+  "Backup `imp/timing-enabled?' so we can test it and then restore it.")
 
 
 (defvar test<imp/timing>:enabled?:backup nil
-  "Backup `imp:timing:enabled?' so we can test it and then restore it.")
+  "Backup `imp/timing-enabled?' so we can test it and then restore it.")
 
 
 (defvar test<imp/timing>:enabled?:test nil
-  "Save `imp:timing:enabled?' after a test so we can check it for debugging.")
+  "Save `imp/timing-enabled?' after a test so we can check it for debugging.")
 
 
 (defvar test<imp/timing>:feature?:backup nil
-  "Backup `imp:timing:feature?' so we can test it and then restore it.")
+  "Backup `imp/timing-feature?' so we can test it and then restore it.")
 
 
 (defvar test<imp/timing>:feature?:test nil
-  "Save `imp:timing:feature?' after a test so we can check it for debugging.")
+  "Save `imp/timing-feature?' after a test so we can check it for debugging.")
 
 
 ;;------------------------------------------------------------------------------
@@ -67,14 +67,14 @@
 
 (defun test<imp/timing>:buffer ()
   "Returns the timing buffer if it exists, else nil."
-  (get-buffer imp:timing:buffer:name))
+  (get-buffer imp/timing-buffer-name))
 
 
 (defun test<imp/timing>:buffer:kill ()
   "Kill the timing buffer if it exists."
   (when-let ((buffer (test<imp/timing>:buffer)))
     (kill-buffer buffer)))
-;; (get-buffer-create imp:timing:buffer:name)
+;; (get-buffer-create imp/timing-buffer-name)
 ;; (test<imp/timing>:buffer:kill)
 
 
@@ -94,10 +94,10 @@ To modify setting variable, use plist keyword `:setting'.
 
 Use a boolean (nil/non-nil) for the values - it will be set as-is."
   (when (plist-member plist :feature)
-    (setq imp:timing:feature? (plist-get plist :feature)))
+    (setq imp/timing-feature? (plist-get plist :feature)))
 
   (when (plist-member plist :setting)
-    (setq imp:timing:enabled? (plist-get plist :setting))))
+    (setq imp/timing-enabled? (plist-get plist :setting))))
 
 
 ;;------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ Use a boolean (nil/non-nil) for the values - it will be set as-is."
   "If timing buffer is the *Messages* buffer, inserts a begin or end marker.
 
 Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
-  (if (int<imp>:timing:buffer:messages?)
+  (if (imp--timing-buffer-messages?)
       ;;------------------------------
       ;; *Messages* buffer.
       ;;------------------------------
@@ -146,17 +146,17 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
     ;; Kill it if a new test is starting so the test has a clean slate.
     ;; Leave it alone at end of test so we can view it.
     (when begin?
-      (imp:cmd:timing:buffer:kill t))))
+      (imp/cmd-timing-buffer-kill t))))
 
 
 (defun test<imp/timing>:setup (name)
   "Set-up for timing tests."
-  (setq test<imp/timing>:enabled?:backup    imp:timing:enabled?
-        test<imp/timing>:feature?:backup    imp:timing:feature?
-        test<imp/timing>:buffer:name:backup imp:timing:buffer:name
-        imp:timing:enabled?                 nil
-        imp:timing:feature?                 nil
-        imp:timing:buffer:name              test<imp/timing>:buffer:name
+  (setq test<imp/timing>:enabled?:backup    imp/timing-enabled?
+        test<imp/timing>:feature?:backup    imp/timing-feature?
+        test<imp/timing>:buffer:name:backup imp/timing-buffer-name
+        imp/timing-enabled?                 nil
+        imp/timing-feature?                 nil
+        imp/timing-buffer-name              test<imp/timing>:buffer:name
         test<imp/timing>:enabled?:test      nil
         test<imp/timing>:feature?:test      nil)
 
@@ -169,11 +169,11 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
   ;; Deal with timing buffer.
   (test<imp/timing>:buffer:mark name nil)
 
-  (setq test<imp/timing>:enabled?:test      imp:timing:enabled?
-        test<imp/timing>:feature?:test      imp:timing:feature?
-        imp:timing:enabled?                 test<imp/timing>:enabled?:backup
-        imp:timing:feature?                 test<imp/timing>:feature?:backup
-        imp:timing:buffer:name              test<imp/timing>:buffer:name:backup
+  (setq test<imp/timing>:enabled?:test      imp/timing-enabled?
+        test<imp/timing>:feature?:test      imp/timing-feature?
+        imp/timing-enabled?                 test<imp/timing>:enabled?:backup
+        imp/timing-feature?                 test<imp/timing>:feature?:backup
+        imp/timing-buffer-name              test<imp/timing>:buffer:name:backup
         test<imp/timing>:enabled?:backup    nil
         test<imp/timing>:feature?:backup    nil
         test<imp/timing>:buffer:name:backup nil))
@@ -191,16 +191,16 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; imp:timing:enabled?
+;; imp/timing-enabled?
 ;;------------------------------
 
-(ert-deftest test<imp/timing>::imp:timing:enabled? ()
-  "Test that `imp:timing:enabled?' behaves appropriately."
+(ert-deftest test<imp/timing>::imp/timing-enabled? ()
+  "Test that `imp/timing-enabled?' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/timing>::imp:timing:enabled?"
+      "test<imp/timing>::imp/timing-enabled?"
       #'test<imp/timing>:setup
       #'test<imp/timing>:teardown
 
@@ -209,104 +209,104 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
     ;;===
 
     (test<imp/timing>:enable :feature nil :setting nil)
-    (should-not (imp:timing:enabled?))
+    (should-not (imp/timing-enabled?))
 
     (test<imp/timing>:enable :feature t :setting nil)
-    (should (imp:timing:enabled?))
+    (should (imp/timing-enabled?))
 
     (test<imp/timing>:enable :feature nil :setting t)
-    (should (imp:timing:enabled?))
+    (should (imp/timing-enabled?))
 
     (test<imp/timing>:enable :feature t :setting t)
-    (should (imp:timing:enabled?))
+    (should (imp/timing-enabled?))
 
     (test<imp/timing>:enable :feature :foo :setting :bar)
-    (should (imp:timing:enabled?))))
+    (should (imp/timing-enabled?))))
 
 
 ;;------------------------------
-;; int<imp>:timing:tree:type
+;; imp--timing-tree-type
 ;;------------------------------
 
-(ert-deftest test<imp/timing>::int<imp>:timing:tree:type ()
-  "Test that `int<imp>:timing:tree:type' behaves appropriately."
+(ert-deftest test<imp/timing>::imp--timing-tree-type ()
+  "Test that `imp--timing-tree-type' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/timing>::int<imp>:timing:tree:type"
+      "test<imp/timing>::imp--timing-tree-type"
       #'test<imp/timing>:setup
       #'test<imp/timing>:teardown
 
     ;;===
     ;; Run the test.
     ;;===
-    (should (string= (int<imp>:timing:tree:type :root 0)
+    (should (string= (imp--timing-tree-type :root 0)
                      ""))
 
-    (should (string= (int<imp>:timing:tree:type :root 1)
+    (should (string= (imp--timing-tree-type :root 1)
                      "├─"))
 
-    (should (string= (int<imp>:timing:tree:type :root 2)
+    (should (string= (imp--timing-tree-type :root 2)
                      "│ "))
 
-    (should (string= (int<imp>:timing:tree:type :leaf 0)
+    (should (string= (imp--timing-tree-type :leaf 0)
                      "└─"))
 
-    (should (string= (int<imp>:timing:tree:type :leaf 1)
+    (should (string= (imp--timing-tree-type :leaf 1)
                      "│ "))
 
-    (should (string= (int<imp>:timing:tree:type :leaf 2)
+    (should (string= (imp--timing-tree-type :leaf 2)
                      "│ "))))
 
 
 ;;------------------------------
-;; int<imp>:timing:tree:string
+;; imp--timing-tree-string
 ;;------------------------------
 
-(ert-deftest test<imp/timing>::int<imp>:timing:tree:string ()
-  "Test that `int<imp>:timing:tree:string' behaves appropriately."
+(ert-deftest test<imp/timing>::imp--timing-tree-string ()
+  "Test that `imp--timing-tree-string' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/timing>::int<imp>:timing:tree:string"
+      "test<imp/timing>::imp--timing-tree-string"
       #'test<imp/timing>:setup
       #'test<imp/timing>:teardown
 
     ;;===
     ;; Run the test.
     ;;===
-    (let ((int<imp>:timing:indent 0))
-      (should (string= (int<imp>:timing:tree:string :root)
+    (let ((imp--timing-indent 0))
+      (should (string= (imp--timing-tree-string :root)
                        ""))
-      (should (string= (int<imp>:timing:tree:string :leaf)
+      (should (string= (imp--timing-tree-string :leaf)
                      "└─")))
 
-    (let ((int<imp>:timing:indent 1))
-      (should (string= (int<imp>:timing:tree:string :root)
+    (let ((imp--timing-indent 1))
+      (should (string= (imp--timing-tree-string :root)
                        "├─"))
-      (should (string= (int<imp>:timing:tree:string :leaf)
+      (should (string= (imp--timing-tree-string :leaf)
                        "│ └─")))
 
-    (let ((int<imp>:timing:indent 2))
-      (should (string= (int<imp>:timing:tree:string :root)
+    (let ((imp--timing-indent 2))
+      (should (string= (imp--timing-tree-string :root)
                        "│ ├─"))
-      (should (string= (int<imp>:timing:tree:string :leaf)
+      (should (string= (imp--timing-tree-string :leaf)
                        "│ │ └─")))))
 
 
 ;;------------------------------
-;; int<imp>:timing:buffer:insert
+;; imp--timing-buffer-insert
 ;;------------------------------
 
-(ert-deftest test<imp/timing>::int<imp>:timing:buffer:insert ()
-  "Test that `int<imp>:timing:buffer:insert' behaves appropriately."
+(ert-deftest test<imp/timing>::imp--timing-buffer-insert ()
+  "Test that `imp--timing-buffer-insert' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/timing>::int<imp>:timing:buffer:insert"
+      "test<imp/timing>::imp--timing-buffer-insert"
       #'test<imp/timing>:setup
       #'test<imp/timing>:teardown
 
@@ -321,7 +321,7 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
     (test<imp/timing>:enable :feature nil :setting nil)
 
     (let ((test-string "Hello there."))
-      (int<imp>:timing:buffer:insert test-string)
+      (imp--timing-buffer-insert test-string)
       ;; Buffer should still not exist since timing is disabled.
       (should-not (test<imp/timing>:buffer)))
 
@@ -331,22 +331,22 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
     (test<imp/timing>:enable :feature nil :setting t)
 
     (let ((test-string "Hello there."))
-      (int<imp>:timing:buffer:insert test-string)
+      (imp--timing-buffer-insert test-string)
       (should (test<imp/timing>:buffer))
       (test<imp/timing>:buffer:has test-string))))
 
 
 ;;------------------------------
-;; imp:timing
+;; imp/timing
 ;;------------------------------
 
-(ert-deftest test<imp/timing>::imp:timing ()
-  "Test that `imp:timing' behaves appropriately."
+(ert-deftest test<imp/timing>::imp/timing ()
+  "Test that `imp/timing' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/timing>::imp:timing"
+      "test<imp/timing>::imp/timing"
       #'test<imp/timing>:setup
       #'test<imp/timing>:teardown
 
@@ -367,7 +367,7 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
       (should (= body-counter 0))
 
       (test<imp/timing>:enable :feature nil :setting nil)
-      (imp:timing
+      (imp/timing
           ;; These don't matter; just for output messages.
           test<imp>:feature:loading:doesnt-exist
           test<imp>:file:loading:doesnt-exist
@@ -384,7 +384,7 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
       ;; With Timing Enabled
       ;;------------------------------
       (test<imp/timing>:enable :setting t)
-      (imp:timing
+      (imp/timing
           ;; These don't matter; just for output messages.
           test<imp>:feature:loading:doesnt-exist
           test<imp>:file:loading:doesnt-exist
@@ -398,7 +398,7 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
       (test<imp/timing>:buffer:has "loading")
       (test<imp/timing>:buffer:has
        (format "%S"
-               (int<imp>:feature:normalize:display test<imp>:feature:loading:doesnt-exist)))
+               (imp--feature-normalize-display test<imp>:feature:loading:doesnt-exist)))
       ;; Has timing/loaded message pieces.
       (test<imp/timing>:buffer:has "└─00.0") ;; Should take ~0.01x seconds but don't care much.
       (test<imp/timing>:buffer:has "seconds")

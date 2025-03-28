@@ -20,22 +20,22 @@
 ;;                       Tests can have imps too, yes?
 ;;                                 ──────────
 ;;
-;; `imp:test:load': Similar to `imp:load', but with some kwargs for testing.
+;; `imp/test-load': Similar to `imp/load', but with some kwargs for testing.
 ;;
 ;;; Code:
 
 
 
 ;;------------------------------------------------------------------------------
-;; `imp:test:load' Helpers
+;; `imp/test-load' Helpers
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:test/load:parse (caller path:current-dir plist-symbol-name plist)
-  "Parses `imp:test:load' args. See `imp:test:load' for details.
+(defun imp--test-load-parse (caller path:current-dir plist-symbol-name plist)
+  "Parses `imp/test-load' args. See `imp/test-load' for details.
 
-CALLER should be \"imp:test:load\".
+CALLER should be \"imp/test-load\".
 
-PATH:CURRENT-DIR should be the return value of `(imp:path:current:dir)',
+PATH:CURRENT-DIR should be the return value of `(imp/path-current-dir)',
 executed in the context of the file calling CALLER.
   - That is, CALLER is probably a macro.
 
@@ -68,7 +68,7 @@ Returns a plist:
         out:feature/post
         (out:error t))
 
-    (int<imp>:debug caller
+    (imp--debug caller
                     '("inputs:\n"
                       "caller:            %S\n"
                       "path:current-dir:  %S\n"
@@ -84,7 +84,7 @@ Returns a plist:
     ;; Validate PLIST.
     ;;------------------------------
     (unless (= 0 (% (length plist) 2))
-      (int<imp>:error caller
+      (imp--error caller
                       '("Malformed %s plist! "
                         "PLIST must have pairs of keywords & values, "
                         "so expecting a length that's a multiple of 2. "
@@ -99,7 +99,7 @@ Returns a plist:
     ;; Dismantle PLIST itself as we parse.
     (while (and plist
                 (not parsing:done))
-      (int<imp>:debug caller
+      (imp--debug caller
                       '("\n"
                         "parse plist:\n"
                         "%s")
@@ -107,12 +107,12 @@ Returns a plist:
 
       (let ((key   (car plist))
             (value (cadr plist)))
-        (int<imp>:debug caller
+        (imp--debug caller
                         '("\n"
                           "    key:   %S\n"
                           "    value: %S")
                         key value)
-        (int<imp>:debug caller
+        (imp--debug caller
                         "Valid keys are `%S'; is `%S' a valid key? %S"
                         keys:valid
                         key
@@ -122,20 +122,20 @@ Returns a plist:
         ;; Sanity checks:
         ;;---
         (unless (keywordp key)
-          (int<imp>:error caller
+          (imp--error caller
                           '("Malformed %s plist! "
                             "Parsing plist expected a keyword but got: %S")
                           plist-symbol-name
                           key))
         (unless (memq key keys:valid)
-          (int<imp>:error caller
+          (imp--error caller
                           '("Unknown keyword %S in %s plist! "
                             "Valid keywords are: %S")
                           key
                           plist-symbol-name
                           keys:valid))
         (when (memq key keys:parsed)
-          (int<imp>:error caller
+          (imp--error caller
                           '("Duplicate key `%S' in %s plist! "
                             "Already have `%S' value: %S")
                           key
@@ -149,7 +149,7 @@ Returns a plist:
                                  feature)
                                 ((eq key :error)
                                  error))))
-        (int<imp>:debug caller
+        (imp--debug caller
                         '("Passed sanity checks:\n"
 
                           "    key:   %S\n"
@@ -172,10 +172,10 @@ Returns a plist:
                (setq in:filename value))
               ((eq key :feature:pre)
                ;; Allow FEATURE:PRE to be a single thing, a flat list, or a list that needs flattened...
-               (setq in:feature/pre (int<imp>:list:flatten value)))
+               (setq in:feature/pre (imp--list-flatten value)))
               ((eq key :feature:post)
                ;; Allow FEATURE:POST to be a single thing, a flat list, or a list that needs flattened...
-               (setq in:feature/post (int<imp>:list:flatten value)))
+               (setq in:feature/post (imp--list-flatten value)))
               ((eq key :error)
                (setq in:error value)))))
 
@@ -185,7 +185,7 @@ Returns a plist:
 
     (unless (or (memq :path keys:parsed)
                 (memq :filename keys:parsed))
-      (int<imp>:error caller
+      (imp--error caller
                       '("No file inputs? "
                         "Either `:path', `:filename', or both are required in plist "
                         "`%s': %S")
@@ -198,38 +198,38 @@ Returns a plist:
     ;;---
     ;; Process FEATURE:PRE and FEATURE:POST.
     ;;---
-    (int<imp>:debug caller
+    (imp--debug caller
                     "Normalize `feature:pre'...")
     (when in:feature/pre
       (condition-case-unless-debug err
-          (if (eq :imp:dne (car in:feature/pre))
-              ;; Don't let `:imp:dne' get normalized to `:impdne'.
-              (setq out:feature/pre (list :imp:dne
-                                          (int<imp>:feature:normalize (cdr in:feature/pre))))
+          (if (eq :imp/dne (car in:feature/pre))
+              ;; Don't let `:imp/dne' get normalized to `:impdne'.
+              (setq out:feature/pre (list :imp/dne
+                                          (imp--feature-normalize (cdr in:feature/pre))))
             ;; Normalize to a list.
-            (setq out:feature/pre (int<imp>:feature:normalize in:feature/pre)))
+            (setq out:feature/pre (imp--feature-normalize in:feature/pre)))
 
         ;; Handlers:
-        ((error user-error) (int<imp>:error caller
+        ((error user-error) (imp--error caller
                                             "Failed to normalize `:feature:pre': %S"
                                             (cdr err))))
-      (int<imp>:debug caller "out:feature/pre: %S" out:feature/pre))
-    (int<imp>:debug caller
+      (imp--debug caller "out:feature/pre: %S" out:feature/pre))
+    (imp--debug caller
                     "Normalize `feature:post'...")
     (when in:feature/post
       (condition-case-unless-debug err
-          (if (eq :imp:dne (car in:feature/post))
-              ;; Don't let `:imp:dne' get normalized to `:impdne'.
-              (setq out:feature/post (list :imp:dne
-                                           (int<imp>:feature:normalize (cdr in:feature/post))))
+          (if (eq :imp/dne (car in:feature/post))
+              ;; Don't let `:imp/dne' get normalized to `:impdne'.
+              (setq out:feature/post (list :imp/dne
+                                           (imp--feature-normalize (cdr in:feature/post))))
             ;; Normalize to a list.
-            (setq out:feature/post (int<imp>:feature:normalize in:feature/post)))
+            (setq out:feature/post (imp--feature-normalize in:feature/post)))
 
         ;; Handlers:
-        ((error user-error) (int<imp>:error caller
+        ((error user-error) (imp--error caller
                                             "Failed to normalize `:feature:post': %S"
                                             (cdr err))))
-      (int<imp>:debug caller "out:feature/post: %S" out:feature/post))
+      (imp--debug caller "out:feature/post: %S" out:feature/post))
 
     ;;---
     ;; Process PATH & FILENAME into single output path.
@@ -246,10 +246,10 @@ Returns a plist:
     ;;---
     ;; Prefer provided path, then look for the root, then use `path:current-dir'.
     (let ((path (or in:path
-                    (int<imp>:path:root/dir (nth 0 out:feature/post) :no-error)
+                    (imp--path-root-dir (nth 0 out:feature/post) :no-error)
                     path:current-dir)))
       (unless (stringp path)
-        (int<imp>:error caller
+        (imp--error caller
                         '("Could not determine a path to look for filename: '%s' "
                           "PATH and current directory are not strings. path: %S, current-dir: %S")
                         in:filename
@@ -261,7 +261,7 @@ Returns a plist:
     ;; 2) Finalize output path, using PATH if FILENAME is a relative path.
     ;;---
     (setq out:path (expand-file-name in:filename in:path))
-    (int<imp>:debug caller "out:path:    %S" out:path)
+    (imp--debug caller "out:path:    %S" out:path)
 
     ;;---
     ;; ERROR
@@ -271,11 +271,11 @@ Returns a plist:
     ;;   - So we need to know if that key was encountered.
     (if (not (memq :error keys:parsed))
         ;; Not encountered; leave as the default.
-        (int<imp>:debug caller "out:error:   %S (default)" out:error)
+        (imp--debug caller "out:error:   %S (default)" out:error)
 
       ;; Parsed explicitly - set exactly.
       (setq out:error (not (null in:error)))
-      (int<imp>:debug caller "out:error:   %S (parsed)" out:error))
+      (imp--debug caller "out:error:   %S (parsed)" out:error))
 
     ;;------------------------------
     ;; Return:
@@ -284,7 +284,7 @@ Returns a plist:
           :feature:pre  out:feature/pre
           :feature:post out:feature/post
           :error        out:error)))
-;; (let ((load-args-plist '(:feature:pre (:imp:dne (:foo bar))
+;; (let ((load-args-plist '(:feature:pre (:imp/dne (:foo bar))
 ;;                          :feature:post (:foo bar)
 ;;                          :path "init.el"
 ;;                          ;; :path
@@ -292,13 +292,13 @@ Returns a plist:
 ;;                          ;; :error nil
 ;;                          )))
 ;;   ;; (message "%S" load-args-plist))
-;;   (int<imp>:test/load:parse "imp:test:load"
-;;                             (imp:path:current:dir)
+;;   (imp--test-load-parse "imp/test-load"
+;;                             (imp/path-current-dir)
 ;;                             (upcase "load-args-plist")
 ;;                             load-args-plist))
 
 
-(defun int<imp>:test/load:verify:feature (caller pre/post feature:pre feature:post path error?)
+(defun imp--test-load-verify-feature (caller pre/post feature:pre feature:post path error?)
   "Verify conditions for either FEATURE:PRE or FEATURE:POST.
 
 Verifies FEATURE:PRE if PRE/POST is `:feature:pre'.
@@ -310,7 +310,7 @@ Raises error signal or returns error string, based on ERROR? value."
                               ((eq :feature:post pre/post)
                                feature:post)
                               (t
-                               (int<imp>:error "int<imp>:test/load:verify:feature"
+                               (imp--error "imp--test-load-verify-feature"
                                  "Bad value for PRE/POST: %S"
                                  pre/post))))
          error-encountered)
@@ -324,12 +324,12 @@ Raises error signal or returns error string, based on ERROR? value."
           ;;---
           ;;"Does Not Exist" Check
           ;;---
-          ((eq :imp:dne (nth 0 feature:verify))
+          ((eq :imp/dne (nth 0 feature:verify))
            (let ((feature (nth 1 feature:verify)))
-             (when (imp:provided? feature)
+             (when (imp/provided? feature)
                (if error?
-                   (int<imp>:error caller
-                                   '("`%S' of `%S' is defined but `:imp:dne' suggests it should not be!\n"
+                   (imp--error caller
+                                   '("`%S' of `%S' is defined but `:imp/dne' suggests it should not be!\n"
                                      "  feature:pre:  %S\n"
                                      "  feature:post: %S\n"
                                      "  path:         %S")
@@ -338,7 +338,7 @@ Raises error signal or returns error string, based on ERROR? value."
                                    feature:pre
                                    feature:post
                                    path)
-                 (setq error-encountered (format (concat "`%S' of `%S' is defined but `:imp:dne'"
+                 (setq error-encountered (format (concat "`%S' of `%S' is defined but `:imp/dne'"
                                                          "suggests it should not be!\n"
                                                          "  feature:pre:   %S\n"
                                                          "  feature:post:  %S\n"
@@ -353,9 +353,9 @@ Raises error signal or returns error string, based on ERROR? value."
           ;; "_DOES_ Exist" Check
           ;;---
           (t
-           (unless (imp:provided? feature:verify)
+           (unless (imp/provided? feature:verify)
              (if error?
-                 (int<imp>:error caller
+                 (imp--error caller
                                  '("`%S' of `%S' should exist, but it is not a feature!\n"
                                    "  feature:pre:  %S\n"
                                    "  feature:post: %S\n"
@@ -386,8 +386,8 @@ Raises error signal or returns error string, based on ERROR? value."
 ;; Test Load API
 ;;------------------------------------------------------------------------------
 
-;; Based off of the `imp:load' macro.
-(defmacro imp:test:load (&rest load-args-plist)
+;; Based off of the `imp/load' macro.
+(defmacro imp/test-load (&rest load-args-plist)
   "Load a file relative to the current executing file (`load-file-name').
 
 LOAD-ARGS-PLIST is a plist of load args:
@@ -428,20 +428,20 @@ and symbols.
     - `feature:post': after the file is loaded.
 
 To make sure a feature doesn't exist and then does exist after the load, start
-the `:feature:pre' list with the keyword `:imp:dne' (does not exist).
+the `:feature:pre' list with the keyword `:imp/dne' (does not exist).
   Example 1:
-    (imp:test:load
+    (imp/test-load
      [...]
-     :feature:pre '(:imp:dne (:imp load))
+     :feature:pre '(:imp/dne (:imp load))
      :feature:post '(:imp load))
   Example 2:
-    (imp:test:load
+    (imp/test-load
      [...]
-     :feature:pre '(:imp:dne :imp load)
+     :feature:pre '(:imp/dne :imp load)
      :feature:post '(:imp load))
 
 Or you can just use `:feature:pre' as a check for a different prerequisite
-feature. (Or that a different feature does /not/ exist via `:imp:dne'.)
+feature. (Or that a different feature does /not/ exist via `:imp/dne'.)
 
 `:error' value (aka ERROR) can be:
   - nil
@@ -454,15 +454,15 @@ It will still raise an error if:
   - It cannot determine where to /look/ for the file.
 
 Always loads the file."
-  (let ((macro:path:current-dir (imp:path:current:dir)))
-    `(let* ((macro:func/name "imp:test:load")
-            (macro:parsed (int<imp>:test/load:parse macro:func/name
+  (let ((macro:path:current-dir (imp/path-current-dir)))
+    `(let* ((macro:func/name "imp/test-load")
+            (macro:parsed (imp--test-load-parse macro:func/name
                                                     ,macro:path:current-dir
                                                     (upcase "load-args-plist")
                                                     (list ,@load-args-plist)))
             (macro:path          (plist-get macro:parsed :path))
-            (macro:path:filename (int<imp>:path:filename macro:path))
-            (macro:path:parent   (imp:path:parent        macro:path))
+            (macro:path:filename (imp--path-filename macro:path))
+            (macro:path:parent   (imp/path-parent        macro:path))
             (macro:feature:pre   (plist-get macro:parsed :feature:pre))
             (macro:feature:post  (plist-get macro:parsed :feature:post))
             ;; Invert for `load' parameter NO-ERROR.
@@ -471,7 +471,7 @@ Always loads the file."
             file-name-handler-alist
             error-encountered
             load-result)
-       (int<imp>:debug macro:func/name
+       (imp--debug macro:func/name
                        '("parsed:\n"
                          "  path: %s\n"
                          "    -> dir:     %s\n"
@@ -489,7 +489,7 @@ Always loads the file."
        ;;------------------------------
        ;; Feature Prereqs Check
        ;;------------------------------
-       (setq error-encountered (int<imp>:test/load:verify:feature macro:func/name
+       (setq error-encountered (imp--test-load-verify-feature macro:func/name
                                                                   :feature:pre
                                                                   macro:feature:pre
                                                                   macro:feature:post
@@ -500,7 +500,7 @@ Always loads the file."
            (progn
              ;; Best we can do is debug? Or message maybe?
              ;; Try debug.
-             (int<imp>:debug macro:func/name
+             (imp--debug macro:func/name
                              "Error during feature prereqs check:\n%s"
                              error-encountered)
              ;; Return nil for errors.
@@ -510,7 +510,7 @@ Always loads the file."
          ;; Always Load!
          ;;------------------------------
          ;; Load w/ timing info if desired.
-         (imp:timing
+         (imp/timing
              macro:feature:post
              macro:path:filename
              macro:path:parent
@@ -522,7 +522,7 @@ Always loads the file."
          ;;------------------------------
          ;; Feature Postreqs Check
          ;;------------------------------
-         (setq error-encountered (int<imp>:test/load:verify:feature macro:func/name
+         (setq error-encountered (imp--test-load-verify-feature macro:func/name
                                                                     :feature:post
                                                                     macro:feature:pre
                                                                     macro:feature:post
@@ -532,7 +532,7 @@ Always loads the file."
              (progn
                ;; Best we can do is debug? Or message maybe?
                ;; Try debug.
-               (int<imp>:debug macro:func/name
+               (imp--debug macro:func/name
                                "Error during feature postreq check:\n%s"
                                error-encountered)
                ;; Return nil for errors.
