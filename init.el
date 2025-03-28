@@ -137,6 +137,35 @@
 ;; PRIORITY: Everything: Emacs Settings
 ;;------------------------------------------------------------------------------
 
+(defvar --/tab/standard 4 "4")
+
+;; Set Emacs' standard to our's.
+(customize-set-variable 'standard-indent --/tab/standard)
+
+;; Long would be... 8, I think? But that's ridiculous and I don't like it so
+;; it's not here until it's needed.
+
+
+;;------------------------------
+;; Tab Settings
+;;------------------------------
+;; https://www.emacswiki.org/emacs/NoTabs
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Just-Spaces.html
+;; https://www.emacswiki.org/emacs/TabsAreEvil
+;; https://www.emacswiki.org/emacs/SmartTabs
+
+;; Always use spaces; never use tabs.
+(customize-set-variable 'indent-tabs-mode nil)
+
+;; Set default tab width for all buffers.
+(customize-set-variable 'tab-width --/tab/standard)
+
+;; Make sure this is at it's default of nil, because:
+;;   "A value of nil means a tab stop every `tab-width' columns."
+(customize-set-variable 'tab-stop-list nil)
+
+;; NOTE: M-x tabify and M-x untabify exist and work on regions.
+
 
 
 ;;------------------------------------------------------------------------------
