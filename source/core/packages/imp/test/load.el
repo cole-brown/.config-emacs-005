@@ -46,7 +46,7 @@
 ;;------------------------------
 ;; imp--load-file
 ;;------------------------------
-;; Is just a wrapper around `load'; testing other `:imp/load' functions will test
+;; Is just a wrapper around `load'; testing other `:imp-load' functions will test
 ;; this fine (until we encounter a bug in this function, I guess).
 
 
@@ -54,13 +54,13 @@
 ;; imp--load-paths
 ;;------------------------------
 
-(ert-deftest test<imp/load>::imp--load-paths ()
+(ert-deftest test<imp-load>::imp--load-paths ()
   "Test that `imp--load-paths' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/load>::imp--load-paths"
+      "test<imp-load>::imp--load-paths"
       nil
       nil
 
@@ -79,7 +79,7 @@
     ;;---
     ;; +Supply a root:+
     ;;---
-    ;; `imp--load-path' doesn't care about features or `imp/path-roots';
+    ;; `imp--load-path' doesn't care about features or `imp-path-roots';
     ;; everything is supplied in the params.
 
     ;;---
@@ -87,7 +87,7 @@
     ;;---
     ;; Unlike `imp--load-feature', `imp--load-paths' does not care about
     ;; provided features and will load regardless, and we'll test for that.
-    (imp/provide test<imp>:feature:loading:dont-load)
+    (imp-provide test<imp>:feature:loading:dont-load)
 
     ;;---
     ;; Set up variables:
@@ -104,7 +104,7 @@
     ;; If feature is alredy provided, I don't care - load it again.
     ;;---
     (should-not test<imp>:loading:dont-load:loaded)
-    (should (file-exists-p (imp/path-join test<imp>:path:root:loading
+    (should (file-exists-p (imp-path-join test<imp>:path:root:loading
                                           (concat test<imp>:file:loading:dont-load ".el"))))
     ;; Call `imp--load-paths on it's feature; should now be be loaded.
     (should (imp--load-paths test<imp>:feature:loading:dont-load
@@ -129,7 +129,7 @@
     ;; Can't find the file to load.
     ;;---
     (should-error test<imp>:loading:load:doesnt-exist)
-    (should-not (file-exists-p (imp/path-join test<imp>:path:root:loading
+    (should-not (file-exists-p (imp-path-join test<imp>:path:root:loading
                                               test<imp>:file:loading:doesnt-exist)))
     (should-error (imp--load-paths test<imp>:feature:loading:load
                                        test<imp>:path:root:loading
@@ -141,13 +141,13 @@
 ;; imp--load-feature
 ;;------------------------------
 
-(ert-deftest test<imp/load>::imp--load-feature ()
+(ert-deftest test<imp-load>::imp--load-feature ()
   "Test that `imp--load-feature' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/load>::imp--load-feature"
+      "test<imp-load>::imp--load-feature"
       nil
       nil
 
@@ -172,20 +172,20 @@
     ;;---
     ;; Supply feature paths:
     ;;---
-    (should-not imp/features-locate)
-    (should (imp--load-file (imp/path-join test<imp>:path:root:loading
-                                               imp/path-filename-features)))
-    (should imp/features-locate)
+    (should-not imp-features-locate)
+    (should (imp--load-file (imp-path-join test<imp>:path:root:loading
+                                               imp-path-filename-features)))
+    (should imp-features-locate)
 
     ;;---
     ;; Load a feature:
     ;;---
     ;; For testing that nothing happens when it's already loaded.
-    (should imp/features)
+    (should imp-features)
     (should test<imp>:loading:features:loaded)
     ;; Clear out loaded flag so we can check.
     (setq test<imp>:loading:features:loaded nil)
-    (should (imp/provided? test<imp>:feature:loading:features))
+    (should (imp-provided? test<imp>:feature:loading:features))
     ;; Should return `t' but not actually load the file.
     (should (imp--load-feature test<imp>:feature:loading:features))
     (should-not test<imp>:loading:features:loaded)
@@ -205,7 +205,7 @@
     ;; If feature is alredy loaded, nothing should happen.
     ;;---
     ;; Pretend we've loaded it.
-    (imp/provide test<imp>:feature:loading:dont-load)
+    (imp-provide test<imp>:feature:loading:dont-load)
     (should-not test<imp>:loading:dont-load:loaded)
     ;; Call `imp--load-feature on it's feature; shouldn't be loaded since we've "loaded" it already.
     (should (imp--load-feature test<imp>:feature:loading:dont-load))
@@ -241,14 +241,14 @@
     (should-error (imp--load-feature (list test<imp>:feature:loading :unknown-feature)))))
 
 
-(ert-deftest test<imp/load>::imp--load-feature--find-features ()
+(ert-deftest test<imp-load>::imp--load-feature--find-features ()
   "Test that `imp--load-feature' behaves appropriately and can
 find/load 'imp-features.el'."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/load>::imp--load-feature"
+      "test<imp-load>::imp--load-feature"
       nil
       nil
 
@@ -280,22 +280,22 @@ find/load 'imp-features.el'."
     ;;---
     ;; Do _NOT_ supply feature paths:
     ;;---
-    (should-not imp/features-locate)
-    ;; (should (imp--load-file (imp/path-join test<imp>:path:root:loading
-    ;;                                            imp/path-filename-features)))
-    ;; (should imp/features-locate)
+    (should-not imp-features-locate)
+    ;; (should (imp--load-file (imp-path-join test<imp>:path:root:loading
+    ;;                                            imp-path-filename-features)))
+    ;; (should imp-features-locate)
 
     ;; But do make sure the expected file is present.
-    (should (file-exists-p (imp/path-join test<imp>:path:root:loading
-                                          imp/path-filename-features)))
+    (should (file-exists-p (imp-path-join test<imp>:path:root:loading
+                                          imp-path-filename-features)))
 
     ;;---
     ;; Load a feature:
     ;;---
-    (should-not imp/features)
+    (should-not imp-features)
     ;; These shouldn't be defined since we haven't loaded anything at all yet.
     (should-error test<imp>:loading:features:loaded)
-    (should-not (imp/provided? test<imp>:feature:loading:features))
+    (should-not (imp-provided? test<imp>:feature:loading:features))
 
     ;; Don't want to test that it can load the features file directly.
     ;; Test that it will load it while trying to load an actual feature.
@@ -334,7 +334,7 @@ find/load 'imp-features.el'."
 ;;---
 ;; Test Helper:
 ;;---
-(defun test<imp/load>::helper::imp--load-parse (test-name marker-name in expected)
+(defun test<imp-load>::helper::imp--load-parse (test-name marker-name in expected)
   "Helper for testing `imp--load-parse'.
 
 MARKER-NAME should be a string for marking this sub-test.
@@ -373,7 +373,7 @@ EXPECTED should be a plist with keys:
          (out:supplied:path    (plist-get expected :path))
          (out:expected:path    (if (file-name-absolute-p out:supplied:path) ;; Always should be an absolute path.
                                    out:supplied:path
-                                 (imp/path-join path:current-dir out:supplied:path)))
+                                 (imp-path-join path:current-dir out:supplied:path)))
          (out:expected:error   (if (memq :error in:plist) ;; `in:error' if provided, else default is `t'.
                                    in:error
                                  t))
@@ -441,7 +441,7 @@ EXPECTED should be a plist with keys:
 
          (t
           (should-not
-           (format (concat "test<imp/load>::helper::imp--load-parse-"
+           (format (concat "test<imp-load>::helper::imp--load-parse-"
                            "unknown input key: %S")
                    key)))))
 
@@ -487,13 +487,13 @@ EXPECTED should be a plist with keys:
 ;; Tests:
 ;;---
 
-(ert-deftest test<imp/load>::imp--load-parse ()
+(ert-deftest test<imp-load>::imp--load-parse ()
   "Test that `imp--load-parse' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/load>::imp--load-parse"
+      "test<imp-load>::imp--load-parse"
       nil
       nil
 
@@ -507,7 +507,7 @@ EXPECTED should be a plist with keys:
     ;; Supply all.
     ;;   `:filename' nil
     ;;   `:error'    nil
-    (test<imp/load>::helper::imp--load-parse
+    (test<imp-load>::helper::imp--load-parse
         test-name
         "filename-nil-and-error-nil"
       ;; Inputs:
@@ -523,7 +523,7 @@ EXPECTED should be a plist with keys:
 
     ;; Supply all.
     ;;   `:error'    nil
-    (test<imp/load>::helper::imp--load-parse
+    (test<imp-load>::helper::imp--load-parse
         test-name
         "error-nil"
       ;; Inputs:
@@ -538,7 +538,7 @@ EXPECTED should be a plist with keys:
             ))
 
     ;; Do not supply `:error'.
-    (test<imp/load>::helper::imp--load-parse
+    (test<imp-load>::helper::imp--load-parse
         test-name
         "error-dne"
       ;; Inputs:
@@ -596,16 +596,16 @@ EXPECTED should be a plist with keys:
 
 
 ;;------------------------------
-;; imp/load
+;; imp-load
 ;;------------------------------
 
-(ert-deftest test<imp/load>::imp/load ()
-  "Test that `imp/load' behaves appropriately."
+(ert-deftest test<imp-load>::imp-load ()
+  "Test that `imp-load' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/load>::imp/load"
+      "test<imp-load>::imp-load"
       nil
       nil
 
@@ -624,13 +624,13 @@ EXPECTED should be a plist with keys:
     ;;---
     ;; +Supply a root:+
     ;;---
-    ;; `imp/load' doesn't care about `imp/path-roots'.
+    ;; `imp-load' doesn't care about `imp-path-roots'.
 
     ;;---
     ;; Load a feature:
     ;;---
-    ;; `imp/load' will not load again if already provided.
-    (imp/provide test<imp>:feature:loading:dont-load)
+    ;; `imp-load' will not load again if already provided.
+    (imp-provide test<imp>:feature:loading:dont-load)
 
     ;;---
     ;; Set up variables:
@@ -648,10 +648,10 @@ EXPECTED should be a plist with keys:
     ;;---
     (let (result)
       (should-not test<imp>:loading:dont-load:loaded)
-      (should (file-exists-p (imp/path-join test<imp>:path:root:loading
+      (should (file-exists-p (imp-path-join test<imp>:path:root:loading
                                             (concat test<imp>:file:loading:dont-load ".el"))))
-      ;; Call `imp/load on it's feature...
-      (setq result (imp/load :feature  test<imp>:feature:loading:dont-load
+      ;; Call `imp-load on it's feature...
+      (setq result (imp-load :feature  test<imp>:feature:loading:dont-load
                              :path     test<imp>:path:root:loading
                              :filename test<imp>:file:loading:dont-load
                              :error    nil))
@@ -664,10 +664,10 @@ EXPECTED should be a plist with keys:
     ;;---
     (let (result)
       (should-not test<imp>:loading:dont-load:loaded)
-      (should (file-exists-p (imp/path-join test<imp>:path:root:loading
+      (should (file-exists-p (imp-path-join test<imp>:path:root:loading
                                             (concat test<imp>:file:loading:dont-load ".el"))))
-      ;; Call `imp/load on it's feature... with `:skip nil' this time.
-      (setq result (imp/load :feature  test<imp>:feature:loading:dont-load
+      ;; Call `imp-load on it's feature... with `:skip nil' this time.
+      (setq result (imp-load :feature  test<imp>:feature:loading:dont-load
                              :path     test<imp>:path:root:loading
                              :filename test<imp>:file:loading:dont-load
                              :error    nil
@@ -681,8 +681,8 @@ EXPECTED should be a plist with keys:
     ;;---
     (let (result)
       (should-not test<imp>:loading:load:loaded)
-      ;; Call `imp/load on it's feature...
-      (setq result (imp/load :feature  test<imp>:feature:loading:load
+      ;; Call `imp-load on it's feature...
+      (setq result (imp-load :feature  test<imp>:feature:loading:load
                              :path     test<imp>:path:root:loading
                              :filename test<imp>:file:loading:load
                              :error    nil))
@@ -694,14 +694,14 @@ EXPECTED should be a plist with keys:
     ;; Errors:
     ;;------------------------------
     ;; Expecting wrong feature.
-    (should-not (eval (imp/load :feature  test<imp>:feature:loading:doesnt-exist
+    (should-not (eval (imp-load :feature  test<imp>:feature:loading:doesnt-exist
                                 :path     test<imp>:path:root:loading
                                 :filename test<imp>:file:loading:load
                                 :error    nil)))
-    (should-error (eval (imp/load :feature  test<imp>:feature:loading:doesnt-exist
+    (should-error (eval (imp-load :feature  test<imp>:feature:loading:doesnt-exist
                                   :path     test<imp>:path:root:loading
                                   :filename test<imp>:file:loading:load
                                   :error    t)))
-    (should-error (eval (imp/load :feature  test<imp>:feature:loading:doesnt-exist
+    (should-error (eval (imp-load :feature  test<imp>:feature:loading:doesnt-exist
                                   :path     test<imp>:path:root:loading
                                   :filename test<imp>:file:loading:load)))))

@@ -21,7 +21,7 @@
 ;;                                 ──────────
 ;;
 ;; Require from just Emacs: `require'
-;; Require from just imp:   `imp/require'
+;; Require from just imp:   `imp-require'
 ;;
 ;;; Code:
 
@@ -30,13 +30,13 @@
 ;; Public API: Require
 ;;------------------------------------------------------------------------------
 
-(defun imp/require (&rest feature)
+(defun imp-require (&rest feature)
   "Ensures file(s) for FEATURE:BASE keyword & FEATURE symbols are provided.
 
 Returns non-nil on success."
   (let ((feature:normal (imp--feature-normalize feature)))
     ;; Already provided?
-    (cond ((imp/feature? feature:normal)
+    (cond ((imp-feature? feature:normal)
            t)
 
           ;; Can we load it?
@@ -48,8 +48,8 @@ Returns non-nil on success."
                ;; info.
                (error
                 ;; TODO: Why does `imp--error' work in 'early-init.el' (w/ --debug-init) where `imp--error-user' doesn't? :(
-                ;; (imp--error-user "imp/require"
-                (imp--error "imp/require"
+                ;; (imp--error-user "imp-require"
+                (imp--error "imp-require"
                                 '("Failed to find/load required feature: \n"
                                   "  input feature: %S\n"
                                   "  normalized:    %S\n"
@@ -69,20 +69,20 @@ Returns non-nil on success."
           ;; Nope; return nil.
           (t
            nil))))
-;; (imp/require 'test 'this)
+;; (imp-require 'test 'this)
 
 
-;; TODO: I want to have a plist version of `imp/require' that works like `imp/load':
-;;   (imp/require-foo :feature '(foo bar) :error nil ...)
+;; TODO: I want to have a plist version of `imp-require' that works like `imp-load':
+;;   (imp-require-foo :feature '(foo bar) :error nil ...)
 ;; But I don't know what to call it, and I don't think I want to replace
-;; `imp/require' since it's what I want in 99% of the cases.
+;; `imp-require' since it's what I want in 99% of the cases.
 ;;
-;; So... What is a good name for `imp/require-but-with-a-plist'?
+;; So... What is a good name for `imp-require-but-with-a-plist'?
 ;;
-;; "eval.el" uses `ignore-error' currently to ignore `imp/require' user-errors.
+;; "eval.el" uses `ignore-error' currently to ignore `imp-require' user-errors.
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp/provide-with-emacs :imp 'require)
+(imp-provide-with-emacs :imp 'require)

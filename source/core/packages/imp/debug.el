@@ -41,7 +41,7 @@
   "Debug flag boolean.")
 
 
-(defun imp/debug (enabled?)
+(defun imp-debug (enabled?)
   "Set imp debugging flag.
 
 Turns on debugging if ENABLED? is non-nil.
@@ -49,16 +49,16 @@ Turns off debugging if ENABLED? is nil."
   (setq imp--debugging? (not (null enabled?))))
 
 
-(defun imp/debug-toggle ()
+(defun imp-debug-toggle ()
   "Toggle debugging for imp."
   (interactive)
   (setq imp--debugging? (not imp--debugging?))
-  (imp/debug-status (if imp--debugging?
+  (imp-debug-status (if imp--debugging?
                         "Enabled debug flag."
                       "Disabled debug flag.")))
 
 
-(defun imp/debug-status (&optional msg)
+(defun imp-debug-status (&optional msg)
   "Print debugging status for imp.
 
 If MSG is non-nil, it is output just before the status but in the same
@@ -94,7 +94,7 @@ If MSG is non-nil, it is output just before the status but in the same
                         status
                         "\n")
              ;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
-             ;; "debug.el" is loaded before "flag.el" so can't use `imp/flag?' here.
+             ;; "debug.el" is loaded before "flag.el" so can't use `imp-flag?' here.
              (if (and (fboundp 'featurep!)
                       (featurep! +debug))
                  "[FEATURE]"
@@ -105,8 +105,8 @@ If MSG is non-nil, it is output just before the status but in the same
              (if (imp--debug-enabled?)
                  "[ENABLED]"
                "[disabled]"))))
-;; (imp/debug-status)
-;; (imp/debug-status "Toggled a bit via solar radiation.")
+;; (imp-debug-status)
+;; (imp-debug-status "Toggled a bit via solar radiation.")
 
 
 ;;------------------------------------------------------------------------------
@@ -182,7 +182,7 @@ Flags:
   (cond
    ;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
    ;; The `+debug' flag in the `doom!' macro in user's "<doom-dir>/init.el".
-   ;; "debug.el" is loaded before "flag.el" so can't use `imp/flag?' here.
+   ;; "debug.el" is loaded before "flag.el" so can't use `imp-flag?' here.
    ((and (fboundp 'featurep!)
          (featurep! +debug))
     t)

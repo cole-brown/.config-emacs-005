@@ -35,10 +35,10 @@
 ;; Test Debugging Helpers
 ;;------------------------------------------------------------------------------
 
-(defun test<imp/provide>:setup:features ()
-  "Manually set `imp/features' so we can test getting things out of it."
+(defun test<imp-provide>:setup:features ()
+  "Manually set `imp-features' so we can test getting things out of it."
   ;; Add in a few defaults.
-  (setq imp/features '((:test
+  (setq imp-features '((:test
                         (one
                          (two)))
                        (:foo nil
@@ -48,7 +48,7 @@
                         (there)))))
 
 
-(defun test<imp/provide>:load:exists? ()
+(defun test<imp-provide>:load:exists? ()
   "Returns t if `test<imp>:file:loading?' exists in the symbol table."
   (condition-case err
       (progn
@@ -70,11 +70,11 @@
 ;; Set-Up / Tear-Down
 ;;------------------------------
 
-(defun test<imp/provide>:setup:load (&optional load)
+(defun test<imp-provide>:setup:load (&optional load)
   "Deletes `test<imp>:file:loading?' variable if it exists.
 
 If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
-`imp/provide-loading?' helpers."
+`imp-provide-loading?' helpers."
   ;; Make sure `test<imp>:file:loading?' doesn't exist.
   ;; We may or may not have loaded the file so we can't rely on its functions, so:
   (makunbound 'test<imp>:file:loading?)
@@ -95,16 +95,16 @@ If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; imp/provide-loading?
+;; imp-provide-loading?
 ;;------------------------------
 
-(ert-deftest test<imp/provide>::imp/provide-loading? ()
-  "Test that `imp/provide-loading?' behaves appropriately."
+(ert-deftest test<imp-provide>::imp-provide-loading? ()
+  "Test that `imp-provide-loading?' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/provide>::imp/provide-loading?"
+      "test<imp-provide>::imp-provide-loading?"
       nil
       nil
 
@@ -112,30 +112,30 @@ If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
     ;; Run the test.
     ;;===
 
-    ;; Make sure we do not have a valid `test<imp/provide>:file:loading?' yet.
-    (test<imp/provide>:setup:load)
-    (should-not (test<imp/provide>:load:exists?))
+    ;; Make sure we do not have a valid `test<imp-provide>:file:loading?' yet.
+    (test<imp-provide>:setup:load)
+    (should-not (test<imp-provide>:load:exists?))
 
-    ;; Now load 'test/loading/load.el' so we can check if `imp/provide-loading?' works
+    ;; Now load 'test/loading/load.el' so we can check if `imp-provide-loading?' works
     ;; when loading a file.
-    (test<imp/provide>:setup:load :load)
-    (should (test<imp/provide>:load:exists?))
+    (test<imp-provide>:setup:load :load)
+    (should (test<imp-provide>:load:exists?))
     ;; `test<imp>:file:loading?' should have been set to `t' during its load.
     (should (eq t
                 test<imp>:file:loading?))))
 
 
 ;;------------------------------
-;; imp/provided?
+;; imp-provided?
 ;;------------------------------
 
-(ert-deftest test<imp/provide>::imp/provided? ()
-  "Test that `imp/provided?' behaves appropriately."
+(ert-deftest test<imp-provide>::imp-provided? ()
+  "Test that `imp-provided?' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/provide>::imp/provided?"
+      "test<imp-provide>::imp-provided?"
       nil
       nil
 
@@ -143,44 +143,44 @@ If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
     ;; Run the test.
     ;;===
 
-    ;; We shouldn't have any features yet in `imp/path-roots'...
-    (should-not imp/features)
+    ;; We shouldn't have any features yet in `imp-path-roots'...
+    (should-not imp-features)
     ;; Add some features.
-    (test<imp/provide>:setup:features)
-    (should imp/features)
-    (should (imp--alist-get-value :test imp/features))
-    (should (imp--alist-get-value :hello imp/features))
+    (test<imp-provide>:setup:features)
+    (should imp-features)
+    (should (imp--alist-get-value :test imp-features))
+    (should (imp--alist-get-value :hello imp-features))
 
     ;; Now test!
-    (should (imp/provided? :test))
-    (should (imp/provided? :test 'one))
-    (should-not (imp/provided? :test 'two))
-    (should (imp/provided? :test 'one 'two))
-    (should-not (imp/provided? :test 'one 'two 'three))
+    (should (imp-provided? :test))
+    (should (imp-provided? :test 'one))
+    (should-not (imp-provided? :test 'two))
+    (should (imp-provided? :test 'one 'two))
+    (should-not (imp-provided? :test 'one 'two 'three))
 
-    (should (imp/provided? :foo))
-    (should-not (imp/provided? :foo 'bar))
-    (should (imp/provided? :foo :bar))
-    (should (imp/provided? :foo :bar 'baz))
+    (should (imp-provided? :foo))
+    (should-not (imp-provided? :foo 'bar))
+    (should (imp-provided? :foo :bar))
+    (should (imp-provided? :foo :bar 'baz))
 
-    (should (imp/provided? :hello))
-    (should (imp/provided? :hello 'world))
-    (should (imp/provided? :hello 'there))
-    (should-not (imp/provided? :hello 'world 'there))
-    (should-not (imp/provided? :hello 'there 'world))))
+    (should (imp-provided? :hello))
+    (should (imp-provided? :hello 'world))
+    (should (imp-provided? :hello 'there))
+    (should-not (imp-provided? :hello 'world 'there))
+    (should-not (imp-provided? :hello 'there 'world))))
 
 
 ;;------------------------------
-;; imp/provide
+;; imp-provide
 ;;------------------------------
 
-(ert-deftest test<imp/provide>::imp/provide ()
-  "Test that `imp/provide' behaves appropriately."
+(ert-deftest test<imp-provide>::imp-provide ()
+  "Test that `imp-provide' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/provide>::imp/provide"
+      "test<imp-provide>::imp-provide"
       nil
       nil
 
@@ -188,21 +188,21 @@ If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
     ;; Run the test.
     ;;===
 
-    ;; We shouldn't have any features yet in `imp/path-roots'...
-    (should-not imp/features)
+    ;; We shouldn't have any features yet in `imp-path-roots'...
+    (should-not imp-features)
 
-    (imp/provide :test 'one 'two 'three)
-    (should (equal imp/features
+    (imp-provide :test 'one 'two 'three)
+    (should (equal imp-features
                    '((:test (one (two (three)))))))
 
-    (imp/provide :test 'one 'and 'uh 'more)
-    (should (equal imp/features
+    (imp-provide :test 'one 'and 'uh 'more)
+    (should (equal imp-features
                    '((:test (one
                              (and (uh (more)))
                              (two (three)))))))
 
-    (imp/provide :test 'one 'and 'done)
-    (should (equal imp/features
+    (imp-provide :test 'one 'and 'done)
+    (should (equal imp-features
                    '((:test (one
                              (and
                               (done)
@@ -211,13 +211,13 @@ If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
                               (three)))))))))
 
 
-(ert-deftest test<imp/provide>::imp/provide-with-emacs ()
-  "Test that `imp/provide-with-emacs' behaves appropriately."
+(ert-deftest test<imp-provide>::imp-provide-with-emacs ()
+  "Test that `imp-provide-with-emacs' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/provide>::imp/provide-with-emacs"
+      "test<imp-provide>::imp-provide-with-emacs"
       nil
       nil
 
@@ -225,14 +225,14 @@ If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
     ;; Run the test.
     ;;===
 
-    ;; We shouldn't have any features yet in `imp/path-roots'...
-    (should-not imp/features)
+    ;; We shouldn't have any features yet in `imp-path-roots'...
+    (should-not imp-features)
 
     (let* ((feature '(:test one two three))
-           (feature/emacs (imp/feature-normalize-imp->emacs feature)))
-      (imp/provide-with-emacs feature)
+           (feature/emacs (imp-feature-normalize-imp->emacs feature)))
+      (imp-provide-with-emacs feature)
       ;; Feature should have been added to `imp'.
-      (should (equal imp/features
+      (should (equal imp-features
                      '((:test (one (two (three)))))))
       ;; Feature should have been added to `emacs'.
       (should (memq feature/emacs features))
@@ -241,10 +241,10 @@ If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
       (setq features (remove feature/emacs features)))
 
     (let* ((feature '(:test one and uh more))
-           (feature/emacs (imp/feature-normalize-imp->emacs feature)))
-      (imp/provide-with-emacs feature)
+           (feature/emacs (imp-feature-normalize-imp->emacs feature)))
+      (imp-provide-with-emacs feature)
       ;; Feature should have been added to `imp'.
-      (should (equal imp/features
+      (should (equal imp-features
                    '((:test (one
                              (and (uh (more)))
                              (two (three)))))))
@@ -255,10 +255,10 @@ If LOAD is non-nil, loads 'test/loading/load.el' to set-up the
       (setq features (remove feature/emacs features)))
 
     (let* ((feature '(:test one and done))
-           (feature/emacs (imp/feature-normalize-imp->emacs feature)))
-      (imp/provide-with-emacs feature)
+           (feature/emacs (imp-feature-normalize-imp->emacs feature)))
+      (imp-provide-with-emacs feature)
       ;; Feature should have been added to `imp'.
-      (should (equal imp/features
+      (should (equal imp-features
                      '((:test (one
                                (and
                                 (done)

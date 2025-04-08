@@ -132,8 +132,8 @@ FEATURE should be a keyword.
 FLAG should be a symbol name that starts with a \"+\" or \"-\" sign.
 
 Examples:
-  (imp/flag? :numbers +random)
-  (imp/flag? :numbers -negative)
+  (imp-flag? :numbers +random)
+  (imp-flag? :numbers -negative)
 
 Returns non-nil if FEATURE has +/- FLAG flag already, nil if not.
 Specifically, returns result of:
@@ -151,15 +151,15 @@ Specifically, returns result of:
 ;; (imp--flag-exists? :foo '+bar)
 
 
-(defmacro imp/flag? (feature flag)
+(defmacro imp-flag? (feature flag)
   "Check if FEATURE has FLAG flagged.
 FEATURE should be a keyword.
 
 FLAG should be a symbol name that starts with a \"+\" or \"-\" sign.
 
 Examples:
-  (imp/flag? :numbers +random)
-  (imp/flag? :numbers -negative)
+  (imp-flag? :numbers +random)
+  (imp-flag? :numbers -negative)
 
 Checks:
   - imp feature flags
@@ -174,14 +174,14 @@ Returns non-nil if FEATURE has FLAG flag, nil if not."
       (and (fboundp #'featurep!)
            (featurep! flag))))
 ;; (setq imp--feature-flags '((:foo . (+bar))))
-;; (imp/flag? :foo +bar)
+;; (imp-flag? :foo +bar)
 
 
 ;;------------------------------------------------------------------------------
 ;; Set Flag Flags
 ;;------------------------------------------------------------------------------
 
-(defmacro imp/flag (feature &rest flag)
+(defmacro imp-flag (feature &rest flag)
   "Set FLAG flag(s) for FEATURE.
 
 FEATURE should be a keyword.
@@ -190,7 +190,7 @@ FLAG should be one or more symbol names that start with a \"+\" or \"-\"
 sign.
 
 Example:
-  (imp/flag :numbers +random -negative)
+  (imp-flag :numbers +random -negative)
     -> This sets flag flags for the `:numbers' feature/package/whatever to:
        - Include optional `random' numbers flag.
        - Exclude optional `negative' numbers flag."
@@ -198,11 +198,11 @@ Example:
   ;; Error checks...
   ;;------------------------------
   (unless (keywordp feature)
-    (error "imp/flag- FEATURE must be a keyword, got: %S"
+    (error "imp-flag- FEATURE must be a keyword, got: %S"
            feature))
 
   (unless flag
-    (error "imp/flag- `%S' must have one or more flags to add/remove, got: %S"
+    (error "imp-flag- `%S' must have one or more flags to add/remove, got: %S"
            feature
            flag))
 
@@ -219,7 +219,7 @@ Example:
        (if (imp--flag-exists? macro<imp>:feature
                                   macro<imp>:flag)
            ;; Flag is invalid; error out now.
-           (error "imp/flag- `%S' is already flagged for flag matching `%S'. Existing flags: %S"
+           (error "imp-flag- `%S' is already flagged for flag matching `%S'. Existing flags: %S"
                   macro<imp>:feature
                   macro<imp>:flag
                   (imp--alist-get-value macro<imp>:feature imp--feature-flags))
@@ -241,11 +241,11 @@ Example:
      macro<imp>:flags:update))
 ;; imp--feature-flags
 ;; ;; OK:
-;; (imp/flag :foo +bar)
+;; (imp-flag :foo +bar)
 ;; ;; Fail - already has +bar can't add -bar:
-;; (imp/flag :foo -bar)
+;; (imp-flag :foo -bar)
 ;; ;; OK: multiple flags
-;; (imp/flag :foo -baz +qux +quux)
+;; (imp-flag :foo -baz +qux +quux)
 
 
 ;;------------------------------------------------------------------------------
@@ -253,8 +253,8 @@ Example:
 ;;------------------------------------------------------------------------------
 
 (defun imp--flag-init ()
-  "Provide the imp/flag feature."
-  (imp/provide-with-emacs :imp 'flag))
+  "Provide the imp-flag feature."
+  (imp-provide-with-emacs :imp 'flag))
 
 
 ;;------------------------------------------------------------------------------

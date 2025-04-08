@@ -14,7 +14,7 @@
 ;; Set our feature locations.
 ;;------------------------------------------------------------------------------
 
-(imp/feature-at :loading
+(imp-feature-at :loading
                 '((:loading
                     "imp-features.el")
                   ((:loading features)
@@ -28,4 +28,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp/provide :loading 'features)
+(imp-provide :loading 'features)

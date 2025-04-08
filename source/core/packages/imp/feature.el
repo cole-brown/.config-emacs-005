@@ -32,8 +32,8 @@
 ;; Loaded Features Tree
 ;;------------------------------------------------------------------------------
 
-(defvar imp/features nil
-  "Features that have been loaded by `imp/provide'.
+(defvar imp-features nil
+  "Features that have been loaded by `imp-provide'.
 
 It is a tree; an alist of alists of ... ad nauseam. Provided features are the
 leaves, and their feature names should be built from the path traversed to get
@@ -72,10 +72,10 @@ For example:
         - ...
       - :pinky
         - ...")
-;; (setq imp/features nil)
+;; (setq imp-features nil)
 
 
-(defvar imp/features-locate nil
+(defvar imp-features-locate nil
   "Alist of imp features to paths/filenames.
 
 NOTE: Use `equal' for the `imp<alist>:[...]' EQUAL-FN params!
@@ -84,66 +84,66 @@ NOTE: Use `equal' for the `imp<alist>:[...]' EQUAL-FN params!
 
 Example:
   (list (list :imp \"init.el\")
-        (list (imp/feature :imp path) \"path.el\")
-        (list (imp/feature :imp multiple)
+        (list (imp-feature :imp path) \"path.el\")
+        (list (imp-feature :imp multiple)
               \"multiple/foo.el\"
               \"multiple/subdir/bar.el\"
               \"multiple/subdir/baz.el\"
               \"common/baz.el\")
         ...)")
-;; (pp imp/features-locate)
-;; (setq imp/features-locate nil)
+;; (pp imp-features-locate)
+;; (setq imp-features-locate nil)
 
 
 (defconst imp--features-locate-equal #'equal
   "Equality func to use for alists.
 
-Supply as EQUAL-FN param to all 'imp/alist.el' functions used
-by `imp/features-locate'.")
+Supply as EQUAL-FN param to all 'imp-alist.el' functions used
+by `imp-features-locate'.")
 
 
 ;;------------------------------------------------------------------------------
 ;; Feature Helpers
 ;;------------------------------------------------------------------------------
 
-(defun imp/feature-exists? (features)
-  "Check for list of FEATURES in the `imp/features' tree."
-  ;; When not `imp/features', always return `nil'.
-  (when imp/features
+(defun imp-feature-exists? (features)
+  "Check for list of FEATURES in the `imp-features' tree."
+  ;; When not `imp-features', always return `nil'.
+  (when imp-features
     (not (null (imp--tree-contains? (imp--list-flatten features)
-                                        imp/features)))))
-;; (imp/feature-exists? '(:imp))
-;; (imp/feature-exists? '(:imp provide))
-;; (imp/feature-exists? '(:imp (provide)))
+                                        imp-features)))))
+;; (imp-feature-exists? '(:imp))
+;; (imp-feature-exists? '(:imp provide))
+;; (imp-feature-exists? '(:imp (provide)))
 
 
-(defun imp/feature? (&rest feature)
+(defun imp-feature? (&rest feature)
   "Check if FEATURE is provided by 'imp' or Emacs."
-  (or (imp/feature-exists? feature)
-      (featurep (imp/feature-normalize-imp->emacs feature))))
-;; (imp/feature? 'which-key)
-;; (imp/feature? :which-key)
-;; (imp/feature? :imp)
+  (or (imp-feature-exists? feature)
+      (featurep (imp-feature-normalize-imp->emacs feature))))
+;; (imp-feature? 'which-key)
+;; (imp-feature? :which-key)
+;; (imp-feature? :imp)
 
 
-(defun imp/mode? (mode)
+(defun imp-mode? (mode)
   "Check if MODE exists and is enabled."
   ;; Can't use `bound-and-true-p' due to MODE being passed in,
   ;; so check bound and truthy separately.
   (and (boundp mode)
        (symbol-value mode)))
-;; (imp/mode? 'evil-mode)
-;; (imp/mode? 'evil-mode-jeff)
+;; (imp-mode? 'evil-mode)
+;; (imp-mode? 'evil-mode-jeff)
 
 
-(defalias 'imp/featurep 'imp/feature?)
+(defalias 'imp-featurep 'imp-feature?)
 
 
 (defun imp--feature-count (&optional tree)
   "Count features in TREE.
 
 TREE should be a list of lists and/or symbols.
-TREE should be a branch of `imp/features`.
+TREE should be a branch of `imp-features`.
 
 Return count of leaf nodes in TREE."
   (cond ((null tree) 0)
@@ -155,12 +155,12 @@ Return count of leaf nodes in TREE."
             (imp--feature-count (cdr tree))))))
 
 
-(defun imp/feature-count ()
-  "Count features in `imp/features`.
+(defun imp-feature-count ()
+  "Count features in `imp-features`.
 
 Return count of leaf nodes."
-  (imp--feature-count imp/features))
-;; (imp/feature-count)
+  (imp--feature-count imp-features))
+;; (imp-feature-count)
 
 
 
@@ -189,9 +189,9 @@ Return count of leaf nodes."
 Using lists instead of cons for alist entries because `cons' doesn't like
 strings.
 
-Used symbol-by-symbol in `imp/feature-normalize-imp->emacs' when
+Used symbol-by-symbol in `imp-feature-normalize-imp->emacs' when
 translating an imp symbol chain into one symbol for Emacs.")
-;; (imp/feature-normalize-imp->emacs :imp 'test?-xx:y::z '+!@$%^&*| 'symbols)
+;; (imp-feature-normalize-imp->emacs :imp 'test?-xx:y::z '+!@$%^&*| 'symbols)
 
 
 (defconst imp--feature-replace-separator
@@ -321,7 +321,7 @@ First symbol in output list will be a keyword; rest will be symbols.
 
 
 
-(defun imp/feature-normalize-imp->emacs (&rest feature)
+(defun imp-feature-normalize-imp->emacs (&rest feature)
   "Translate the feature to a single symbol appropriate for Emacs' `provide'.
 
 FEATURE should be:
@@ -335,21 +335,21 @@ FEATURE will be normalized, then converted into a single symbol
               (seq-filter (lambda (x) (not (imp--str-empty? x)))
                           (nreverse (imp--feature-normalize-string feature)))
               imp--feature-replace-separator)))
-;; (imp/feature-normalize-imp->emacs :imp 'test 'symbols)
-;; (imp/feature-normalize-imp->emacs '(:imp test symbols))
-;; (imp/feature-normalize-imp->emacs '(:imp test) 'symbols)
-;; (imp/feature-normalize-imp->emacs '(:imp provide))
-;; (imp/feature-normalize-imp->emacs :imp 'provide)
-;; (imp/feature-normalize-imp->emacs :imp)
-;; (imp/feature-normalize-imp->emacs '(((:imp))) '((provide)))
-;; (imp/feature-normalize-imp->emacs :imp 'test?-xx:y::z '+!@$%^&*| 'symbols)
+;; (imp-feature-normalize-imp->emacs :imp 'test 'symbols)
+;; (imp-feature-normalize-imp->emacs '(:imp test symbols))
+;; (imp-feature-normalize-imp->emacs '(:imp test) 'symbols)
+;; (imp-feature-normalize-imp->emacs '(:imp provide))
+;; (imp-feature-normalize-imp->emacs :imp 'provide)
+;; (imp-feature-normalize-imp->emacs :imp)
+;; (imp-feature-normalize-imp->emacs '(((:imp))) '((provide)))
+;; (imp-feature-normalize-imp->emacs :imp 'test?-xx:y::z '+!@$%^&*| 'symbols)
 
 
-(defun imp/feature-normalize (&rest input)
+(defun imp-feature-normalize (&rest input)
   "Normalize INPUT to feature in one of two ways.
 
 If only one INPUT param, returns a symbol/keyword.
-  - This is useful for converting strings to symbols for e.g. `imp/provide'.
+  - This is useful for converting strings to symbols for e.g. `imp-provide'.
 If more than one INPUT param, returns a list of symbol/keywords.
 
 If INPUT item is:
@@ -363,7 +363,7 @@ E.g.
   (let* ((normalized (imp--feature-normalize input)))
     ;; Return the list, the one item, or error?
     (cond ((null normalized)
-           (imp--error "imp/feature-normalize"
+           (imp--error "imp-feature-normalize"
                            "Error normalizing features from INPUT; no features produced: %S"
                            input))
 
@@ -372,21 +372,21 @@ E.g.
 
           (t
            normalized))))
-;; (imp/feature-normalize '+layout/spydez)
-;; (imp/feature-normalize :spydez)
-;; (imp/feature-normalize "spydez")
-;; (imp/feature-normalize "+spydez")
-;; (imp/feature-normalize "+spydez" "foo" "bar")
-;; (imp/feature-normalize '("+spydez" "foo" "bar"))
-;; (imp/feature-normalize :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
+;; (imp-feature-normalize '+layout/spydez)
+;; (imp-feature-normalize :spydez)
+;; (imp-feature-normalize "spydez")
+;; (imp-feature-normalize "+spydez")
+;; (imp-feature-normalize "+spydez" "foo" "bar")
+;; (imp-feature-normalize '("+spydez" "foo" "bar"))
+;; (imp-feature-normalize :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
 
-(defalias 'imp/feature 'imp/feature-normalize)
+(defalias 'imp-feature 'imp-feature-normalize)
 
 
 (defun imp--feature-normalize-display (&rest feature)
   "Normalizes FEATURE down into a single keyword with separators.
 
-Similar output to `imp/feature-normalize-imp->emacs'."
+Similar output to `imp-feature-normalize-imp->emacs'."
   ;; Prepend ":" and turn into a keyword.
   (intern (concat ":"
                   ;; Compress feature list down into a single string w/ separators.
@@ -407,50 +407,50 @@ Similar output to `imp/feature-normalize-imp->emacs'."
 ;;------------------------------------------------------------------------------
 
 (defun imp--feature-add (normalized)
-  "Add the NORMALIZED features to the `imp/features' tree.
+  "Add the NORMALIZED features to the `imp-features' tree.
 
 NORMALIZED must already be a normalized (by `imp--feature-normalize')
 list of keywords/symbols."
-  (imp--debug "imp--feature-add" "Adding to imp/features...")
+  (imp--debug "imp--feature-add" "Adding to imp-features...")
   (imp--debug "imp--feature-add" "  feature: %S" normalized)
-  ;; (imp--debug "imp--feature-add" "imp/features before:\n%s"
-  ;;                 (pp-to-string imp/features))
+  ;; (imp--debug "imp--feature-add" "imp-features before:\n%s"
+  ;;                 (pp-to-string imp-features))
 
-  ;; Add normalized features to `imp/features' tree & set updated tree back
-  ;; to `imp/features'.
-  (imp--tree-update normalized nil imp/features)
+  ;; Add normalized features to `imp-features' tree & set updated tree back
+  ;; to `imp-features'.
+  (imp--tree-update normalized nil imp-features)
 
-  (imp--debug "imp--feature-add" "imp/features after:\n%s"
-                  (pp-to-string imp/features))
+  (imp--debug "imp--feature-add" "imp-features after:\n%s"
+                  (pp-to-string imp-features))
   ;; Not sure what to return, but the updated features seems decent enough.
-  imp/features)
-;; (setq imp/features nil)
+  imp-features)
+;; (setq imp-features nil)
 ;; (imp--feature-add :imp 'test)
-;; imp/features
+;; imp-features
 ;; (imp--feature-add :imp 'ort 'something 'here)
-;; (imp--alist-get-value :imp imp/features)
-;; (imp--tree-contains? '(:imp) imp/features)
-;; (imp--tree-contains? '(:imp ort something) imp/features)
+;; (imp--alist-get-value :imp imp-features)
+;; (imp--tree-contains? '(:imp) imp-features)
+;; (imp--tree-contains? '(:imp ort something) imp-features)
 
 
 ;;------------------------------------------------------------------------------
 ;; Demand Features Exist!
 ;;------------------------------------------------------------------------------
 
-(defun imp/feature-assert (feature:base &rest feature)
+(defun imp-feature-assert (feature:base &rest feature)
   "A \"soft require\"; error if the feature is not already loaded.
 
 Normalize FEATURE:BASE and FEATURE into an imp feature
-\(via `imp/feature-normalize'), then checks if it's loaded or not.
+\(via `imp-feature-normalize'), then checks if it's loaded or not.
 
 Return normalized feature symobl if loaded.
 Raise an error signal if not found.
-Only check `imp/features' variable; does not check Emacs' `features' list."
-  (if (imp/feature-exists? (cons feature:base feature))
+Only check `imp-features' variable; does not check Emacs' `features' list."
+  (if (imp-feature-exists? (cons feature:base feature))
       t
-    (imp--error "imp/feature-assert"
+    (imp--error "imp-feature-assert"
                     "No `%S' feature exists in imp's features!"
-                    (imp/feature-normalize (list feature:base feature)))))
+                    (imp-feature-normalize (list feature:base feature)))))
 
 
 ;;------------------------------------------------------------------------------
@@ -458,16 +458,16 @@ Only check `imp/features' variable; does not check Emacs' `features' list."
 ;;------------------------------------------------------------------------------
 
 (defun imp--feature-locations (feature:base)
-  "Return FEATURE:BASE's entry in `imp/features-locate' or nil."
+  "Return FEATURE:BASE's entry in `imp-features-locate' or nil."
   (imp--alist-get-value feature:base
-                            imp/features-locate))
+                            imp-features-locate))
 
 
 (defun imp--feature-paths (feature:base &rest feature)
   "Find (relative) path(s) to files for FEATURE:BASE + FEATURE.
 
 This will only provide the paths for the feature itself, each of which may
-`imp/require' more features.
+`imp-require' more features.
 
 Return list of: '(path:root . (paths:relative))
 
@@ -482,9 +482,9 @@ Errors if:
     ;;------------------------------
     ;; FEATURE:BASE must:
     ;; 1) Be an imp feature.
-    ;; (imp/feature-assert feature:base)
+    ;; (imp-feature-assert feature:base)
     ;;   ...must it be a feature? Not so sure. All I /think/ we need is the entries in
-    ;;   `imp/path-roots' and `imp/features-locate' and the
+    ;;   `imp-path-roots' and `imp-features-locate' and the
 
     ;; 2) Have registered a root path.
     (unless (imp--path-root-contains? feature:base)
@@ -537,11 +537,11 @@ Errors if:
       (cons path:root paths))))
 
 
-(defun imp/feature-at (feature:base feature:alist)
+(defun imp-feature-at (feature:base feature:alist)
   "Provide imp with an alist of imp features to paths/filenames.
 
-This is used when `imp/require' is called for a sub-feature that isn't loaded.
-imp will look in the `imp/path-roots' entry for the features file, load that
+This is used when `imp-require' is called for a sub-feature that isn't loaded.
+imp will look in the `imp-path-roots' entry for the features file, load that
 file, and then use the provided alist to find what files are required for said
 sub-feature. If there is no features file, imp will load the root file.
 
@@ -555,13 +555,13 @@ FEATURE:ALIST should be an alist with each entry in this format:
 
 Features in the FEATURE:ALIST should:
   1) Not be normalized:
-     e.g. '(:imp path) instead of (imp/feature :imp path)
+     e.g. '(:imp path) instead of (imp-feature :imp path)
   2) Be either:
      a) The base feature keyword (e.g. `:imp').
      b) A list of the base feature keyword plus other symbols
         (e.g. `(:imp path)').
 
-Paths in the FEATURE:ALIST should be relative to your `imp/path-root'.
+Paths in the FEATURE:ALIST should be relative to your `imp-path-root'.
 
 The paths will be loaded in the order provided.
 
@@ -574,7 +574,7 @@ For example:
      \"multiple/subdir/baz.el\"
      \"multiple/subdir/qux.el\")
     ...)"
-  (let ((func/name "imp/feature-at")
+  (let ((func/name "imp-feature-at")
         features:at)
     ;;------------------------------
     ;; Verify Inputs.
@@ -594,7 +594,7 @@ For example:
                           feature:base:path))
       (imp--error func/name
                       '("FEATURE:BASE must have a registered root path! "
-                        "Did not find it in `imp/path-roots'.")))
+                        "Did not find it in `imp-path-roots'.")))
 
     ;;---
     ;; FEATURE:ALIST must be valid format.
@@ -643,7 +643,7 @@ For example:
     ;; Return their created alist if we succeeded. `nil' if failed.
     (if (imp--alist-update feature:base
                                features:at
-                               imp/features-locate
+                               imp-features-locate
                                imp--features-locate-equal)
         features:at
       nil)))

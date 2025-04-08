@@ -35,62 +35,62 @@
 ;; Global Scoped Variable
 ;;------------------------------
 
-(setq test<imp/alist>:alist/nil    nil)
-(setq test<imp/alist>:alist/values nil)
+(setq test<imp-alist>:alist/nil    nil)
+(setq test<imp-alist>:alist/values nil)
 
 
-(defun test<imp/alist>:alist:get (type &optional local-symbol-name)
+(defun test<imp-alist>:alist:get (type &optional local-symbol-name)
   "Function call that will return something based on TYPE.
 
 TYPE:
   - :local
     + Returns LOCAL-SYMBOL-NAME.
   - :global/nil
-    + Returns `test<imp/alist>:alist/nil'.
+    + Returns `test<imp-alist>:alist/nil'.
   - :global/values
-    + Returns `test<imp/alist>:alist/values'.
+    + Returns `test<imp-alist>:alist/values'.
 
 
 Usage:
-  (test<imp/alist>:alist:get :global)
-    -> `test<imp/alist>:alist'
-  (test<imp/alist>:alist:get :local 'some-local-symbol-name)
+  (test<imp-alist>:alist:get :global)
+    -> `test<imp-alist>:alist'
+  (test<imp-alist>:alist:get :local 'some-local-symbol-name)
     -> `some-local-symbol-name'"
   (cond ((eq type :local)
          local-symbol-name)
         ((eq type :global/nil)
-         'test<imp/alist>:alist/nil)
+         'test<imp-alist>:alist/nil)
         ((eq type :global/values)
-         'test<imp/alist>:alist/values)
+         'test<imp-alist>:alist/values)
         (t
          (should-not "wrong input, idiot."))))
-;; (test<imp/alist>:alist:get :global/values)
-;; (let ((alist/local '((:k . :v)))) (test<imp/alist>:alist:get :local 'alist/local))
+;; (test<imp-alist>:alist:get :global/values)
+;; (let ((alist/local '((:k . :v)))) (test<imp-alist>:alist:get :local 'alist/local))
 
 
 ;;------------------------------
 ;; Set-Up / Tear-Down
 ;;------------------------------
 
-(defun test<imp/alist>:setup (_)
+(defun test<imp-alist>:setup (_)
   "Create a global-scoped alist (as opposed to function scoped w/ `let') for some tests to use."
-  (setq test<imp/alist>:alist/values (list (cons :key-0 :value-0/initial)
+  (setq test<imp-alist>:alist/values (list (cons :key-0 :value-0/initial)
                                            (cons :key-1 :value-1/initial)
                                            (cons :key-2 :value-2/initial)
                                            (cons :key-3 :value-3/initial)
                                            (cons :key-4 :value-4/initial)
                                            (cons :key-5 :value-5/initial)))
-  (setq test<imp/alist>:alist/nil nil)
-  ;; (message "setup: %S" test<imp/alist>:alist)
+  (setq test<imp-alist>:alist/nil nil)
+  ;; (message "setup: %S" test<imp-alist>:alist)
   )
 
 
-(defun test<imp/alist>:teardown (test-name)
+(defun test<imp-alist>:teardown (test-name)
   "Leave the global-scoped alists hanging around w/ whatever values tests modified to?"
-  ;; (makunbound 'test<imp/alist>:alist)
-  ;; (unintern 'test<imp/alist>:alist)
+  ;; (makunbound 'test<imp-alist>:alist)
+  ;; (unintern 'test<imp-alist>:alist)
   ;; (message "teardown: %S" (condition-case _
-  ;;                             test<imp/alist>:alist
+  ;;                             test<imp-alist>:alist
   ;;                           (void-variable "<void>")))
   )
 
@@ -110,13 +110,13 @@ Usage:
 ;; imp--alist-get-value
 ;;------------------------------
 
-(ert-deftest test<imp/alist>::imp--alist-get-value ()
+(ert-deftest test<imp-alist>::imp--alist-get-value ()
   "Test that `imp--alist-get-value' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/alist>::imp--alist-get-value"
+      "test<imp-alist>::imp--alist-get-value"
       nil
       nil
 
@@ -190,13 +190,13 @@ Usage:
 ;; imp--alist-get-pair
 ;;------------------------------
 
-(ert-deftest test<imp/alist>::imp--alist-get-pair ()
+(ert-deftest test<imp-alist>::imp--alist-get-pair ()
   "Test that `imp--alist-get-pair' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/alist>::imp--alist-get-pair"
+      "test<imp-alist>::imp--alist-get-pair"
       nil
       nil
 
@@ -308,13 +308,13 @@ Usage:
 ;; imp--alist-update - local alist (defined in a `let')
 ;;------------------------------
 
-(ert-deftest test<imp/alist>::imp--alist-update--local ()
+(ert-deftest test<imp-alist>::imp--alist-update--local ()
   "Test that `imp--alist-update' will add/overwrite values in a local alist correctly."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/alist>::imp--alist-update--local"
+      "test<imp-alist>::imp--alist-update--local"
       nil
       nil
 
@@ -400,26 +400,26 @@ Usage:
 ;; imp--alist-update - non-local alist
 ;;------------------------------
 
-(ert-deftest test<imp/alist>::imp--alist-update--global ()
+(ert-deftest test<imp-alist>::imp--alist-update--global ()
   "Test that `imp--alist-update' will add/overwrite values in a global alist correctly."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/alist>::imp--alist-update--global"
+      "test<imp-alist>::imp--alist-update--global"
       (lambda (_)
         "Set up globals for this test."
-        (setq test<imp/alist>:alist/cons (list (cons :key-0 :value-0/initial)
+        (setq test<imp-alist>:alist/cons (list (cons :key-0 :value-0/initial)
                                                (cons :key-1 :value-1/initial)
                                                (cons :key-2 :value-2/initial)))
-        (setq test<imp/alist>:alist/list (list (list :key-0 :value-0/initial)
+        (setq test<imp-alist>:alist/list (list (list :key-0 :value-0/initial)
                                                (list :key-1 :value-1/initial)
                                                (list :key-2 :value-2/initial)))
         )
       (lambda (_)
         "Clean up the alist of lists."
-        ;; (unintern test<imp/alist>:alist/cons)
-        ;; (unintern test<imp/alist>:alist/list)
+        ;; (unintern test<imp-alist>:alist/cons)
+        ;; (unintern test<imp-alist>:alist/list)
         )
 
     ;;===
@@ -431,27 +431,27 @@ Usage:
       ;;------------------------------
       ;; Add new key/values.
       ;;------------------------------
-      (should-not (imp--alist-get-value :key-3 test<imp/alist>:alist/cons))
-      (should-not (imp--alist-get-value :key-3 test<imp/alist>:alist/list))
+      (should-not (imp--alist-get-value :key-3 test<imp-alist>:alist/cons))
+      (should-not (imp--alist-get-value :key-3 test<imp-alist>:alist/list))
 
       (test<imp>:should:marker test-name "cons: New Key/Value")
-      (setq alist/updated (imp--alist-update :key-3 :value-3/new test<imp/alist>:alist/cons))
+      (setq alist/updated (imp--alist-update :key-3 :value-3/new test<imp-alist>:alist/cons))
       (should alist/updated)
 
       ;; Our return value should be our alist.
-      (should (eq alist/updated test<imp/alist>:alist/cons))
-      (setq value/get (imp--alist-get-value :key-3 test<imp/alist>:alist/cons))
+      (should (eq alist/updated test<imp-alist>:alist/cons))
+      (setq value/get (imp--alist-get-value :key-3 test<imp-alist>:alist/cons))
       (should value/get)
       (should (keywordp value/get))
       (should (eq value/get :value-3/new))
 
       (test<imp>:should:marker test-name "list: New Key/Value")
-      ;; Add the new value as a list, since it's the `test<imp/alist>:alist/list'.
-      (setq alist/updated (imp--alist-update :key-3 '(:value-3/new) test<imp/alist>:alist/list))
+      ;; Add the new value as a list, since it's the `test<imp-alist>:alist/list'.
+      (setq alist/updated (imp--alist-update :key-3 '(:value-3/new) test<imp-alist>:alist/list))
       (should alist/updated)
       ;; Our return value should be our alist.
-      (should (eq alist/updated test<imp/alist>:alist/list))
-      (setq value/get (imp--alist-get-value :key-3 test<imp/alist>:alist/list))
+      (should (eq alist/updated test<imp-alist>:alist/list))
+      (setq value/get (imp--alist-get-value :key-3 test<imp-alist>:alist/list))
       (should value/get)
       (should (listp value/get))
       (should (= 1 (length value/get)))
@@ -462,30 +462,30 @@ Usage:
       ;;------------------------------
       ;; Update existing key's value.
       ;;------------------------------
-      (let ((value/cons (imp--alist-get-value :key-0 test<imp/alist>:alist/cons))
-            (value/list (imp--alist-get-value :key-0 test<imp/alist>:alist/list)))
+      (let ((value/cons (imp--alist-get-value :key-0 test<imp-alist>:alist/cons))
+            (value/list (imp--alist-get-value :key-0 test<imp-alist>:alist/list)))
         (should value/cons)
         (should value/list)
         (should (eq value/cons :value-0/initial))
         (should (equal value/list '(:value-0/initial)))
 
         (test<imp>:should:marker test-name "cons: Update Existing Key/Value")
-        (setq alist/updated (imp--alist-update :key-0 :value-0/updated test<imp/alist>:alist/cons))
+        (setq alist/updated (imp--alist-update :key-0 :value-0/updated test<imp-alist>:alist/cons))
         (should alist/updated)
         ;; Our return value should be our alist.
-        (should (eq alist/updated test<imp/alist>:alist/cons))
-        (setq value/get (imp--alist-get-value :key-0 test<imp/alist>:alist/cons))
+        (should (eq alist/updated test<imp-alist>:alist/cons))
+        (setq value/get (imp--alist-get-value :key-0 test<imp-alist>:alist/cons))
         (should value/get)
         (should (keywordp value/get))
         (should (eq value/get :value-0/updated))
 
         (test<imp>:should:marker test-name "list: Update Existing Key/Value")
-        ;; Add the new value as a list, since it's the `test<imp/alist>:alist/list'.
-        (setq alist/updated (imp--alist-update :key-0 '(:value-0/updated) test<imp/alist>:alist/list))
+        ;; Add the new value as a list, since it's the `test<imp-alist>:alist/list'.
+        (setq alist/updated (imp--alist-update :key-0 '(:value-0/updated) test<imp-alist>:alist/list))
         (should alist/updated)
         ;; Our return value should be our alist.
-        (should (eq alist/updated test<imp/alist>:alist/list))
-        (setq value/get (imp--alist-get-value :key-0 test<imp/alist>:alist/list))
+        (should (eq alist/updated test<imp-alist>:alist/list))
+        (setq value/get (imp--alist-get-value :key-0 test<imp-alist>:alist/list))
         (should value/get)
         (should (listp value/get))
         (should (= 1 (length value/get)))
@@ -498,13 +498,13 @@ Usage:
 ;; imp--alist-delete - local alist (defined in a `let')
 ;;------------------------------
 
-(ert-deftest test<imp/alist>::imp--alist-delete--local ()
+(ert-deftest test<imp-alist>::imp--alist-delete--local ()
   "Test that `imp--alist-delete' will delete keys from the alist correctly."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/alist>::imp--alist-delete--local"
+      "test<imp-alist>::imp--alist-delete--local"
       nil
       nil
 
@@ -541,26 +541,26 @@ Usage:
 ;; imp--alist-delete - global alist
 ;;------------------------------
 
-(ert-deftest test<imp/alist>::imp--alist-delete--global ()
+(ert-deftest test<imp-alist>::imp--alist-delete--global ()
   "Test that `imp--alist-delete' will delete keys from the alist correctly."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/alist>::imp--alist-delete--global"
+      "test<imp-alist>::imp--alist-delete--global"
       (lambda (_)
         "Set up globals for this test."
-        (setq test<imp/alist>:alist/cons (list (cons :key-0 :value-0/initial)
+        (setq test<imp-alist>:alist/cons (list (cons :key-0 :value-0/initial)
                                                (cons :key-1 :value-1/initial)
                                                (cons :key-2 :value-2/initial)))
-        (setq test<imp/alist>:alist/list (list (list :key-0 :value-0/initial)
+        (setq test<imp-alist>:alist/list (list (list :key-0 :value-0/initial)
                                                (list :key-1 :value-1/initial)
                                                (list :key-2 :value-2/initial)))
         )
       (lambda (_)
         "Clean up the alist of lists."
-        ;; (unintern test<imp/alist>:alist/cons)
-        ;; (unintern test<imp/alist>:alist/list)
+        ;; (unintern test<imp-alist>:alist/cons)
+        ;; (unintern test<imp-alist>:alist/list)
         )
 
     ;;===
@@ -572,18 +572,18 @@ Usage:
       ;; Delete keys from the alists.
       ;;------------------------------
       (test<imp>:should:marker test-name "cons: `:key-0'")
-      (setq alist/deleted (imp--alist-delete :key-0 test<imp/alist>:alist/cons))
+      (setq alist/deleted (imp--alist-delete :key-0 test<imp-alist>:alist/cons))
       (should alist/deleted)
       ;; Our return value should be our alist.
-      (should (eq alist/deleted test<imp/alist>:alist/cons))
-      (should-not (imp--alist-get-value :key-0 test<imp/alist>:alist/cons))
+      (should (eq alist/deleted test<imp-alist>:alist/cons))
+      (should-not (imp--alist-get-value :key-0 test<imp-alist>:alist/cons))
 
       (test<imp>:should:marker test-name "list: `:key-0'")
-      (setq alist/deleted (imp--alist-delete :key-0 test<imp/alist>:alist/list))
+      (setq alist/deleted (imp--alist-delete :key-0 test<imp-alist>:alist/list))
       (should alist/deleted)
       ;; Our return value should be our alist.
-      (should (eq alist/deleted test<imp/alist>:alist/list))
-      (should-not (imp--alist-get-value :key-0 test<imp/alist>:alist/list)))))
+      (should (eq alist/deleted test<imp-alist>:alist/list))
+      (should-not (imp--alist-get-value :key-0 test<imp-alist>:alist/list)))))
 
 
 ;;------------------------------------------------------------------------------
@@ -596,7 +596,7 @@ Usage:
 ;; imp--alist-update
 ;;------------------------------
 
-(ert-deftest test<imp/alist>::imp--alist-update--regression-call-for-alist ()
+(ert-deftest test<imp-alist>::imp--alist-update--regression-call-for-alist ()
   "Test that `imp--alist-update' can work if you use a macro call that
 returns a symbol-name as a parameter.
 
@@ -615,14 +615,14 @@ Bug came from:
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/alist>::imp--alist-update--regression-call-for-alist"
-      #'test<imp/alist>:setup
-      #'test<imp/alist>:teardown
+      "test<imp-alist>::imp--alist-update--regression-call-for-alist"
+      #'test<imp-alist>:setup
+      #'test<imp-alist>:teardown
 
     ;;===
     ;; Run the test.
     ;;===
-    (should test<imp/alist>:alist/values)
+    (should test<imp-alist>:alist/values)
     (should-error alist/values)
 
     (let* ((alist/values (list (cons :key-0 :value-0/initial)
@@ -644,37 +644,37 @@ Bug came from:
       (should (imp--alist-update :key-3
                                      :value-3/02
                                      ;; Passes in value of `alist/nil'.
-                                     test<imp/alist>:alist/values))
+                                     test<imp-alist>:alist/values))
 
       ;;------------------------------
       ;; Update should work w/ a macro call which returns the symbol name.
       ;;------------------------------
       (should (eq 'alist/values
-                  (test<imp/alist>:alist:get :local 'alist/values)))
-      (should (eq 'test<imp/alist>:alist/nil
-                  (test<imp/alist>:alist:get :global/nil)))
-      (should (eq 'test<imp/alist>:alist/values
-                  (test<imp/alist>:alist:get :global/values)))
+                  (test<imp-alist>:alist:get :local 'alist/values)))
+      (should (eq 'test<imp-alist>:alist/nil
+                  (test<imp-alist>:alist:get :global/nil)))
+      (should (eq 'test<imp-alist>:alist/values
+                  (test<imp-alist>:alist:get :global/values)))
 
       ;; Dunno how to get lexicals to work? :(
       (should-error (imp--alist-update :key-3
                                            :value-3/07
-                                           (test<imp/alist>:alist:get :local 'alist/values)))
+                                           (test<imp-alist>:alist:get :local 'alist/values)))
 
       ;; Should update a list if given the values variable name.
       (should (imp--alist-update :key-3
                                      :value-3/08
-                                     (test<imp/alist>:alist:get :global/values)))
+                                     (test<imp-alist>:alist:get :global/values)))
       (should (eq :value-3/08
-                  (imp--alist-get-value :key-3 test<imp/alist>:alist/values)))
+                  (imp--alist-get-value :key-3 test<imp-alist>:alist/values)))
 
       ;; Should create a list if given the nil variable name.
       (should (eq nil
-                  test<imp/alist>:alist/nil))
+                  test<imp-alist>:alist/nil))
       (should (imp--alist-update :key-3
                                      :value-3/09
-                                     (test<imp/alist>:alist:get :global/nil)))
+                                     (test<imp-alist>:alist:get :global/nil)))
       (should (eq :value-3/09
-                  (imp--alist-get-value :key-3 test<imp/alist>:alist/nil))))))
+                  (imp--alist-get-value :key-3 test<imp-alist>:alist/nil))))))
 
 

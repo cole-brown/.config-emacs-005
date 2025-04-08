@@ -20,22 +20,22 @@
 ;;                       Tests can have imps too, yes?
 ;;                                 ──────────
 ;;
-;; `imp/test-load': Similar to `imp/load', but with some kwargs for testing.
+;; `imp-test-load': Similar to `imp-load', but with some kwargs for testing.
 ;;
 ;;; Code:
 
 
 
 ;;------------------------------------------------------------------------------
-;; `imp/test-load' Helpers
+;; `imp-test-load' Helpers
 ;;------------------------------------------------------------------------------
 
 (defun imp--test-load-parse (caller path:current-dir plist-symbol-name plist)
-  "Parses `imp/test-load' args. See `imp/test-load' for details.
+  "Parses `imp-test-load' args. See `imp-test-load' for details.
 
-CALLER should be \"imp/test-load\".
+CALLER should be \"imp-test-load\".
 
-PATH:CURRENT-DIR should be the return value of `(imp/path-current-dir)',
+PATH:CURRENT-DIR should be the return value of `(imp-path-current-dir)',
 executed in the context of the file calling CALLER.
   - That is, CALLER is probably a macro.
 
@@ -202,9 +202,9 @@ Returns a plist:
                     "Normalize `feature:pre'...")
     (when in:feature/pre
       (condition-case-unless-debug err
-          (if (eq :imp/dne (car in:feature/pre))
-              ;; Don't let `:imp/dne' get normalized to `:impdne'.
-              (setq out:feature/pre (list :imp/dne
+          (if (eq :imp-dne (car in:feature/pre))
+              ;; Don't let `:imp-dne' get normalized to `:impdne'.
+              (setq out:feature/pre (list :imp-dne
                                           (imp--feature-normalize (cdr in:feature/pre))))
             ;; Normalize to a list.
             (setq out:feature/pre (imp--feature-normalize in:feature/pre)))
@@ -218,9 +218,9 @@ Returns a plist:
                     "Normalize `feature:post'...")
     (when in:feature/post
       (condition-case-unless-debug err
-          (if (eq :imp/dne (car in:feature/post))
-              ;; Don't let `:imp/dne' get normalized to `:impdne'.
-              (setq out:feature/post (list :imp/dne
+          (if (eq :imp-dne (car in:feature/post))
+              ;; Don't let `:imp-dne' get normalized to `:impdne'.
+              (setq out:feature/post (list :imp-dne
                                            (imp--feature-normalize (cdr in:feature/post))))
             ;; Normalize to a list.
             (setq out:feature/post (imp--feature-normalize in:feature/post)))
@@ -284,7 +284,7 @@ Returns a plist:
           :feature:pre  out:feature/pre
           :feature:post out:feature/post
           :error        out:error)))
-;; (let ((load-args-plist '(:feature:pre (:imp/dne (:foo bar))
+;; (let ((load-args-plist '(:feature:pre (:imp-dne (:foo bar))
 ;;                          :feature:post (:foo bar)
 ;;                          :path "init.el"
 ;;                          ;; :path
@@ -292,8 +292,8 @@ Returns a plist:
 ;;                          ;; :error nil
 ;;                          )))
 ;;   ;; (message "%S" load-args-plist))
-;;   (imp--test-load-parse "imp/test-load"
-;;                             (imp/path-current-dir)
+;;   (imp--test-load-parse "imp-test-load"
+;;                             (imp-path-current-dir)
 ;;                             (upcase "load-args-plist")
 ;;                             load-args-plist))
 
@@ -324,12 +324,12 @@ Raises error signal or returns error string, based on ERROR? value."
           ;;---
           ;;"Does Not Exist" Check
           ;;---
-          ((eq :imp/dne (nth 0 feature:verify))
+          ((eq :imp-dne (nth 0 feature:verify))
            (let ((feature (nth 1 feature:verify)))
-             (when (imp/provided? feature)
+             (when (imp-provided? feature)
                (if error?
                    (imp--error caller
-                                   '("`%S' of `%S' is defined but `:imp/dne' suggests it should not be!\n"
+                                   '("`%S' of `%S' is defined but `:imp-dne' suggests it should not be!\n"
                                      "  feature:pre:  %S\n"
                                      "  feature:post: %S\n"
                                      "  path:         %S")
@@ -338,7 +338,7 @@ Raises error signal or returns error string, based on ERROR? value."
                                    feature:pre
                                    feature:post
                                    path)
-                 (setq error-encountered (format (concat "`%S' of `%S' is defined but `:imp/dne'"
+                 (setq error-encountered (format (concat "`%S' of `%S' is defined but `:imp-dne'"
                                                          "suggests it should not be!\n"
                                                          "  feature:pre:   %S\n"
                                                          "  feature:post:  %S\n"
@@ -353,7 +353,7 @@ Raises error signal or returns error string, based on ERROR? value."
           ;; "_DOES_ Exist" Check
           ;;---
           (t
-           (unless (imp/provided? feature:verify)
+           (unless (imp-provided? feature:verify)
              (if error?
                  (imp--error caller
                                  '("`%S' of `%S' should exist, but it is not a feature!\n"
@@ -386,8 +386,8 @@ Raises error signal or returns error string, based on ERROR? value."
 ;; Test Load API
 ;;------------------------------------------------------------------------------
 
-;; Based off of the `imp/load' macro.
-(defmacro imp/test-load (&rest load-args-plist)
+;; Based off of the `imp-load' macro.
+(defmacro imp-test-load (&rest load-args-plist)
   "Load a file relative to the current executing file (`load-file-name').
 
 LOAD-ARGS-PLIST is a plist of load args:
@@ -428,20 +428,20 @@ and symbols.
     - `feature:post': after the file is loaded.
 
 To make sure a feature doesn't exist and then does exist after the load, start
-the `:feature:pre' list with the keyword `:imp/dne' (does not exist).
+the `:feature:pre' list with the keyword `:imp-dne' (does not exist).
   Example 1:
-    (imp/test-load
+    (imp-test-load
      [...]
-     :feature:pre '(:imp/dne (:imp load))
+     :feature:pre '(:imp-dne (:imp load))
      :feature:post '(:imp load))
   Example 2:
-    (imp/test-load
+    (imp-test-load
      [...]
-     :feature:pre '(:imp/dne :imp load)
+     :feature:pre '(:imp-dne :imp load)
      :feature:post '(:imp load))
 
 Or you can just use `:feature:pre' as a check for a different prerequisite
-feature. (Or that a different feature does /not/ exist via `:imp/dne'.)
+feature. (Or that a different feature does /not/ exist via `:imp-dne'.)
 
 `:error' value (aka ERROR) can be:
   - nil
@@ -454,15 +454,15 @@ It will still raise an error if:
   - It cannot determine where to /look/ for the file.
 
 Always loads the file."
-  (let ((macro:path:current-dir (imp/path-current-dir)))
-    `(let* ((macro:func/name "imp/test-load")
+  (let ((macro:path:current-dir (imp-path-current-dir)))
+    `(let* ((macro:func/name "imp-test-load")
             (macro:parsed (imp--test-load-parse macro:func/name
                                                     ,macro:path:current-dir
                                                     (upcase "load-args-plist")
                                                     (list ,@load-args-plist)))
             (macro:path          (plist-get macro:parsed :path))
             (macro:path:filename (imp--path-filename macro:path))
-            (macro:path:parent   (imp/path-parent        macro:path))
+            (macro:path:parent   (imp-path-parent        macro:path))
             (macro:feature:pre   (plist-get macro:parsed :feature:pre))
             (macro:feature:post  (plist-get macro:parsed :feature:post))
             ;; Invert for `load' parameter NO-ERROR.
@@ -510,7 +510,7 @@ Always loads the file."
          ;; Always Load!
          ;;------------------------------
          ;; Load w/ timing info if desired.
-         (imp/timing
+         (imp-timing
              macro:feature:post
              macro:path:filename
              macro:path:parent

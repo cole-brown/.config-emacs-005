@@ -42,38 +42,38 @@
 ;; Timings Toggle
 ;;------------------------------------------------------------------------------
 
-(defcustom imp/timing-enabled? nil
+(defcustom imp-timing-enabled? nil
   "Should loading & timing messages be printed?"
-  :group 'imp/group
+  :group 'imp-group
   :type '(boolean))
 
 
-(defcustom imp/timing-buffer-tail? t
+(defcustom imp-timing-buffer-tail? t
   "Should the timing buffer be tailed?"
-  :group 'imp/group
+  :group 'imp-group
   :type '(boolean))
 
 
 ;; NOTE: Doom Emacs can add the feature flag `+timing' to "doom/init.el".
-(defconst imp/timing-feature? (imp/flag? :imp +timing)
+(defconst imp-timing-feature? (imp-flag? :imp +timing)
   "Cache of our feature flag.")
 
 
-(defun imp/timing-enabled? ()
+(defun imp-timing-enabled? ()
   "Return non-nil if timing is enabled.
 
-Specifically, if `imp/timing-enabled?' is non-nil or imp's `+timing'
+Specifically, if `imp-timing-enabled?' is non-nil or imp's `+timing'
 feature flag is set."
-  (or imp/timing-enabled?
-      imp/timing-feature?))
-;; (imp/timing-enabled?)
+  (or imp-timing-enabled?
+      imp-timing-feature?))
+;; (imp-timing-enabled?)
 
 
 ;;------------------------------------------------------------------------------
 ;; Constants & Variables
 ;;------------------------------------------------------------------------------
 
-(defconst imp/timing-format-tree
+(defconst imp-timing-format-tree
   '(;; Supplied types:
     :root   ""
     :leaf   "└─"
@@ -89,7 +89,7 @@ loading xxx...
 
 
 (defconst imp--timing-precision-time 4
-  "Show this many places after decimal for default `imp/timing-format-time'.")
+  "Show this many places after decimal for default `imp-timing-format-time'.")
 
 
 (defvar imp--timing-indent 0
@@ -111,7 +111,7 @@ List of imp keyword/symbol names.
 Example: '(:imp example feature)")
 
 
-(defvar imp/timing-sum 0.0
+(defvar imp-timing-sum 0.0
   "Sum of all timings at indent 0 level.")
 
 
@@ -119,49 +119,49 @@ Example: '(:imp example feature)")
 ;; Custom Variables
 ;;------------------------------------------------------------------------------
 
-(defcustom imp/timing-buffer-name
-  "ⓘ-imp/timing-ⓘ"
+(defcustom imp-timing-buffer-name
+  "ⓘ-imp-timing-ⓘ"
   "Buffer name to print to.
 
 If you want it to go to *Messages* with the usual minibuffer interaction, set
 to: `:messages'."
-  :group 'imp/group
+  :group 'imp-group
   :type '(choice (string :tag "Name of Buffer")
                  (const :tag "Use `message' to send to *Messages* buffer with the usual minibuffer interactions."
                         :messages)))
 
 
-(defcustom imp/timing-buffer-show t
-  "If non-nil, show `imp/timing-buffer-name' every time it gets a new message."
-  :group 'imp/group
+(defcustom imp-timing-buffer-show t
+  "If non-nil, show `imp-timing-buffer-name' every time it gets a new message."
+  :group 'imp-group
   :type  '(boolean))
 
 
-(defcustom imp/timing-format-load "loading %1$S..."
+(defcustom imp-timing-format-load "loading %1$S..."
   "Format string for loading a filename.
 
 Args to this format string are:
   1. Feature symbol: :imp/+timing
   2. File name:      +timing.el
   3. File path:      /path/to/imp/+timing.el"
-  :group 'imp/group
+  :group 'imp-group
   :type '(string)
   :risky t)
 
 
-(defcustom imp/timing-format-skip "skip: %1$S"
+(defcustom imp-timing-format-skip "skip: %1$S"
   "Format string for skipping loading of a required file.
 
 Args to this format string are:
   1. Feature symbol: :imp/+timing
   2. File name:      +timing.el
   3. File path:      /path/to/imp/+timing.el"
-  :group 'imp/group
+  :group 'imp-group
   :type '(string)
   :risky t)
 
 
-(defcustom imp/timing-reason "reason: "
+(defcustom imp-timing-reason "reason: "
   "String prefix for _why_ something was or wasn't.
 
 Example: When a file is skipped because it's already provided, the timing buffer
@@ -170,36 +170,36 @@ will say (with default settings):
   ├─skip: :feature:example
   │ └─reason: already provided
   [...]"
-  :group 'imp/group
+  :group 'imp-group
   :type '(string)
   :risky t)
 
 
-(defcustom imp/timing-format-skip-already-provided "feature already provided"
+(defcustom imp-timing-format-skip-already-provided "feature already provided"
   "Format string for skipping loading of a required file.
 
 Args to this format string are:
   1. Feature symbol: :imp/+timing
   2. File name:      +timing.el
   3. File path:      /path/to/imp/+timing.el"
-  :group 'imp/group
+  :group 'imp-group
   :type '(string)
   :risky t)
 
 
-(defcustom imp/timing-format-skip-optional-dne "optional file does not exist: %3$s"
+(defcustom imp-timing-format-skip-optional-dne "optional file does not exist: %3$s"
   "Format string for skipping loading of an optional file.
 
 Args to this format string are:
   1. Feature symbol: :imp/+timing
   2. File name:      +timing.el
   3. File path:      /path/to/imp/+timing.el"
-  :group 'imp/group
+  :group 'imp-group
   :type '(string)
   :risky t)
 
 
-(defcustom imp/timing-format-time-total
+(defcustom imp-timing-format-time-total
   (concat "\n"
           ;;---
           ;; Open Box.
@@ -231,12 +231,12 @@ Args to this format string are:
           ;; Close Box.
           ;;---
           "└───────┴──────────────────┘")
-  "String format for total elapsed time according to `imp/timing-sum'."
-  :group 'imp/group
+  "String format for total elapsed time according to `imp-timing-sum'."
+  :group 'imp-group
   :type '(string))
 
 
-(defcustom imp/timing-format-time
+(defcustom imp-timing-format-time
   (concat "%0"                                     ;; Fill with zeros.
           (number-to-string
            (+ 2 1 imp--timing-precision-time)) ;; Full seconds precision + "." + fractional seconds precision
@@ -246,25 +246,25 @@ Args to this format string are:
           "f"                                      ;; Format as a floating point.
           " seconds")                              ;; And... say what the units are.
   "Format string for number of seconds it took to load a file."
-  :group 'imp/group
+  :group 'imp-group
   :type '(string)
   :risky t)
 
 
-(defcustom imp/timing-separator-restart
+(defcustom imp-timing-separator-restart
   (concat "\n\n"
           (make-string 80 ?─ :multibyte))
   "String that can be inserted into the output buffer via `imp--timing-launch'."
-  :group 'imp/group
+  :group 'imp-group
   :type '(string)
   :risky t)
 
 
-(defcustom imp/timing-separator-final
+(defcustom imp-timing-separator-final
   (concat "\n\n"
           (make-string 80 ?═ :multibyte))
-  "String that can be inserted into the output buffer via `imp/timing-final'."
-  :group 'imp/group
+  "String that can be inserted into the output buffer via `imp-timing-final'."
+  :group 'imp-group
   :type '(string)
   :risky t)
 
@@ -294,7 +294,7 @@ Return non-nil if FEATURE is non-nil and matches feature currently being timed
 
 INDENT is an integer where 0 the TYPE's indent and 1+ are its parents
 indention levels."
-  (plist-get imp/timing-format-tree
+  (plist-get imp-timing-format-tree
              ;;------------------------------
              ;; Indent 0: Return the type's actual format.
              ;;------------------------------
@@ -341,42 +341,42 @@ indention levels."
 ;;------------------------------------------------------------------------------
 
 (defun imp--timing-buffer-messages? ()
-  "Return t if `imp/timing-buffer-name' is the \"*Messages*\" buffer.
+  "Return t if `imp-timing-buffer-name' is the \"*Messages*\" buffer.
 
 NOTE: This covers a value `:messages' as well as the string name."
   ;; Check for `:messages' keyword as well as a name match to the buffer.
-  (cond ((and (keywordp imp/timing-buffer-name)
+  (cond ((and (keywordp imp-timing-buffer-name)
               (eq :messages
-                  imp/timing-buffer-name)))
-        ((and (stringp imp/timing-buffer-name)
+                  imp-timing-buffer-name)))
+        ((and (stringp imp-timing-buffer-name)
               (string= "*Messages*"
-                       imp/timing-buffer-name)))
+                       imp-timing-buffer-name)))
         ;; Else it's some other buffer.
         (t
          nil)))
 
 
-(defun imp/timing-buffer-name ()
-  "Return the string name of `imp/timing-buffer-name' custom variable.
+(defun imp-timing-buffer-name ()
+  "Return the string name of `imp-timing-buffer-name' custom variable.
 
 NOTE: This converts a value `:messages' to \"*Messages*\"."
   (if (imp--timing-buffer-messages?)
       "*Messages*"
-    imp/timing-buffer-name))
+    imp-timing-buffer-name))
 
 
 (defun imp--timing-buffer-get (&optional buffer-or-name &rest args)
   "Get the imp timing buffer.
 
 BUFFER-OR-NAME should be a string or a buffer object.
-If it is nil, return value of function `imp/timing-buffer-name' will be used.
+If it is nil, return value of function `imp-timing-buffer-name' will be used.
 
 ARGS can be:
   - `:create', `create' - Create the buffer if it doesn't exist.
 
 NOTE: If created, the buffer will be put into `imp-timing-mode'."
   (let ((buffer-or-name (or buffer-or-name
-                            (imp/timing-buffer-name))))
+                            (imp-timing-buffer-name))))
     ;; If it already exists, we're done; just return it.
     (cond ((get-buffer buffer-or-name))
 
@@ -398,14 +398,14 @@ NOTE: If created, the buffer will be put into `imp-timing-mode'."
 (defun imp--timing-buffer-tail ()
   "Tail the timing buffer.
 
-NOTE: Does nothing if `imp/timing-buffer-tail?' is nil, or '*Messages*' buffer
+NOTE: Does nothing if `imp-timing-buffer-tail?' is nil, or '*Messages*' buffer
 is used for timing.
 
 NOTE: Cannot use `auto-revert-tail-mode' as it only works on file-based buffers.
 So, this just throws an error:
   (require 'autorevert)
   (auto-revert-tail-mode +1)"
-  (when (and imp/timing-buffer-tail?
+  (when (and imp-timing-buffer-tail?
              (not (imp--timing-buffer-messages?)))
     (with-current-buffer (imp--timing-buffer-get)
       ;; Set point to max for the buffer in general.
@@ -425,10 +425,10 @@ So, this just throws an error:
 FORCE-SHOW?, if non-nil, will always show the buffer."
   (when (or force-show?
             (imp--timing-buffer-messages?))
-    (display-buffer (imp/timing-buffer-name))))
+    (display-buffer (imp-timing-buffer-name))))
 
 
-(defun imp/cmd-timing-buffer-bury (&optional ignore-messages-buffer)
+(defun imp-cmd-timing-buffer-bury (&optional ignore-messages-buffer)
   "Hide and bury the imp timing output buffer.
 
 If IGNORE-MESSAGES-BUFFER is non-nil and the output buffer is \"*Messages*\",
@@ -438,16 +438,16 @@ does nothing instead."
   (unless (and ignore-messages-buffer
                (imp--timing-buffer-messages?))
     ;; Bury only when we find the window currently displaying it.
-    (when-let* ((name (imp/timing-buffer-name))
+    (when-let* ((name (imp-timing-buffer-name))
                 (window (get-buffer-window name)))
       (with-selected-window window
         (bury-buffer))
-      (message "imp/timing- Buried timing buffer: %s"
+      (message "imp-timing- Buried timing buffer: %s"
                name))))
-;; (imp/cmd-timing-buffer-bury)
+;; (imp-cmd-timing-buffer-bury)
 
 
-(defun imp/cmd-timing-buffer-kill (&optional ignore-messages-buffer)
+(defun imp-cmd-timing-buffer-kill (&optional ignore-messages-buffer)
   "Kill the imp timing output buffer.
 
 If IGNORE-MESSAGES-BUFFER is non-nil and the output buffer is \"*Messages*\",
@@ -457,13 +457,13 @@ does nothing instead."
   (unless (and ignore-messages-buffer
                (imp--timing-buffer-messages?))
     ;; Bury only when we find the window currently displaying it.
-    (when-let* ((name (imp/timing-buffer-name))
+    (when-let* ((name (imp-timing-buffer-name))
                 ;; Get the buffer in order to prevent "No buffer named <...>" messages.
                 (buffer (imp--timing-buffer-get name)))
       (kill-buffer buffer)
-      (message "imp/timing- Killed timing buffer: %s"
+      (message "imp-timing- Killed timing buffer: %s"
                name))))
-;; (imp/cmd-timing-buffer-kill)
+;; (imp-cmd-timing-buffer-kill)
 
 
 ;;------------------------------------------------------------------------------
@@ -473,8 +473,8 @@ does nothing instead."
 (defun imp--timing-buffer-insert (string)
   "Insert finalized message STRING into output buffer."
   ;; Don't do anything unless enabled.
-  (when-let ((enabled? (imp/timing-enabled?))
-             (name (imp/timing-buffer-name)))
+  (when-let ((enabled? (imp-timing-enabled?))
+             (name (imp-timing-buffer-name)))
     (cond
      ;;------------------------------
      ;; Buffers
@@ -513,7 +513,7 @@ does nothing instead."
     (imp--timing-buffer-tail)
 
     ;; Show buffer if desired.
-    (when imp/timing-buffer-show
+    (when imp-timing-buffer-show
       ;; Don't want to end up with multiple windows after start up, so be a good
       ;; steward and just use the same window as whatever's already here.
       (let ((display-buffer-alist (list (list name
@@ -534,9 +534,9 @@ TYPE should be either `:root' or `:leaf'. Uses TYPE to get the indent string."
 (defun imp--timing-start (feature filename path)
   "Print a loading message for this FEATURE, FILENAME, and/or PATH.
 
-Message depends on `imp/timing-format-load'."
+Message depends on `imp-timing-format-load'."
   (imp--timing-message :root
-                           imp/timing-format-load
+                           imp-timing-format-load
                            (imp--feature-normalize-display feature)
                            filename
                            path))
@@ -545,24 +545,24 @@ Message depends on `imp/timing-format-load'."
 (defun imp--timing-end (time:start)
   "Print the time since TIME:START.
 
-Message depends on `imp/timing-format-time'."
+Message depends on `imp-timing-format-time'."
   (let ((elapsed (float-time (time-since time:start))))
     (imp--timing-message :leaf
-                             imp/timing-format-time
+                             imp-timing-format-time
                              elapsed)
     ;; Add `elapsed' to running sum if at base indent level.
     (when (= imp--timing-indent 0)
-      (setq imp/timing-sum (+ imp/timing-sum elapsed)))))
+      (setq imp-timing-sum (+ imp-timing-sum elapsed)))))
 
 
-(defun imp/timing-skip-already-provided (feature filename path)
+(defun imp-timing-skip-already-provided (feature filename path)
   "Print a message about skipping this FEATURE / FILENAME / PATH.
 
-Message depends on `imp/timing-format-skip'."
-  (when (imp/timing-enabled?)
+Message depends on `imp-timing-format-skip'."
+  (when (imp-timing-enabled?)
     ;; Skip message.
     (imp--timing-message :root
-                             imp/timing-format-skip
+                             imp-timing-format-skip
                              (imp--feature-normalize-display feature)
                              filename
                              path)
@@ -570,21 +570,21 @@ Message depends on `imp/timing-format-skip'."
     (let ((imp--timing-indent (1+ imp--timing-indent)))
       ;; Skip reason message.
       (imp--timing-message :leaf
-                               (concat imp/timing-reason
-                                       imp/timing-format-skip-already-provided)
+                               (concat imp-timing-reason
+                                       imp-timing-format-skip-already-provided)
                                (imp--feature-normalize-display feature)
                                filename
                                path))))
 
 
-(defun imp/timing-skip-optional-dne (feature filename path)
+(defun imp-timing-skip-optional-dne (feature filename path)
   "Print a message about optional FEATURE / FILENAME / PATH that doesn't exist.
 
-Message depends on `imp/timing-format-optional'."
-  (when (imp/timing-enabled?)
+Message depends on `imp-timing-format-optional'."
+  (when (imp-timing-enabled?)
     ;; Skip message.
     (imp--timing-message :root
-                             imp/timing-format-skip
+                             imp-timing-format-skip
                              (imp--feature-normalize-display feature)
                              filename
                              path)
@@ -592,14 +592,14 @@ Message depends on `imp/timing-format-optional'."
     (let ((imp--timing-indent (1+ imp--timing-indent)))
       ;; Skip reason message.
       (imp--timing-message :leaf
-                               (concat imp/timing-reason
-                                       imp/timing-format-skip-optional-dne)
+                               (concat imp-timing-reason
+                                       imp-timing-format-skip-optional-dne)
                                (imp--feature-normalize-display feature)
                                filename
                                path))))
 
 
-(defmacro imp/timing (feature filename path &rest body)
+(defmacro imp-timing (feature filename path &rest body)
   "Measure & print the time it takes to evaluate BODY.
 
 FEATURE should be a list of keyword & symbol names.
@@ -608,13 +608,13 @@ FILENAME should be the file's basename.
 
 PATH should be the path to FILENAME's parent directory.
 
-Output message depends on `imp/timing-format-time'.
+Output message depends on `imp-timing-format-time'.
 
 Return result of evaluating BODY."
   (declare (indent 3))
 
   `(let ((macro<imp>:feature (imp--feature-normalize ,feature)))
-     (if (and (imp/timing-enabled?)
+     (if (and (imp-timing-enabled?)
               ;; Don't do (another) timing block/level for a duplicated call.
               (not (imp--timing-feature-duplicate? macro<imp>:feature)))
 
@@ -648,27 +648,27 @@ Return result of evaluating BODY."
 ;; Output: Init / Finalize
 ;;------------------------------------------------------------------------------
 
-(defun imp/timing-restart ()
+(defun imp-timing-restart ()
   "'Restart' timing.
 
-1) Reset `imp/timing-sum' to zero.
+1) Reset `imp-timing-sum' to zero.
 2) Print a starting separator to the timing buffer if needed.
-   - If `imp/timing-buffer-name' doesn't exists or is *Messages*, does nothing."
+   - If `imp-timing-buffer-name' doesn't exists or is *Messages*, does nothing."
   ;; Reset timing sum variable.
-  (setq imp/timing-sum 0.0)
+  (setq imp-timing-sum 0.0)
 
   ;; Broken up because it's too early for this... :|
   (cond
    ;; Not enabled = no output.
-   ((not (imp/timing-enabled?))
+   ((not (imp-timing-enabled?))
     nil)
    ;; *Messages* buffer = no output.
    ((imp--timing-buffer-messages?)
     nil)
    ;; Not *Messages* and exists = output!
-   ((imp--timing-buffer-get (imp/timing-buffer-name))
+   ((imp--timing-buffer-get (imp-timing-buffer-name))
     ;; Mark where we restarted timing from
-    (imp--timing-buffer-insert imp/timing-separator-restart))
+    (imp--timing-buffer-insert imp-timing-separator-restart))
    ;; Else, no output.
    (t
     nil)))
@@ -677,14 +677,14 @@ Return result of evaluating BODY."
 (defun imp--timing-final (&optional separator-line?)
   "Actually output the total timing summary.
 
-If SEPARATOR-LINE? is non-nil, print out `imp/timing-separator-final' after
+If SEPARATOR-LINE? is non-nil, print out `imp-timing-separator-final' after
 final timing message."
-  (when (imp/timing-enabled?)
+  (when (imp-timing-enabled?)
     (imp--timing-buffer-insert
-     (format imp/timing-format-time-total
-             imp/timing-sum))
+     (format imp-timing-format-time-total
+             imp-timing-sum))
     (when separator-line?
-      (imp--timing-buffer-insert imp/timing-separator-final))))
+      (imp--timing-buffer-insert imp-timing-separator-final))))
 ;; (imp--timing-final)
 ;; (imp--timing-final t)
 
@@ -694,7 +694,7 @@ final timing message."
 
 If not ready to output at end of timer, re-run timer.
 
-If SEPARATOR-LINE? is non-nil, print out `imp/timing-separator-final' after
+If SEPARATOR-LINE? is non-nil, print out `imp-timing-separator-final' after
 final timing message."
   (run-with-timer 1 ; seconds
                   nil ; do not repeat
@@ -709,10 +709,10 @@ final timing message."
                   separator-line?))
 
 
-(defun imp/timing-final (&optional separator-line?)
+(defun imp-timing-final (&optional separator-line?)
   "Set up a total timing summary to print out once everything's done loading.
 
-If SEPARATOR-LINE? is non-nil, print out `imp/timing-separator-final' after
+If SEPARATOR-LINE? is non-nil, print out `imp-timing-separator-final' after
 final timing message."
   ;; Don't bother trying until start-up is (mostly) over.
   ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Startup-Summary.html#Startup-Summary
@@ -720,7 +720,7 @@ final timing message."
             (lambda ()
               "Print final timing info to imp timing buffer once done timing."
               (imp--timing-final-timer separator-line?))))
-;; (imp/timing-final t)
+;; (imp-timing-final t)
 ;; (run-hooks 'emacs-startup-hook)
 
 
@@ -817,7 +817,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
         ;; case we normalize/change the tenses...
         (rx/status/info    (rx-to-string `(or "load" "loading"  "loaded")  :no-group))
         (rx/status/warning (rx-to-string `(or "skip" "skipping" "skipped") :no-group))
-        (rx/reason/warning (rx-to-string `(and ,imp/timing-reason
+        (rx/reason/warning (rx-to-string `(and ,imp-timing-reason
                                                (one-or-more any)
                                                line-end)
                                          :no-group))
@@ -852,7 +852,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
         ;;------------------------------
         ;; Final Status
         ;;------------------------------
-        ;; Not currently printed to 'imp/timing' buffer?
+        ;; Not currently printed to 'imp-timing' buffer?
         )
 
     ;;------------------------------
@@ -955,7 +955,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Final Status
     ;;------------------------------
-    ;; Not currently printed to 'imp/timing' buffer?
+    ;; Not currently printed to 'imp-timing' buffer?
 
     ;;------------------------------
     ;; Done; Return Font Lock Keywords
@@ -1043,8 +1043,8 @@ See help for `font-lock-defaults' for what all this does/can do.")
 
 
 ;;;###autoload
-(define-derived-mode imp-timing-mode special-mode "imp/timing"
-  "Major mode for the `imp/timing-buffer-name' timing information buffer.
+(define-derived-mode imp-timing-mode special-mode "imp-timing"
+  "Major mode for the `imp-timing-buffer-name' timing information buffer.
 
 Derive from `special-mode' as a start:
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html"

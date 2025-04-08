@@ -17,10 +17,10 @@
 (defun test<imp>:load:set ()
   "Check whether we're loading a file right now.
 
-Sets `test<imp>:file:loading?' with results from `imp/provide-loading?'."
+Sets `test<imp>:file:loading?' with results from `imp-provide-loading?'."
   ;; Use setq so it gets set every time.
   (setq test<imp>:file:loading?
-        (imp/provide-loading?)))
+        (imp-provide-loading?)))
 
 
 (defun test<imp>:load:unset ()
@@ -65,4 +65,4 @@ That is: delete the variable from existance."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp/provide :loading 'load)
+(imp-provide :loading 'load)

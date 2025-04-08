@@ -43,7 +43,7 @@
 ;; imp--tree-node?
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-node? ()
+(ert-deftest test<imp-tree>::imp--tree-node? ()
   "Tests that the `imp--tree-node?' predicate functions correctly."
   ;;---
   ;; Not node or tree - false.
@@ -70,7 +70,7 @@
 ;; imp--tree-tree?
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-tree? ()
+(ert-deftest test<imp-tree>::imp--tree-tree? ()
   "Tests that the `imp--tree-tree?' predicate functions correctly."
   ;;---
   ;; Not node or tree - false.
@@ -100,7 +100,7 @@
 ;; imp--tree-chain?
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-chain? ()
+(ert-deftest test<imp-tree>::imp--tree-chain? ()
   "Tests that the `imp--tree-chain?' predicate functions correctly."
   ;;---
   ;; Just a symbol - false.
@@ -137,7 +137,7 @@
 ;; imp--tree-key-exists?
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-key-exists? ()
+(ert-deftest test<imp-tree>::imp--tree-key-exists? ()
   "Tests that the `imp--tree-key-exists?' predicate functions correctly.
 
 It should only search the root level of the tree for the key."
@@ -189,7 +189,7 @@ It should only search the root level of the tree for the key."
 ;; imp--tree-chain
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-chain ()
+(ert-deftest test<imp-tree>::imp--tree-chain ()
   "Tests that the `imp--tree-chain' predicate functions correctly."
 
   (should (equal '(:root)
@@ -203,7 +203,7 @@ It should only search the root level of the tree for the key."
 ;; imp--tree-create
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-create ()
+(ert-deftest test<imp-tree>::imp--tree-create ()
   "Tests that the `imp--tree-create' predicate functions correctly.
 It should basically make a list of the `imp--tree-chain' output."
   (should (equal '((:root))
@@ -217,7 +217,7 @@ It should basically make a list of the `imp--tree-chain' output."
 ;; imp--tree-branch-update
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-branch-update ()
+(ert-deftest test<imp-tree>::imp--tree-branch-update ()
   "Tests that the `imp--tree-branch-update' predicate functions correctly."
   (should (equal '((:two (:leaf-node1) (:three (:leaf-node0))))
                  (imp--tree-branch-update '(:two (:leaf-node1))
@@ -228,7 +228,7 @@ It should basically make a list of the `imp--tree-chain' output."
 ;; imp--tree-update-helper
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-update-helper ()
+(ert-deftest test<imp-tree>::imp--tree-update-helper ()
   "Tests that the `imp--tree-update-helper' predicate functions correctly.
 
 This is not guarenteed to set the tree variable passed in to the updated tree."
@@ -327,7 +327,7 @@ This is not guarenteed to set the tree variable passed in to the updated tree."
 ;; imp--tree-update
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-update ()
+(ert-deftest test<imp-tree>::imp--tree-update ()
   "Tests that the `imp--tree-update' predicate functions correctly.
 
 This should guarenteed setting the tree variable passed in to the updated tree."
@@ -446,7 +446,7 @@ This should guarenteed setting the tree variable passed in to the updated tree."
 ;; imp--tree-contains?
 ;;------------------------------
 
-(ert-deftest test<imp/tree>::imp--tree-contains? ()
+(ert-deftest test<imp-tree>::imp--tree-contains? ()
   "Tests that the `imp--tree-contains?' predicate functions correctly."
 
   (let* ((tree  (imp--tree-create '(:root :one :two :three) :leaf-node0)))

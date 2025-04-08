@@ -27,7 +27,7 @@
 ;; Hack?
 ;;------------------------------------------------------------------------------
 ;; TODO: Unhack?
-;; TODO: Or at least move it into `imp/output-level' by making that able to use
+;; TODO: Or at least move it into `imp-output-level' by making that able to use
 ;;       multiple sinks or something of the like.
 
 (defvar imp--error-sink-hack-debug #'message
@@ -36,7 +36,7 @@
 Value should be nil or a function with a signature like `message'.
 
 Error messages get truncated and I haven't figured out how not to truncate:
-  Lisp error: (error \"[ERROR   ]: imp/require- Failed to find/load requi...\")
+  Lisp error: (error \"[ERROR   ]: imp-require- Failed to find/load requi...\")
 
 This is really annoying when you error out in 'early-init.el' and cannot expand
 the messages to find out what happened... So also send to this function, which
@@ -47,11 +47,11 @@ does not truncate.")
 ;; Output Functions / Variables
 ;;------------------------------------------------------------------------------
 
-(defcustom imp/output-buffer "ⓘ-imp/output-ⓘ"
+(defcustom imp-output-buffer "ⓘ-imp-output-ⓘ"
   "Name of the output buffer used by `imp--output-insert'.")
 
 
-(defcustom imp/output-level
+(defcustom imp-output-level
   '((:error . (:prefix "[ERROR   ]: "
                :func error))
     (:error:user . (:prefix "[ERROR   ]:USER-ERROR: "
@@ -70,15 +70,15 @@ does not truncate.")
 
 (defun imp--output-level-get (level setting)
   "Get a SETTING for an output LEVEL."
-  (plist-get (alist-get level imp/output-level)
+  (plist-get (alist-get level imp-output-level)
              setting))
 ;; (imp--output-level-get :error :prefix)
 ;; (imp--output-level-get :debug :func)
 
 
 (defun imp--output-insert (message &rest args)
-  "Output MESSAGE formatted with ARGS to the `imp/output-buffer'."
-  (with-current-buffer (get-buffer-create imp/output-buffer)
+  "Output MESSAGE formatted with ARGS to the `imp-output-buffer'."
+  (with-current-buffer (get-buffer-create imp-output-buffer)
     ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
     (goto-char (point-max))
     (insert (apply #'format
@@ -172,7 +172,7 @@ ARGS should be a list of args for formatting the STRING, or nil."
 (defun imp--error (caller string &rest args)
   "Create a formatted error message and raise an error signal with it.
 
-Uses `:error' level settings in `imp/output-level'.
+Uses `:error' level settings in `imp-output-level'.
 
 STRING should be a string, which can have formatting info in it (see `format'),
 and will be printed as the debug message.
@@ -183,14 +183,14 @@ ARGS should be a list of args for formatting the STRING."
                    string
                    args))
 ;; (imp--error "test:func" "True == %s" "False")
-;; (let ((imp/error-function nil)) (imp--error "test:func" "True == %s" "False"))
-;; (let ((imp/error-function #'message)) (imp--error "test:func" "True == %s" "False"))
+;; (let ((imp-error-function nil)) (imp--error "test:func" "True == %s" "False"))
+;; (let ((imp-error-function #'message)) (imp--error "test:func" "True == %s" "False"))
 
 
 (defun imp--error-if (error? caller string &rest args)
   "If ERROR? is non-nil, format STRING & ARGS and raise an error signal.
 
-Uses `:error' level settings in `imp/output-level'.
+Uses `:error' level settings in `imp-output-level'.
 
 STRING should be a string, which can have formatting info in it (see `format'),
 and will be printed as the debug message.
@@ -205,7 +205,7 @@ ARGS should be a list of args for formatting the STRING."
 (defun imp--error-user (caller string &rest args)
   "Create a formatted error message and raise an error signal with it.
 
-Uses `:error' level settings in `imp/output-level'.
+Uses `:error' level settings in `imp-output-level'.
 
 STRING should be a string, which can have formatting info in it (see `format'),
 and will be printed as the debug message.
@@ -220,4 +220,4 @@ ARGS should be a list of args for formatting the STRING."
 ;; The End.
 ;;------------------------------------------------------------------------------
 ;; Don't provide - entirely internal to imp.
-;; (imp/provide :imp 'error)
+;; (imp-provide :imp 'error)
