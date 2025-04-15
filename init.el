@@ -12,13 +12,14 @@
 ;;
 ;;; Commentary:
 ;;
-;; Init package systems:
-;;   - Emacs package stuff (e.g. `package.el').
-;;   - `use-package'
-;;   - `straight'
+;; In the beginning...
+;;   -what?
+;; No, early-beginning doesn't count.
+;; That just gets ready for the beginning.
+;; This is the actual beginning.
+;; ...anyways.
 ;;
-;; Oh, and `innit:package:upgrade'.
-;; Now we're the Postal Upgrade Service.
+;; In the beginning there was
 ;;
 ;;; Code:
 
@@ -48,13 +49,19 @@
 ;; External Requirements
 ;;------------------------------------------------------------------------------
 
-(defun --/assert/exe (exe)
-  "Assert `exe' can be found by Emacs."
+(defun --/exe/require (exe)
+  "Assert EXE can be found by Emacs."
   (cl-assert (executable-find exe)
 	     t
 	     "Emacs cannot find required exe: `%s'"))
 
-(--/assert/exe "git")
+(defun --/exe/optional (exe)
+  "Warn if EXE cannot be found by Emacs."
+  (unless (executable-find exe)
+    (warn "Emacs cannot find optional exe: `%s'" exe )))
+
+
+(--/exe/require "git")
 
     
 ;;------------------------------------------------------------------------------
@@ -383,8 +390,31 @@
 	       (cons '--/gptel/directive/default --/gptel/directive/default)))
 
 
+;;------------------------------------------------------------------------------
+;; dev-env: Language: Terraform (HCL)
+;;------------------------------------------------------------------------------
+;; 2023-07-23_sn004:/mantle/config/dev-env/languages/terraform.el
 
+;; ;;------------------------------------------------------------------------------
+;; ;; Sanity Check
+;; ;;------------------------------------------------------------------------------
 
+;; Lodge a complaint if 'terraform' isn't installed on the system. But don't
+;; skip the `terraform-mode' `use-package', since it only needs the exe for the
+;; compile stuff.
+(--/exe/optional "terraform")
+
+;; ;;------------------------------------------------------------------------------
+;; ;; Syntax Highlighting
+;; ;;------------------------------------------------------------------------------
+
+(use-package terraform-mode
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; `terraform fmt` uses 2 spaces per indent level
+  (terraform-indent-level 2))
 
 
 
@@ -398,7 +428,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(colorful-mode deadgrep git-gutter-fringe git-modes hc-zenburn-theme
-		   magit)))
+                   magit terraform-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
