@@ -24,47 +24,26 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Hack?
-;;------------------------------------------------------------------------------
-;; TODO: Unhack?
-;; TODO: Or at least move it into `imp-output-level' by making that able to use
-;;       multiple sinks or something of the like.
-
-(defvar imp--error-sink-hack-debug #'message
-  "Also send error messages to this function?
-
-Value should be nil or a function with a signature like `message'.
-
-Error messages get truncated and I haven't figured out how not to truncate:
-  Lisp error: (error \"[ERROR   ]: imp-require- Failed to find/load requi...\")
-
-This is really annoying when you error out in 'early-init.el' and cannot expand
-the messages to find out what happened... So also send to this function, which
-does not truncate.")
-
-
-;;------------------------------------------------------------------------------
 ;; Output Functions / Variables
 ;;------------------------------------------------------------------------------
 
 (defcustom imp-output-buffer "ⓘ-imp-output-ⓘ"
-  "Name of the output buffer used by `imp--output-insert'.")
-
+  "Name of the output buffer used by `imp--output-sink'.")
 
 (defcustom imp-output-level
-  '((:error . (:prefix "[ERROR   ]: "
-               :func error))
-    (:error:user . (:prefix "[ERROR   ]:USER-ERROR: "
-                    :func user-error))
-    (:debug . (:prefix "[   debug]: "
-               ;; :func message
-               :func imp--output-insert))
+  '((:error      . (:display "ERROR"
+                    :sink (error imp--output-sink)))
+    (:error:user . (:display "ERROR:user"
+                    :sink (user-error imp--output-sink)))
+    (:debug      . (:display "debug"
+                    :align right ; default/nil: left
+                    ;; :sink message
+                    :sink (message imp--output-sink)))
 
     ;; Not really a level, but available to debug messages via
     ;; `imp--debug-newline'.
-    (:blank . (:prefix ""
-               ;; :func message
-               :func imp--output-insert)))
+    (:blank . (;; :sink message
+               :sink imp--output-sink)))
   "Output message level (:debug, :error, etc) settings.")
 
 
@@ -72,12 +51,42 @@ does not truncate.")
   "Get a SETTING for an output LEVEL."
   (plist-get (alist-get level imp-output-level)
              setting))
-;; (imp--output-level-get :error :prefix)
-;; (imp--output-level-get :debug :func)
+;; (imp--output-level-get :error :display)
+;; (imp--output-level-get :debug :sink)
 
 
-(defun imp--output-insert (message &rest args)
-  "Output MESSAGE formatted with ARGS to the `imp-output-buffer'."
+(defun imp--output-prefix (level)
+  ;;  "[ERROR     ]: "
+  ;;  "[ERROR:user]: "
+  ;;  "[warning   ]: "
+  ;;  "[     debug]: "
+  (if-let ((display (imp--output-level-get level :display)))
+      (format (concat "[%"
+                      (when (memq (imp--output-level-get level :align) '(nil left)) "-")
+                      (format "%d"
+                              (length
+                               (plist-get
+                                (cdr
+                                 (seq-reduce (lambda (a b)
+                                               (if (> (length (plist-get (cdr a) :display))
+                                                      (length (plist-get (cdr b) :display)))
+                                                   a
+                                                 b))
+                                             imp-output-level
+                                             nil))
+                                :display)))
+                      "s]: ")
+              display)
+    ""))
+;; (imp--output-prefix :error)
+;; (imp--output-prefix :debug)
+;; (imp--output-prefix :blank)
+
+
+(defun imp--output-sink (message &rest args)
+  "Output MESSAGE formatted with ARGS to the `imp-output-buffer'.
+
+Must have signature like `format' & `message'"
   (with-current-buffer (get-buffer-create imp-output-buffer)
     ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
     (goto-char (point-max))
@@ -89,12 +98,14 @@ does not truncate.")
                        ""
                      "\n")
                    args))))
-;; (imp--output-insert "General Kenobi.")
-;; (imp--output-insert "Hello there.")
+;; (imp--output-sink "General Kenobi.")
+;; (imp--output-sink "Hello there.")
 
 
 (defun imp--output (level caller string args)
   "Output a message (formatted from STRING & ARGS) from CALLER function.
+
+Output to LEVEL's `:sinks' functions.
 
 LEVEL should be one of the alist keys in `imp--output-prefix'.
 
@@ -105,39 +116,32 @@ STRING should be:
   - A string (which can have formatting info in it (see `format')).
     Will be printed as the debug message.
   - A list of strings (which can have formatting info in it (see `format')).
-    Will be concatenated and printed as the debug message.
+    Will be concatenated.
 
 ARGS should be a list of args for formatting the STRING, or nil."
-  (when-let ((func (imp--output-level-get level :func))
-             (prefix (imp--output-level-get level :prefix)))
+  (when (imp--output-level-get level :sink)
+    (let ((sinks (imp--output-level-get level :sink))
+          (prefix (imp--output-prefix level)))
 
-    ;; TODO-HACK: Format & send error output to *Messages* buffer?
-    (when (and (eq level :error)
-               (functionp imp--error-sink-hack-debug))
-      (apply imp--error-sink-hack-debug
-             (concat prefix
-                     caller
-                     (if caller ": " "")
-                     (cond ((stringp string)
-                            string)
-                           ((null string)
-                            nil)
-                           ((listp string)
-                            (apply #'concat string))))
-             args))
+      (unless (listp sinks)
+        (setq lists (list sinks)))
 
-    ;; Format & send output to the level's output function.
-    (apply func
-           (concat prefix
-                   caller
-                   (if caller ": " "")
-                   (cond ((stringp string)
-                          string)
-                         ((null string)
-                          nil)
-                         ((listp string)
-                          (apply #'concat string))))
-           args)))
+      ;; Send to each sink.
+      (dolist (sink sinks result)
+        ;; Format & send output to the level's output function.
+        (apply sink
+               (concat prefix
+                       caller
+                       (if caller ": " "")
+                       (cond ((stringp string)
+                              string)
+                             ((null string)
+                              nil)
+                             ((listp string)
+                              (apply #'concat string))))
+               args)))))
+;; (imp--output :error "me" "General Kenobi." nil)
+;; (imp--output "Hello there.")
 
 
 ;;------------------------------------------------------------------------------
@@ -161,11 +165,11 @@ ARGS should be a list of args for formatting the STRING, or nil."
                        (t
                         (format "%S" callers)))))
     (if callers
-        (concat this " <-via- " callers)
+        (concat this " ⇐ " callers)
+      ;; (concat this " <-via- " callers)
       this)))
 ;; (imp--output-callers "bob" nil)
 ;; (imp--output-callers "bob" "alice")
-;; (imp--output-callers "C" (nub:format:callers "B" "A"))
 ;; (imp--output-callers nil nil)
 
 
@@ -179,12 +183,12 @@ and will be printed as the debug message.
 
 ARGS should be a list of args for formatting the STRING."
   (imp--output :error
-                   caller
-                   string
-                   args))
-;; (imp--error "test:func" "True == %s" "False")
-;; (let ((imp-error-function nil)) (imp--error "test:func" "True == %s" "False"))
-;; (let ((imp-error-function #'message)) (imp--error "test:func" "True == %s" "False"))
+               caller
+               string
+               args))
+;; (imp--error "test-func" "True == %s" "False")
+;; (let ((imp-error-function nil)) (imp--error "test-func" "True == %s" "False"))
+;; (let ((imp-error-function #'message)) (imp--error "test-func" "True == %s" "False"))
 
 
 (defun imp--error-if (error? caller string &rest args)
@@ -193,13 +197,13 @@ ARGS should be a list of args for formatting the STRING."
 Uses `:error' level settings in `imp-output-level'.
 
 STRING should be a string, which can have formatting info in it (see `format'),
-and will be printed as the debug message.
+and will be printed as the error message.
 
 ARGS should be a list of args for formatting the STRING."
   (when error?
     (imp--error caller
-                    string
-                    args)))
+                string
+                args)))
 
 
 (defun imp--error-user (caller string &rest args)
@@ -208,13 +212,13 @@ ARGS should be a list of args for formatting the STRING."
 Uses `:error' level settings in `imp-output-level'.
 
 STRING should be a string, which can have formatting info in it (see `format'),
-and will be printed as the debug message.
+and will be printed as the error message.
 
 ARGS should be a list of args for formatting the STRING."
   (imp--output :error:user
-                   caller
-                   string
-                   args))
+               caller
+               string
+               args))
 
 ;;------------------------------------------------------------------------------
 ;; The End.
