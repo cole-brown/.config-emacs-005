@@ -66,10 +66,8 @@ If MSG is non-nil, it is output just before the status but in the same
   (interactive)
 
   (let* ((line "────────────────────────────────")
-         (status (list "Debug Feature Flag:    %s"
-                   "`imp--debugging?': %s"
-                   line
-                   " %s")))
+         (status '("imp--debugging?: [%s]")))
+
     ;;---
     ;; Do we have a message?
     ;;---
@@ -93,18 +91,9 @@ If MSG is non-nil, it is output just before the status but in the same
     (message (mapconcat #'identity
                         status
                         "\n")
-             ;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
-             ;; "debug.el" is loaded before "flag.el" so can't use `imp-flag?' here.
-             (if (and (fboundp 'featurep!)
-                      (featurep! +debug))
-                 "[FEATURE]"
-               "[-------]")
              (if imp--debugging?
-                 "[FLAGGED]"
-               "[-------]")
-             (if (imp--debug-enabled?)
-                 "[ENABLED]"
-               "[disabled]"))))
+                 "YES"
+               "no"))))
 ;; (imp-debug-status)
 ;; (imp-debug-status "Toggled a bit via solar radiation.")
 
@@ -117,7 +106,8 @@ If MSG is non-nil, it is output just before the status but in the same
   "Initialize `imp' debugging based on Emacs' variables.
 
 Checks:
-  - `init-file-debug'
+  - Env Var: DEBUG
+  - CLI param `--debug-on-init' aka variable `init-file-debug'
   - `debug-on-error'
 
 Return non-nil if debugging."
@@ -172,29 +162,6 @@ Return non-nil if debugging."
     imp--debugging?))
 
 
-(defun imp--debug-enabled? ()
-  "Return non-nil if one or more debug flags are enabled.
-
-Flags:
-  - `+debug' feature flag in `doom!' macro in user's \"<doom-dir>/init.el\".
-  - `imp--debugging' toggle variable."
-  ;; Is a debug flag enabled?
-  (cond
-   ;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
-   ;; The `+debug' flag in the `doom!' macro in user's "<doom-dir>/init.el".
-   ;; "debug.el" is loaded before "flag.el" so can't use `imp-flag?' here.
-   ((and (fboundp 'featurep!)
-         (featurep! +debug))
-    t)
-
-   ;; `:imp' debugging boolean: Return its value if not nil.
-   (imp--debugging?)
-
-   ;; Fallthrough: debugging is not enabled.
-   (t
-    nil)))
-
-
 (defun imp--debug (caller string &rest args)
   "Print out a debug message if debugging is enabled.
 
@@ -204,21 +171,21 @@ STRING should be a string, which can have formatting info in it (see `format'),
 and will be printed as the debug message.
 
 ARGS should be args for formatting the STRING."
-  (when (imp--debug-enabled?)
+  (when imp--debugging?
     (imp--output :debug
-                     caller
-                     string
-                     args)))
+                 caller
+                 string
+                 args)))
 ;; (imp--debug "test_func" "test")
 
 
 (defun imp--debug-newline ()
   "Prints an empty debug line if debugging."
-  (when t ;; (imp--debug-enabled?)
+  (when imp-debugging?
     (imp--output :blank
-                     nil
-                     " "
-                     nil)))
+                 nil
+                 " "
+                 nil)))
 ;; (imp--debug-newline)
 
 ;;------------------------------------------------------------------------------

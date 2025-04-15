@@ -74,9 +74,9 @@
 
 
   ;;------------------------------
-  ;; Debug ASAP!..
+  ;; Debug: Get it initialized ASAP, cuz I bug a lot.
   ;;------------------------------
-  (imp--init-load "debug")
+  (imp--init-load "debug") ;k
   (imp--debug-init)
 
 
