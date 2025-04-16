@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/error.el --- imp error helpers -*- lexical-binding: t; -*-
+;;; imp/error.el --- imp error helpers -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -22,13 +22,15 @@
 ;;
 ;;; Code:
 
+(require 'seq)
 
 ;;------------------------------------------------------------------------------
-;; Output Functions / Variables
+;; Custom Variables
 ;;------------------------------------------------------------------------------
 
 (defcustom imp-output-buffer "ⓘ-imp-output-ⓘ"
   "Name of the output buffer used by `imp--output-sink'.")
+
 
 (defcustom imp-output-level
   '((:error      . (:display "ERROR"
@@ -46,6 +48,46 @@
                :sink imp--output-sink)))
   "Output message level (:debug, :error, etc) settings.")
 
+
+;;------------------------------------------------------------------------------
+;; String Helpers
+;;------------------------------------------------------------------------------
+
+(defun imp--string-or-nil (input)
+  "Normalize INPUT to string or nil"
+  (declare (pure t)
+           (side-effect-free t))
+  (if (or (stringp input)
+          (null input))
+      input
+    (format "%S" input)))
+
+
+(defun imp--output-callers (callers)
+  "Format a string from CALLERS.
+
+Return nil if no callers."
+  (declare (pure t)
+           (side-effect-free t))
+  (seq-reduce (lambda (output next)
+                "nil-aware concat"
+                (if (and output next)
+                    (concat next " ⇐ " output)
+                  (or output next)))
+              (seq-map #'imp--string-or-nil
+                       (reverse callers))
+              nil))
+;; (imp--output-callers '("bob" nil))
+;; (imp--output-callers '("bob" "alice"))
+;; (imp--output-callers '("bob" alice))
+;; (imp--output-callers '(nil nil))
+;; (imp--output-callers '(test . (some . (deeper . (callers . nil)))))
+;; (imp--output-callers '(fail . (cuz . (not . list))))
+
+
+;;------------------------------------------------------------------------------
+;; Output
+;;------------------------------------------------------------------------------
 
 (defun imp--output-level-get (level setting)
   "Get a SETTING for an output LEVEL."
@@ -109,8 +151,10 @@ Output to LEVEL's `:sinks' functions.
 
 LEVEL should be one of the alist keys in `imp--output-prefix'.
 
-CALLER should be a string of the calling function's name.
-  - It can be nil, though it is /really/ not suggested.
+CALLER should be one of:
+  - a string or symbol representing the calling function's name
+  - a list of such
+It can be nil, though it is not suggested.
 
 STRING should be:
   - A string (which can have formatting info in it (see `format')).
@@ -121,7 +165,8 @@ STRING should be:
 ARGS should be a list of args for formatting the STRING, or nil."
   (when (imp--output-level-get level :sink)
     (let ((sinks (imp--output-level-get level :sink))
-          (prefix (imp--output-prefix level)))
+          (prefix (imp--output-prefix level))
+          (caller (imp--output-callers caller)))
 
       (unless (listp sinks)
         (setq lists (list sinks)))
@@ -145,38 +190,16 @@ ARGS should be a list of args for formatting the STRING, or nil."
 
 
 ;;------------------------------------------------------------------------------
-;; String Helpers
+;; Error
 ;;------------------------------------------------------------------------------
 
-(defun imp--output-callers (this &optional callers)
-  "Build a caller string from THIS & CALLERS strings.
-
-`imp' users should use `nub:format:callers' instead of this."
-  (let ((this (cond ((null this)
-                     nil)
-                    ((stringp this)
-                     this)
-                    (t
-                     (format "%S" this))))
-        (callers (cond ((null callers)
-                        nil)
-                       ((stringp callers)
-                        callers)
-                       (t
-                        (format "%S" callers)))))
-    (if callers
-        (concat this " ⇐ " callers)
-      ;; (concat this " <-via- " callers)
-      this)))
-;; (imp--output-callers "bob" nil)
-;; (imp--output-callers "bob" "alice")
-;; (imp--output-callers nil nil)
-
-
 (defun imp--error (caller string &rest args)
-  "Create a formatted error message and raise an error signal with it.
+  "Output formatted error message to `imp-output-level' `:error' sinks.
 
-Uses `:error' level settings in `imp-output-level'.
+CALLER should be one of:
+  - a string or symbol representing the calling function's name
+  - a list of such
+It can be nil, though it is not suggested.
 
 STRING should be a string, which can have formatting info in it (see `format'),
 and will be printed as the debug message.
@@ -196,6 +219,11 @@ ARGS should be a list of args for formatting the STRING."
 
 Uses `:error' level settings in `imp-output-level'.
 
+CALLER should be one of:
+  - a string or symbol representing the calling function's name
+  - a list of such
+It can be nil, though it is not suggested.
+
 STRING should be a string, which can have formatting info in it (see `format'),
 and will be printed as the error message.
 
@@ -210,6 +238,11 @@ ARGS should be a list of args for formatting the STRING."
   "Create a formatted error message and raise an error signal with it.
 
 Uses `:error' level settings in `imp-output-level'.
+
+CALLER should be one of:
+  - a string or symbol representing the calling function's name
+  - a list of such
+It can be nil, though it is not suggested.
 
 STRING should be a string, which can have formatting info in it (see `format'),
 and will be printed as the error message.
