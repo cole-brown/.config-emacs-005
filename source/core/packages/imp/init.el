@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/init.el --- Structured IMPort/export of elisp features  -*- lexical-binding: t; -*-
+;;; imp/init.el --- Structured IMPort/export of elisp features  -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -83,8 +83,8 @@
   ;;------------------------------
   ;; Order matters.
   ;;------------------------------
-  (imp--init-load "feature")
   (imp--init-load "alist")
+  (imp--init-load "feature")
   (imp--init-load "tree")
   (imp--init-load "path")
   (imp--init-load "+flag")   ;; Currently optional but always loaded. Could make fully optional or required.
