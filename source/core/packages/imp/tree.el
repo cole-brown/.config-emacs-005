@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/tree.el --- imp feature tree helpers -*- lexical-binding: t; -*-
+;;; imp/tree.el --- imp feature tree helpers -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -24,8 +24,9 @@
 
 
 ;;--------------------------------------------------------------------------------
-;; Constants & Variables
+;; Debugging
 ;;--------------------------------------------------------------------------------
+;; Tree debugging will flood out other debugging, so enable/disable separately.
 
 (defvar imp--tree-debug-flag nil
   "Allow `imp--tree-debug' to call `imp--debug'?")
@@ -41,11 +42,13 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Predicates: Types
+;; Predicates
 ;;------------------------------------------------------------------------------
 
 (defun imp--tree-node? (node)
-  "Retuns t if NODE is a node; nil otherwise (including if NODE is a
+  "Is NODE an imp tree node?
+
+Return t if NODE is a node; nil otherwise (including if NODE is a
 tree or nil)."
   ;; A node is:
   ;;   - A list...
@@ -56,12 +59,16 @@ tree or nil)."
        (not (null (car node)))
        (not (listp (car node)))
        (symbolp (car node))))
+;; (imp--tree-node? nil)
 ;; (imp--tree-node? :root)
 ;; (imp--tree-node? '(:root))
+;; (imp--tree-node? '((alist-key alist-value)))
 
 
 (defun imp--tree-tree? (tree)
-  "Retuns t if TREE is a tree; nil otherwise (including if TREE is a node)."
+  "Is TREE an imp tree?
+
+Return t if TREE is a tree; nil otherwise (including if TREE is a node)."
   ;; A tree is:
   ;;   - A list...
   ;;   - ...which has nodes for each item in it (so an alist of nodes).
@@ -73,21 +80,23 @@ tree or nil)."
      (seq-contains-p (mapcar #'imp--tree-node? tree)
                      nil))))
 ;; symbol: no
-;;   (imp--tree? :root)
+;;   (imp--tree-tree? :root)
 ;; node: no
-;;   (imp--tree? '(:root))
+;;   (imp--tree-tree? '(:root))
 ;; list of node: yes
-;;   (imp--tree? '((:root)))
-;;   (imp--tree? '((:root :ignored) (:root02) (:root03)))
+;;   (imp--tree-tree? '((:root)))
+;;   (imp--tree-tree? '((:root :ignored) (:root02) (:root03)))
 
 
 (defun imp--tree-chain? (chain &optional rooted)
-  "Retuns t if CHAIN is a chain of tree keys; nil otherwise (including if CHAIN
+  "Is CHAIN a chain of tree keys?
+
+Return t if CHAIN is a chain of tree keys; nil otherwise (including if CHAIN
 is nil)."
   (let (is-chain
         (is-rooted t)) ;; default to true for when not interested in rootedness.
 
-    ;; A tree is:
+    ;; A chain is:
     ;;   - A list...
     ;;   - ...which has symbols as the only items in it.
     ;; A
@@ -114,7 +123,7 @@ is nil)."
 
 
 (defun imp--tree-key-exists? (key tree)
-  "Returns non-nil if key exists in tree, even if it has no children.
+  "Return non-nil if key exists in tree, even if it has no children.
 
 Return value is KEY's entry in TREE, or nil if KEY does not exist."
   (imp--alist-get-pair key tree))
@@ -129,8 +138,8 @@ Return value is KEY's entry in TREE, or nil if KEY does not exist."
   "Create an alist entry for a tree from CHAIN and VALUE."
   (unless (listp chain) ;; nil ok too
     (imp--error "imp--tree-chain"
-                    "Chain cannot be created - expected list, got: %S"
-                    chain))
+                "Chain cannot be created - expected list, got: %S"
+                chain))
   ;; Set-up: Need to build in reverse.
   (let* ((backwards (reverse chain))
          ;; Entry starts off as the final link w/ the value (if the value is not
@@ -297,8 +306,8 @@ Returns an updated copy of tree."
           (imp--tree-debug "imp--tree-update" "  key:   %S" (car entry))
           (imp--tree-debug "imp--tree-update" "  value: %S" (cdr entry))
           (setq branch-update (imp--alist-update (car entry)
-                                                     (cdr entry)
-                                                     branch)))
+                                                 (cdr entry)
+                                                 branch)))
 
         ;;------------------------------
         ;; Finish by updating tree.
@@ -365,9 +374,9 @@ If VALUE is nil, just adds chain - does not add a nil child."
 
       (t
        (imp--error "imp--tree-update"
-                       "Unable to update tree: not a list or a symbol: %S (type: %S)"
-                       macro<imp>:tree
-                       (typeof macro<imp>:tree))))))
+                   "Unable to update tree: not a list or a symbol: %S (type: %S)"
+                   macro<imp>:tree
+                   (typeof macro<imp>:tree))))))
 ;; (setq test<imp>:tree nil)
 ;; (imp--tree-update '(:foo bar baz) 'qux test<imp>:tree)
 ;; test<imp>:tree
@@ -389,7 +398,7 @@ If VALUE is nil, just adds chain - does not add a nil child."
     (imp--error "imp--tree-contains" "TREE is not a tree: %S" tree))
 
   (imp--tree-debug "imp--tree-contains?" "CHAIN and TREE verified as valid.\n  chain: %S\n  tree:\n    %S"
-                  chain tree)
+                   chain tree)
 
   ;;------------------------------
   ;; Does tree contain the chain?
@@ -406,9 +415,9 @@ If VALUE is nil, just adds chain - does not add a nil child."
 
     ;; Final entry:
     (imp--tree-debug "imp--tree-contains?" "final entry for link '%S': %S"
-                    (car (last chain)) entry)
+                     (car (last chain)) entry)
     (imp--tree-debug "imp--tree-contains?" "final branch: %S"
-                    branch)
+                     branch)
 
     ;; Return whatever we found after walking that whole chain. Will be either
     ;; a tree entry or nil, so that satisfies our predicate nature.
