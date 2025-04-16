@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/alist.el --- imp alist helpers -*- lexical-binding: t; -*-
+;;; imp/alist.el --- imp alist helpers -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -12,67 +12,47 @@
 ;;
 ;;; Commentary:
 ;;
-;; imp alist helpers
+;; Associative List Helpers
+;; ...and a few plain old list helpers we can't get rid of.
 ;;
-;; NOTE: 'imp' only! Everyone else go to: 'core/modules/emacs/alist'
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; A random list function.
+;; A List Function.
 ;;------------------------------------------------------------------------------
 
-(defun imp--list-flatten-recurse (recurse &rest input)
-  "Flatten INPUT list to a single list.
+(defun imp--list-flatten (input)
+  "Take INPUT and return it as flat list.
 
-If RECURSE is an integer greater than zero, flatten by that many levels.
-If RECURSE `:recursive', flatten recursively until flat.
-Else, flatten by one level."
-  (let ((recurse (if (integerp recurse)
-                     ;; We always flatten by one; find out how many extra levels
-                     ;; of flattening they want.
-                     (1- recurse)
-                   recurse)))
-    (mapcan (lambda (item)
-              "Return item as a list."
-              (if (listp item)
-                  ;; List & needs flattening; check for special `recurse' cases.
-                  (cond ((integerp recurse)
-                         ;; Flatten by a certain number of levels?
-                         (if (> recurse 0)
-                             (apply #'imp--list-flatten-recurse (1- recurse) item)
-                           item))
-                        ((eq :recursive recurse)
-                         ;; Flatten until flat or stack overflow.
-                         (apply #'imp--list-flatten-recurse :recursive item))
-                        (t
-                         item))
-                ;; Just an item, turn into a list so it can be
-                ;; concatenated by `mapcan'.
-                (list item)))
-            input)))
-;; (imp--list-flatten-recurse 1 '(foo bar (baz) (qux (quux))))
-;; (imp--list-flatten-recurse 1 'foo 'bar '(baz) '(qux (quux)))
-;; (imp--list-flatten-recurse :recursive '(foo bar (baz) (qux (quux (quuux)))))
+If INPUT is a list, flatten it.
+If INPUT is not a list, put it in a list.
 
+NOTE: nil represents a empty list, so nils will disappear during flattening.
 
-(defun imp--list-flatten (&rest input)
-  "Flatten INPUT list to a single list.
+NOTE: '(atom . atom) is not considered a list and is not flattened.
 
-Flatten by a max of 10 levels."
-  ;; &rest wrapped our INPUT in a list, and `imp--list-flatten-recurse' will
-  ;; do the same, so +2 to our max of 10.
-  (imp--list-flatten-recurse 12 input))
+NOTE: recursive"
+  (declare (pure t)
+           (side-effect-free t)
+           (important-return-value t))
+  (apply 'append
+         (mapcar (lambda (x)
+                   (if (and (listp x) (listp (cdr x)))
+                       (imp--list-flatten x)
+                     (list x)))
+                 input)))
 ;; (imp--list-flatten '(foo bar (baz) (qux (quux))))
 ;; (imp--list-flatten '(foo bar (baz) (qux (quux (quuux)))))
+;; (imp--list-flatten '(foo bar (baz) (qux . quux)))
 
 
 ;;------------------------------------------------------------------------------
 ;; A-list Functions
 ;;------------------------------------------------------------------------------
 
-(defun imp--alist-valid-key (caller key &optional error?)
+(defun imp--alist-key-valid (caller key &optional error?)
   "Return non-nil if KEY is valid.
 
 CALLER should be the calling function's name string.
@@ -80,14 +60,14 @@ CALLER should be the calling function's name string.
 If ERROR? is non-nil, raise an error for invalid keys. Else return nil/non-nil."
   (if (stringp key)
       (if error?
-          (imp--error (imp--output-callers "imp--alist-valid-key" caller)
-                          "imp alist cannot have a string key! Key: %S"
-                          key)
+          (imp--error (cons "imp--alist-key-valid" caller)
+                      "imp alist cannot have a string key! Key: %S"
+                      key)
         nil)
     key))
-;; (imp--alist-valid-key "test" 'foo t)
-;; (imp--alist-valid-key "test" :foo t)
-;; (imp--alist-valid-key "test" "foo" t)
+;; (imp--alist-key-valid "test" 'foo t)
+;; (imp--alist-key-valid "test" :foo t)
+;; (imp--alist-key-valid "test" "foo" t)
 
 
 (defun imp--alist-get-value (key alist &optional equal-fn)
@@ -95,7 +75,7 @@ If ERROR? is non-nil, raise an error for invalid keys. Else return nil/non-nil."
 
 EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
 two alist keys."
-  (imp--alist-valid-key "imp--alist-get-value" key :error)
+  (imp--alist-key-valid "imp--alist-get-value" key :error)
   (alist-get key alist nil nil equal-fn))
 ;; (imp--alist-get-value :foo test-foo #'equal)
 
@@ -105,7 +85,7 @@ two alist keys."
 
 EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
 two alist keys."
-  (imp--alist-valid-key "imp--alist-get-pair" key :error)
+  (imp--alist-key-valid "imp--alist-get-pair" key :error)
   (assoc key alist equal-fn))
 
 
@@ -119,7 +99,7 @@ EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
 two alist keys.
 
 Return an updated alist, which may or may not be ALIST."
-  (imp--alist-valid-key "imp--alist-update-helper" key :error)
+  (imp--alist-key-valid "imp--alist-update-helper" key :error)
 
   (if (null alist)
       ;; Create a new alist and return it.
@@ -145,23 +125,23 @@ EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
 two alist keys.
 
 Return updated ALIST."
-  `(let ((macro<imp>:alist ,alist))
+  `(let ((imp--macro-alist ,alist))
      (cond
-      ((listp macro<imp>:alist)
+      ((listp imp--macro-alist)
        (setq ,alist
              (imp--alist-update-helper ,key ,value ,alist ,equal-fn)))
-      ((symbolp macro<imp>:alist)
-       (set macro<imp>:alist
-            (imp--alist-update-helper ,key ,value (eval macro<imp>:alist) ,equal-fn)))
+      ((symbolp imp--macro-alist)
+       (set imp--macro-alist
+            (imp--alist-update-helper ,key ,value (eval imp--macro-alist) ,equal-fn)))
 
       (t
        (imp--error "imp--alist-update"
                        "Unable to update alist: not a list or a symbol: %S (type: %S)"
-                       macro<imp>:alist
-                       (typeof macro<imp>:alist))))))
-;; (setq test<imp>:alist nil)
-;; (imp--alist-update :k0 :v0 test<imp>:alist)
-;; test<imp>:alist
+                       imp--macro-alist
+                       (typeof imp--macro-alist))))))
+;; (setq test-imp-alist nil)
+;; (imp--alist-update :k0 :v0 test-imp-alist)
+;; test-imp-alist
 
 
 (defun imp--alist-delete-helper (key alist &optional equal-fn)
@@ -171,7 +151,7 @@ EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
 two alist keys.
 
 Return updated ALIST sans KEY."
-  (imp--alist-valid-key "imp--alist-delete-helper" key :error)
+  (imp--alist-key-valid "imp--alist-delete-helper" key :error)
 
   ;; If it's null, no need to do anything.
   (unless (null alist)

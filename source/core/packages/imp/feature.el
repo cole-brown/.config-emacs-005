@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/feature.el --- imp feature tree, name normalization, etc -*- lexical-binding: t; -*-
+;;; imp/feature.el --- imp feature tree, name normalization, etc -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -35,7 +35,7 @@
 (defvar imp-features nil
   "Features that have been loaded by `imp-provide'.
 
-It is a tree; an alist of alists of ... ad nauseam. Provided features are the
+It is a tree; an alist of alists of ad nauseam. Provided features are the
 leaves, and their feature names should be built from the path traversed to get
 to them.
   - I.e. directory structures w/ files as leaves.
@@ -77,10 +77,6 @@ For example:
 
 (defvar imp-features-locate nil
   "Alist of imp features to paths/filenames.
-
-NOTE: Use `equal' for the `imp<alist>:[...]' EQUAL-FN params!
-
-'(normalized-feature . (file-path-0 ...))
 
 Example:
   (list (list :imp \"init.el\")
