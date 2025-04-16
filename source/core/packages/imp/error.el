@@ -53,16 +53,6 @@
 ;; String Helpers
 ;;------------------------------------------------------------------------------
 
-(defun imp--string-or-nil (input)
-  "Normalize INPUT to string or nil"
-  (declare (pure t)
-           (side-effect-free t))
-  (if (or (stringp input)
-          (null input))
-      input
-    (format "%S" input)))
-
-
 (defun imp--output-callers (callers)
   "Format a string from CALLERS.
 

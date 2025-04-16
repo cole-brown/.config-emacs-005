@@ -107,7 +107,7 @@ by `imp-features-locate'.")
   ;; When not `imp-features', always return `nil'.
   (when imp-features
     (not (null (imp--tree-contains? (imp--list-flatten features)
-                                        imp-features)))))
+                                    imp-features)))))
 ;; (imp-feature-exists? '(:imp))
 ;; (imp-feature-exists? '(:imp provide))
 ;; (imp-feature-exists? '(:imp (provide)))
@@ -132,9 +132,6 @@ by `imp-features-locate'.")
 ;; (imp-mode? 'evil-mode-jeff)
 
 
-(defalias 'imp-featurep 'imp-feature?)
-
-
 (defun imp--feature-count (&optional tree)
   "Count features in TREE.
 
@@ -157,7 +154,6 @@ Return count of leaf nodes in TREE."
 Return count of leaf nodes."
   (imp--feature-count imp-features))
 ;; (imp-feature-count)
-
 
 
 ;;------------------------------------------------------------------------------
@@ -198,21 +194,6 @@ String to use in between symbols when translating an imp symbol chain to
 an Emacs symbol.")
 
 
-(defun imp--str-empty? (str &optional trim?)
-  "Return non-nil if STR is nil or empty.
-
-If TRIM? is non-nil, use `string-trim' before checking if string is empty."
-  (or (null str)
-      (string= ""
-               (if trim?
-                   (string-trim str)
-                 str))))
-;; (imp--str-empty? nil)
-;; (imp--str-empty? "")
-;; (imp--str-empty? " ")
-;; (imp--str-empty? " " :trim)
-
-
 (defun imp--feature-name-normalize (input)
   "Normalize INPUT to a symbol.
 
@@ -250,18 +231,18 @@ Always returns a backwards list.
         output)
     (dolist (item (imp--list-flatten input))
       (let ((normalized (imp--feature-name-normalize item)))
-        (if (imp--str-empty? normalized)
+        (if (imp--string-empty? normalized)
             (imp--error func/name
-                            "Cannot use INPUT '%S'; it normalizes to nothing: %S"
-                            item
-                            normalized)
+                        "Cannot use INPUT '%S'; it normalizes to nothing: %S"
+                        item
+                        normalized)
           (push normalized output))))
 
     ;; Return the list or raise an error.
     (if (null output)
         (imp--error func/name
-                        "No normalized strings produced from INPUT: %S"
-                        input))
+                    "No normalized strings produced from INPUT: %S"
+                    input))
     output))
 ;; (imp--feature-normalize-string "+spydez" "foo" "bar")
 ;; (imp--feature-normalize-string '((nil)))
@@ -299,8 +280,8 @@ First symbol in output list will be a keyword; rest will be symbols.
     ;; Return the list or raise an error.
     (if (null output)
         (imp--error func/name
-                        "No normalized features produced from INPUT: %S"
-                        input))
+                    "No normalized features produced from INPUT: %S"
+                    input))
     output))
 ;; (imp--feature-normalize '+layout/spydez)
 ;; (imp--feature-normalize :spydez)
@@ -360,8 +341,8 @@ E.g.
     ;; Return the list, the one item, or error?
     (cond ((null normalized)
            (imp--error "imp-feature-normalize"
-                           "Error normalizing features from INPUT; no features produced: %S"
-                           input))
+                       "Error normalizing features from INPUT; no features produced: %S"
+                       input))
 
           ((= 1 (length normalized))
            (nth 0 normalized))
@@ -417,7 +398,7 @@ list of keywords/symbols."
   (imp--tree-update normalized nil imp-features)
 
   (imp--debug "imp--feature-add" "imp-features after:\n%s"
-                  (pp-to-string imp-features))
+              (pp-to-string imp-features))
   ;; Not sure what to return, but the updated features seems decent enough.
   imp-features)
 ;; (setq imp-features nil)
@@ -445,8 +426,8 @@ Only check `imp-features' variable; does not check Emacs' `features' list."
   (if (imp-feature-exists? (cons feature:base feature))
       t
     (imp--error "imp-feature-assert"
-                    "No `%S' feature exists in imp's features!"
-                    (imp-feature-normalize (list feature:base feature)))))
+                "No `%S' feature exists in imp's features!"
+                (imp-feature-normalize (list feature:base feature)))))
 
 
 ;;------------------------------------------------------------------------------
@@ -456,7 +437,7 @@ Only check `imp-features' variable; does not check Emacs' `features' list."
 (defun imp--feature-locations (feature:base)
   "Return FEATURE:BASE's entry in `imp-features-locate' or nil."
   (imp--alist-get-value feature:base
-                            imp-features-locate))
+                        imp-features-locate))
 
 
 (defun imp--feature-paths (feature:base &rest feature)
@@ -485,8 +466,8 @@ Errors if:
     ;; 2) Have registered a root path.
     (unless (imp--path-root-contains? feature:base)
       (imp--error func/name
-                      "Feature `%S' does not have a root path in imp."
-                      feature:base))
+                  "Feature `%S' does not have a root path in imp."
+                  feature:base))
 
     ;;------------------------------
     ;; Get the paths and load them?
@@ -494,42 +475,42 @@ Errors if:
     (let* ((path:root (imp--path-root-dir feature:base))
            (feature:locations (imp--feature-locations feature:base))
            (paths (imp--alist-get-value check
-                                            feature:locations
-                                            imp--features-locate-equal)))
+                                        feature:locations
+                                        imp--features-locate-equal)))
       (imp--debug func/name
-                      '("Get feature paths:\n"
-                        "  - feature:base: %S\n"
-                        "  - path:root:    %s\n"
-                        "  - feature:locations: %S\n"
-                        "  - paths: %S")
-                      feature:base
-                      path:root
-                      feature:locations
-                      paths)
+                  '("Get feature paths:\n"
+                    "  - feature:base: %S\n"
+                    "  - path:root:    %s\n"
+                    "  - feature:locations: %S\n"
+                    "  - paths: %S")
+                  feature:base
+                  path:root
+                  feature:locations
+                  paths)
 
       ;;---
       ;; Error Checks
       ;;---
       (unless feature:locations
         (imp--error func/name
-                        "No feature locations found for: %S"
-                        feature:base))
+                    "No feature locations found for: %S"
+                    feature:base))
 
       (unless paths
         (imp--error func/name
-                        "No feature paths found for: %S"
-                        check))
+                    "No feature paths found for: %S"
+                    check))
 
       ;;---
       ;; Done; return.
       ;;---
       (imp--debug func/name
-                      '("Return feature paths for `%S':\n"
-                        "  - path:root:    %s\n"
-                        "  - paths: %S")
-                      feature:base
-                      path:root
-                      paths)
+                  '("Return feature paths for `%S':\n"
+                    "  - path:root:    %s\n"
+                    "  - paths: %S")
+                  feature:base
+                  path:root
+                  paths)
       (cons path:root paths))))
 
 
@@ -581,16 +562,16 @@ For example:
     ;;---
     (unless (keywordp feature:base)
       (imp--error func/name
-                      "FEATURE:BASE must be a keyword! Got: %S"
-                      feature:base))
+                  "FEATURE:BASE must be a keyword! Got: %S"
+                  feature:base))
     (if-let ((feature:base:path (imp--path-root-dir feature:base)))
         (unless (stringp feature:base:path)
           (imp--error func/name
-                          "Registered root path for FEATURE:BASE must be a string! Got: %S"
-                          feature:base:path))
+                      "Registered root path for FEATURE:BASE must be a string! Got: %S"
+                      feature:base:path))
       (imp--error func/name
-                      '("FEATURE:BASE must have a registered root path! "
-                        "Did not find it in `imp-path-roots'.")))
+                  '("FEATURE:BASE must have a registered root path! "
+                    "Did not find it in `imp-path-roots'.")))
 
     ;;---
     ;; FEATURE:ALIST must be valid format.
@@ -605,21 +586,21 @@ For example:
                          (keywordp (car feature))
                          (seq-each #'symbolp feature)))
           (imp--error func/name
-                          '("FEATURE:ALIST entry `%S' has an invalid feature! "
-                            "Must be a keyword or list of symbols (starting w/ keyword). "
-                            "Got: %S")
-                          entry
-                          feature))
+                      '("FEATURE:ALIST entry `%S' has an invalid feature! "
+                        "Must be a keyword or list of symbols (starting w/ keyword). "
+                        "Got: %S")
+                      entry
+                      feature))
         ;; Must have one string or list of strings for the paths.
         (unless (or (stringp paths)
                     (and (listp paths)
                          (seq-each #'stringp paths)))
           (imp--error func/name
-                          '("FEATURE:ALIST entry `%S' has invalid path(s)! "
-                            "Must be a path string or a list of path strings. "
-                            "Got: %S")
-                          entry
-                          paths))
+                      '("FEATURE:ALIST entry `%S' has invalid path(s)! "
+                        "Must be a path string or a list of path strings. "
+                        "Got: %S")
+                      entry
+                      paths))
 
         ;; Valid; finalize and add to alist.
         (push (cons (imp--feature-normalize feature)
@@ -629,18 +610,18 @@ For example:
     ;; We should have created something. Error if not.
     (unless features:at
       (imp--error func/name
-                      '("Nothing created to be added.. No input? FEATURE:ALIST: %S -> `features:at': %S")
-                      feature:alist
-                      features:at))
+                  '("Nothing created to be added.. No input? FEATURE:ALIST: %S -> `features:at': %S")
+                  feature:alist
+                  features:at))
 
     ;;------------------------------
     ;; Add to the features locations alist.
     ;;------------------------------
     ;; Return their created alist if we succeeded. `nil' if failed.
     (if (imp--alist-update feature:base
-                               features:at
-                               imp-features-locate
-                               imp--features-locate-equal)
+                           features:at
+                           imp-features-locate
+                           imp--features-locate-equal)
         features:at
       nil)))
 
