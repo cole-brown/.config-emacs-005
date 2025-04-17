@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/+flag.el --- Imp Feature Flags -*- lexical-binding: t; -*-
+;;; imp/+flag.el --- Imp Feature Flags -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -59,7 +59,8 @@ initialization.")
 Errors if no +/- sign present.
 
 Returns keyword cons: (sign-keyword . name-keyword)"
-  (let ((name (symbol-name flag))
+  (let ((func-name "imp--flag-split")
+        (name (symbol-name flag))
         (regex (rx string-start
                    (group
                     (or "+" "-"))
@@ -68,16 +69,17 @@ Returns keyword cons: (sign-keyword . name-keyword)"
                    string-end)))
 
     (cond ((not (string-match regex name))
-           (error "%s: FLAG doesn't conform to requirements! Regex '%s' didn't match FLAG '%s'"
-                  "imp--flag-split"
-                  regex
-                  name))
+           (imp--error func-name
+                       "FLAG doesn't conform to requirements! Regex '%s' didn't match FLAG '%s'"
+                       regex
+                       name))
 
           ((string-match-p (rx string-start (or "+" "-")) (match-string 2 name))
-           (error "%s: FLAG '%s' doesn't conform to requirements! Name must not start with '+' or '-'! Got: '%s'"
-                  "imp--flag-split"
-                  name
-                  (match-string 2 name)))
+           (imp--error func-name
+                       "FLAG '%s' doesn't conform to requirements! Name must not start with '+' or '-'! Got: '%s'"
+                       func-name
+                       name
+                       (match-string 2 name)))
 
           ;; Ok; return the split symbol and flag name as keywords:
           (t
@@ -99,11 +101,11 @@ Returns non-nil if they are related.
 
 Errors if either flag match naming requirements."
   (let* ((split-a (imp--flag-split flag-a))
-         (sign-a (car split-a))
-         (name-a (cdr split-a))
+         (sign-a  (car split-a))
+         (name-a  (cdr split-a))
          (split-b (imp--flag-split flag-b))
-         (sign-b (car split-b))
-         (name-b (cdr split-b)))
+         (sign-b  (car split-b))
+         (name-b  (cdr split-b)))
     ;; Unrelated?
     (cond ((not (eq name-a name-b))
            nil)
@@ -144,11 +146,12 @@ Specifically, returns result of:
     (while (and feature-flags
                 (not found?))
       (setq found? (imp--flag-compare flag
-                                          (pop feature-flags))))
+                                      (pop feature-flags))))
     ;; Return result of search.
     found?))
 ;; (setq imp--feature-flags '((:foo . (+bar))))
 ;; (imp--flag-exists? :foo '+bar)
+;; (imp--flag-exists? :foo '-bar)
 
 
 (defmacro imp-flag? (feature flag)
@@ -194,67 +197,63 @@ Example:
     -> This sets flag flags for the `:numbers' feature/package/whatever to:
        - Include optional `random' numbers flag.
        - Exclude optional `negative' numbers flag."
-  ;;------------------------------
-  ;; Error checks...
-  ;;------------------------------
-  (unless (keywordp feature)
-    (error "imp-flag- FEATURE must be a keyword, got: %S"
-           feature))
+  (let ((imp--macro-name "imp-flag"))
+    ;;------------------------------
+    ;; Error checks...
+    ;;------------------------------
+    (unless (keywordp feature)
+      (imp--error imp--macro-name
+                  "FEATURE must be a keyword, got: %S"
+                  feature))
 
-  (unless flag
-    (error "imp-flag- `%S' must have one or more flags to add/remove, got: %S"
-           feature
-           flag))
+    (unless flag
+      (imp--error imp--macro-name
+                  "`%S' must have one or more flags to add/remove, got: %S"
+                  feature
+                  flag))
 
-  ;;------------------------------
-  ;; Process flags (w/ error checks)...
-  ;;------------------------------
-  `(let* ((macro<imp>:feature        ,feature)
-          (macro<imp>:flags:add      ',flag)
-          (macro<imp>:flags:existing (imp--alist-get-value macro<imp>:feature imp--feature-flags))
-          (macro<imp>:flags:update   macro<imp>:flags:existing))
-     ;; First check all input flags against existing and error if any cannot be added.
-     ;; Then we can do the actual updated as all-or-nothing.
-     (dolist (macro<imp>:flag macro<imp>:flags:add)
-       (if (imp--flag-exists? macro<imp>:feature
-                                  macro<imp>:flag)
-           ;; Flag is invalid; error out now.
-           (error "imp-flag- `%S' is already flagged for flag matching `%S'. Existing flags: %S"
-                  macro<imp>:feature
-                  macro<imp>:flag
-                  (imp--alist-get-value macro<imp>:feature imp--feature-flags))
+    ;;------------------------------
+    ;; Process flags (w/ error checks)...
+    ;;------------------------------
+    `(let* ((imp--macro-feature        ,feature)
+            (imp--macro-flags-add      ',flag)
+            (imp--macro-flags-existing (imp--alist-get-value imp--macro-feature imp--feature-flags))
+            (imp--macro-flags-update   imp--macro-flags-existing))
+       ;; First check all input flags against existing and error if any cannot be added.
+       ;; Then we can do the actual updated as all-or-nothing.
+       (dolist (imp--macro-flag imp--macro-flags-add)
+         (if (imp--flag-exists? imp--macro-feature
+                                imp--macro-flag)
+             ;; Flag is invalid; error out now.
+             (imp--error ,imp--macro-name
+                         "`%S' is already flagged for flag matching `%S'. Existing flags: %S"
+                         imp--macro-feature
+                         imp--macro-flag
+                         (imp--alist-get-value imp--macro-feature imp--feature-flags))
 
-         ;; Flag is valid; add to the update list.
-         (push macro<imp>:flag macro<imp>:flags:update)))
+           ;; Flag is valid; add to the update list.
+           (push imp--macro-flag imp--macro-flags-update)))
 
-     ;;------------------------------
-     ;; Add flags.
-     ;;------------------------------
-     ;; Replace existing flag list with the new, updated list.
-     (imp--alist-update macro<imp>:feature
-                            macro<imp>:flags:update
-                            imp--feature-flags)
+       ;;------------------------------
+       ;; Add flags.
+       ;;------------------------------
+       ;; Replace existing flag list with the new, updated list.
+       (imp--alist-update imp--macro-feature
+                          imp--macro-flags-update
+                          imp--feature-flags)
 
-     ;;------------------------------
-     ;; Return full flag list for feature.
-     ;;------------------------------
-     macro<imp>:flags:update))
+       ;;------------------------------
+       ;; Return full flag list for feature.
+       ;;------------------------------
+       imp--macro-flags-update)))
 ;; imp--feature-flags
+;; (setq imp--feature-flags nil)
 ;; ;; OK:
 ;; (imp-flag :foo +bar)
 ;; ;; Fail - already has +bar can't add -bar:
 ;; (imp-flag :foo -bar)
 ;; ;; OK: multiple flags
 ;; (imp-flag :foo -baz +qux +quux)
-
-
-;;------------------------------------------------------------------------------
-;; The End.
-;;------------------------------------------------------------------------------
-
-(defun imp--flag-init ()
-  "Provide the imp-flag feature."
-  (imp-provide-with-emacs :imp 'flag))
 
 
 ;;------------------------------------------------------------------------------
