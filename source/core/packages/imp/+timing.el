@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/+timing.el --- Imps with Timecards -*- lexical-binding: t; -*-
+;;; imp/timing.el --- Imps with Timecards -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -14,7 +14,7 @@
 ;;
 ;;                                 ──────────
 ;; ╔════════════════════════════════════════════════════════════════════════╗
-;; ║                              Load Timing                               ║
+;; ║                            Loading Timing...                           ║
 ;; ╚════════════════════════════════════════════════════════════════════════╝
 ;;                                   ──────
 ;;                  Be done is as little as 98.765 seconds.
@@ -24,6 +24,7 @@
 
 
 (require 'rx)
+(require 'range)
 
 
 ;;------------------------------
@@ -44,13 +45,13 @@
 
 (defcustom imp-timing-enabled? nil
   "Should loading & timing messages be printed?"
-  :group 'imp-group
+  :group 'imp
   :type '(boolean))
 
 
 (defcustom imp-timing-buffer-tail? t
   "Should the timing buffer be tailed?"
-  :group 'imp-group
+  :group 'imp
   :type '(boolean))
 
 
@@ -88,7 +89,7 @@ loading xxx...
 └─aa.bb seconds")
 
 
-(defconst imp--timing-precision-time 4
+(defconst imp--timing-precision 4
   "Show this many places after decimal for default `imp-timing-format-time'.")
 
 
@@ -125,7 +126,7 @@ Example: '(:imp example feature)")
 
 If you want it to go to *Messages* with the usual minibuffer interaction, set
 to: `:messages'."
-  :group 'imp-group
+  :group 'imp
   :type '(choice (string :tag "Name of Buffer")
                  (const :tag "Use `message' to send to *Messages* buffer with the usual minibuffer interactions."
                         :messages)))
@@ -133,7 +134,7 @@ to: `:messages'."
 
 (defcustom imp-timing-buffer-show t
   "If non-nil, show `imp-timing-buffer-name' every time it gets a new message."
-  :group 'imp-group
+  :group 'imp
   :type  '(boolean))
 
 
@@ -144,7 +145,7 @@ Args to this format string are:
   1. Feature symbol: :imp/+timing
   2. File name:      +timing.el
   3. File path:      /path/to/imp/+timing.el"
-  :group 'imp-group
+  :group 'imp
   :type '(string)
   :risky t)
 
@@ -156,7 +157,7 @@ Args to this format string are:
   1. Feature symbol: :imp/+timing
   2. File name:      +timing.el
   3. File path:      /path/to/imp/+timing.el"
-  :group 'imp-group
+  :group 'imp
   :type '(string)
   :risky t)
 
@@ -170,7 +171,7 @@ will say (with default settings):
   ├─skip: :feature:example
   │ └─reason: already provided
   [...]"
-  :group 'imp-group
+  :group 'imp
   :type '(string)
   :risky t)
 
@@ -182,7 +183,7 @@ Args to this format string are:
   1. Feature symbol: :imp/+timing
   2. File name:      +timing.el
   3. File path:      /path/to/imp/+timing.el"
-  :group 'imp-group
+  :group 'imp
   :type '(string)
   :risky t)
 
@@ -194,7 +195,7 @@ Args to this format string are:
   1. Feature symbol: :imp/+timing
   2. File name:      +timing.el
   3. File path:      /path/to/imp/+timing.el"
-  :group 'imp-group
+  :group 'imp
   :type '(string)
   :risky t)
 
@@ -214,13 +215,13 @@ Args to this format string are:
           ;; Elapsed Seconds Format
           ;;---
           ;; Format total elapsed time like: "111.2345", "  1.2345", etc.
-          "%"                                      ;; Fill with spaces.
+          "%"                             ; Fill with spaces.
           (number-to-string
-           (+ 3 1 imp--timing-precision-time)) ;; Full seconds precision + "." + fractional seconds precision
+           (+ 3 1 imp--timing-precision)) ; Full seconds precision + "." + fractional seconds precision
           "."
           (number-to-string
-           imp--timing-precision-time)         ;; Fractional seconds precision
-          "f"                                      ;; Format as a floating point.
+           imp--timing-precision)         ; Fractional seconds precision
+          "f"                             ; Format as a floating point.
 
           ;;---
           ;; End of Line
@@ -232,21 +233,21 @@ Args to this format string are:
           ;;---
           "└───────┴──────────────────┘")
   "String format for total elapsed time according to `imp-timing-sum'."
-  :group 'imp-group
+  :group 'imp
   :type '(string))
 
 
 (defcustom imp-timing-format-time
-  (concat "%0"                                     ;; Fill with zeros.
+  (concat "%0"                            ; Fill with zeros.
           (number-to-string
-           (+ 2 1 imp--timing-precision-time)) ;; Full seconds precision + "." + fractional seconds precision
+           (+ 2 1 imp--timing-precision)) ; Full seconds precision + "." + fractional seconds precision
           "."
           (number-to-string
-           imp--timing-precision-time)         ;; Fractional seconds precision
-          "f"                                      ;; Format as a floating point.
-          " seconds")                              ;; And... say what the units are.
+           imp--timing-precision)         ; Fractional seconds precision
+          "f"                             ; Format as a floating point.
+          " seconds")                     ; And... say what the units are.
   "Format string for number of seconds it took to load a file."
-  :group 'imp-group
+  :group 'imp
   :type '(string)
   :risky t)
 
@@ -255,7 +256,7 @@ Args to this format string are:
   (concat "\n\n"
           (make-string 80 ?─ :multibyte))
   "String that can be inserted into the output buffer via `imp--timing-launch'."
-  :group 'imp-group
+  :group 'imp
   :type '(string)
   :risky t)
 
@@ -264,7 +265,7 @@ Args to this format string are:
   (concat "\n\n"
           (make-string 80 ?═ :multibyte))
   "String that can be inserted into the output buffer via `imp-timing-final'."
-  :group 'imp-group
+  :group 'imp
   :type '(string)
   :risky t)
 
@@ -321,17 +322,9 @@ indention levels."
 
 (defun imp--timing-tree-string (type)
   "Get tree type string for current TYPE."
-  (mapconcat
-   #'identity
-   (let (prefix)
-     ;; For each indent level, build the trunks/branches.
-     ;; Need to loop at least once (for indent 0), so 1+ indent level.
-     (dotimes (i (1+ imp--timing-indent) prefix)
-       (push
-        (imp--timing-tree-type type i)
-        prefix)))
-   ;; Join w/ no padding.
-   ""))
+  (mapconcat (lambda (i) (imp--timing-tree-type type i))
+             (nreverse (range-uncompress (cons 0 imp--timing-indent)))
+             ""))
 ;; (imp--timing-tree-string :root)
 ;; (let ((imp--timing-indent 2)) (imp--timing-tree-string :root))
 
@@ -473,7 +466,8 @@ does nothing instead."
 (defun imp--timing-buffer-insert (string)
   "Insert finalized message STRING into output buffer."
   ;; Don't do anything unless enabled.
-  (when-let ((enabled? (imp-timing-enabled?))
+  (when-let ((func-name "imp--timing-buffer-insert")
+             (enabled? (imp-timing-enabled?))
              (name (imp-timing-buffer-name)))
     (cond
      ;;------------------------------
@@ -503,11 +497,12 @@ does nothing instead."
      ;; Errors
      ;;------------------------------
      (t
-      (error "imp--timing-buffer-insert- unhandled %s buffer: '%s'"
-             (if (imp--timing-buffer-messages?)
-                 "(*Messages*)"
-               "(non-*Messages*)")
-             name)))
+      (imp--error func-name
+                  "unhandled %s buffer: '%s'"
+                  (if (imp--timing-buffer-messages?)
+                      "(*Messages*)"
+                    "(non-*Messages*)")
+                  name)))
 
     ;; Tail buffer if desired.
     (imp--timing-buffer-tail)
@@ -536,10 +531,10 @@ TYPE should be either `:root' or `:leaf'. Uses TYPE to get the indent string."
 
 Message depends on `imp-timing-format-load'."
   (imp--timing-message :root
-                           imp-timing-format-load
-                           (imp--feature-normalize-display feature)
-                           filename
-                           path))
+                       imp-timing-format-load
+                       (imp--feature-normalize-display feature)
+                       filename
+                       path))
 
 
 (defun imp--timing-end (time:start)
@@ -548,8 +543,8 @@ Message depends on `imp-timing-format-load'."
 Message depends on `imp-timing-format-time'."
   (let ((elapsed (float-time (time-since time:start))))
     (imp--timing-message :leaf
-                             imp-timing-format-time
-                             elapsed)
+                         imp-timing-format-time
+                         elapsed)
     ;; Add `elapsed' to running sum if at base indent level.
     (when (= imp--timing-indent 0)
       (setq imp-timing-sum (+ imp-timing-sum elapsed)))))
@@ -562,19 +557,19 @@ Message depends on `imp-timing-format-skip'."
   (when (imp-timing-enabled?)
     ;; Skip message.
     (imp--timing-message :root
-                             imp-timing-format-skip
-                             (imp--feature-normalize-display feature)
-                             filename
-                             path)
+                         imp-timing-format-skip
+                         (imp--feature-normalize-display feature)
+                         filename
+                         path)
     ;; Increase indent level for reason.
     (let ((imp--timing-indent (1+ imp--timing-indent)))
       ;; Skip reason message.
       (imp--timing-message :leaf
-                               (concat imp-timing-reason
-                                       imp-timing-format-skip-already-provided)
-                               (imp--feature-normalize-display feature)
-                               filename
-                               path))))
+                           (concat imp-timing-reason
+                                   imp-timing-format-skip-already-provided)
+                           (imp--feature-normalize-display feature)
+                           filename
+                           path))))
 
 
 (defun imp-timing-skip-optional-dne (feature filename path)
@@ -584,19 +579,19 @@ Message depends on `imp-timing-format-optional'."
   (when (imp-timing-enabled?)
     ;; Skip message.
     (imp--timing-message :root
-                             imp-timing-format-skip
-                             (imp--feature-normalize-display feature)
-                             filename
-                             path)
+                         imp-timing-format-skip
+                         (imp--feature-normalize-display feature)
+                         filename
+                         path)
     ;; Increase indent level for reason.
     (let ((imp--timing-indent (1+ imp--timing-indent)))
       ;; Skip reason message.
       (imp--timing-message :leaf
-                               (concat imp-timing-reason
-                                       imp-timing-format-skip-optional-dne)
-                               (imp--feature-normalize-display feature)
-                               filename
-                               path))))
+                           (concat imp-timing-reason
+                                   imp-timing-format-skip-optional-dne)
+                           (imp--feature-normalize-display feature)
+                           filename
+                           path))))
 
 
 (defmacro imp-timing (feature filename path &rest body)
@@ -613,21 +608,21 @@ Output message depends on `imp-timing-format-time'.
 Return result of evaluating BODY."
   (declare (indent 3))
 
-  `(let ((macro<imp>:feature (imp--feature-normalize ,feature)))
+  `(let ((imp--macro-feature (imp--feature-normalize ,feature)))
      (if (and (imp-timing-enabled?)
               ;; Don't do (another) timing block/level for a duplicated call.
-              (not (imp--timing-feature-duplicate? macro<imp>:feature)))
+              (not (imp--timing-feature-duplicate? imp--macro-feature)))
 
          ;; Timings enabled: Run body in between timing start/end messages.
-         (let ((macro<imp>:filename ,filename)
-               (macro<imp>:path     ,path)
-               (macro<imp>:time     (current-time)))
+         (let ((imp--macro-filename ,filename)
+               (imp--macro-path     ,path)
+               (imp--macro-time     (current-time)))
            ;; Update current feature being timed.
-           (setq imp--timing-feature-current macro<imp>:feature)
+           (setq imp--timing-feature-current imp--macro-feature)
            ;; Output load message.
-           (imp--timing-start macro<imp>:feature
-                                  macro<imp>:filename
-                                  macro<imp>:path)
+           (imp--timing-start imp--macro-feature
+                              imp--macro-filename
+                              imp--macro-path)
            (prog1
                ;; Increase indent level for body.
                (let ((imp--timing-indent (1+ imp--timing-indent)))
@@ -638,7 +633,7 @@ Return result of evaluating BODY."
              (setq imp--timing-feature-current nil)
 
              ;; Finish with the timing message.
-             (imp--timing-end macro<imp>:time)))
+             (imp--timing-end imp--macro-time)))
 
        ;; Timing disabled: Just run body.
        ,@body)))
@@ -728,7 +723,7 @@ final timing message."
 ;; Major Mode
 ;;--------------------------------------------------------------------------------
 
-(defun imp--timing-mode-font-lock-keywords:element/create (matcher subexp facename &optional override laxmatch)
+(defun imp--timing-mode-font-lock-keywords-element-create (matcher subexp facename &optional override laxmatch)
   "Create an entry for the `font-lock-keywords' list.
 
 See `font-lock-keywords' for full details.
@@ -776,7 +771,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
           ;; (Optional) LAXMATCH Flag:
           ;; If LAXMATCH is non-nil, that means don't signal an error if there is no match for SUBEXP in MATCHER.
           (list laxmatch))))))))
-;; (imp--timing-mode-font-lock-keywords:element/create "foo" 0 'font-lock-comment-face nil t)
+;; (imp--timing-mode-font-lock-keywords-element-create "foo" 0 'font-lock-comment-face nil t)
 
 
 (defconst imp--timing-mode-font-lock-keywords
@@ -858,7 +853,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Timing Tree
     ;;------------------------------
-    (push (imp--timing-mode-font-lock-keywords:element/create
+    (push (imp--timing-mode-font-lock-keywords-element-create
            rx/unicode-box ; Match Regex
            0 ; Match's Group Number from Match Regex
            'font-lock-comment-delimiter-face ; Font Face to Use
@@ -872,7 +867,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;; Punctuation and Suchlike
     ;;------------------------------
     ;; NOTE: `M-x list-faces-display' and go to 'font-lock-' to see all the pre-defined font-lock faces.
-    (push (imp--timing-mode-font-lock-keywords:element/create
+    (push (imp--timing-mode-font-lock-keywords-element-create
            (rx-to-string `(or ,@throbber) :no-group) ; Match Regex
            0 ; Match's Group Number from Match Regex
            'font-lock-comment-face ; Font Face to Use
@@ -885,7 +880,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Words and Things
     ;;------------------------------
-    (push (imp--timing-mode-font-lock-keywords:element/create
+    (push (imp--timing-mode-font-lock-keywords-element-create
            rx/status/info
            0 ; Match's Group Number from Match Regex
            'font-lock-comment-face ; Font Face to Use
@@ -894,7 +889,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
            t
            t)
           flk)
-    (push (imp--timing-mode-font-lock-keywords:element/create
+    (push (imp--timing-mode-font-lock-keywords-element-create
            rx/status/warning
            0 ; Match's Group Number from Match Regex
            'font-lock-warning-face ; Font Face to Use
@@ -903,7 +898,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
            t
            t)
           flk)
-    (push (imp--timing-mode-font-lock-keywords:element/create
+    (push (imp--timing-mode-font-lock-keywords-element-create
            rx/reason/warning
            0 ; Match's Group Number from Match Regex
            'font-lock-warning-face ; Font Face to Use
@@ -914,7 +909,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
           flk)
 
     ;; NOTE: Try leaving `status' and `amounts' as just... unlocked text? (e.g. white in my theme's case)
-    ;; (push (imp--timing-mode-font-lock-keywords:element/create
+    ;; (push (imp--timing-mode-font-lock-keywords-element-create
     ;;        (rx-to-string `(or ,@status) :no-group) ; Match Regex
     ;;        0 ; Match's Group Number from Match Regex
     ;;        'font-lock-comment-face ; Font Face to Use
@@ -928,7 +923,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;; Groupings:
     ;;   - #0: "01.234"
     ;;   - #1: "seconds"
-    (push (imp--timing-mode-font-lock-keywords:element/create
+    (push (imp--timing-mode-font-lock-keywords-element-create
            rx/duration ; Match Regex
            1 ; Match's Group Number from Match Regex
            'font-lock-function-name-face ; Font Face to Use
@@ -941,7 +936,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Feature Names
     ;;------------------------------
-    (push (imp--timing-mode-font-lock-keywords:element/create
+    (push (imp--timing-mode-font-lock-keywords-element-create
            rx/feature ; Match Regex
            0 ; Match's Group Number from Match Regex
            'font-lock-variable-name-face ; Font Face to Use
@@ -1074,11 +1069,10 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html
   ;;---
   ;; Might be nice to tail the buffer?
   ;; Force the buffer to be tailed; users can hook into this mode and disable if desired.
-  ;(require 'autorevert)
-  ;(auto-revert-tail-mode +1)
-  ; Only works for file buffers...
+                                        ;(require 'autorevert)
+                                        ;(auto-revert-tail-mode +1)
+                                        ; Only works for file buffers...
   )
-
 
 
 ;; NOTE: We aren't a file-based mode, so we don't register ourselves for anything in `auto-mode-alist'.

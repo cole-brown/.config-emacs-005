@@ -28,11 +28,6 @@
 ;; Custom Variables
 ;;------------------------------------------------------------------------------
 
-(defgroup imp-group nil
-  "Automatically-ish commit/push git repos for note, docs, etc."
-  :prefix "imp:"
-  :group 'tools)
-
 
 (defcustom imp-output-features-buffer
   "*imp-features*"

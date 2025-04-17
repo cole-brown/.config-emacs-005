@@ -28,7 +28,9 @@
 ;;------------------------------------------------------------------------------
 
 (defcustom imp-output-buffer "ⓘ-imp-output-ⓘ"
-  "Name of the output buffer used by `imp--output-sink'.")
+  "Name of the output buffer used by `imp--output-sink'."
+  :group 'imp
+  :type '(string))
 
 
 (defcustom imp-output-level
@@ -45,7 +47,11 @@
     ;; `imp--debug-newline'.
     (:blank . (;; :sink message
                :sink imp--output-sink)))
-  "Output message level (:debug, :error, etc) settings.")
+  "Output message level (:debug, :error, etc) settings."
+  :group 'imp
+  :type '(alist :key-type symbol
+                :value-type plist))
+
 
 
 ;;------------------------------------------------------------------------------

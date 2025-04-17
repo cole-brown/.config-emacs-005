@@ -40,6 +40,17 @@
 
 (require 'cl-macs)
 
+
+;;------------------------------------------------------------------------------
+;; Custom
+;;------------------------------------------------------------------------------
+
+(defgroup imp nil
+  "Automatically-ish commit/push git repos for note, docs, etc."
+  :prefix "imp-"
+  :group 'tools)
+
+
 ;;------------------------------------------------------------------------------
 ;; Function for to Load our own Files...
 ;;------------------------------------------------------------------------------
@@ -88,7 +99,7 @@
   (imp--init-load "tree")
   (imp--init-load "feature")
   (imp--init-load "path")
-  (imp--init-load "+flag")   ;; Currently optional but always loaded. Could make fully optional or required.
+  (imp--init-load "flag")
   (imp--init-load "+timing") ;; Optional, but always load it - it'll time or not time based on settings.
   (imp--init-load "provide")
   (imp--init-load "load")

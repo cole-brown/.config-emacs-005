@@ -1,4 +1,4 @@
-;;; imp/+flag.el --- Imp Feature Flags -*- lexical-binding: t; -*-
+;;; imp/flag.el --- Imp Feature Flags -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
