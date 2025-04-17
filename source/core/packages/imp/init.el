@@ -48,7 +48,7 @@
             ;; Given PATH-RELATIVE, find the absolute path and load the file.
             (let (file-name-handler-alist)
               (load (expand-file-name
-                     filename
+                     path-relative
                      (directory-file-name
                       (file-name-directory
                        (cond ((bound-and-true-p byte-compile-current-file))
@@ -69,14 +69,15 @@
   ;;------------------------------
   ;; Required by debug.
   ;;------------------------------
-  ;; Try not to have too many things here.
-  (imp--init-load "error") ;k
+  (imp--init-load "string")
+  (imp--init-load "output")
+  (imp--init-load "error")
 
 
   ;;------------------------------
   ;; Debug: Get it initialized ASAP, cuz I bug a lot.
   ;;------------------------------
-  (imp--init-load "debug") ;k
+  (imp--init-load "debug")
   (imp--debug-init)
 
 
