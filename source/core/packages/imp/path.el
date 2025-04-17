@@ -1153,24 +1153,24 @@ This will:
   - Provide 'path.el' feature to imp & emacs.
 
 Must be called after 'provide.el' is loaded."
-  ;;---
   ;; Set `imp' root.
   ;;   - Might as well automatically fill ourself in.
-  ;;---
-  (imp-path-root-set :imp
-                     ;; root dir
-                     (file-name-directory (if load-in-progress
-                                              load-file-name
-                                            (buffer-file-name)))
-                     ;; root file - just provide relative to dir/imp
-                     "init.el")
-
-  ;;---
-  ;; Provide feature symbol for 'path.el'.
-  ;;---
-  (imp-provide-with-emacs :imp 'path))
+  (unless (imp-path-root-get :imp 'no-error)
+    (imp-path-root-set :imp
+                       ;; root dir
+                       (file-name-directory (if load-in-progress
+                                                load-file-name
+                                              (buffer-file-name)))
+                       ;; root file - just provide relative to dir/imp
+                       "init.el")))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
+;; Set `imp' root.
+;;   - Might as well automatically fill ourself in.
+(unless (imp-path-root-get :imp 'no-error)
+  (imp-path-root-set :imp
+                     (imp-path-current-dir)
+                     "init.el"))
