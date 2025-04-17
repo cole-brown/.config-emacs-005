@@ -100,7 +100,7 @@
   (imp--init-load "feature")
   (imp--init-load "path")
   (imp--init-load "flag")
-  (imp--init-load "+timing") ;; Optional, but always load it - it'll time or not time based on settings.
+  (imp--init-load "timing")
   (imp--init-load "provide")
   (imp--init-load "load")
   (imp--init-load "require")
