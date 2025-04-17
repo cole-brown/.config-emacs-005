@@ -17,11 +17,11 @@
 ;; ║                            Require Features                            ║
 ;; ╚════════════════════════════════════════════════════════════════════════╝
 ;;                                   ──────
-;;                     Require Imp feature symbol paths.
+;;                     Require imp feature symbol paths.
 ;;                                 ──────────
 ;;
-;; Require from just Emacs: `require'
-;; Require from just imp:   `imp-require'
+;; Require from Emacs: `require'
+;; Require from imp:   `imp-require'
 ;;
 ;;; Code:
 
@@ -31,40 +31,39 @@
 ;;------------------------------------------------------------------------------
 
 (defun imp-require (&rest feature)
-  "Ensures file(s) for FEATURE:BASE keyword & FEATURE symbols are provided.
+  "Ensure file(s) for FEATURE are provided.
 
-Returns non-nil on success."
-  (let ((feature:normal (imp--feature-normalize feature)))
+Return non-nil on success."
+  (let ((feature-normal (imp--feature-normalize feature)))
     ;; Already provided?
-    (cond ((imp-feature? feature:normal)
+    (cond ((imp-feature? feature-normal)
            t)
 
           ;; Can we load it?
           ((progn
              (condition-case err
-                 (imp--load-feature feature:normal)
+                 (imp--load-feature feature-normal)
                ;; If loading by feature failed, then user needs to check their
                ;; order of loading/requiring things. Let's give them some more
                ;; info.
                (error
-                ;; TODO: Why does `imp--error' work in 'early-init.el' (w/ --debug-init) where `imp--error-user' doesn't? :(
-                ;; (imp--error-user "imp-require"
+                ;; NOTE: Use `imp--error' instead of `imp--error-user';
+                ;; `user-error' signal does not get caught by `--debug-init' normally.
                 (imp--error "imp-require"
-                                '("Failed to find/load required feature: \n"
-                                  "  input feature: %S\n"
-                                  "  normalized:    %S\n"
-                                  "Check your order of providing/loading, "
-                                  "or make sure it initializes its root and "
-                                  "features with imp first.\n"
-                                  "Error: %S\n"
-                                  "  %S")
-                                feature
-                                feature:normal
-                                (car err)
-                                (cdr err)))
-               ;; Yes; so add to imp's feature tree.
-               (imp--feature-add feature:normal)))
-           )
+                            '("Failed to find/load required feature: \n"
+                              "  input feature: %S\n"
+                              "  normalized:    %S\n"
+                              "Check your order of providing/loading, "
+                              "or make sure it initializes its root and "
+                              "features with imp first.\n"
+                              "Error: %S\n"
+                              "  %S")
+                            feature
+                            feature-normal
+                            (car err)
+                            (cdr err))))
+             ;; Yes; so add to imp's feature tree.
+             (imp--feature-add feature-normal)))
 
           ;; Nope; return nil.
           (t
@@ -72,17 +71,7 @@ Returns non-nil on success."
 ;; (imp-require 'test 'this)
 
 
-;; TODO: I want to have a plist version of `imp-require' that works like `imp-load':
-;;   (imp-require-foo :feature '(foo bar) :error nil ...)
-;; But I don't know what to call it, and I don't think I want to replace
-;; `imp-require' since it's what I want in 99% of the cases.
-;;
-;; So... What is a good name for `imp-require-but-with-a-plist'?
-;;
-;; "eval.el" uses `ignore-error' currently to ignore `imp-require' user-errors.
-
-
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide-with-emacs :imp 'require)
+(imp-provide :imp 'require)
