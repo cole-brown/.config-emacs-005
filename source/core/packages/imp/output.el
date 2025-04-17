@@ -58,14 +58,17 @@
 Return nil if no callers."
   (declare (pure t)
            (side-effect-free t))
-  (seq-reduce (lambda (output next)
-                "nil-aware concat"
-                (if (and output next)
-                    (concat next " ⇐ " output)
-                  (or output next)))
-              (seq-map #'imp--string-or-nil
-                       (reverse callers))
-              nil))
+  (if (stringp callers)
+      callers
+    (seq-reduce (lambda (output next)
+                  "nil-aware concat"
+                  (if (and output next)
+                      (concat next " ⇐ " output)
+                    (or output next)))
+                (seq-map #'imp--string-or-nil
+                         (reverse callers))
+                nil)))
+;; (imp--output-callers "bob")
 ;; (imp--output-callers '("bob" nil))
 ;; (imp--output-callers '("bob" "alice"))
 ;; (imp--output-callers '("bob" alice))
