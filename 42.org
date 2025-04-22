@@ -1,10 +1,209 @@
-
-
 * my code
 
 ** imp
 
-TODO: Start [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/emacs/imp/init.el][here]]
+*** refactor symbol names
+
+get
+  - [X] copy paste imp to this .emacs
+
+init.el [[file:~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/init.el]]
+
+first
+  - [-] rename functions
+    - [X] int<imp> -> imp--
+    - [ ] : -> /
+
+ChatGPT?
+  - process-file already exists... oops.
+
+#+begin_src elisp
+  (require 'cl-lib)
+
+  ;; imp:provide:with-emacs
+  ;; imp:path:root/set
+  ;; int<imp>:load:parse
+  ;;
+  ;; ...oh wait test functions...
+  ;; ...those ones got wild...
+  ;; test<imp/load>::helper::int<imp>:load:parse
+  (defun _refactor-buffer-00 (namespace)
+    "[DONE] more normal func/var names."
+    (let* ((regex (rx-to-string
+                   `(and
+                     (or
+                      (and "int<"
+                           ,namespace
+                           ">")
+                      ,namespace)
+                     ":"
+                     (group (+ (any alnum ":" "/"))))
+                   'no-group)))
+
+      (goto-char (point-min))
+
+      (while (re-search-forward regex nil t)
+        (replace-match (concat namespace
+                               (if (string-prefix-p "int<" (match-string 0))
+                                   "--" ; private
+                                 "/") ; public
+                               (replace-regexp-in-string "[/:]" "-" (match-string 1)))))))
+
+  (defun _refactor-buffer-01 (namespace)
+    "[DONE] even normaler func/var names"
+    (let* ((regex (rx-to-string
+                   `(and
+                     (group
+                      (not "/")
+                      ,namespace)
+                     "/"
+                     (group (+ (any alnum ":" "/"))))
+                   'no-group)))
+
+      (goto-char (point-min))
+
+      (while (re-search-forward regex nil t)
+        (replace-match (concat (match-string 1)
+                               "-"
+                               (match-string 2))))))
+  ;; (_refactor-shit "imp" "source/core/packages/imp/error.el")
+
+  (defun _refactor-file (namespace file)
+    "Process a single FILE for NAMESPACE refactoring."
+    (let* ((existing-buffer (find-buffer-visiting file))
+           (regex (rx-to-string
+                   `(and
+                     (or
+                      (and "int<"
+                           ,namespace
+                           ">")
+                      ,namespace)
+                     ":"
+                     (group (+ (any alnum ":" "/"))))
+                   'no-group)))
+      (save-window-excursion
+        (save-mark-and-excursion
+          (if existing-buffer
+              (switch-to-buffer existing-buffer)
+            (find-file file))
+          (goto-char (point-min))
+
+          ;;(_refactor-buffer-00 namespace)
+          (_refactor-buffer-01 namespace)
+
+          (save-buffer)
+          (unless existing-buffer
+            (kill-buffer))))))
+
+  (defun _refactor-directory (namespace dir)
+    "Process all *.el files in DIR recursively for refactoring."
+    (dolist (file (directory-files-recursively dir "\\.el$"))
+      (_refactor-file namespace file)))
+
+  (defun _refactor-shit (namespace path)
+    "Prompt the user for a PATH and refactor namespace patterns within it."
+    (interactive "GPath to file or directory: ")
+    (if (not (file-exists-p path))
+        (error "The path does not exist!")
+      (if (file-directory-p path)
+          (_refactor-directory namespace path)
+        (_refactor-file namespace path))))
+
+  ;; [FILE]  (_refactor-shit "imp" "source/core/packages/imp/init.el")
+  ;; [ALL] (_refactor-shit "imp" "source/core/packages/imp")
+  ;;
+  ;; [TODO] (_refactor-shit "imp" "source/core/packages/imp/error.el")
+#+end_src
+
+debug...
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+  - [X] k
+
+test on:
+  - [X] ~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/init.el
+
+run on:
+  - [X] ~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp
+
+save script off somewhere for the next thing...
+  - [X] [[file:scripts/refactor-sn4-to-sn5.el]]
+
+*** imp/provide/with-emacs
+
+Make ~imp/provide~ act like ~imp/provide/with-emacs~ by default.
+  - flag param to not ~with-emacs~ it.
+
+DONE
+
+*** go through files in order
+
+and do what?
+
+check for includes and non-halal shit
+
+files:
+  - [X] error.el
+  - [X] debug.el
+  - [X] alist.el
+    - feature uses this, so shouldn't it be before it?
+      - Let's find out...
+  - [X] tree.el
+    - feature uses this, so shouldn't it be before it?
+      - Let's find out...
+  - [X] feature.el
+  - [X] path.el
+  - [X] flag.el
+  - [X] timing.el
+  - [X] provide
+  - [ ] load
+  - [ ] require
+  - [ ] package
+  - [ ] commands
+
+    
+*** again, check for unused funcs and shit
+
+also check for ones to declare in
+  (declare (pure t)
+           (side-effect-free t)
+           (important-return-value t))
+
+
+*** refactor funcs
+
+imp--load-parse
+  - make error checking funcs?
+  - make bool flag parsing func
+    
+
+*** when I get to tests
+
+https://emacs.stackexchange.com/a/17202
+
+
 
 
 ** repo buffernames
@@ -43,6 +242,18 @@ I wanna use imp. Debugging is a bit easier.
 
 Need my begin_src...
 
+*** new snippets
+
+/todo/penis
+                             TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO.
+TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ODO TODO TODO TODO TODO TODO TODO TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO TODO
+DO TODO TODO TODO TODO TODO TODO TODO TODO'
+O TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO
+
 
 ** evil
-
