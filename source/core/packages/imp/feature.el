@@ -231,7 +231,7 @@ Always returns a backwards list.
   (let ((func/name "imp--feature-normalize-chain")
         output)
     (dolist (item (imp--list-flatten chain))
-      (let ((normalized (imp--feature-name-normalize item)))
+      (let ((normalized (imp--feature-normalize-name item)))
         (if (imp--string-empty? normalized)
             (imp--error func/name
                         "Cannot use CHAIN '%S'; it normalizes to nothing: %S"
