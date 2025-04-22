@@ -1166,11 +1166,16 @@ Must be called after 'provide.el' is loaded."
 
 
 ;;------------------------------------------------------------------------------
-;; The End.
+;; The Init.
 ;;------------------------------------------------------------------------------
-;; Set `imp' root.
+;; Set `imp' root idempotently.
 ;;   - Might as well automatically fill ourself in.
+;;     - dogfood, etc.
 (unless (imp-path-root-get :imp 'no-error)
   (imp-path-root-set :imp
                      (imp-path-current-dir)
                      "init.el"))
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
