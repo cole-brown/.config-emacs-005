@@ -102,6 +102,37 @@ If MSG is non-nil, it is output just before the status but in the same
 ;; Debugging Functions
 ;;------------------------------------------------------------------------------
 
+(defun imp--debug (caller string &rest args)
+  "Print out a debug message if debugging is enabled.
+
+CALLER should be the calling function's name.
+
+STRING should be a string, which can have formatting info in it (see `format'),
+and will be printed as the debug message.
+
+ARGS should be args for formatting the STRING."
+  (when imp--debugging?
+    (imp--output :debug
+                 caller
+                 string
+                 args)))
+;; (imp--debug "test_func" "test")
+
+
+(defun imp--debug-newline ()
+  "Prints an empty debug line if debugging."
+  (when imp-debugging?
+    (imp--output :blank
+                 nil
+                 " "
+                 nil)))
+;; (imp--debug-newline)
+
+
+;;------------------------------------------------------------------------------
+;; Initialization
+;;------------------------------------------------------------------------------
+
 (defun imp--debug-init ()
   "Initialize `imp' debugging based on Emacs' variables.
 
@@ -162,33 +193,24 @@ Return non-nil if debugging."
     imp--debugging?))
 
 
-(defun imp--debug (caller string &rest args)
-  "Print out a debug message if debugging is enabled.
+;;------------------------------------------------------------------------------
+;; The Init.
+;;------------------------------------------------------------------------------
 
-CALLER should be the calling function's name.
+;; Don't reset init flag if file re-evaluated.
+(unless (boundp 'imp--debug-init?)
+  (defvar imp--debug-init? nil
+    "Guard var so debug init only happens once."))
+;; (setq imp--debug-init? t)
+;; (setq imp--debug-init? nil)
 
-STRING should be a string, which can have formatting info in it (see `format'),
-and will be printed as the debug message.
+;; Only init the one time.
+(when (and (boundp imp--debug-init?)
+           (not imp--debug-init?))
+  (imp--debug-init)
+  (setq imp--debug-init? 'done-at-end-of-debug-el))
 
-ARGS should be args for formatting the STRING."
-  (when imp--debugging?
-    (imp--output :debug
-                 caller
-                 string
-                 args)))
-;; (imp--debug "test_func" "test")
-
-
-(defun imp--debug-newline ()
-  "Prints an empty debug line if debugging."
-  (when imp-debugging?
-    (imp--output :blank
-                 nil
-                 " "
-                 nil)))
-;; (imp--debug-newline)
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-;; Don't provide. Imp internal only.
