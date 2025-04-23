@@ -228,12 +228,12 @@ Always returns a backwards list.
       -> '(\"foo\")
     (imp--feature-normalize '(:foo bar) 'baz)
       -> '(\"baz\" \"bar\" \"foo\")"
-  (let ((func/name "imp--feature-normalize-chain")
+  (let ((func-name "imp--feature-normalize-chain")
         output)
     (dolist (item (imp--list-flatten chain))
       (let ((normalized (imp--feature-normalize-name item)))
         (if (imp--string-empty? normalized)
-            (imp--error func/name
+            (imp--error func-name
                         "Cannot use CHAIN '%S'; it normalizes to nothing: %S"
                         item
                         normalized)
@@ -241,7 +241,7 @@ Always returns a backwards list.
 
     ;; Return the list or raise an error.
     (if (null output)
-        (imp--error func/name
+        (imp--error func-name
                     "No normalized strings produced from CHAIN: %S"
                     chain))
     output))
@@ -264,15 +264,15 @@ First symbol in output list will be a keyword; rest will be symbols.
       -> '(:foo)
     (imp--feature-normalize '(foo :bar) 'baz)
       -> '(:foo bar baz)"
-  (let ((func/name "imp--feature-normalize")
-        (strings/reversed (imp--feature-normalize-chain chain))
+  (let ((func-name "imp--feature-normalize")
+        (strings-reversed (imp--feature-normalize-chain chain))
         output)
-    (while strings/reversed
-      (let ((item (pop strings/reversed)))
+    (while strings-reversed
+      (let ((item (pop strings-reversed)))
         (push (intern
                ;; If this is the last item we're processing, it should be the
                ;; keyword as it'll be first in the output list.
-               (concat (if (null strings/reversed)
+               (concat (if (null strings-reversed)
                            ":"
                          "")
                        item))
@@ -280,7 +280,7 @@ First symbol in output list will be a keyword; rest will be symbols.
 
     ;; Return the list or raise an error.
     (if (null output)
-        (imp--error func/name
+        (imp--error func-name
                     "No normalized features produced from CHAIN: %S"
                     chain))
     output))
