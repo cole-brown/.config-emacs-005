@@ -80,7 +80,7 @@
   ;;------------------------------
   ;; Required by debug.
   ;;------------------------------
-  (imp--init-load "string")
+  (imp--init-load "fundamental")
   (imp--init-load "output")
   (imp--init-load "error")
 
