@@ -387,7 +387,7 @@ Returns a plist:
               ((eq key :filename)
                (setq in-filename value))
               ((eq key :feature)
-               (setq in-feature value))
+               (setq in-feature (imp--unquote value)))
               ((eq key :error)
                (setq in-error value))
               ((eq key :skip)
@@ -515,18 +515,8 @@ Returns a plist:
           :error    out-error
           :skip     out-skip
           :optional out-optional)))
-;; (let ((load-args-plist '(:feature (:foo bar)
-;;                                   :path "init.el"
-;;                                   ;; :path
-;;                                   ;; :filename
-;;                                   ;; :error nil
-;;                                   ;; :skip nil
-;;                                   )))
-;;   ;; (message "%S" load-args-plist))
-;;   (imp--load-parse "imp-load"
-;;                    (imp-path-current-dir)
-;;                    (upcase "load-args-plist")
-;;                    load-args-plist))
+;; (imp--load-parse "test-unquoted" (imp-path-current-dir) "name" '(:feature  (:foo bar) :path "init.el"))
+;; (imp--load-parse "test-quoted"   (imp-path-current-dir) "name" '(:feature '(:foo bar)  :path "init.el"))
 
 
 ;; TODO: add optional `:after' that will delay the whole file load until after the prereqs are met via `imp-eval-after'?
@@ -595,29 +585,28 @@ If SKIP is nil:
   - Always loads the file.
 
 Return nil for failure, non-nil for success."
-  (let ((imp--macro-path-current-dir (imp-path-current-dir)))
-    `(let* ((imp--macro-func-name "imp-load")
-            (imp--macro-parsed (imp--load-parse imp--macro-func-name
-                                                ,imp--macro-path-current-dir
-                                                (upcase (symbol-name load-args-plist))
-                                                (list ,@load-args-plist)))
-            (imp--macro-path-load   (plist-get imp--macro-parsed :path))
+  (let* ((imp--premacro-func-name "imp-load")
+         (imp--premacro-parsed (imp--load-parse imp--premacro-func-name
+                                                (imp-path-current-dir)
+                                                (upcase (symbol-name 'load-args-plist))
+                                                load-args-plist)))
+    `(let* ((imp--macro-path-load   ,(plist-get imp--premacro-parsed :path))
             (imp--macro-path-file   (concat imp--macro-path-load ".el"))       ; for exist check & debug out.
             (imp--macro-name-load   (imp--path-filename imp--macro-path-load)) ; for timing
             (imp--macro-path-parent (imp-path-parent imp--macro-path-load))    ; for timing
-            (imp--macro-feature     (plist-get imp--macro-parsed :feature))
-            (imp--macro-skip?       (plist-get imp--macro-parsed :skip))
-            (imp--macro-error?      (plist-get imp--macro-parsed :error))
-            (imp--macro-optional?   (plist-get imp--macro-parsed :optional))
+            (imp--macro-feature     ',(imp--unquote (plist-get imp--premacro-parsed :feature)))
+            (imp--macro-skip?       ,(plist-get imp--premacro-parsed :skip))
+            (imp--macro-error?      ,(plist-get imp--premacro-parsed :error))
+            (imp--macro-optional?   ,(plist-get imp--premacro-parsed :optional))
             file-name-handler-alist ; Set to nil to speed up loading.
             (imp--macro-load-file? t)
             imp--macro-load-result)
-       (imp--debug imp--macro-func-name
+       (imp--debug ,imp--premacro-func-name
                    '("parsed:\n"
                      "  path:      %s\n"
                      "    -> dir:  %s\n"
                      "    -> file: %s\n"
-                     "  feature-   %S\n"
+                     "  feature:   %S\n"
                      "  skip?:     %S\n"
                      "  error?:    %S\n"
                      "  optional?: %S")
@@ -688,9 +677,9 @@ Return nil for failure, non-nil for success."
            ;; But if we try to just let `load` do it's messaging, we don't get any message for the erroring file...
            ;; So just a message ourself. But don't use `imp--debug' as that doesn't output to stdout during the
            ;; pre-gui stages of init.
-           (when (imp--debug-enabled?)
+           (when imp--debugging?
              (message "[imp-debug] %s: '%s'"
-                      imp--macro-func-name
+                      ,imp--premacro-func-name
                       ;; Don't love expanded path, but it does match what Emacs outputs:
                       ;; Emacs: "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
                       ;; imp:   "[imp-debug] imp-load- ’/home/work/.config/emacs-sn004/core/modules/elisp/utils/init’"
@@ -709,7 +698,7 @@ Return nil for failure, non-nil for success."
          ;;     the feature name for the actual loading.
          (when (not (imp-provided? imp--macro-feature))
            (if imp--macro-error?
-               (imp--error imp--macro-func-name
+               (imp--error ,imp--premacro-func-name
                            '("Feature is still not defined after loading the file!\n"
                              "  feature:       %S\n"
                              "  path:          %S\n"
