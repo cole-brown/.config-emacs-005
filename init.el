@@ -353,8 +353,8 @@
        ""
        "Default to C# for code."
        "There are 2 important .NET versions in use:"
-       "1. .NET Framework 4.8.1 (latest release of .NET Framework)"
-       "2. .NET 8 (latest LTS release of .NET (Core))")
+       "1. .NET Framework ≥4.8.1 (latest release of .NET Framework)"
+       "2. .NET ≥8 (latest LTS release of .NET (Core))")
      "\n")
     "For adding to alist `gptel-directives' and/or var `gptel--system-message'.")
 
@@ -386,8 +386,9 @@
   ;;------------------------------
 
   ;; `default' doesn't provide examples as often as I want.
-  (add-to-list gptel-directives
-	       (cons '--/gptel/directive/default --/gptel/directive/default)))
+  (add-to-list 'gptel-directives
+	           (cons '--/gptel/directive/default --/gptel/directive/default)))
+;; (pp gptel-directives)
 
 
 ;;------------------------------------------------------------------------------
