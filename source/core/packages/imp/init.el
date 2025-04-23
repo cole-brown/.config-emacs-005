@@ -111,4 +111,4 @@
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp-provide :imp)
-;;; imp-init.el ends here
+;;; imp/init.el ends here

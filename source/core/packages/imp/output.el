@@ -175,7 +175,7 @@ ARGS should be a list of args for formatting the STRING, or nil."
         (setq lists (list sinks)))
 
       ;; Send to each sink.
-      (dolist (sink sinks result)
+      (dolist (sink sinks)
         ;; Format & send output to the level's output function.
         (apply sink
                (concat prefix

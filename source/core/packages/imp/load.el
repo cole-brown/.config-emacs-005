@@ -281,12 +281,14 @@ PLIST should be `load-args-plist'.
 
 Returns a plist:
   - :path
-    + Path string to load file.
+    - Path string to load file.
   - :feature
-    + imp feature keyword/symbol list
+    - imp feature keyword/symbol list
   - :error
     - t/nil
   - :skip
+    - t/nil
+  - :optional
     - t/nil"
   ;; Valid keys:
   (let ((keys-valid '(:path :filename :feature :optional :error :skip))
@@ -327,7 +329,7 @@ Returns a plist:
     (while (and plist
                 (not parsing-done))
       (imp--debug caller
-                  "  parse plist: \n      %S"
+                  "parse plist: \n      %S"
                   plist)
 
       (let ((key   (car plist))
