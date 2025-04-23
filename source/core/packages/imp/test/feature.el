@@ -187,7 +187,7 @@ the same index in SEQUENCE:EXPECTED."
                                                          ""
                                                        "'")
                                                      (symbol-name feature-symbol)))
-                                           (imp--feature-normalize features)
+                                           (imp--feature-normalize-to-list features)
                                            " ")))))
 
             ;; Finish up.
@@ -561,37 +561,37 @@ to a list of string."
 
 
 ;;------------------------------
-;; imp--feature-normalize
+;; imp--feature-normalize-to-list
 ;;------------------------------
 
-(ert-deftest test<imp-feature>::imp--feature-normalize ()
-  "Test that `imp--feature-normalize' behaves appropriately."
+(ert-deftest test<imp-feature>::imp--feature-normalize-to-list ()
+  "Test that `imp--feature-normalize-to-list' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp-feature>::imp--feature-normalize"
+      "test<imp-feature>::imp--feature-normalize-to-list"
       #'test<imp-feature>:setup
       #'test<imp-feature>:teardown
 
     ;;===
     ;; Run the test.
     ;;===
-    ;; Only difference between `imp--feature-normalize' and `imp-feature-normalize':
+    ;; Only difference between `imp--feature-normalize-to-list' and `imp-feature-normalize':
     ;; Always get a list back, even for single feature.
 
     (should (equal '(:imp)
-                   (imp--feature-normalize :imp)))
+                   (imp--feature-normalize-to-list :imp)))
 
     (should (equal '(:imp test symbols)
-                   (imp--feature-normalize :imp 'test 'symbols)))
+                   (imp--feature-normalize-to-list :imp 'test 'symbols)))
 
     (should (equal '(:imp provide)
-                   (imp--feature-normalize :imp 'provide)))
+                   (imp--feature-normalize-to-list :imp 'provide)))
 
     ;; First item in returned list should be a keyword; rest should be symbols.
     (should (equal '(:imp strings are stringy)
-                   (imp--feature-normalize "imp" "strings" :are '+stringy)))))
+                   (imp--feature-normalize-to-list "imp" "strings" :are '+stringy)))))
 
 
 ;;------------------------------
@@ -647,7 +647,7 @@ to a list of string."
     ;;===
     ;; Run the test.
     ;;===
-    ;; Main difference between `imp--feature-normalize' and `imp-feature-normalize':
+    ;; Main difference between `imp--feature-normalize-to-list' and `imp-feature-normalize':
     ;; Get a single symbol back if gave a single feature keyword/symbol.
 
     (should (equal :imp

@@ -137,7 +137,7 @@ Does nothing if:
 
 Returns non-nil if loaded."
   (let* ((func-name "imp--load-feature")
-         (feature-normal (imp--feature-normalize feature))
+         (feature-normal (imp--feature-normalize-to-list feature))
          (feature-base (car feature-normal))
          (feature-rest (cdr feature-normal))
          (feature-emacs (imp-feature-normalize--for-emacs feature-normal))
@@ -425,7 +425,7 @@ Returns a plist:
                   "Required `:feature' value not present."))
 
     ;; Normalize FEATURE to a list.
-    (setq out-feature (imp--feature-normalize in-feature))
+    (setq out-feature (imp--feature-normalize-to-list in-feature))
     (imp--debug caller "out-feature:  %S" out-feature)
 
     ;;---

@@ -34,7 +34,7 @@
   "Ensure file(s) for FEATURE are provided.
 
 Return non-nil on success."
-  (let ((feature-normal (imp--feature-normalize feature)))
+  (let ((feature-normal (imp--feature-normalize-to-list feature)))
     ;; Already provided?
     (cond ((imp-feature? feature-normal)
            t)

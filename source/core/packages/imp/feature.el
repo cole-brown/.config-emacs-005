@@ -107,7 +107,7 @@ by `imp-features-locate'.")
   "Check for list of FEATURES in the `imp-features' tree."
   ;; When not `imp-features', always return `nil'.
   (when imp-features
-    (not (null (imp--tree-contains? (imp-feature-normalize features)
+    (not (null (imp--tree-contains? (imp--feature-normalize-to-list features)
                                     imp-features)))))
 ;; (imp-feature-exists? '(:imp))
 ;; (imp-feature-exists? '(:imp provide))
@@ -222,11 +222,11 @@ Return a string."
 
 Always returns a backwards list.
   Example:
-    (imp--feature-normalize :foo)
+    (imp--feature-normalize-chain :foo)
       -> '(\"foo\")
-    (imp--feature-normalize '(:foo))
+    (imp--feature-normalize-chain '(:foo))
       -> '(\"foo\")
-    (imp--feature-normalize '(:foo bar) 'baz)
+    (imp--feature-normalize-chain '(:foo bar) 'baz)
       -> '(\"baz\" \"bar\" \"foo\")"
   (let ((func-name "imp--feature-normalize-chain")
         output)
@@ -252,19 +252,19 @@ Always returns a backwards list.
 ;; (imp--feature-normalize-chain :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
 
 
-(defun imp--feature-normalize (&rest chain)
+(defun imp--feature-normalize-to-list (&rest chain)
   "Normalize CHAIN to a list of feature keyword/symbols.
 
 Always returns a list.
 First symbol in output list will be a keyword; rest will be symbols.
   Example:
-    (imp--feature-normalize :foo)
+    (imp--feature-normalize-to-list :foo)
       -> '(:foo)
-    (imp--feature-normalize '(:foo))
+    (imp--feature-normalize-to-list '(:foo))
       -> '(:foo)
-    (imp--feature-normalize '(foo :bar) 'baz)
+    (imp--feature-normalize-to-list '(foo :bar) 'baz)
       -> '(:foo bar baz)"
-  (let ((func-name "imp--feature-normalize")
+  (let ((func-name "imp--feature-normalize-to-list")
         (strings-reversed (imp--feature-normalize-chain chain))
         output)
     (while strings-reversed
@@ -284,17 +284,17 @@ First symbol in output list will be a keyword; rest will be symbols.
                     "No normalized features produced from CHAIN: %S"
                     chain))
     output))
-;; (imp--feature-normalize '+layout/spydez)
-;; (imp--feature-normalize :spydez)
-;; (imp--feature-normalize "spydez")
-;; (imp--feature-normalize "+spydez")
-;; (imp--feature-normalize '("+spydez" "foo" "bar"))
-;; (imp--feature-normalize '(("+spydez" "foo" "bar")))
-;; (imp--feature-normalize '(((:test))) '(("+spydez" "foo" "bar")))
-;; (imp--feature-normalize 'something-that-doesnt-exist-in-emacs)
-;; (imp--feature-normalize '(something-that-doesnt-exist-in-emacs))
-;; (let ((feature 'something-that-doesnt-exist-in-emacs)) (imp--feature-normalize (list feature)))
-;; (imp--feature-normalize :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
+;; (imp--feature-normalize-to-list '+layout/spydez)
+;; (imp--feature-normalize-to-list :spydez)
+;; (imp--feature-normalize-to-list "spydez")
+;; (imp--feature-normalize-to-list "+spydez")
+;; (imp--feature-normalize-to-list '("+spydez" "foo" "bar"))
+;; (imp--feature-normalize-to-list '(("+spydez" "foo" "bar")))
+;; (imp--feature-normalize-to-list '(((:test))) '(("+spydez" "foo" "bar")))
+;; (imp--feature-normalize-to-list 'something-that-doesnt-exist-in-emacs)
+;; (imp--feature-normalize-to-list '(something-that-doesnt-exist-in-emacs))
+;; (let ((feature 'something-that-doesnt-exist-in-emacs)) (imp--feature-normalize-to-list (list feature)))
+;; (imp--feature-normalize-to-list :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
 
 
 (defun imp-feature-normalize-for-emacs (&rest feature)
@@ -336,7 +336,7 @@ E.g.
   1) `:module' -> `:module'
   2) `feature' -> `feature'
   3) \"str-4874\" -> `:str-4874'"
-  (let* ((normalized (imp--feature-normalize input)))
+  (let* ((normalized (imp--feature-normalize-to-list input)))
     ;; Return the list, the one item, or error?
     (cond ((null normalized)
            (imp--error "imp-feature-normalize"
@@ -455,7 +455,7 @@ Error if:
   - No root path for FEATURE root.
   - No paths found for input parameters."
   (let* ((func-name "imp--feature-paths")
-         (features-normal (imp--feature-normalize feature)))
+         (features-normal (imp--feature-normalize-to-list feature)))
 
     ;;------------------------------
     ;; Error Check Inputs
@@ -606,7 +606,7 @@ For example:
                       paths))
 
         ;; Valid; finalize and add to alist.
-        (push (cons (imp--feature-normalize feature)
+        (push (cons (imp--feature-normalize-to-list feature)
                     (seq-map #'imp--path-sans-extension paths))
               features-at)))
 

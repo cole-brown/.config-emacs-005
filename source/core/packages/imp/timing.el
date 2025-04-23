@@ -608,7 +608,7 @@ Output message depends on `imp-timing-format-time'.
 Return result of evaluating BODY."
   (declare (indent 3))
 
-  `(let ((imp--macro-feature (imp--feature-normalize ,feature)))
+  `(let ((imp--macro-feature (imp--feature-normalize-to-list ,feature)))
      (if (and (imp-timing-enabled?)
               ;; Don't do (another) timing block/level for a duplicated call.
               (not (imp--timing-feature-duplicate? imp--macro-feature)))

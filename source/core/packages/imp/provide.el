@@ -66,7 +66,7 @@ If you want to provide the feature to emacs as well, you can either:
      - imp will translate the FEATURE symbol chain via `imp-feature-normalize-imp->emacs'.
   2. Do it yourself by also calling Emacs' `provide' with a symbol of your
      choosing."
-  (let ((feature-imp (imp--feature-normalize feature)))
+  (let ((feature-imp (imp--feature-normalize-to-list feature)))
     (if (null feature-imp)
         (imp--error "imp-provide"
                     '("No features to provide? "
