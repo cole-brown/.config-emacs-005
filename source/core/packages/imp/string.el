@@ -1,4 +1,4 @@
-;;; imp/string.el --- string helpers -*- lexical-binding: t; -*-
+;;; imp/fundamental.el --- string helpers, etc -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -14,20 +14,21 @@
 ;;
 ;;                                 ──────────
 ;; ╔════════════════════════════════════════════════════════════════════════╗
-;; ║                                 String                                 ║
+;; ║                              Fundamentals                              ║
 ;; ╚════════════════════════════════════════════════════════════════════════╝
 ;;                                   ──────
+;;                    Shit too basic to get its own file.
 ;;                                 ──────────
 ;;
-;; - string
-;; - string
-;; - also string
+;; - strings
+;; - symbols
+;; - firmaments
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; String
+;; Strings
 ;;------------------------------------------------------------------------------
 
 (defun imp--string-or-nil (whatever)
@@ -53,6 +54,24 @@ If TRIM? is non-nil, use `string-trim' before checking if string is empty."
 ;; (imp--str-empty? "")
 ;; (imp--str-empty? " ")
 ;; (imp--str-empty? " " :trim)
+
+
+;;------------------------------------------------------------------------------
+;; Symbols
+;;------------------------------------------------------------------------------
+
+(defun imp--unquote (arg)
+  "Return ARG unquoted.
+
+Removes both `quote' ('foo) and `function' (#'foo) style quoting.
+
+Originaly from `doom-unquote'."
+  (declare (pure t) (side-effect-free t))
+  (while (memq (car-safe arg) '(quote function))
+    (setq arg (cadr arg)))
+  arg)
+;; (imp--unquote 'foo)
+;; (imp--unquote '''#'foo)
 
 
 ;;------------------------------------------------------------------------------
