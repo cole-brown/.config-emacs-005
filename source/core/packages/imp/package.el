@@ -29,7 +29,18 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Use-Package
+;; Use-Package: imp keyword
+;;------------------------------------------------------------------------------
+
+;; TODO: `use-package' keyword instead of replacement.
+
+;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Creating-an-extension.html
+
+use-package-keywords
+(:pin :ensure :disabled :load-path :requires :defines :functions :preface :if :when :unless :vc :no-require :catch :after :custom :custom-face :bind :bind* :bind-keymap :bind-keymap* :interpreter :mode :magic :magic-fallback :hook :commands :autoload :init :defer :demand :load :config :diminish :delight)
+
+;;------------------------------------------------------------------------------
+;; Use-Package: (old) use-package + imp timings replacement macro
 ;;------------------------------------------------------------------------------
 
 (defmacro imp-use-package (name &rest args)
@@ -112,7 +123,7 @@ This is a wrapper around `eval-after-load' that:
                        ;; `imp-require' will check Emacs and imp for:
                        ;;   1) Is the feature already provided?
                        ;;   2) Can the feature be provided right now?
-                       ;; It signals a `user-error' if the answers are no, which
+                       ;; It signals an `error' if the answers are no, which
                        ;; we need to prevent; this is just a check for if it's
                        ;; ready right now.
                        (ignore-error '(error user-error)
@@ -123,14 +134,14 @@ This is a wrapper around `eval-after-load' that:
                ;; macro expansion from pulling (or failing to pull) in autoloaded
                ;; macros/features.
                `(eval-after-load ',(if (keywordp feature)
-                                       (imp-feature-normalize-imp->emacs feature)
+                                       (imp-feature-normalize-for-emacs feature)
                                      feature)
                   ',(macroexp-progn body))))
 
         ((and (listp feature)
               (not (memq (car feature) '(:and :all :or :any))))
          ;; Convert imp feature list to Emacs feature symbol & recurse to hit the above case.
-         `(imp-eval-after ,(apply #'imp-feature-normalize-imp->emacs feature) ,@body))
+         `(imp-eval-after ,(apply #'imp-feature-normalize-for-emacs feature) ,@body))
 
         ;;------------------------------
         ;; Multiple Features
@@ -182,4 +193,4 @@ This is a wrapper around `eval-after-load' that:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide-with-emacs :imp 'package)
+(imp-provide :imp 'package)

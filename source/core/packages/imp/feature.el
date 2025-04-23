@@ -371,9 +371,9 @@ Similar output to `imp-feature-normalize-for-emacs'."
                   (mapconcat #'identity
                              (nreverse (imp--feature-normalize-chain feature))
                              imp--feature-replace-separator))))
-(list :for-imp   (imp-feature-normalize '(:imp test symbols))
-      :for-emacs (imp-feature-normalize-for-emacs '(:imp test symbols))
-      :for-human (imp--feature-normalize-display '(:imp test symbols)))
+;; (list :for-imp   (imp-feature-normalize '(:imp test symbols))
+;;       :for-emacs (imp-feature-normalize-for-emacs '(:imp test symbols))
+;;       :for-human (imp-feature-normalize-for-display '(:imp test symbols)))
 ;; (imp-feature-normalize-for-display '(:imp test) 'symbols)
 ;; (imp-feature-normalize-for-display '(:imp provide))
 ;; (imp-feature-normalize-for-display :imp 'provide)
