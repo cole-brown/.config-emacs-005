@@ -101,22 +101,27 @@ Return nil if no callers."
   ;;  "[warning   ]: "
   ;;  "[     debug]: "
   (if-let ((display (imp--output-level-get level :display)))
-      (format (concat "[%"
-                      (when (memq (imp--output-level-get level :align) '(nil left)) "-")
-                      (format "%d"
-                              (length
-                               (plist-get
-                                (cdr
-                                 (seq-reduce (lambda (a b)
-                                               (if (> (length (plist-get (cdr a) :display))
-                                                      (length (plist-get (cdr b) :display)))
-                                                   a
-                                                 b))
-                                             imp-output-level
-                                             nil))
-                                :display)))
-                      "s]: ")
-              display)
+      (concat "["
+              (string-replace
+               " "
+               "-"
+               (format (concat "%"
+                               (when (memq (imp--output-level-get level :align) '(nil left)) "-")
+                               (format "%d"
+                                       (length
+                                        (plist-get
+                                         (cdr
+                                          (seq-reduce (lambda (a b)
+                                                        (if (> (length (plist-get (cdr a) :display))
+                                                               (length (plist-get (cdr b) :display)))
+                                                            a
+                                                          b))
+                                                      imp-output-level
+                                                      nil))
+                                         :display)))
+                               "s")
+                       display))
+              "]: ")
     ""))
 ;; (imp--output-prefix :error)
 ;; (imp--output-prefix :debug)
