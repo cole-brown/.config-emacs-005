@@ -103,7 +103,7 @@ Returns the Emacs feature symbol created/used."
     feature-emacs))
 
 
-(defun imp-provide (&rest feautre)
+(defun imp-provide (&rest feature)
   "Record FEATURE as available to imp and emacs.
 
 imp:   See tree `imp-features'
