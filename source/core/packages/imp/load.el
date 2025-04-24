@@ -678,12 +678,11 @@ Return nil for failure, non-nil for success."
            ;; So just a message ourself. But don't use `imp--debug' as that doesn't output to stdout during the
            ;; pre-gui stages of init.
            (when imp--debugging?
-             (message "[imp-debug] %s: '%s'"
-                      ,imp--premacro-func-name
-                      ;; Don't love expanded path, but it does match what Emacs outputs:
-                      ;; Emacs: "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
-                      ;; imp:   "[imp-debug] imp-load- ’/home/work/.config/emacs-sn004/core/modules/elisp/utils/init’"
-                      imp--macro-path-load))
+             (imp--debug ,imp--premacro-func-name
+                         "load '%s'"
+                         ;; Don't love expanded path, but it does match what Emacs `load' outputs:
+                         ;; > "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
+                         imp--macro-path-load))
            ;; Actually do the load.
            (setq imp--macro-load-result
                  (load imp--macro-path-load
@@ -717,6 +716,14 @@ Return nil for failure, non-nil for success."
 ;;           :path     test<imp-load>-loading:root
 ;;           :filename test<imp-load>-loading:dont-load:file
 ;;           :error    nil)
+;;------
+;; (setq imp--debugging? t)
+;; (imp-load :feature '(:test) :path "test.el")
+;; imp-features
+;; features
+;; (imp-provided? :test)
+;; (imp--unprovide-from-emacs :test)
+
 
 
 ;;------------------------------------------------------------------------------

@@ -357,10 +357,6 @@ E.g.
 ;; (imp-feature-normalize-for-imp :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
 
 
-(defalias 'imp-feature-normalize 'imp-feature-normalize-for-imp)
-(defalias 'imp-feature           'imp-feature-normalize-for-imp)
-
-
 (defun imp-feature-normalize-for-display (&rest feature)
   "Normalizes FEATURE down into a single keyword with separators.
 
@@ -371,7 +367,7 @@ Similar output to `imp-feature-normalize-for-emacs'."
                   (mapconcat #'identity
                              (nreverse (imp--feature-normalize-chain feature))
                              imp--feature-replace-separator))))
-;; (list :for-imp   (imp-feature-normalize '(:imp test symbols))
+;; (list :for-imp   (imp-feature-normalize-for-imp '(:imp test symbols))
 ;;       :for-emacs (imp-feature-normalize-for-emacs '(:imp test symbols))
 ;;       :for-human (imp-feature-normalize-for-display '(:imp test symbols)))
 ;; (imp-feature-normalize-for-display '(:imp test) 'symbols)
@@ -421,7 +417,7 @@ list of keywords/symbols."
   "A \"soft require\"; error if the feature is not already loaded.
 
 Normalize FEATURE:BASE and FEATURE into an imp feature
-\(via `imp-feature-normalize'), then checks if it's loaded or not.
+\(via `imp-feature-normalize-for-imp'), then checks if it's loaded or not.
 
 Return normalized feature symobl if loaded.
 Raise an error signal if not found.
@@ -430,7 +426,7 @@ Only check `imp-features' variable; does not check Emacs' `features' list."
       t
     (imp--error "imp-feature-assert"
                 "No `%S' feature exists in imp's features!"
-                (imp-feature-normalize feature))))
+                (imp-feature-normalize-for-imp feature))))
 
 
 ;;------------------------------------------------------------------------------
