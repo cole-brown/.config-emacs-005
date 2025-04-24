@@ -14,8 +14,21 @@
 ;;; Commentary:
 ;;
 ;; ------------------------------------------------------------------------------
+;; Add to Your .emacs
+;; ------------------------------------------------------------------------------
+;;
+;; (load (expand-file-name "path/to/imp/init.el" user-emacs-directory))
+;;
+;; ;; optional customizations
+;; (customize-set-variable 'imp-timing-enabled? t)
+;;
+;; ------------------------------------------------------------------------------
 ;; Usage
 ;; ------------------------------------------------------------------------------
+;;
+;; TODO Load
+;; ------
+;; (imp-load TODO: TODO)
 ;;
 ;; Require
 ;; ------
@@ -42,13 +55,15 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Custom
+;; Customize
 ;;------------------------------------------------------------------------------
 
 (defgroup imp nil
   "Automatically-ish commit/push git repos for note, docs, etc."
   :prefix "imp-"
   :group 'tools)
+
+;; TODO: Move defcustoms here?
 
 
 ;;------------------------------------------------------------------------------
@@ -62,6 +77,7 @@
                      path-relative
                      (directory-file-name
                       (file-name-directory
+                       ;; this is just `imp-path-current-file'
                        (cond ((bound-and-true-p byte-compile-current-file))
                              (load-file-name)
                              ((stringp (car-safe current-load-list))
