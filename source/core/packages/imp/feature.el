@@ -379,7 +379,7 @@ Similar output to `imp-feature-normalize-for-emacs'."
 
 
 ;;------------------------------------------------------------------------------
-;; Add Feature.
+;; Feature Getters & Setters
 ;;------------------------------------------------------------------------------
 
 (defun imp--feature-add (normalized)
@@ -407,6 +407,16 @@ list of keywords/symbols."
 ;; (imp--alist-get-value :imp imp-features)
 ;; (imp--tree-contains? '(:imp) imp-features)
 ;; (imp--tree-contains? '(:imp or something) imp-features)
+
+
+(defun imp--feature-get-tree (normalized)
+  "Get tree of NORMALIZED features from `imp-features'."
+  (imp--tree-contains? normalized imp-features))
+
+
+(defun imp--feature-delete (normalized)
+  "Remove the NORMALIZED feature, and all subfeatures, from `imp-features'."
+  (imp--tree-delete normalized imp-features))
 
 
 ;;------------------------------------------------------------------------------
