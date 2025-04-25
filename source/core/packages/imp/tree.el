@@ -55,7 +55,7 @@ tree or nil)."
   ;;   - ...which has not-a-list as the first item (so not an alist).
   ;;   - First item should be a symbol/keyword.
   (and (not (null node))
-       (listp node)
+       (proper-list-p node)
        (not (null (car node)))
        (not (listp (car node)))
        (symbolp (car node))))
@@ -68,17 +68,21 @@ tree or nil)."
 (defun imp--tree-tree? (tree)
   "Is TREE an imp tree?
 
-Return t if TREE is a tree; nil otherwise (including if TREE is a node)."
-  ;; A tree is:
-  ;;   - A list...
-  ;;   - ...which has nodes for each item in it (so an alist of nodes).
+A tree is never nil.
+A tree is not a node.
+A tree is a list of nodes.
+
+Return t if TREE is a tree; nil otherwise "
+  ;; A tree must be the non-nil sort of list.
   (if (or (null tree)
-          (not (listp tree)))
+          (not (proper-list-p tree)))
       nil
-    ;; Each item in list must be a node.
+    ;; Each thing in this non-nil list must be a node.
     (not
      (seq-contains-p (mapcar #'imp--tree-node? tree)
                      nil))))
+;; nil: no
+;;   (imp--tree-tree? nil)
 ;; symbol: no
 ;;   (imp--tree-tree? :root)
 ;; node: no
@@ -86,6 +90,8 @@ Return t if TREE is a tree; nil otherwise (including if TREE is a node)."
 ;; list of node: yes
 ;;   (imp--tree-tree? '((:root)))
 ;;   (imp--tree-tree? '((:root :ignored) (:root02) (:root03)))
+;; too far: no
+;;   (imp--tree-tree? '(((:root))))
 
 
 (defun imp--tree-chain? (chain &optional rooted)
@@ -208,9 +214,8 @@ BRANCH."
 ;; (alist-get :two (imp--tree-branch-update '(:two (:leaf-node1)) '((:two (:three (:leaf-node0))))))
 ;; (alist-get :leaf-node1 (alist-get :two (imp--tree-branch-update '(:two (:leaf-node1)) '((:two (:three (:leaf-node0)))))))
 
-
 ;;------------------------------------------------------------------------------
-;; API for imp:
+;; Tree Management
 ;;------------------------------------------------------------------------------
 
 (defun imp--tree-update-helper (chain value tree)
@@ -349,13 +354,13 @@ Returns an updated copy of tree."
 ;; Chain w/ null value:
 ;;   (imp--tree-update '(:root :one :two :free) nil (imp--tree-create '(:root :one :two :three) :leaf-node0))
 ;; This func does not update the variable; use `imp--tree-update' for that.
-;;   (setq test<imp>:tree nil)
-;;   (imp--tree-update-helper '(:foo bar baz) 'qux test<imp>:tree)
-;;   test<imp>:tree
+;;   (setq test--imp-tree nil)
+;;   (imp--tree-update-helper '(:foo bar baz) 'qux test--imp-tree)
+;;   test--imp-tree
 
 
 (defmacro imp--tree-update (chain value tree)
-  "Adds CHAIN with final VALUE to TREE.
+  "Add CHAIN with final VALUE to TREE.
 
 CHAIN should be a list of symbols and/or keywords.
 VALUE should be a symbol or keyword.
@@ -363,27 +368,27 @@ TREE should be a list or symbol that holds the list.
 
 If VALUE is nil, just adds chain - does not add a nil child."
   ;; Have to eval ,tree up to twice to set it, but we can avoid more than that?
-  `(let ((macro<imp>:tree ,tree))
+  `(let ((imp--macro-tree ,tree))
      (cond
-      ((listp macro<imp>:tree)
+      ((listp imp--macro-tree)
        (setq ,tree
              (imp--tree-update-helper ,chain ,value ,tree)))
-      ((symbolp macro<imp>:tree)
-       (set macro<imp>:tree
-            (imp--tree-update-helper ,chain ,value (eval macro<imp>:tree))))
+      ((symbolp imp--macro-tree)
+       (set imp--macro-tree
+            (imp--tree-update-helper ,chain ,value (eval imp--macro-tree))))
 
       (t
        (imp--error "imp--tree-update"
                    "Unable to update tree: not a list or a symbol: %S (type: %S)"
-                   macro<imp>:tree
-                   (typeof macro<imp>:tree))))))
-;; (setq test<imp>:tree nil)
-;; (imp--tree-update '(:foo bar baz) 'qux test<imp>:tree)
-;; test<imp>:tree
+                   imp--macro-tree
+                   (typeof imp--macro-tree))))))
+;; (setq test--imp-tree nil)
+;; (imp--tree-update '(:foo bar baz) 'qux test--imp-tree)
+;; test--imp-tree
 
 
 (defun imp--tree-contains? (chain tree)
-  "Returns non-nil if TREE contains the CHAIN of symbols/keywords."
+  "Return non-nil if TREE contains the CHAIN of symbols/keywords."
   ;;------------------------------
   ;; Error Checking
   ;;------------------------------
@@ -426,3 +431,264 @@ If VALUE is nil, just adds chain - does not add a nil child."
 ;; (imp--tree-contains? '(:root :one :two :free) (imp--tree-create '(:root :one :two :three) :leaf-node0))
 ;; (imp--tree-contains? '(:root1 :one :two) (imp--tree-create '(:root :one :two :three) :leaf-node0))
 ;; (imp--tree-contains? '(:imp test) '((:imp (ort (something (here))) (test))))
+
+
+(defun imp--tree-delete-helper (chain tree)
+  "Delete CHAIN and descendants from TREE.
+
+CHAIN should be a list of symbols and/or keywords.
+TREE should be an alist of alists.
+
+Return an updated copy of tree."
+  (let ((func-name "imp--tree-delete-helper"))
+    ;;------------------------------
+    ;; Error Checking
+    ;;------------------------------
+    ;; Don't allow a null chain.
+    (when (or (null chain)
+              (not (imp--tree-chain? chain)))
+      (imp--error func-name "CHAIN is not a chain: %S" chain))
+
+    ;; Valid tree?
+    (unless (imp--tree-tree? tree)
+      (imp--error func-name "TREE is not a tree: %S" tree))
+
+    ;;------------------------------
+    ;; Deleting
+    ;;------------------------------
+    (let ((branch tree)
+          (link (car chain))
+          (remaining (cdr chain))
+          parent-branches
+          parent-links
+          )
+      (while (and branch
+                  remaining)
+        ;; Get branch for current link; save off branch/link.
+        ;; 'parent-branch' for the 'parent-link' should include the link as an key
+        ;; - we need it for easier updating on the way back up to the root.
+        (push branch parent-branches)
+        (setq branch (imp--alist-get-value link branch))
+        (push link parent-links)
+        (imp--tree-debug func-name "%S = %S" parent-links parent-branches)
+
+        ;; Update link/remaining for next round.
+        (setq link (car remaining))
+        (setq remaining (cdr remaining)))
+
+      (imp--tree-debug func-name "found final branch:")
+      (imp--tree-debug func-name "  branch:    %S" branch)
+      (imp--tree-debug func-name "  remaining: %S" remaining)
+      (imp--tree-debug func-name "  link:      %S" link)
+      ;; [-----debug]: imp--tree-delete-helper: found final branch:
+      ;; [-----debug]: imp--tree-delete-helper:   branch:    ((foo (bar)) (snork) (narf (poit zort)))
+      ;; [-----debug]: imp--tree-delete-helper:   remaining: nil
+      ;; [-----debug]: imp--tree-delete-helper:   link:      foo
+
+      (when (and branch link)
+        ;; Delete `link` from alist `branch`
+        (let ((branch-updated (imp--alist-delete link branch)))
+
+          ;; Walk back up the tree, updating all the branches along the way.
+          (imp--tree-debug func-name "branch-updated: %S" branch-updated)
+          (imp--tree-debug func-name "Branch found/updated. Walk update up to root...\n")
+
+            (while parent-branches
+              ;; Grab what this level is.
+              (setq link (car parent-links))
+              (setq parent-links (cdr parent-links))
+              (setq branch (car parent-branches))
+              (setq parent-branches (cdr parent-branches))
+              (imp--tree-debug func-name "link: %S" link)
+              (imp--tree-debug func-name "branch: %S" branch)
+
+              ;; Push updated branch of tree into place.
+              (setq branch-updated (imp--alist-update link branch-updated branch))
+              (imp--tree-debug func-name "branch-updated: %S" branch-updated))
+
+            branch-updated)))))
+;; (imp--tree-delete-helper '(:test foo)
+;;                          '((:imp
+;;                             (provide)
+;;                             (require))
+;;                            (:metasyntactic
+;;                             (foo (bar (baz (qux (quux (quuux (quuuux (quuuuux))))))
+;;                                       (thud (grunt))
+;;                                       (bletch)
+;;                                       (fum)
+;;                                       (bongo)
+;;                                       (zot)))
+;;                             (bazola (ztesch))
+;;                             (fred (jim (sheila (barney))))
+;;                             (corge (grault (flarp)))
+;;                             (zxc (spqr (wombat)))
+;;                             (shme)
+;;                             (spam (eggs))
+;;                             (snork)
+;;                             (blarg (wibble))
+;;                             (toto (titi (tata (tutu))))
+;;                             (pippo (pluto (paperino)))
+;;                             (aap (noot (mies)))
+;;                             (oogle (foogle (boogle (zork (gork (bork)))))))
+;;                            (:test (foo (bar))
+;;                                   (snork)
+;;                                   (narf (poit zort)))
+;;                            (:pinky (narf (zort (poit (egad (troz (fiddely-posh)))))))))
+
+
+(defmacro imp--tree-delete (chain tree)
+  "Delete CHAIN and descendants from TREE.
+
+CHAIN should be a list of symbols and/or keywords.
+TREE should be an alist of alists."
+  ;; Have to eval ,tree up to twice to set it, but we can avoid more than that?
+  `(let ((imp--macro-tree ,tree))
+     (cond
+      ((listp imp--macro-tree)
+       (setq ,tree
+             (imp--tree-delete-helper ,chain ,tree)))
+      ((symbolp imp--macro-tree)
+       (set imp--macro-tree
+            (imp--tree-delete-helper ,chain (eval imp--macro-tree))))
+
+      (t
+       (imp--error "imp--tree-delete"
+                   "Unable to delete tree: not a list or a symbol: %S (type: %S)"
+                   imp--macro-tree
+                   (typeof imp--macro-tree))))))
+;; (setq test--imp-tree '((:imp
+;;                         (provide)
+;;                         (require))
+;;                        (:metasyntactic
+;;                         (foo (bar (baz (qux (quux (quuux (quuuux (quuuuux))))))
+;;                                   (thud (grunt))
+;;                                   (bletch)
+;;                                   (fum)
+;;                                   (bongo)
+;;                                   (zot)))
+;;                         (bazola (ztesch))
+;;                         (fred (jim (sheila (barney))))
+;;                         (corge (grault (flarp)))
+;;                         (zxc (spqr (wombat)))
+;;                         (shme)
+;;                         (spam (eggs))
+;;                         (snork)
+;;                         (blarg (wibble))
+;;                         (toto (titi (tata (tutu))))
+;;                         (pippo (pluto (paperino)))
+;;                         (aap (noot (mies)))
+;;                         (oogle (foogle (boogle (zork (gork (bork)))))))
+;;                        (:test (foo (bar))
+;;                               (snork)
+;;                               (narf (poit zort)))
+;;                        (:pinky (narf (zort (poit (egad (troz (fiddely-posh)))))))))
+;; (imp--tree-delete '(:test foo) test--imp-tree)
+;; test--imp-tree
+
+
+;;------------------------------------------------------------------------------
+;; Tree Walks!
+;;------------------------------------------------------------------------------
+
+(defun imp--tree-map (function chain-reversed tree &optional dbg-depth)
+  "Walk a tree depth first, calling FUNCTION at each node.
+
+FUNCTION should be a function with 1 arg: chain (see `imp--tree-chain?').
+
+TREE should be tree or nil. See `imp--tree-tree?'.
+
+CHAIN-REVERSED should be a backwards chain (i.e. tree node lineage).
+
+DBG-DEPTH should always be nil.
+
+Return nil."
+  (let ((func-name "imp--tree-map")
+        (dbg-depth (if (integerp dbg-depth) dbg-depth 0))
+        chains-out)
+    (unless (functionp function)
+      (imp--error func-name
+                  "FUNCTION must be `functionp'. FUNCTION: %S"
+                  function))
+
+    (imp--tree-debug func-name
+                     "CHAIN-R:%d: %S"
+                     dbg-depth
+                     chain-reversed)
+    (imp--tree-debug func-name
+                     "TREE:%d:    %S"
+                     dbg-depth
+                     tree)
+
+    (cond ((eq nil tree)
+           (let ((chain-leaf (reverse chain-reversed)))
+             ;;----------------------------
+             ;; Eat the leaf of the null tree.
+             ;;----------------------------
+             (imp--tree-debug func-name "TREE(NULL):%d: %S" dbg-depth tree)
+             (imp--tree-debug func-name "LEAF(EAT):%d:  %S" dbg-depth (imp-feature-normalize-for-display chain-leaf))
+
+             ;; Do the thing to this leaf's chain.
+             (funcall function chain-leaf)
+
+             ;; Clean return
+             nil))
+
+          ;;----------------------------
+          ;; Require well kept trees.
+          ;;----------------------------
+          ((not (imp--tree-tree? tree))
+           (imp--error func-name
+                       "Invalid TREE. See `imp-tree-tree?' for details. TREE:%d: %S"
+                       dbg-depth
+                       tree))
+
+          ;;----------------------------
+          ;; Eat the tree.
+          ;;----------------------------
+          (t
+           ;; Do the thing to this branch node's chain.
+           (when chain-reversed
+             (funcall function (reverse chain-reversed)))
+
+           ;; Eat tree.
+           (while tree
+             ;; Eat the tree just like everyone else:
+             ;;   One assoc list at a time.
+             (let* ((assoc (pop tree)) ;; alist assoc: (link . tree-branch)
+                    (link (car-safe assoc))
+                    (branch (cdr-safe assoc))
+                    (chain-link (cons link chain-reversed)))
+               (imp--tree-debug func-name "ASSOC:%d: %S" dbg-depth assoc)
+               (imp--tree-debug func-name "  - LINK:%d: %S" dbg-depth link)
+               (imp--tree-debug func-name "  - BRANCH:%d: %S" dbg-depth branch)
+               (imp--tree-debug func-name "CHAIN-R(LINK):%d: %S" dbg-depth chain-link)
+
+               ;; Recurse to handle all of this branches's nodes.
+               (imp--tree-map function chain-link branch (1+ dbg-depth))))
+
+           ;; Clean return.
+           nil))))
+;; (setq imp--tree-debug-flag nil)
+;; (imp--tree-map (lambda (chain) (message "hello from %S" chain)) nil '((:test (tree-a (child-a-a) (child-a-b)) (tree-b (child-b-a) (child-b-b))) (:package (module (submodule (feature))))))
+
+
+(defun imp--tree-chains-get-all (chain-reversed tree)
+"Walk a tree depth first, calling FUNCTION at each node.
+
+FUNCTION should be a function with 1 arg: chain (see `imp--tree-chain?').
+
+TREE should be tree or nil. See `imp--tree-tree?'.
+
+CHAIN-REVERSED should be a backwards chain (i.e. tree node lineage).
+
+Return list of chains starting with CHAIN in TREE."
+  (let (chains)
+    (imp--tree-map (lambda (chain) (push chain chains))
+                   chain-reversed
+                   tree)
+    chains))
+;; (pp (imp--tree-chains-get-all nil '((:test (tree-a (child-a-a) (child-a-b)) (tree-b (child-b-a) (child-b-b))) (:package (module (submodule (feature)))))))
+;;   => ((:package module submodule feature) (:package module submodule)
+;;       (:package module) (:package) (:test tree-b child-b-b)
+;;       (:test tree-b child-b-a) (:test tree-b) (:test tree-a child-a-b)
+;;       (:test tree-a child-a-a) (:test tree-a) (:test))
