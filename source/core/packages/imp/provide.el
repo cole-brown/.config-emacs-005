@@ -26,6 +26,7 @@
 ;;
 ;;; Code:
 
+(require 'seq)
 
 ;;------------------------------------------------------------------------------
 ;; Public API: Provide
@@ -91,7 +92,7 @@ Each FEATURE should be one of:
   - A symbol.
   - A string to be passed through `imp-feature-normalize'.
 
-imp will translate the FEATURE symbol chain via `imp-feature-normalize-imp->emacs' and use
+imp will translate the FEATURE symbol chain via `imp-feature-normalize-for-emacs' and use
 the result for the call to Emacs' `provide'.
 
 Returns the Emacs feature symbol created/used."
@@ -122,6 +123,52 @@ If you want to provide the feature to emacs as well, you can either:
      choosing."
   (apply #'imp-provide-to-emacs feature)
   (apply #'imp-provide-to-imp feature))
+
+
+(defun imp--unprovide-feature-from-emacs (&rest feature)
+  "Delete FEATURE from Emacs' `features'.
+
+Delete exactly/only FEATURE."
+  (let ((func-name "imp--unprovide-feature-from-emacs")
+        (normalized (imp-feature-normalize-for-emacs feature)))
+    (when (featurep normalized)
+      ;; Filter it out of the `features' list.
+      (setq features (seq-filter (lambda (f) (not (eq f normalized))) features))
+      (imp--debug func-name
+                  "Unprovided `%s' from `features'"
+                  normalized))))
+
+
+(defun imp--unprovide-tree-from-emacs (normalized tree)
+  "Unprovide NORMALIZED and its subfeatures TREE from Emacs' `features'."
+  (imp--tree-map #'imp--unprovide-from-emacs
+                 (reverse normalized)
+                 tree))
+
+
+(defun imp-unprovide (&rest feature)
+  "Ninja-delete FEATURE from feature lists.
+
+Delete from:
+  - imp: `imp-features'
+  - emacs: `features'"
+  (let* ((feature-imp (imp--feature-normalize-to-list feature))
+         (tree (imp--feature-get-tree feature-imp)))
+    ;; Does imp know about this?
+    (if (null tree)
+        ;; No, imp doesn't know about that.
+        ;; Make some half-hearted sort of effort to delete from Emacs'
+        ;; features by deleting only FEATURE; no subfeatures harmed.
+        (imp--unprovide-from-emacs feature)
+
+      ;; Yeah, imp knows about that.
+      (imp--feature-delete feature-imp)
+      ;; Well... imp used to.
+
+      ;; Delete from Emacs' `features' smarter:
+      ;; Delete it and all is subfeatures.
+      (imp--unprovide-tree-from-emacs feature-imp tree))))
+;; (imp-unprovide :test)
 
 
 ;;------------------------------------------------------------------------------
