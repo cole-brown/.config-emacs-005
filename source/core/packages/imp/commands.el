@@ -44,3 +44,19 @@ of the features imp has provided."
   (interactive)
   (pp-display-expression imp-features imp-output-features-buffer))
 ;; (imp-cmd-features-print)
+
+
+;;------------------------------------------------------------------------------
+;; Clear & Purge
+;;------------------------------------------------------------------------------
+
+(defun imp-cmd-features-nuke ()
+  "The most heavy-handed approach to clearing the clutter away.
+
+Set to nil:
+  - `imp-features'
+  - `imp-features-locate'"
+  (interactive)
+  (setq imp-features        nil)
+  (setq imp-features-locate nil))
+;; (imp-cmd-features-nuke)
