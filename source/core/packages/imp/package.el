@@ -20,24 +20,142 @@
 ;;                            Free(ish) Shipping!
 ;;                                 ──────────
 ;;
-;; `imp' + `use-package' = `imp-use-package'
+;; `imp' + `use-package' = "(wrong-type-argument number-or-marker-p imp)"
 ;;
 ;;; Code:
 
-
 (require 'cl-lib)
-
+(require 'seq)
 
 ;;------------------------------------------------------------------------------
 ;; Use-Package: imp keyword
 ;;------------------------------------------------------------------------------
-
-;; TODO: `use-package' keyword instead of replacement.
-
 ;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Creating-an-extension.html
 
-use-package-keywords
-(:pin :ensure :disabled :load-path :requires :defines :functions :preface :if :when :unless :vc :no-require :catch :after :custom :custom-face :bind :bind* :bind-keymap :bind-keymap* :interpreter :mode :magic :magic-fallback :hook :commands :autoload :init :defer :demand :load :config :diminish :delight)
+(defcustom imp-use-package-extension-enabled t
+  "Add `:imp' keyword to `use-package'?"
+  :group 'imp
+  :type '(boolean))
+
+;; TODO
+;; TODO So... how do I let users modify `imp-use-package-extension-enabled' before using it here?
+;; TODO   - Put all the customs into init.el or settings.el
+;; TODO
+
+;; TODO
+;; TODO Make this an optional file?
+;; TODO
+
+(cond ((not imp-use-package-extension-enabled)
+       nil)
+      ((not (featurep 'use-package))
+       ;; We need `use-package' to be loaded for e.g. `imp--use-package-keyword-add'.
+       (imp--output :info
+                    "imp/package.el"
+                    "`use-package' feature not loaded. Add to init before `imp': (require 'use-package)"))
+      (t
+       (progn
+         ;;----------------------------
+         ;; Define our `use-package' extension.
+         ;;----------------------------
+
+         (defcustom use-package-always-imp t
+           "Treat every package as though it had specified using `:imp SEXP'.
+See also `use-package-defaults', which uses this value."
+             :group 'imp
+             :type 'sexp)
+
+
+         (defconst imp--use-package-keyword :imp
+           "imp's keyword for `use-package'.")
+
+
+         (defun imp--use-package-init-default ()
+           "Idempotently add `use-package-always-imp' to `use-package-defaults'."
+           (add-to-list 'use-package-defaults
+                        (list imp--use-package-keyword t)
+                        :append))
+         ;; (imp--use-package-init-default)
+         ;; use-package-defaults
+
+
+         (defun imp--use-package-init-keyword ()
+           "Idempotently add imp's keyword to `use-package-keywords'."
+           (unless (and (bound-and-true-p use-package-keywords)
+                        (memq imp--use-package-keyword use-package-keywords))
+
+             ;; Demand to be in front of the line so we can time every millisecond.
+             (push imp--use-package-keyword use-package-keywords)
+
+             ;; ;; inject into middle of list:
+             ;; (seq-concatenate 'list
+             ;;                  (seq-take-while (lambda (k) (not (eq k :init))) use-package-keywords)
+             ;;                  '(:imp)
+             ;;                  (seq-drop-while (lambda (k) (not (eq k :init))) use-package-keywords))
+             ))
+         ;; use-package-keywords
+         ;; (imp--use-package-init-keyword)
+
+         (defun imp--use-package-init ()
+           "Idempotently initialize `:imp' keyword for `use-package'."
+           (imp--use-package-init-keyword)
+           (imp--use-package-init-default))
+
+
+         (defalias 'use-package-normalize/:imp 'use-package-normalize-predicate
+           "Normalize `imp' args to boolean.")
+
+
+         (defun use-package-handler/:imp (name keyword arg rest state)
+           "Resolve `use-package' keyword `:imp'.
+
+Given this example:
+  (use-package example-foo
+    :imp
+    :init
+    (message \"init\")
+    :config
+    (message \"config\"))
+
+NAME is the package's symbol.
+  - eg: `example-foo'
+
+KEYWORD is `:imp'.
+  - eg: `:imp'
+
+ARG is the return value from `use-package-normalize/:imp'.
+  - eg: t
+
+REST is a list of remaining `use-package' keywords & arg lists.
+  - eg: (:ensure (t) :catch t :init ((message \"init\")) :load (example-foo) :config ((message \"config\")))
+
+STATE is a plist of shit from other handlers that you can add to for other handlers.
+  - eg: From function `use-package-handler/:load-path':
+        (let ((body (use-package-process-keywords name rest
+                      (plist-put state :load-path arg))))
+          ...)"
+           ;; This happens at macro expansion time, not when the expanded code is
+           ;; compiled or evaluated.
+           (let ((body (use-package-process-keywords name rest state)))
+             `((imp--timing-macro-helper
+                '(:use-package ,keyword)
+                ,@body))))
+
+         ;; this is idempotent
+         (imp--use-package-init))))
+
+;; (use-package-handler/:imp 'test-imp-up
+;;                           :imp
+;;                           t
+;;                           '(:ensure (t) :catch t :init ((message "init")) :load (test-imp-up) :config ((message "config")))
+;;                           nil)
+;; (use-package test-imp-up
+;;   :imp
+;;   :init
+;;   (message "init")
+;;   :config
+;;   (message "config"))
+
 
 ;;------------------------------------------------------------------------------
 ;; Use-Package: (old) use-package + imp timings replacement macro
@@ -178,9 +296,9 @@ This is a wrapper around `eval-after-load' that:
                  ;; keyword, but to be complete: signal an error.
                  (t
                   `(imp--error "imp-eval-after"
-                                   "Unhandled condition `%S' for features: %S"
-                                   condition
-                                   feature)))))))
+                               "Unhandled condition `%S' for features: %S"
+                               condition
+                               feature)))))))
 ;; (imp-eval-after nil (message "hi"))
 ;; (imp-eval-after :imp (message "hi"))
 ;; (imp-eval-after imp (message "hi"))

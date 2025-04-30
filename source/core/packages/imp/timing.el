@@ -532,7 +532,7 @@ TYPE should be either `:root' or `:leaf'. Uses TYPE to get the indent string."
 Message depends on `imp-timing-format-load'."
   (imp--timing-message :root
                        imp-timing-format-load
-                       (imp--feature-normalize-display feature)
+                       (imp-feature-normalize-for-display feature)
                        filename
                        path))
 
@@ -558,7 +558,7 @@ Message depends on `imp-timing-format-skip'."
     ;; Skip message.
     (imp--timing-message :root
                          imp-timing-format-skip
-                         (imp--feature-normalize-display feature)
+                         (imp-feature-normalize-for-display feature)
                          filename
                          path)
     ;; Increase indent level for reason.
@@ -567,7 +567,7 @@ Message depends on `imp-timing-format-skip'."
       (imp--timing-message :leaf
                            (concat imp-timing-reason
                                    imp-timing-format-skip-already-provided)
-                           (imp--feature-normalize-display feature)
+                           (imp-feature-normalize-for-display feature)
                            filename
                            path))))
 
@@ -580,7 +580,7 @@ Message depends on `imp-timing-format-optional'."
     ;; Skip message.
     (imp--timing-message :root
                          imp-timing-format-skip
-                         (imp--feature-normalize-display feature)
+                         (imp-feature-normalize-for-display feature)
                          filename
                          path)
     ;; Increase indent level for reason.
@@ -589,9 +589,42 @@ Message depends on `imp-timing-format-optional'."
       (imp--timing-message :leaf
                            (concat imp-timing-reason
                                    imp-timing-format-skip-optional-dne)
-                           (imp--feature-normalize-display feature)
+                           (imp-feature-normalize-for-display feature)
                            filename
                            path))))
+
+;; TODO use in `imp-timing' macro below?
+(defun imp--timing-macro-helper (feature &rest body)
+  "imp timing for use in use-package handler.
+
+TODO better docstr"
+  (let ((feature (imp--feature-normalize-to-list feature)))
+    (if (not (and (imp-timing-enabled?)
+                  ;; Don't do (another) timing block/level for a duplicated call.
+                  (not (imp--timing-feature-duplicate? feature))))
+
+        ;; Timing disabled: Return body unharmed.
+        body
+
+      ;; Timings enabled: Run body in between timing start/end messages.
+      `(
+        ;; Update current feature being timed.
+        (setq imp--timing-feature-current feature)
+        ;; Output load message.
+        (imp--timing-start feature
+                           ,(imp-file-current)
+                           ,(imp-path-current-dir))
+        (prog1
+            ;; Increase indent level for body.
+            (let ((imp--timing-indent (1+ imp--timing-indent)))
+              ;; Run the body...
+              ,@body)
+
+          ;; Clear this feature from current.
+          (setq imp--timing-feature-current nil)
+
+          ;; Finish with the timing message.
+          (imp--timing-end ,(current-time)))))))
 
 
 (defmacro imp-timing (feature filename path &rest body)

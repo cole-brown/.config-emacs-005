@@ -255,7 +255,7 @@ Always returns a backwards list.
 (defun imp--feature-normalize-to-list (&rest chain)
   "Normalize CHAIN to a list of feature keyword/symbols.
 
-Always returns a list.
+Always return a list.
 First symbol in output list will be a keyword; rest will be symbols.
   Example:
     (imp--feature-normalize-to-list :foo)
