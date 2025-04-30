@@ -178,26 +178,377 @@ files:
   - [X] flag.el
   - [X] timing.el
   - [X] provide
-  - [ ] load
-  - [ ] require
-  - [ ] package
-  - [ ] commands
+  - [X] load
+  - [X] require
+  - [X] package
+  - [X] commands
 
-    
+*** load a file
+
+(imp-load :feature '(:test)
+          :filename "test.el"
+          :optional t)
+
+see [[file:init.el::;; (setq imp--debugging? t)][here]] for trying to get imp load working
+
+Debugger entered--Lisp error: (error "[ERROR     ]: imp-load: Feature is still not defined after loading the file!\n  feature:       (:quote test)\n  path:          \"/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/test.el\"\n  ‘load’-result: t")
+
+Am I going round in circles?
+Seen this about 3 times?
+
+Debugger entered--Lisp error: (error "[ERROR-----]: imp--tree-contains: CHAIN is not a chain: :test")
+  signal(error ("[ERROR-----]: imp--tree-contains: CHAIN is not a chain: :test"))
+  error("[ERROR-----]: imp--tree-contains: CHAIN is not a chain: %S" :test)
+  apply(error "[ERROR-----]: imp--tree-contains: CHAIN is not a chain: %S" :test)
+  (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail)))
+  ...
+  imp--tree-contains?(:test ((:test) (:imp (require) (load) (provide))))
+  (null (imp--tree-contains? (imp-feature-normalize features) imp-features))
+  (not (null (imp--tree-contains? (imp-feature-normalize features) imp-features)))
+  (progn (not (null (imp--tree-contains? (imp-feature-normalize features) imp-features))))
+  (if imp-features (progn (not (null (imp--tree-contains? (imp-feature-normalize features) imp-features)))))
+  imp-feature-exists?(((:test)))
+  (or (imp-feature-exists? feature) (featurep (imp-feature-normalize-for-emacs feature)))
+  imp-provided?((:test))
+
+(imp-feature-normalize '((:test)))
+
+(imp--tree-contains? (imp--feature-normalize '((:test))) imp-features)
+
+ok. it was
+this:    (imp-feature-normalize :test)
+vs this: (imp--feature-normalize :test)
+
+
+;; (setq imp--debugging? t)
+;; (imp-load :feature '(:test) :path "source/user" :filename "test.el")
+;; imp-features
+;; features
+;; (imp-provided? :test)
+;; (imp--unprovide-from-emacs :test)
+
+test.el load work!
+
+*** unprovide
+
+(setq imp--tree-debug-flag t)
+
+not fully tested but here we be.
+
+DONE
+
 *** again, check for unused funcs and shit
 
-also check for ones to declare in
+test.el: do the refactoring; missed this file
+  - [ ] k
+    - Meh
+
+search for what to get all?
+rg '^\(def(un|var|const|custom) ' .
+rg '^\(def[a-z]* ' .
+
+
+TODO
+TODO
+TODO
+TODO
+TODO
+Check [9/17]
+  - [X] source/core/packages/imp/init.el
+    - [X] 61   (defgroup imp nil
+
+  - [X] source/core/packages/imp/fundamental.el
+    - [X] 34   (defun imp--string-or-nil (whatever)
+    - [X] 44   (defun imp--string-empty? (str &optional trim?)
+    - [X] 63   (defun imp--unquote (arg)
+
+  - [X] source/core/packages/imp/output.el
+    - [X] 30   (defcustom imp-output-buffer "ⓘ-imp-output-ⓘ"
+    - [X] 36   (defcustom imp-output-level
+    - [X] 61   (defun imp--output-callers (callers)
+    - [X] 90   (defun imp--output-level-get (level setting)
+    - [X] 98   (defun imp--output-prefix (level)
+    - [X] 131  (defun imp--output-sink (message &rest args)
+    - [X] 150  (defun imp--output (level caller string args)
+
+  - [X] source/core/packages/imp/error.el
+    - [X] 30   (defun imp--error (caller string &rest args)
+    - [X] 51   (defun imp--error-if (error? caller string &rest args)
+    - [X] 71   (defun imp--error-user (caller string &rest args)
+      - [X] Delete.
+
+  - [X] source/core/packages/imp/debug.el
+    - [X] 40   (defvar imp--debugging? nil
+    - [X] 44   (defun imp-debug (enabled?)
+      - [X] delete
+    - [X] 52   (defun imp-debug-toggle ()
+    - [X] 61   (defun imp-debug-status (&optional msg)
+    - [X] 105  (defun imp--debug (caller string &rest args)
+    - [X] 122  (defun imp--debug-newline ()
+    - [X] 136  (defun imp--debug-init ()
+
+  - [X] source/core/packages/imp/alist.el
+    - [X] 26   (defun imp--list-flatten (input)
+    - [X] 55   (defun imp--alist-key-valid (caller key &optional error?)
+    - [X] 73   (defun imp--alist-get-value (key alist &optional equal-fn)
+    - [X] 83   (defun imp--alist-get-pair (key alist &optional equal-fn)
+    - [X] 92   (defun imp--alist-update-helper (key value alist &optional equal-fn)
+    - [X] 118  (defmacro imp--alist-update (key value alist &optional equal-fn)
+    - [X] 147  (defun imp--alist-delete-helper (key alist &optional equal-fn)
+    - [X] 164  (defmacro imp--alist-delete (key alist &optional equal-fn)
+
+  - [X] source/core/packages/imp/tree.el
+    - [X] 31   (defvar imp--tree-debug-flag nil
+    - [X] 35   (defun imp--tree-debug (caller string &rest args)
+    - [X] 48   (defun imp--tree-node? (node)
+    - [X] 68   (defun imp--tree-tree? (tree)
+    - [X] 97   (defun imp--tree-chain? (chain &optional rooted)
+    - [X] 131  (defun imp--tree-key-exists? (key tree)
+    - [X] 143  (defun imp--tree-chain (chain value)
+    - [X] 182  (defun imp--tree-create (chain value)
+    - [X] 188  (defun imp--tree-branch-update (entry branch)
+    - [X] 221  (defun imp--tree-update-helper (chain value tree)
+    - [X] 362  (defmacro imp--tree-update (chain value tree)
+    - [X] 390  (defun imp--tree-contains? (chain tree)
+    - [X] 436  (defun imp--tree-delete-helper (chain tree)
+    - [X] 539  (defmacro imp--tree-delete (chain tree)
+    - [X] 593  (defun imp--tree-map (function chain-reversed tree &optional dbg-depth)
+    - [X] 675  (defun imp--tree-chains-get-all (chain-reversed tree)
+
+  - [X] source/core/packages/imp/feature.el
+    - [X] 36   (defvar imp-features nil
+    - [X] 79   (defvar imp-features-locate nil
+    - [X] 95   (defconst imp--features-locate-equal #'equal
+    - [X] 106  (defun imp-feature-exists? (features)
+    - [X] 117  (defun imp-feature? (&rest feature)
+    - [X] 126  (defun imp-mode? (mode)
+    - [X] 136  (defun imp--feature-count (&optional tree)
+    - [X] 152  (defun imp-feature-count ()
+    - [X] 164  (defconst imp--feature-replace-rx
+    - [X] 190  (defconst imp--feature-replace-separator
+    - [X] 198  (defun imp--feature-normalize-name (name)
+    - [X] 220  (defun imp--feature-normalize-chain (&rest chain)
+    - [X] 255  (defun imp--feature-normalize-to-list (&rest chain)
+    - [X] 300  (defun imp-feature-normalize-for-emacs (&rest feature)
+    - [X] 324  (defun imp-feature-normalize-for-imp (&rest input)
+    - [X] 360  (defun imp-feature-normalize-for-display (&rest feature)
+    - [X] 385  (defun imp--feature-add (normalized)
+    - [X] 412  (defun imp--feature-get-tree (normalized)
+    - [X] 417  (defun imp--feature-delete (normalized)
+    - [X] 426  (defun imp-feature-assert (&rest feature)
+    - [X] 446  (defun imp--feature-locations (feature-root)
+    - [X] 452  (defun imp--feature-paths (&rest feature)
+    - [X] 526  (defun imp-feature-at (feature-root feature-alist)
+
+  - [X] source/core/packages/imp/path.el
+    - [X] 39   (defconst imp--path-replace-rx
+    - [X] 165  (defvar imp-path-roots nil
+    - [X] 174  (defconst imp-path-filename-init "imp-init.el"
+    - [X] 178  (defconst imp-path-filename-features "imp-features.el"
+    - [X] 186  (defun imp-path-canonical (path &optional root)
+    - [X] 194  (defun imp-path-join-canonical (&rest path)
+    - [X] 210  (defun imp-path-abbreviate (&rest path)
+    - [X] 218  (defun imp--path-relative (feature-or-root path &optional error?)
+    - [X] 317  (defun imp-path-relative (feature-or-root &rest path)
+    - [X] 348  (defun imp--path-root-dir (feature-base &optional no-error?)
+    - [X] 366  (defun imp--path-file-exists? (root &rest paths)
+    - [X] 383  (defun imp--path-strings? (root &rest paths)
+    - [X] 391  (defun imp--path-root-file-init (feature-base &optional no-exist-check)
+    - [X] 440  (defun imp--path-root-file-features (feature-base &optional no-exist-check)
+    - [X] 474  (defun imp--path-root-contains? (feature-base)
+    - [X] 479  (defun imp--path-root-valid? (caller path &rest kwargs)
+    - [X] 569  (defun imp--path-safe-string (symbol-or-string)
+    - [X] 614  (defun imp--path-safe-list (feature)
+    - [X] 628  (defun imp--path-dir? (path)
+    - [X] 639  (defun imp-path-parent (path)
+    - [X] 671  (defun imp--path-filename (path)
+    - [X] 681  (defun imp-path-current-file ()
+    - [X] 708  (defun imp-path-current-file-relative (&optional feature-or-root)
+    - [X] 742  (defun imp-file-current ()
+    - [X] 747  (defun imp-path-current-dir ()
+    - [X] 754  (defun imp-path-current-dir-relative (feature/base)
+    - [X] 818  (defvar imp--path-path-platform-case-insensitive
+    - [X] 826  (defun imp--path-platform-agnostic (path)
+    - [X] 849  (defun imp--path-to-str (input)
+    - [X] 884  (defun imp--path-append (parent next)
+    - [X] 912  (defun imp-path-join (&rest path)
+    - [X] 927  (defun imp--path-sans-extension (&rest path)
+    - [X] 937  (defun imp--path-canonical (root relative &optional assert-exists sans-extension)
+    - [X] 1085 (defun imp-path-root-set (feature-base path-dir-root &optional path-file-init path-file-features)
+    - [X] 1128 (defun imp-path-root-get (feature-base &optional no-error?)
+    - [X] 1148 (defun imp--path-init ()
+
+  - [ ] source/core/packages/imp/flag.el
+    - [ ] 33   (defvar imp--feature-flags nil
+    - [ ] 56   (defun imp--flag-split (flag)
+    - [ ] 93   (defun imp--flag-compare (flag-a flag-b)
+    - [ ] 130  (defun imp--flag-exists? (feature flag)
+    - [ ] 157  (defmacro imp-flag? (feature flag)
+    - [ ] 187  (defmacro imp-flag (feature &rest flag)
+
+  - [ ] source/core/packages/imp/timing.el
+    - [ ] 46   (defcustom imp-timing-enabled? nil
+    - [ ] 52   (defcustom imp-timing-buffer-tail? t
+    - [ ] 59   (defconst imp-timing-feature? (imp-flag? :imp +timing)
+    - [ ] 63   (defun imp-timing-enabled? ()
+    - [ ] 77   (defconst imp-timing-format-tree
+    - [ ] 92   (defconst imp--timing-precision 4
+    - [ ] 96   (defvar imp--timing-indent 0
+    - [ ] 106  (defvar imp--timing-feature-current nil
+    - [ ] 115  (defvar imp-timing-sum 0.0
+    - [ ] 123  (defcustom imp-timing-buffer-name
+    - [ ] 135  (defcustom imp-timing-buffer-show t
+    - [ ] 141  (defcustom imp-timing-format-load "loading %1$S..."
+    - [ ] 153  (defcustom imp-timing-format-skip "skip: %1$S"
+    - [ ] 165  (defcustom imp-timing-reason "reason: "
+    - [ ] 179  (defcustom imp-timing-format-skip-already-provided "feature already provided"
+    - [ ] 191  (defcustom imp-timing-format-skip-optional-dne "optional file does not exist: %3$s"
+    - [ ] 203  (defcustom imp-timing-format-time-total
+    - [ ] 240  (defcustom imp-timing-format-time
+    - [ ] 255  (defcustom imp-timing-separator-restart
+    - [ ] 264  (defcustom imp-timing-separator-final
+    - [ ] 277  (defun imp--timing-feature-duplicate? (feature)
+    - [ ] 293  (defun imp--timing-tree-type (type indent)
+    - [ ] 323  (defun imp--timing-tree-string (type)
+    - [ ] 336  (defun imp--timing-buffer-messages? ()
+    - [ ] 352  (defun imp-timing-buffer-name ()
+    - [ ] 361  (defun imp--timing-buffer-get (&optional buffer-or-name &rest args)
+    - [ ] 391  (defun imp--timing-buffer-tail ()
+    - [ ] 415  (defun imp--timing-buffer-show (force-show?)
+    - [ ] 424  (defun imp-cmd-timing-buffer-bury (&optional ignore-messages-buffer)
+    - [ ] 443  (defun imp-cmd-timing-buffer-kill (&optional ignore-messages-buffer)
+    - [ ] 466  (defun imp--timing-buffer-insert (string)
+    - [ ] 519  (defun imp--timing-message (type formatting &rest args)
+    - [ ] 529  (defun imp--timing-start (feature filename path)
+    - [ ] 540  (defun imp--timing-end (time:start)
+    - [ ] 553  (defun imp-timing-skip-already-provided (feature filename path)
+    - [ ] 575  (defun imp-timing-skip-optional-dne (feature filename path)
+    - [ ] 597  (defmacro imp-timing (feature filename path &rest body)
+    - [ ] 646  (defun imp-timing-restart ()
+    - [ ] 672  (defun imp--timing-final (&optional separator-line?)
+    - [ ] 687  (defun imp--timing-final-timer (&optional separator-line?)
+    - [ ] 707  (defun imp-timing-final (&optional separator-line?)
+    - [ ] 726  (defun imp--timing-mode-font-lock-keywords-element-create (matcher subexp facename &optional override laxmatch)
+    - [ ] 777  (defconst imp--timing-mode-font-lock-keywords
+    - [ ] 972  (defconst imp--timing-mode-font-lock-defaults
+    - [ ] 1018 (defvar imp-timing-mode-map
+
+  - [ ] source/core/packages/imp/provide.el
+    - [ ] 52   (defalias 'imp-provided? 'imp-feature?)
+    - [ ] 53   (defalias 'imp-providedp 'imp-feature?)
+    - [ ] 56   (defun imp-provide-to-imp (&rest feature)
+    - [ ] 86   (defun imp-provide-to-emacs (&rest feature)
+    - [ ] 107  (defun imp-provide (&rest feature)
+    - [ ] 128  (defun imp--unprovide-feature-from-emacs (&rest feature)
+    - [ ] 142  (defun imp--unprovide-tree-from-emacs (normalized tree)
+    - [ ] 149  (defun imp-unprovide (&rest feature)
+
+  - [ ] source/core/packages/imp/load.el
+    - [ ] 33   (defun imp--load-file (filepath)
+    - [ ] 62   (defun imp--load-paths (feature path-root paths-relative)
+    - [ ] 106  (defun imp--load-feature (&rest feature)
+    - [ ] 271  (defun imp--load-parse (caller path-current-dir plist-symbol-name plist)
+    - [ ] 525  (defmacro imp-load (&rest load-args-plist)
+
+  - [ ] source/core/packages/imp/require.el
+    - [ ] 33   (defun imp-require (&rest feature)
+
+  - [ ] source/core/packages/imp/package.el
+    - [ ] 102  (defmacro imp-use-package (name &rest args)
+    - [ ] 138  (defmacro imp-eval-after (feature &rest body)
+
+  - [ ] source/core/packages/imp/commands.el
+    - [ ] 31   (defcustom imp-output-features-buffer
+    - [ ] 42   (defun imp-cmd-features-print ()
+    - [ ] 53   (defun imp-cmd-features-nuke ()
+
+
+also check for ones to declare in like
   (declare (pure t)
            (side-effect-free t)
            (important-return-value t))
 
+got bored.
+ok.
+moving on...
+
+*** ----- URHERE URHERE -----
+*** use-package integration via keyword
+
+[[file:source/core/packages/imp/package.el::;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Creating-an-extension.html][here]]
+
+((use-package-ensure-elpa 'test-imp-up '(t) 'nil)
+ (defvar use-package--warning10
+   #'(lambda (keyword err)
+       (let
+           ((msg
+             (format "%s/%s: %s" 'test-imp-up keyword
+                     (error-message-string err))))
+         (display-warning 'use-package msg :error))))
+ (condition-case-unless-debug err
+     (progn
+       (condition-case-unless-debug err (message "init")
+         (error (funcall use-package--warning10 :init err)))
+       (if (not (require 'test-imp-up nil t))
+           (display-warning 'use-package
+                            (format "Cannot load %s" 'test-imp-up)
+                            :error)
+         (condition-case-unless-debug err (progn (message "config") t)
+           (error (funcall use-package--warning10 :config err)))))
+   (error (funcall use-package--warning10 :catch err))))
+
+
+always imp?
+
+from [[file:/usr/share/emacs/30.1/lisp/use-package/use-package-ensure.el.gz][use-package-ensure.el.gz]]
+#begin_src emacs-lisp
+(defcustom use-package-always-ensure nil
+  "Treat every package as though it had specified using `:ensure SEXP'.
+See also `use-package-defaults', which uses this value."
+  :type 'sexp
+  :group 'use-package-ensure
+  :version "29.1")
+
+(add-to-list 'use-package-defaults
+             '(:ensure (list use-package-always-ensure)
+                       (lambda (name args)
+                         (and use-package-always-ensure
+                              (not (plist-member args :load-path))))) t)
+#end_src
+
+(pp use-package-defaults)
+
+use-package-defaults is alist of (keyword form-for-default-value form-for-whether-to-assign-default-value)
+
+((:config '(t) t) (:init nil t)
+ (:catch t (lambda (name args) (not use-package-expand-minimally)))
+ (:defer use-package-always-defer
+         (lambda (name args)
+           (and use-package-always-defer
+                (not (plist-member args :defer))
+                (not (plist-member args :demand)))))
+ (:demand use-package-always-demand
+          (lambda (name args)
+            (and use-package-always-demand
+                 (not (plist-member args :defer))
+                 (not (plist-member args :demand)))))
+ (:ensure (list use-package-always-ensure)
+          (lambda (name args)
+            (and use-package-always-ensure
+                 (not (plist-member args :load-path)))))
+ (:pin use-package-always-pin use-package-always-pin))
+
+*** settings.el
+
+move all defcustoms to settings.el
+load settings first(?)
 
 *** refactor funcs
 
 imp--load-parse
   - make error checking funcs?
   - make bool flag parsing func
-    
+
 
 *** when I get to tests
 
