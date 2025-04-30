@@ -110,20 +110,35 @@
 ;; `*-hook'.
 (customize-set-variable 'use-package-hook-name-suffix nil)
 
+
 ;;---
 ;; Debugging Settings:
 ;;---
+;; TODO enable use-package-verbose?
+;; TODO enable use-package-compute-statistics?
 ;; TODO
 ;; (setq use-package-compute-statistics    innit:debug?
 ;;       use-package-verbose               innit:debug?
 ;;       use-package-minimum-reported-time (if innit:debug? 0 0.1)
 ;;       use-package-expand-minimally      innit:interactive?)
 
+
 ;; TODO
 ;; TODO
 ;; TODO no-littering package
 ;; TODO
 ;; TODO
+
+
+;;------------------------------------------------------------------------------
+;; PRIORITY: imp
+;;------------------------------------------------------------------------------
+
+;; Let this load error; imps are a fundamental to this init.
+(load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
+
+;; Have imp time all `imp-load' and output a pretty buffer of info.
+;; (customize-set-variable 'imp-timing-enabled? t)
 
 
 ;;------------------------------------------------------------------------------
