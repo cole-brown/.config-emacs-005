@@ -43,7 +43,7 @@
 ;; Timings Toggle
 ;;------------------------------------------------------------------------------
 
-(defcustom imp-timing-enabled? nil
+(defcustom imp-timing-enabled? t
   "Should loading & timing messages be printed?"
   :group 'imp
   :type '(boolean))
