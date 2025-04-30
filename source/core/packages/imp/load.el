@@ -267,6 +267,7 @@ Returns non-nil if loaded."
 ;; Load API
 ;;------------------------------------------------------------------------------
 
+;; TODO: only :path; remove :filename
 (defun imp--load-parse (caller path-current-dir plist-symbol-name plist)
   "Parses `imp-load' args. See `imp-load' for details.
 
@@ -519,6 +520,7 @@ Returns a plist:
 ;; (imp--load-parse "test-quoted"   (imp-path-current-dir) "name" '(:feature '(:foo bar)  :path "init.el"))
 
 
+;; TODO: only :path; remove :filename
 ;; TODO: add optional `:after' that will delay the whole file load until after the prereqs are met via `imp-eval-after'?
 (defmacro imp-load (&rest load-args-plist)
   "Load a file relative to the current executing file (`load-file-name').

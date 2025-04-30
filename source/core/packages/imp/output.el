@@ -36,15 +36,18 @@
 (defcustom imp-output-level
   '((:error      . (:display "ERROR"
                     :sink (error imp--output-sink)))
-    (:error:user . (:display "ERROR:user"
-                    :sink (user-error imp--output-sink)))
+    ;; (:error:user . (:display "ERROR:user"
+    ;;                 :sink (user-error imp--output-sink)))
+    (:warning    . (:display "Warning"
+                    :sink (warn imp--output-sink)))
+    (:info       . (:display "info"
+                    :sink (message imp--output-sink)))
     (:debug      . (:display "debug"
                     :align right ; default/nil: left
                     ;; :sink message
                     :sink (message imp--output-sink)))
 
-    ;; Not really a level, but available to debug messages via
-    ;; `imp--debug-newline'.
+    ;; No prefix.
     (:blank . (;; :sink message
                :sink imp--output-sink)))
   "Output message level (:debug, :error, etc) settings."

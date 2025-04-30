@@ -162,6 +162,8 @@ Alist format in `defcustom' language:
 ;; (makunbound 'imp--path-replace-rx)
 
 
+;; TODO: also put dirs into Emacs's `load-path'?
+;; TODO: one or more vars for how much to hook imp into Emacs like that?
 (defvar imp-path-roots nil
   "Alist of require/provide root keywords to a cons of: (root-dir . root-file).
 
