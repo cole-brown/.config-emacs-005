@@ -47,8 +47,6 @@ Return non-nil on success."
                ;; order of loading/requiring things. Let's give them some more
                ;; info.
                (error
-                ;; NOTE: Use `imp--error' instead of `imp--error-user';
-                ;; `user-error' signal does not get caught by `--debug-init' normally.
                 (imp--error "imp-require"
                             '("Failed to find/load required feature: \n"
                               "  input feature: %S\n"

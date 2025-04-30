@@ -68,26 +68,6 @@ ARGS should be a list of args for formatting the STRING."
                 args)))
 
 
-(defun imp--error-user (caller string &rest args)
-  "Create a formatted error message and raise an error signal with it.
-
-Uses `:error' level settings in `imp-output-level'.
-
-CALLER should be one of:
-  - a string or symbol representing the calling function's name
-  - a list of such
-It can be nil, though it is not suggested.
-
-STRING should be a string, which can have formatting info in it (see `format'),
-and will be printed as the error message.
-
-ARGS should be a list of args for formatting the STRING."
-  (imp--output :error:user
-               caller
-               string
-               args))
-
-
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
