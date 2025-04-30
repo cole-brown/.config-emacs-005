@@ -24,40 +24,6 @@
 (require 'seq)
 
 ;;------------------------------------------------------------------------------
-;; Custom Variables
-;;------------------------------------------------------------------------------
-
-(defcustom imp-output-buffer "ⓘ-imp-output-ⓘ"
-  "Name of the output buffer used by `imp--output-sink'."
-  :group 'imp
-  :type '(string))
-
-
-(defcustom imp-output-level
-  '((:error      . (:display "ERROR"
-                    :sink (error imp--output-sink)))
-    ;; (:error:user . (:display "ERROR:user"
-    ;;                 :sink (user-error imp--output-sink)))
-    (:warning    . (:display "Warning"
-                    :sink (warn imp--output-sink)))
-    (:info       . (:display "info"
-                    :sink (message imp--output-sink)))
-    (:debug      . (:display "debug"
-                    :align right ; default/nil: left
-                    ;; :sink message
-                    :sink (message imp--output-sink)))
-
-    ;; No prefix.
-    (:blank . (;; :sink message
-               :sink imp--output-sink)))
-  "Output message level (:debug, :error, etc) settings."
-  :group 'imp
-  :type '(alist :key-type symbol
-                :value-type plist))
-
-
-
-;;------------------------------------------------------------------------------
 ;; String Helpers
 ;;------------------------------------------------------------------------------
 

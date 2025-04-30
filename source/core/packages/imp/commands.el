@@ -23,18 +23,6 @@
 ;;; Code:
 
 
-
-;;------------------------------------------------------------------------------
-;; Custom Variables
-;;------------------------------------------------------------------------------
-
-(defcustom imp-output-features-buffer
-  "*imp-features*"
-  "Name of the buffer for `imp-features-print' to output a pretty-printed tree
-of the features imp has provided."
-  :group 'imp)
-
-
 ;;------------------------------------------------------------------------------
 ;; Display Features
 ;;------------------------------------------------------------------------------

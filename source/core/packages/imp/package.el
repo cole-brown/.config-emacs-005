@@ -59,13 +59,6 @@
          ;; Define our `use-package' extension.
          ;;----------------------------
 
-         (defcustom use-package-always-imp t
-           "Treat every package as though it had specified using `:imp SEXP'.
-See also `use-package-defaults', which uses this value."
-             :group 'imp
-             :type 'sexp)
-
-
          (defconst imp--use-package-keyword :imp
            "imp's keyword for `use-package'.")
 
