@@ -317,6 +317,10 @@
 ;; Secret: Init
 ;;------------------------------------------------------------------------------
 
+(imp-load :feature :secret
+          :path    "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el")
+
+
 ;;------------------------------------------------------------------------------
 ;; Search: Deadgrep (uses Ripgrep)
 ;;------------------------------------------------------------------------------
@@ -555,3 +559,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+
+
+(imp-timing-final)
