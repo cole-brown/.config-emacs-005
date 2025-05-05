@@ -78,7 +78,7 @@ loading xxx...
 
 
 (defconst imp--timing-precision 4
-  "Show this many places after decimal for default `imp-timing-format-time'.")
+  "Show this many places after decimal for default `imp--timing-format-time'.")
 
 
 (defvar imp--timing-indent 0

@@ -90,13 +90,7 @@ See also `use-package-defaults', which uses this value."
   :type '(boolean))
 
 
-(defcustom imp-timing-buffer-tail? t
-  "Should the timing buffer be tailed?"
-  :group 'imp
-  :type '(boolean))
-
-
-(defcustom imp-timing-buffer-name
+(defcustom imp-timing-buffer
   "ⓘ-imp-timing-ⓘ"
   "Buffer name to print to.
 
@@ -104,11 +98,17 @@ If you want it to go to *Messages* with the usual minibuffer interaction, set
 to: `:messages'."
   :group 'imp
   :type '(choice (string :tag "Name of Buffer")
-                 (const :tag "Use `message' to send to *Messages* buffer with the usual minibuffer interactions."
+                 (const :tag "Use `:messages' to send to *Messages* buffer with the usual minibuffer interactions."
                         :messages)))
 
 
-(defcustom imp-timing-buffer-show t
-  "If non-nil, show `imp-timing-buffer-name' every time it gets a new message."
+(defcustom imp-timing-buffer-tail? t
+  "Should the timing buffer be tailed?"
+  :group 'imp
+  :type '(boolean))
+
+
+(defcustom imp-timing-buffer-show-auto? t
+  "If non-nil, show `imp-timing-buffer' every time it gets a new message."
   :group 'imp
   :type  '(boolean))

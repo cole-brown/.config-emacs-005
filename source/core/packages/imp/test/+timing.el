@@ -67,14 +67,14 @@
 
 (defun test<imp-timing>:buffer ()
   "Returns the timing buffer if it exists, else nil."
-  (get-buffer imp-timing-buffer-name))
+  (get-buffer imp-timing-buffer))
 
 
 (defun test<imp-timing>:buffer:kill ()
   "Kill the timing buffer if it exists."
   (when-let ((buffer (test<imp-timing>:buffer)))
     (kill-buffer buffer)))
-;; (get-buffer-create imp-timing-buffer-name)
+;; (get-buffer-create imp-timing-buffer)
 ;; (test<imp-timing>:buffer:kill)
 
 
@@ -153,10 +153,10 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
   "Set-up for timing tests."
   (setq test<imp-timing>:enabled?:backup    imp-timing-enabled?
         test<imp-timing>:feature?:backup    imp-timing-feature?
-        test<imp-timing>:buffer:name:backup imp-timing-buffer-name
+        test<imp-timing>:buffer:name:backup imp-timing-buffer
         imp-timing-enabled?                 nil
         imp-timing-feature?                 nil
-        imp-timing-buffer-name              test<imp-timing>:buffer:name
+        imp-timing-buffer                   test<imp-timing>:buffer:name
         test<imp-timing>:enabled?:test      nil
         test<imp-timing>:feature?:test      nil)
 
@@ -173,7 +173,7 @@ Else kills timing buffer if BEGIN? is non-nil (test is just starting)."
         test<imp-timing>:feature?:test      imp-timing-feature?
         imp-timing-enabled?                 test<imp-timing>:enabled?:backup
         imp-timing-feature?                 test<imp-timing>:feature?:backup
-        imp-timing-buffer-name              test<imp-timing>:buffer:name:backup
+        imp-timing-buffer                   test<imp-timing>:buffer:name:backup
         test<imp-timing>:enabled?:backup    nil
         test<imp-timing>:feature?:backup    nil
         test<imp-timing>:buffer:name:backup nil))
