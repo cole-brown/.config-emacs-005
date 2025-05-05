@@ -68,6 +68,10 @@
 ;; Packages
 ;;------------------------------------------------------------------------------
 
+;;------------------------------
+;; Emacs `package'
+;;------------------------------
+
 (require 'package)
 
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -84,19 +88,24 @@
    "Update packages list...")
   (package-refresh-contents))
 
+
 ;;------------------------------
-;; `use-package'
+;; Emacs `use-package'
 ;;------------------------------
 
 (require 'use-package)
 (require 'use-package-ensure)
 
+;; `use-package-always-ensure'
+;;---
 ;; Automatically install package if not found.
 ;;   https://github.com/jwiegley/use-package#package-installation
 ;; NOTE: Does not keep anything up-to-date. For that you would use package
 ;; `auto-package-update' or something similar.
 (customize-set-variable 'use-package-always-ensure t)
 
+;; `use-package-hook-name-suffix'
+;;---
 ;; 'When using :hook omit the "-hook" suffix if you specify the hook
 ;; explicitly, as this is appended by default.
 ;;
@@ -106,44 +115,135 @@
 ;; nil. By default the value of this variable is "-hook".'
 ;;   - https://github.com/jwiegley/use-package#hooks
 ;;
-;; Need to override this to allow naming hooks something other than
-;; `*-hook'.
+;; Need to override this to allow using hooks named something
+;; other than `*-hook'.
+;; Also to avoid confusion when I look at a broken `use-package' and
+;; can't fucking what its hooked up to.
 (customize-set-variable 'use-package-hook-name-suffix nil)
 
 
 ;;---
 ;; Debugging Settings:
 ;;---
-;; TODO enable use-package-verbose?
-;; TODO enable use-package-compute-statistics?
-;; TODO
+
+;; TODO: auto on when `--debug-init' -- `innit:debug'?
+;; TODO: not on otherwise? IDK. Previous .emacs:
 ;; (setq use-package-compute-statistics    innit:debug?
 ;;       use-package-verbose               innit:debug?
 ;;       use-package-minimum-reported-time (if innit:debug? 0 0.1)
 ;;       use-package-expand-minimally      innit:interactive?)
 
+;; `use-package-verbose'
+;;---
+;;   "Whether to report about loading and configuration details.
+;; If you customize this, then you should require the `use-package'
+;; feature in files that use `use-package', even if these files only
+;; contain compiled expansions of the macros.  If you don't do so,
+;; then the expanded macros do their job silently."
+(customize-set-variable 'use-package-verbose t)
 
-;; TODO
-;; TODO
-;; TODO no-littering package
-;; TODO
-;; TODO
+
+;; `use-package-compute-statistics'
+;;---
+;;   "If non-nil, compute statistics concerned ‘use-package’ declarations.
+;; View the statistical report using ‘use-package-report’.  Note that
+;; if this option is enabled, you must require ‘use-package’ in your
+;; user init file at loadup time, or you will see errors concerning
+;; undefined variables."
+;;
+;; I love stats.
+(customize-set-variable 'use-package-compute-statistics t)
+
+
+;; `use-package-minimum-reported-time'
+;;---
+;;   "Minimal load time that will be reported.
+;; Note that ‘use-package-verbose’ has to be set to a non-nil value
+;; for anything to be reported at all."
+;;
+;; Default:       0.1 (seconds)
+;; Do-Not-Report: nil
+;;
+;; Hm... I love stats... Try 0?
+;; Or set to nil because I'm trying to make `imp' be all that?
+(customize-set-variable 'use-package-minimum-reported-time 0)
+
+
+;; `use-package-expand-minimally'
+;;---
+;; "If non-nil, make the expanded code as minimal as possible.
+;; This disables:
+;;   - Printing to the *Messages* buffer of slowly-evaluating forms
+;;   - Capturing of load errors (normally redisplayed as warnings)
+;;   - Conditional loading of packages (load failures become errors)"
+;; blah blah main advantage blah byte-compile blah SPEEEEEEED!
+;;
+;; NO!
+;; Do not want to optimize for SPEEEEEEEED!
+;; Want to optimize for less stress when everything is broken.
+;; It defaults to off/nil but still...
+(customize-set-variable 'use-package-expand-minimally nil)
 
 
 ;;------------------------------------------------------------------------------
-;; PRIORITY: imp
+;; PRIORITY: `imp'
 ;;------------------------------------------------------------------------------
 
 ;; Let this load error; imps are a fundamental to this init.
 (load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
 
 ;; Have imp time all `imp-load' and output a pretty buffer of info.
+;; This is now default.
 ;; (customize-set-variable 'imp-timing-enabled? t)
 
 
 ;;------------------------------------------------------------------------------
-;; PRIORITY: Chrome: Theme
+;; PRIORITY: `no-littering'
 ;;------------------------------------------------------------------------------
+;; Keep the `user-emacs-directory' clean by changing where Emacs & packages
+;; store their data. Move it from various & sundry places in and under
+;; `user-emacs-directory' to be in one of two `user-emacs-directory'
+;; sub-directories:
+;;   - `no-littering-etc-directory'
+;;   - `no-littering-var-directory'
+
+(use-package no-littering
+  ;; Make sure this loads ASAP. It's used for init/config of other packages.
+  :demand t
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  ;; Suggested settings: https://github.com/emacscollective/no-littering#suggested-settings
+
+  ;; `recentf' should ignore the files in the `no-littering' dirs.
+  (imp-eval-after recentf
+    (add-to-list 'recentf-exclude no-littering-etc-directory)
+    (add-to-list 'recentf-exclude no-littering-var-directory))
+
+  ;; Auto-saves, `undo-tree' history, etc. should go in the `no-littering' directory.
+  ;; They should not be littered in the same dir as their real actual file.
+  (no-littering-theme-backups)
+
+
+  ;; Native Compliation (Emacs 29+):
+  (when (fboundp 'startup-redirect-eln-cache)
+    (startup-redirect-eln-cache
+     (convert-standard-filename
+      (no-littering-expand-var-file-name "eln-cache/")))))
+
+
+;;------------------------------------------------------------------------------
+;; PRIORITY: Theme
+;;------------------------------------------------------------------------------
+;; If this doesn't happen sooner, the Emacs frame will pop, flicker, and
+;; maybe resize. Set theme ASAP and hope it gets resolved before the OS can
+;; show Emacs to us.
 
 ;; https://github.com/greduan/emacs-theme-gruvbox
 ;; https://github.com/bbatsov/zenburn-emacs
@@ -436,6 +536,10 @@
 
 (message "hello there")
 
+
+;; ;; Move `custom-set-variables' and `custom-set-faces' out if this file.
+;; ;; TODO: send to /dev/null instead? Get code for that from 2023's repo.
+;; (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
