@@ -472,6 +472,11 @@ got bored.
 ok.
 moving on...
 
+*** settings.el
+
+move all defcustoms to settings.el
+load settings first(?)
+
 *** ----- URHERE URHERE -----
 *** use-package integration via keyword
 
@@ -538,10 +543,12 @@ use-package-defaults is alist of (keyword form-for-default-value form-for-whethe
                  (not (plist-member args :load-path)))))
  (:pin use-package-always-pin use-package-always-pin))
 
-*** settings.el
+*** Add to places in imp/path.el
 
-move all defcustoms to settings.el
-load settings first(?)
+`convert-standard-filename' for canonicalizing filenames/fielpaths.
+(expand-file-name (convert-standard-filename "etc/") user-emacs-directory)
+  - https://github.com/emacscollective/no-littering/blob/ea15b1c607d4036ce37326bd5b4b2f4291ddfd60/no-littering.el#L92C3-L92C77
+
 
 *** refactor funcs
 
