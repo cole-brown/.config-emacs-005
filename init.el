@@ -229,11 +229,6 @@
     :demand t
 
     ;;------------------------------
-    :custom
-    ;;------------------------------
-
-
-    ;;------------------------------
     :config
     ;;------------------------------
     ;; Suggested settings: https://github.com/emacscollective/no-littering#suggested-settings
