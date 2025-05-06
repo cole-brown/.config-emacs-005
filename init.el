@@ -334,8 +334,31 @@
   ;; Secret: Init
   ;;------------------------------------------------------------------------------
 
-  (imp-load :feature :secret.d
-            :path    "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el")
+  ;; TODO: paths per computer machine host
+  ;; use (system-name)?
+  ;; system-type and system-name?
+  ;; What does the multiplexing do in sn004?
+  (message (mapconcat
+            #'identity
+            '("System:"
+              "  - system-type: %s"
+              "  - system-name: %s"
+              )
+            "\n")
+           system-type
+           system-name)
+  ;; TODO: for now, this way.
+  (pcase system-type
+    ('gnu/linux
+     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
+     ;; to figure out path from system-name/host.
+     (imp-load :feature :secret.d
+               :path    "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))
+    ('windows-nt
+     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
+     ;; to figure out path from system-name/host.
+     (imp-load :feature :secret.d
+               :path    "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
 
 
   ;;------------------------------------------------------------------------------
