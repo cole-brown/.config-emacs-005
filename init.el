@@ -55,6 +55,7 @@
              t
              "Emacs cannot find required exe: `%s'"))
 
+
 (defun --/exe/optional (exe)
   "Warn if EXE cannot be found by Emacs."
   (unless (executable-find exe)
