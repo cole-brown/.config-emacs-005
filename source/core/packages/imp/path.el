@@ -1100,22 +1100,22 @@ PATH-FILE-FEATURES is nil or a minimal file with a call to `imp-feature-at'.
     is no entry in `imp-features', this file will be loaded in order to populate
     `imp-features' so the feature can be looked for."
   (cond ((imp--path-root-contains? feature-base)
-         (imp--error "imp-root"
+         (imp--error "imp-path-root-set"
                      '("FEATURE-BASE '%S' is already an imp root.\n"
                        "path: %s\n"
                        "file: %s")
                      feature-base
-                     (imp--path-root-dir feature-base)
-                     (imp--path-root-file-init feature-base)))
+                     (imp--path-root-dir feature-base :no-error)
+                     (imp--path-root-file-init feature-base :no-error)))
 
         ((not (keywordp feature-base))
-         (imp--error "imp-root"
+         (imp--error "imp-path-root-set"
                      "FEATURE-BASE must be a keyword (e.g. `:foo' `:bar' etc)"))
 
         ;; imp--path-root-valid? will error with better reason, so the error here
         ;; isn't actually triggered... I think?
         ((not (imp--path-root-valid? "imp-root" path-dir-root))
-         (imp--error "imp-root"
+         (imp--error "imp-path-root-set"
                      "Path must be a valid directory: %s" path-dir-root))
 
         ;; Ok; set keyword to path.
