@@ -1,5 +1,88 @@
-* my code
+* .emacs.d layout
 
+source/user/config
+  - dev-env?
+  - devops?
+  - languages
+  - keybinds?
+  - org
+
+** old
+
+
+├── core
+│   ├── boot
+│   │   ├── 00-early
+│   │   ├── 10-init
+│   │   ├── 20-config
+│   │   └── 99-finalize
+│   └── modules
+│       ├── elisp
+│       │   ├── datetime
+│       │   ├── jerky
+│       │   │   └── test
+│       │   └── utils
+│       ├── emacs
+│       │   ├── alist
+│       │   │   ├── test
+│       │   │   │   └── type
+│       │   │   └── type
+│       │   ├── buffer
+│       │   ├── chrome
+│       │   ├── dlv
+│       │   │   └── test
+│       │   ├── imp
+│       │   │   └── test
+│       │   │       └── loading
+│       │   ├── innit
+│       │   ├── path
+│       │   ├── str
+│       │   └── template
+│       ├── output
+│       │   └── nub
+│       │       └── test
+│       └── system
+│           ├── multiplexer
+│           └── secret
+├── mantle
+│   ├── config
+│   │   ├── dev-env
+│   │   │   └── languages
+│   │   ├── hydra
+│   │   ├── keybinds
+│   │   └── org
+│   ├── init
+│   │   └── keybinds
+│   │       └── general
+│   └── theme
+│       └── zenburn
+├── modules
+│   ├── dev-env
+│   │   └── taskspace
+│   ├── emacs
+│   │   ├── persp+
+│   │   └── perspective
+│   ├── input
+│   ├── mode
+│   │   └── org
+│   └── tools
+│       └── signature
+
+
+** snippets
+
+├── snippets
+│   ├── emacs-lisp-mode
+│   ├── fundamental-mode
+│   ├── gitconfig-mode
+│   ├── org-mode
+│   ├── prog-mode
+│   ├── python-mode
+│   ├── sh-mode
+│   └── yaml-mode
+
+
+* my code
 ** imp
 
 *** refactor symbol names
@@ -478,6 +561,53 @@ move all defcustoms to settings.el
 load settings first(?)
 
 *** ----- URHERE URHERE -----
+*** imp-load bugs, improvements
+
+
+Macro can't deal with funcs properly:
+  (imp-load :feature '(:user config org)
+            :path (imp-path-join 'user 'config 'org)
+            )
+
+Debugger entered--Lisp error: (wrong-type-argument stringp (imp-path-join 'user 'config 'org))
+  expand-file-name((imp-path-join 'user 'config 'org) "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005")
+  (setq out-path (expand-file-name in-filename in-path))
+
+
+Probably not a bug??:
+  (imp-load :feature '(:user config org)
+            :path  "user/config/org"
+            )
+
+Debugger entered--Lisp error: (file-missing "Cannot open load file" "No such file or directory" "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/user/config/org")
+  load("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/user/config/org" nil nomessage)
+
+*** imp-load default filename
+
+Want to be able to just do this:
+
+(imp-path-root-set :user
+                   (imp-path-join user-emacs-directory 'source 'user))
+(imp-load :feature '(:user config org))
+
+instead of this:
+
+(imp-path-root-set :user
+                   (imp-path-join user-emacs-directory 'source 'user))
+(imp-load :feature '(:user config org)
+          :path (imp-path-join user-emacs-directory 'config 'org))
+
+Can do just this I think?:
+(imp-load :feature '(:user config org)
+          :path (imp-path-join user-emacs-directory 'source 'user 'config 'org))
+
+Want to be able to do like:
+(imp-load :feature '(:user config org)
+          :path (imp-path-join user-emacs-directory 'source 'user 'config 'org))
+(imp-load :feature '(:user config foo))
+(imp-load :feature '(:user config bar))
+(imp-load :feature '(:user baz))
+
 *** use-package integration via keyword
 
 [[file:source/core/packages/imp/package.el::;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Creating-an-extension.html][here]]
@@ -549,24 +679,17 @@ use-package-defaults is alist of (keyword form-for-default-value form-for-whethe
 (expand-file-name (convert-standard-filename "etc/") user-emacs-directory)
   - https://github.com/emacscollective/no-littering/blob/ea15b1c607d4036ce37326bd5b4b2f4291ddfd60/no-littering.el#L92C3-L92C77
 
-
 *** refactor funcs
 
 imp--load-parse
   - make error checking funcs?
   - make bool flag parsing func
 
-
 *** when I get to tests
 
 https://emacs.stackexchange.com/a/17202
 
-
-
-
 ** repo buffernames
-
-
 
 * settings
 
@@ -584,7 +707,6 @@ mantle/config/dev-env/languages/emacs-lisp.el
 
 
 ** titlebar
-
 
 * install: packages
 
@@ -615,3 +737,7 @@ O TODO TODO TODO TODO TODO TODO TODO TODO
 
 
 ** evil
+* Secrets: 1Password CLI?
+
+Is there a package for 1Password?
+Should I use 1Password CLI instead of secret repo?
