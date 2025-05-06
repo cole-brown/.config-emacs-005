@@ -49,6 +49,8 @@
 ;; External Requirements
 ;;------------------------------------------------------------------------------
 
+(require 'cl-macs)
+
 (defun --/exe/require (exe)
   "Assert EXE can be found by Emacs."
   (cl-assert (executable-find exe)
