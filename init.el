@@ -362,7 +362,7 @@
 
   ;; TODO THIS
   ;; (imp-load :feature '(:user config org)
-  ;;           :path  "config/org"  ;;(imp-path-join 'config 'org 'init.el)
+  ;;           :path  "config/org/init.el"  ;;(imp-path-join 'config 'org 'init.el)
   ;;           )
 
 

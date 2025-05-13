@@ -561,7 +561,11 @@ move all defcustoms to settings.el
 load settings first(?)
 
 *** ----- URHERE URHERE -----
-*** imp-load bugs, improvements
+*** imp-load bugs
+
+Do minimum now.
+Do better after emacs is more than limping along.
+
 
 
 Macro can't deal with funcs properly:
@@ -579,34 +583,16 @@ Probably not a bug??:
             :path  "user/config/org"
             )
 
+
 Debugger entered--Lisp error: (file-missing "Cannot open load file" "No such file or directory" "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/user/config/org")
   load("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/user/config/org" nil nomessage)
 
-*** imp-load default filename
+I think moving that one call out in front of macro expansion was probably bad for short term stability.
 
-Want to be able to just do this:
+Uh.....
+I think this requires more than minimum to fix....
 
-(imp-path-root-set :user
-                   (imp-path-join user-emacs-directory 'source 'user))
-(imp-load :feature '(:user config org))
-
-instead of this:
-
-(imp-path-root-set :user
-                   (imp-path-join user-emacs-directory 'source 'user))
-(imp-load :feature '(:user config org)
-          :path (imp-path-join user-emacs-directory 'config 'org))
-
-Can do just this I think?:
-(imp-load :feature '(:user config org)
-          :path (imp-path-join user-emacs-directory 'source 'user 'config 'org))
-
-Want to be able to do like:
-(imp-load :feature '(:user config org)
-          :path (imp-path-join user-emacs-directory 'source 'user 'config 'org))
-(imp-load :feature '(:user config foo))
-(imp-load :feature '(:user config bar))
-(imp-load :feature '(:user baz))
+So the minimum is... fix the callers?
 
 *** use-package integration via keyword
 
@@ -741,3 +727,84 @@ O TODO TODO TODO TODO TODO TODO TODO TODO
 
 Is there a package for 1Password?
 Should I use 1Password CLI instead of secret repo?
+
+* imp improvements
+
+** strip ~use-package~ down and make an argparser from it
+
+;;------------------------------------------------------------------------------
+;; Load Parsing Like Use-Package
+;;------------------------------------------------------------------------------
+;; `use-package' (macro)
+;;   - `use-package-core' (macro)
+;;     - `use-package-normalize-keywords'
+;;       - `use-package-normalize-plist'
+;;         - `use-package-normalize/:keyword'
+
+;; (defun use-package-merge-keys (key new old)
+;;   "Originally borrowed from `use-package-merge-keys'"
+;;   (let ((merger (assq key use-package-merge-key-alist)))
+;;     (if merger
+;;         (funcall (cdr merger) new old)
+;;       (append new old))))
+
+;; (defun imp--load-normalize (name input &optional plist)
+;;   "Given a pseudo-plist INPUT, normalize it to a regular plist.
+;; The normalized key/value pairs from input are added to PLIST,
+;; extending any keys already present.
+
+;; Originally borrowed from `use-package-normalize-plist'"
+;;   (if (null input)
+;;       plist
+;;     (let* ((keyword (car input))
+;;            (xs (use-package-split-list #'keywordp (cdr input)))
+;;            (args (car xs))
+;;            (tail (cdr xs))
+;;            (normalizer
+;;             (intern-soft (concat "use-package-normalize/"
+;;                                  (symbol-name keyword))))
+;;            (arg (and (functionp normalizer)
+;;                      (funcall normalizer name keyword args)))
+;;            (error-string (format "Unrecognized keyword: %s" keyword)))
+;;       (if (memq keyword use-package-keywords)
+;;           (progn
+;;             (setq plist (imp--load-normalize
+;;                          name tail plist))
+;;             (plist-put plist keyword
+;;                        (if (plist-member plist keyword)
+;;                            (funcall merge-function keyword arg
+;;                                     (plist-get plist keyword))
+;;                          arg)))
+;;         (if use-package-ignore-unknown-keywords
+;;             (progn
+;;               (display-warning 'use-package error-string)
+;;               (imp--load-normalize
+;;                name tail plist))
+;;           (use-package-error error-string))))))
+
+
+** imp-load default filename
+
+Want to be able to just do this:
+
+(imp-path-root-set :user
+                   (imp-path-join user-emacs-directory 'source 'user))
+(imp-load :feature '(:user config org))
+
+instead of this:
+
+(imp-path-root-set :user
+                   (imp-path-join user-emacs-directory 'source 'user))
+(imp-load :feature '(:user config org)
+          :path (imp-path-join user-emacs-directory 'config 'org))
+
+Can do just this I think?:
+(imp-load :feature '(:user config org)
+          :path (imp-path-join user-emacs-directory 'source 'user 'config 'org))
+
+Want to be able to do like:
+(imp-load :feature '(:user config org)
+          :path (imp-path-join user-emacs-directory 'source 'user 'config 'org))
+(imp-load :feature '(:user config foo))
+(imp-load :feature '(:user config bar))
+(imp-load :feature '(:user baz))
