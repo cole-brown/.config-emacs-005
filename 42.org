@@ -81,11 +81,9 @@ source/user/config
 │   ├── sh-mode
 │   └── yaml-mode
 
+* imp
 
-* my code
-** imp
-
-*** refactor symbol names
+** refactor symbol names
 
 get
   - [X] copy paste imp to this .emacs
@@ -234,14 +232,14 @@ run on:
 save script off somewhere for the next thing...
   - [X] [[file:scripts/refactor-sn4-to-sn5.el]]
 
-*** imp/provide/with-emacs
+** imp/provide/with-emacs
 
 Make ~imp/provide~ act like ~imp/provide/with-emacs~ by default.
   - flag param to not ~with-emacs~ it.
 
 DONE
 
-*** go through files in order
+** go through files in order
 
 and do what?
 
@@ -266,7 +264,7 @@ files:
   - [X] package
   - [X] commands
 
-*** load a file
+** load a file
 
 (imp-load :feature '(:test)
           :filename "test.el"
@@ -312,7 +310,7 @@ vs this: (imp--feature-normalize :test)
 
 test.el load work!
 
-*** unprovide
+** unprovide
 
 (setq imp--tree-debug-flag t)
 
@@ -320,7 +318,7 @@ not fully tested but here we be.
 
 DONE
 
-*** again, check for unused funcs and shit
+** again, check for unused funcs and shit
 
 test.el: do the refactoring; missed this file
   - [ ] k
@@ -555,13 +553,12 @@ got bored.
 ok.
 moving on...
 
-*** settings.el
+** settings.el
 
 move all defcustoms to settings.el
 load settings first(?)
 
-*** ----- URHERE URHERE -----
-*** imp-load bugs
+** imp-load bugs
 
 Do minimum now.
 Do better after emacs is more than limping along.
@@ -594,7 +591,83 @@ I think this requires more than minimum to fix....
 
 So the minimum is... fix the callers?
 
-*** use-package integration via keyword
+* org
+
+imp works* now.
+Make org work now.
+
+I wanna have a dir for it.
+I wanna use imp. Debugging is a bit easier.
+  - [[*imp][imp]]
+
+Copy
+  - from
+    ~2023-07-23_sn004/mantle/config/org~
+  - to
+    ~2025-03-13_sn005/source/user/config/org~
+
+Start editting for content:
+  - [ ] init.el
+  - [ ] contacts.el
+  - [ ] journal.el
+  - [ ] mode.el
+  - [ ] pretty.el
+  - [ ] toggl.el
+  - [ ] version-control.el
+  - [ ] agenda.el
+    - Skip/avoid for now?
+
+    
+    
+* yasnippets
+
+Need my begin_src snippet...
+
+** new snippets
+
+/todo/penis
+                             TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO.
+TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ODO TODO TODO TODO TODO TODO TODO TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO TODO
+DO TODO TODO TODO TODO TODO TODO TODO TODO'
+O TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO
+
+
+** evil
+* repo buffernames
+
+TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
+
+* file timestamp auto-update
+
+mantle/config/dev-env/languages/emacs-lisp.el
+163     (emacs-lisp-mode-hook . mantle:hook:time-stamp:settings)
+
+[[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el]]
+
+[[file:init.el::;; PRIORITY: Everything: Emacs Settings]]
+;; TODO: More from: file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el
+;; (add-hook 'before-save-hook 'time-stamp)
+
+
+
+* titlebar
+
+* install: packages
+
+
+
+* Secrets: 1Password CLI?
+
+Is there a package for 1Password?
+Should I use 1Password CLI instead of secret repo?
+
+* imp improvements
+** use-package integration via keyword
 
 [[file:source/core/packages/imp/package.el::;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Creating-an-extension.html][here]]
 
@@ -658,77 +731,6 @@ use-package-defaults is alist of (keyword form-for-default-value form-for-whethe
             (and use-package-always-ensure
                  (not (plist-member args :load-path)))))
  (:pin use-package-always-pin use-package-always-pin))
-
-*** Add to places in imp/path.el
-
-`convert-standard-filename' for canonicalizing filenames/fielpaths.
-(expand-file-name (convert-standard-filename "etc/") user-emacs-directory)
-  - https://github.com/emacscollective/no-littering/blob/ea15b1c607d4036ce37326bd5b4b2f4291ddfd60/no-littering.el#L92C3-L92C77
-
-*** refactor funcs
-
-imp--load-parse
-  - make error checking funcs?
-  - make bool flag parsing func
-
-*** when I get to tests
-
-https://emacs.stackexchange.com/a/17202
-
-** repo buffernames
-
-* settings
-
-** file timestamp auto-update
-
-mantle/config/dev-env/languages/emacs-lisp.el
-163     (emacs-lisp-mode-hook . mantle:hook:time-stamp:settings)
-
-[[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el]]
-
-[[file:init.el::;; PRIORITY: Everything: Emacs Settings]]
-;; TODO: More from: file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el
-;; (add-hook 'before-save-hook 'time-stamp)
-
-
-
-** titlebar
-
-* install: packages
-
-** org shit
-
-I wanna have a dir for it.
-I wanna use imp. Debugging is a bit easier.
-  - [[*imp][imp]]
-
-
-
-** yasnippets
-
-Need my begin_src...
-
-*** new snippets
-
-/todo/penis
-                             TODO TODO
- TODO TODO TODO TODO TODO TODO TODO TODO.
-TODO TODO TODO TODO TODO TODO TODO TODO TODO
- TODO TODO TODO TODO TODO TODO TODO TODO TODO
-ODO TODO TODO TODO TODO TODO TODO TODO TODO
- TODO TODO TODO TODO TODO TODO TODO TODO TODO
-DO TODO TODO TODO TODO TODO TODO TODO TODO'
-O TODO TODO TODO TODO TODO TODO TODO TODO
-                             TODO TODO
-
-
-** evil
-* Secrets: 1Password CLI?
-
-Is there a package for 1Password?
-Should I use 1Password CLI instead of secret repo?
-
-* imp improvements
 
 ** strip ~use-package~ down and make an argparser from it
 
@@ -808,3 +810,20 @@ Want to be able to do like:
 (imp-load :feature '(:user config foo))
 (imp-load :feature '(:user config bar))
 (imp-load :feature '(:user baz))
+** ??? Add to places in imp/path.el
+
+`convert-standard-filename' for canonicalizing filenames/fielpaths.
+(expand-file-name (convert-standard-filename "etc/") user-emacs-directory)
+  - https://github.com/emacscollective/no-littering/blob/ea15b1c607d4036ce37326bd5b4b2f4291ddfd60/no-littering.el#L92C3-L92C77
+
+** ??? refactor funcs
+
+imp--load-parse
+  - make error checking funcs?
+  - make bool flag parsing func
+
+** ??? when I get to tests
+
+https://emacs.stackexchange.com/a/17202
+
+
