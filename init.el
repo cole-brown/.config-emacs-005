@@ -272,6 +272,7 @@
   ;;------------------------------------------------------------------------------
 
   (defvar --/tab/standard 4 "4")
+  (defvar --/tab/small    2 "2")
 
   ;; Set Emacs' standard to our's.
   (customize-set-variable 'standard-indent --/tab/standard)
