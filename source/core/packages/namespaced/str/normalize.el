@@ -17,7 +17,7 @@
 ;;
 ;;; Code:
 
-(imp-require :elisp 'functions)
+(imp-require-assert :elisp 'functions)
 
 
 ;;------------------------------------------------------------------------------
