@@ -220,11 +220,11 @@ This is a wrapper around `eval-after-load' that:
   ;; Error Cases
   ;;------------------------------
   (cond ((null feature)
-         (error "imp-eval-after- FEATURE must not be null! Got: %S" feature))
+         (error "imp-eval-after: FEATURE must not be null! Got: %S" feature))
 
         ((and (listp feature)
               (eq 'quote (car feature)))
-         (error "imp-eval-after- FEATURE should not be quoted! Got: %S" feature))
+         (error "imp-eval-after: FEATURE should not be quoted! Got: %S" feature))
 
         ;;------------------------------
         ;; Single Feature
