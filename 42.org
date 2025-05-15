@@ -592,6 +592,15 @@ I think this requires more than minimum to fix....
 So the minimum is... fix the callers?
 
 * -- U R HERE --
+* keybinds
+
+Disable C-z
+Disable C-mousewheel (font size +/-)
+
+* namespaced
+
+Overall init file [[file:source/core/packages/namespaced/init.el][here]]
+
 * innit
 
 Need the face funcs.
@@ -602,11 +611,19 @@ So start porting.
 Just the face funcs for now:
 file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/emacs/innit/theme.el
 
-TODO U R HERE: [[file:source/core/packages/innit/face.el::defmacro innit-face-set-for-theme (theme &rest specs]]
+Need:
+  - [ ] ns:str
+    - ~str:normalize:join~
+  - [ ] ns:list
+    - ~elisp:list:listify~
+
 
 hm....
 Do I even want to keep this Doomism?
 Just convert to the Emacs version and just call the Emacs funcs?
+
+steal funcs from snoo4 or steal all namespaced libs?
+
 
 
 * zenburn
@@ -621,6 +638,9 @@ Can I make ~hc-zenburn~ piggyback on top of ~zenburn~?
       - https://github.com/edran/hc-zenburn-emacs/blob/master/change_brightness.py
     - And I have funcs to mess with colors: 
       - [[file:source/core/packages/innit/face.el::defun innit:color:darken (color alpha &optional colors-alist][here]] or [[file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/keyword.el][sn004]]
+
+TODO: make ~zenburn-high-contrast~ for ~zenburn~ somehow.
+
 
 
 * org
@@ -843,6 +863,49 @@ lrwxrwxrwx 1 main main 53 Mar 14 15:30 /home/main/.config/emacs -> /home/main/oc
 
 So it thinks those paths are different when actually they're the same after following the symlink.
 
+** imp-path-root-set defaults
+
+I do this a lot in init files:
+
+(imp-path-root-set :str
+                   (imp-path-current-dir)
+                   (imp-file-current))
+
+Make those the defaults?
+(imp-path-root-set :str)
+                   
+** imp-timing default file/path
+
+90+% I just want current dir/file:
+
+(imp-timing
+    :elisp
+    (imp-file-current)
+    (imp-path:current:dir)
+  ...)
+
+Can I make them optional?
+(imp-timing
+    :elisp
+  ...)
+
+maybe like `dolist'?
+(imp-timing (:elisp)  ...)  
+(imp-timing (:elisp ?path ?file)  ...)  
+
+
+Or split into two?
+
+(imp-timing
+    :elisp
+  ...)
+
+(imp-timing-also
+    :elisp
+    path
+    file
+  ...)
+    
 ** imp-load default filename
 
 Want to be able to just do this:
