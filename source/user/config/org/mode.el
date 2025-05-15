@@ -12,29 +12,20 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Configure Org-Mode.
+;; Configure Org-Mode.
+;; The Cthulu of Emacs.
+;; Required and will drive you insane trying to grok.
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-;;                        ORG-MODE - The Thing Itself
-;;  The Cthulu of Emacs. Required and will drive you insane trying to grok.
-;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-;;------------------------------------------------------------------------------
-
-
-;;------------------------------------------------------------------------------
 ;; NOTE: Org-Mode TODO Sequence Keywords
 ;;------------------------------------------------------------------------------
-;; See "mantle/theme/<theme>/org-mode.el" (e.g.
-;; "mantle/theme/zenburn/org-mode.el") for set-up of org-mode TODO keywords,
+;; See "theme/*.el" files under this dir for set-up of org-mode TODO keywords,
 ;; faces, and other such theme-related stuff.
 
-;; TODO: Put keyword shit in here with org mode shit.
-
-;;;------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;; Org-Mode
 ;;------------------------------------------------------------------------------
 
@@ -50,23 +41,6 @@
   ;;------------------------------
   :init
   ;;------------------------------
-
-  ;;---
-  ;; Non-interactive Snippets
-  ;;---
-  
-  ;; (template:define :src 'org-mode
-  ;;   "#+begin_src %s" ; language
-  ;;   "%s"             ; yank/region
-  ;;   "#+end_src"
-  ;;   "")
-
-  ;; (template:define :quote 'org-mode
-  ;;   "#+begin_quote"
-  ;;   "%s"            ; yank/region
-  ;;   "#+end_quote"
-  ;;   "")
-
 
   ;;---
   ;; Create Org-Mode Hooks
@@ -93,7 +67,7 @@
   ;;------------------------------
 
   ((org-mode-hook    . --/hook/org/settings)
-   (org-mode-hook    . --/hook/time-stamp/settings
+   (org-mode-hook    . --/hook/time-stamp/settings)
    (before-save-hook . --/hook/time-stamp/before-save))
 
 
@@ -740,4 +714,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :user 'config 'org 'mode)
+(imp-provide :user 'config 'org 'mode)
