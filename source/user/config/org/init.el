@@ -20,12 +20,19 @@
 ;; Org-Mode Itself
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:user config org mode)
+(imp-load :feature  '(:user config org mode)
           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
           :filename "mode")
 
+;; ...And now theme org mode itself...
+(imp-eval-after zenburn-theme
+  (imp-load :feature  '(:user config org theme zenburn)
+            :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
+            :filename "theme/zenburn"))
+;; TODO: another one for `hc-zenburn-theme'
+
 ;; Skip agenda for now... It doesn't jive well with hundreds of org files...
-;; (imp:load :feature  '(:user config org agenda)
+;; (imp-load :feature  '(:user config org agenda)
 ;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
 ;;           :filename "agenda")
 
@@ -34,7 +41,7 @@
 ;; ;; Org-Journal
 ;; ;;------------------------------------------------------------------------------
 
-;; (imp:load :feature  '(:user config org journal)
+;; (imp-load :feature  '(:user config org journal)
 ;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
 ;;           :filename "journal")
 
@@ -43,11 +50,11 @@
 ;; ;; Etc.
 ;; ;;------------------------------------------------------------------------------
 
-;; (imp:load :feature  '(:user config org contacts)
+;; (imp-load :feature  '(:user config org contacts)
 ;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
 ;;           :filename "contacts")
 
-;; (imp:load :feature  '(:user config org pretty)
+;; (imp-load :feature  '(:user config org pretty)
 ;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
 ;;           :filename "pretty")
 
@@ -56,7 +63,7 @@
 ;; ;; Integration with Other Parts of Emacs
 ;; ;;------------------------------------------------------------------------------
 
-;; (imp:load :feature  '(:user config org version-control)
+;; (imp-load :feature  '(:user config org version-control)
 ;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
 ;;           :filename "version-control")
 
@@ -65,7 +72,7 @@
 ;; ;; Integration with Apps / Services
 ;; ;;--------------------------------------------------------------------------------
 
-;; (imp:load :feature  '(:user config org toggl)
+;; (imp-load :feature  '(:user config org toggl)
 ;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
 ;;           :filename "toggl")
 
@@ -73,4 +80,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :user 'config 'org)
+(imp-provide :user 'config 'org)
