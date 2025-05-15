@@ -18,17 +18,19 @@
 ;;
 ;;; Code:
 
+;;-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
+;; `ns' Imports Allowed:
+;; ----------------
+;;   - :elisp
+;;-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
 
-(imp:require :elisp 'utils 'types)
+(imp:require :elisp 'types)
 
 
 ;;------------------------------------------------------------------------------
-;; Imports
+;; Symbols
 ;;------------------------------------------------------------------------------
-
-;; Don't rely on anything more than the core modules... or anything at all?
-;; This should be low-level stuff for use by other code.
-
+;; TODO: Make & move to `symbol.el'
 
 (defmacro elisp:symbol/lexical:bound-and-true? (symbol)
   "Return SYMBOL's value if it exists, else nil.
@@ -57,15 +59,17 @@ See also `elisp:symbol/lexical:bound-and-true?'."
 ;; (let ((testing 42)) (elisp:symbol/lexical:bound? testing))
 ;; (elisp:symbol/lexical:bound? testing)
 
-;;------------------------------------------------------------------------------
-;; Delete Functions
-;;------------------------------------------------------------------------------
 
-(defun elisp:func:delete (symbol)
-  "Delete a function by its SYMBOL by calling:
-1. `fmakunbound' - Removes the function definition.
-2. `makunbound'  - Removes the variable binding.
-3. `unintern'    - Removes the symbol name from the symbol table."
+;;------------------------------------------------------------------------------
+;; Delete
+;;------------------------------------------------------------------------------
+;; TODO: move to `elisp/elisp.el'
+
+(defun elisp:delete (symbol)
+  "Delete a SYMBOL by calling:
+1. `fmakunbound' - Remove the function definition.
+2. `makunbound'  - Remove the variable binding.
+3. `unintern'    - Remove the symbol name from the symbol table."
   (fmakunbound symbol)
   (makunbound symbol)
   (unintern symbol nil))
@@ -74,10 +78,10 @@ See also `elisp:symbol/lexical:bound-and-true?'."
 ;;------------------------------------------------------------------------------
 ;; List Functions
 ;;------------------------------------------------------------------------------
-
-;; TODO: move to a list utils module?
+;; TODO: Move to `ns/list'!!!!
 ;;   - I think I have other list util functions hiding... somewhere.
 ;;     - Maybe in `alist'...
+
 (defun elisp:list:flatten (args)
   "Return ARGS as a single, flat list.
 
@@ -99,7 +103,6 @@ If ARGS is a list, it must be a proper list (no circular lists or conses)."
 ;; (elisp:list:flatten '(1 (2 3)))
 
 
-;; TODO: move to a list utils module?
 ;;   - I think I have other list util functions hiding... somewhere.
 ;;     - Maybe in `alist'...
 (defun elisp:list:listify (args)
@@ -117,6 +120,9 @@ From Doom's `doom-enlist'."
 ;;------------------------------------------------------------------------------
 ;; Ensure Quote/Unquote
 ;;------------------------------------------------------------------------------
+;; TODO: IDK where these go but likely not here. in `symbol.el'?
+;;   - Well... you can unquote more than just symbols.
+;;   - Maybe just put in `elisp/elisp.el'
 
 (defun elisp:unquote (arg)
   "Return ARG unquoted.
@@ -148,6 +154,7 @@ Check both `quote' ('foo) and `function' (#'foo) style quoting."
 ;;------------------------------------------------------------------------------
 ;; Interactive Commands
 ;;------------------------------------------------------------------------------
+;; TODO: Move to `elisp:command'? `elisp:lambda'?
 
 (defmacro elisp:cmd (&rest body)
   "Return (lambda () (interactive) ,@BODY)
@@ -224,6 +231,7 @@ Originally from from Doom's `cmd!!' in \"core/core-lib.el\"."
 ;;------------------------------------------------------------------------------
 ;; Functions for argument parsing.
 ;;------------------------------------------------------------------------------
+;; TODO: Move to `elisp:parse'?
 
 (defun elisp:parse:args+kwargs (input &rest claims)
   "Parse INPUT into args (list) and keyword args (plist).
