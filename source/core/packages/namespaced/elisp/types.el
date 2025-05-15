@@ -1,4 +1,4 @@
-;;; core/modules/elisp/utils/types.el --- Functions for Types -*- lexical-binding: t; -*-
+;;; namespaced/elisp/types.el --- Functions for Types -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -30,11 +30,21 @@
 (defun elisp:cons? (var)
   "Is VAR a cons and not a list?
 
-Apparently lists qualify as conses as far as `consp' cares, so... fucking elisp,
-yeah? ...and I can't `listp' or `length' a cons because it's not a list...?!?!
+Did you know that a cons is a list?
+  (listp '(1 . 2))
+    => t
 
-Jesus fuck Emacs Lisp. I just want to check for actual conses...
+Did you know that a list is a cons?
+  (consp '(1 2 3 4))
+    => t
 
+Do you want this instead?
+  (elisp:cons? '(1 . 2))
+    => t
+  (elisp:cons? '(1 2 3 4))
+    => nil
+
+Originally from:
 https://emacs.stackexchange.com/questions/10489/predicate-function-for-dotted-pairs"
   (declare (pure t) (side-effect-free t))
   (and (listp var)
@@ -47,24 +57,24 @@ https://emacs.stackexchange.com/questions/10489/predicate-function-for-dotted-pa
 ;; (elisp:cons? '(1 . nil))
 
 
-(defun elisp:list/proper? (var)
-  "Is VAR an actual, proper list?
+(defun elisp:list/strict? (var)
+  "Is VAR an actual proper list, strictly speaking?
 
-VAR must be a list and must not be:
-  1. circular
-  2. dotted (e.g. a `cons' cell)"
+A proper list is neither circular nor dotted (i.e., its last cdr is nil).
+  - `proper-list-p' docstr"
   (declare (pure t) (side-effect-free t))
   (proper-list-p var))
 
 
-(defun elisp:list/any? (var)
-  "Is VAR anything that Emacs Lisp considers a \"list\"?
+(defun elisp:list/lax? (var)
+  "Is VAR anything that Emacs Lisp considers a list?
 
 Includes:
-  1. nil
-  2. conses
-  3. proper lists
+  1. strict/proper lists: '(1 2 3 4)
+  2. nil
+  3. conses: '(1 . 2)
   4. lists with circular references
+  5. lists with a dotted end instead of nil: '(1 2 3 . 4)
   5. etc"
   (declare (pure t) (side-effect-free t))
   (listp var))
@@ -73,4 +83,4 @@ Includes:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :elisp 'utils 'types)
+(imp:provide :elisp 'types)
