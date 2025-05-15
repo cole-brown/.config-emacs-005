@@ -23,12 +23,15 @@
 ;;; Code:
 
 
+;; TODO: make this `:type' instead of `:elisp'
+
+
 ;;------------------------------------------------------------------------------
 ;; Type checking
 ;;------------------------------------------------------------------------------
 
-(defun elisp:cons? (var)
-  "Is VAR a cons and not a list?
+(defun elisp:cons/strict? (var)
+  "Is VAR a cons, only a cons, and nothing but a cons?
 
 Did you know that a cons is a list?
   (listp '(1 . 2))
@@ -39,9 +42,9 @@ Did you know that a list is a cons?
     => t
 
 Do you want this instead?
-  (elisp:cons? '(1 . 2))
+  (elisp:cons/strict? '(1 . 2))
     => t
-  (elisp:cons? '(1 2 3 4))
+  (elisp:cons/strict? '(1 2 3 4))
     => nil
 
 Originally from:
@@ -55,6 +58,21 @@ https://emacs.stackexchange.com/questions/10489/predicate-function-for-dotted-pa
 ;; (elisp:cons? '(1 2))
 ;; (elisp:cons? '(1))
 ;; (elisp:cons? '(1 . nil))
+
+
+(defun elisp:cons/lax? (var)
+  "Is VAR a cons? Any cons.
+
+Strict cons? Cons.
+  (eq (elisp:cons/strict? '(1 . 2))
+      (elisp:cons/lax?    '(1 . 2)))
+    => t
+
+List? Also cons.
+  (consp '(1 2 3 4))
+    => t"
+  (declare (pure t) (side-effect-free t))
+  (consp var))
 
 
 (defun elisp:list/strict? (var)
