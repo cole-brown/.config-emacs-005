@@ -1,4 +1,4 @@
-;;; core/modules/emacs/innit/theme.el --- Theme Helpers -*- lexical-binding: t; -*-
+;;; namespaced/innit/theme.el --- Theme Helpers -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -12,7 +12,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; Theme Helpers
+;; Face Helpers
+;; Mainly cuz Doom has less scary faces than Emacs.
+;; And I'm scared.
+;; So instead of attempting to grok faces,
+;; I'mma just steal from Doom.
 ;;
 ;; Some things in here originally borrowed from Doom files:
 ;;   - "core/autoload/themes.el"
@@ -23,38 +27,39 @@
 
 (require 'color) ; `color-clamp'
 
-(imp:require :innit 'vars)
-(imp:require :str)
-(imp:require :elisp)
+(imp-require :innit 'vars)
+(imp-require :path)
+(imp-require :str)
+(imp-require :elisp)
 
 
 ;;------------------------------------------------------------------------------
 ;; Customs
 ;;------------------------------------------------------------------------------
 
-(defcustom innit:theme:path (path:join innit:path:mantle "theme")
+(defcustom innit:theme/path (path:join innit:path:mantle "theme")
   "Absolute path string to theme's directory.
 
 Used by `imp:load'.
 
-`innit:theme:path' and `innit:theme:file' must be set in order to load
+`innit:theme/path' and `innit:theme/file' must be set in order to load
 your theme."
   :group 'innit:group
   :type  'string)
 
 
-(defcustom innit:theme:file nil
+(defcustom innit:theme/file nil
   "String of either filename or absolute filepath to theme.
 
 Used by `imp:load'.
 
-`innit:theme:path' and `innit:theme:file' must be set in order to load
+`innit:theme/path' and `innit:theme/file' must be set in order to load
 your theme."
   :group 'innit:group
   :type  'string)
 
 
-(defcustom innit:theme:feature nil
+(defcustom innit:theme/feature nil
   "`imp' feature name for theme.
 
 Used by `imp:load'.
@@ -72,36 +77,36 @@ Set to `nil' if you don't want `mantle' to load a theme for you."
 ;; Loading Hooks
 ;;----------------------------
 
-(defvar innit:theme:customize:hook nil
+(defvar innit:theme/customize:hook nil
   "Hook to run for theme customization.
 
-This hook is run by `innit:theme:load:hook'.")
+This hook is run by `innit:theme/load:hook'.")
 
 
-(defvar innit:theme:load:hook nil
+(defvar innit:theme/load:hook nil
   "Hook run after the theme is loaded.
 
-Run when loaded with `load-theme' or reloaded with `innit:theme:reload'.")
+Run when loaded with `load-theme' or reloaded with `innit:theme/reload'.")
 
 
-(defun innit:theme:customize:apply ()
-  "Run `innit:theme:customize:hook' functions."
-  (run-hooks 'innit:theme:customize:hook))
+(defun innit:hook:theme:customize:apply ()
+  "Run `innit:theme/customize:hook' functions."
+  (run-hooks 'innit:theme/customize:hook))
 
 
-;; Always run `innit:theme:customize:hook' when running `innit:theme:load:hook'.
-(add-hook 'innit:theme:load:hook  #'innit:theme:customize:apply)
+;; Always run `innit:theme/customize:hook' when running `innit:theme/load:hook'.
+(add-hook 'innit:theme/load:hook  #'innit:theme/customize:apply)
 
 
 ;;----------------------------
 ;; Load Theme
 ;;----------------------------
 
-(defvar innit:theme:loaded nil
+(defvar innit:theme/loaded nil
   "Theme that user has loaded, or nil for \"not loaded (yet)\".")
 
 
-(defun innit:theme:load (theme)
+(defun innit:theme/load (theme)
   "Load THEME and mark as loaded.
 
 THEME must be the theme's quoted symbol name (e.g. `'zenburn'); it will be
@@ -109,28 +114,28 @@ passed to `load-theme'."
   ;; Load the theme please and yes, I do want to load a theme thank you.
   (load-theme theme :no-confirm)
   ;; Save that theme was loaded.
-  (setq innit:theme:loaded theme)
+  (setq innit:theme/loaded theme)
   ;; Apply the hook funcs now that the theme is loaded.
-  (innit:hook:run 'innit:theme:load:hook))
+  (innit:hook:run 'innit:theme/load:hook))
 
 
-;; TODO: Currently doesn't interact with `innit:theme:loaded'. Should it?
-(defun innit:theme:reload ()
+;; TODO: Currently doesn't interact with `innit:theme/loaded'. Should it?
+(defun innit:theme/reload ()
   "Reload the current Emacs theme(s)."
   (interactive)
-  (unless innit:theme:feature
+  (unless innit:theme/feature
     ;; TODO: nub error func?
-    (user-error (concat "innit:theme:reload: "
+    (user-error (concat "innit:theme/reload: "
                         "No theme is active. "
-                        "Make sure `innit:theme:feature', `innit:theme:path', "
-                        "and `innit:theme:file' are set properly.")))
+                        "Make sure `innit:theme/feature', `innit:theme/path', "
+                        "and `innit:theme/file' are set properly.")))
   (let ((themes (copy-sequence custom-enabled-themes)))
     ;; Turn themes off and back on again...
     (mapc #'disable-theme custom-enabled-themes)
-    (let (innit:theme:load:hook) ; Disable load hook while we re-enable the themes.
+    (let (innit:theme/load:hook) ; Disable load hook while we re-enable the themes.
       (mapc #'enable-theme (reverse themes)))
     ;; Apply the hook funcs once now that the themes are all reloaded.
-    (innit:hook:run 'innit:theme:load:hook)
+    (innit:hook:run 'innit:theme/load:hook)
     ;; TODO: Steal Doom fonts init/functions/etc too?
     ;; (doom/reload-font)
     (message "%s %s"
@@ -146,11 +151,11 @@ passed to `load-theme'."
 ;; Theme Init
 ;;------------------------------------------------------------------------------
 
-(defun innit:theme:init ()
+(defun innit:theme/init ()
   "Initialize themes."
   ;; User themes should live in "<user-emacs-directory>/mantle/theme/",
   ;; not "<user-emacs-directory>/".
-  (setq custom-theme-directory innit:theme:path)
+  (setq custom-theme-directory innit:theme/path)
 
   ;; Always prioritize the user's themes above the built-in/packaged ones.
   (setq custom-theme-load-path
@@ -163,7 +168,7 @@ passed to `load-theme'."
 ;; Faces
 ;;------------------------------------------------------------------------------
 
-(defun int<innit>:theme:face:set (spec)
+(defun --innit:theme:face:set (spec)
   "Convert Doom's more user-friendly face SPEC into an Emacs' face spec.
 
 Initially from Doom's `doom--custom-theme-set-face'."
@@ -171,62 +176,62 @@ Initially from Doom's `doom--custom-theme-set-face'."
   (cond ((listp (car spec))
          (cl-loop for face in (car spec)
                   collect
-                  (car (int<innit>:theme:face:set (cons face (cdr spec))))))
+                  (car (--innit:theme:face:set (cons face (cdr spec))))))
         ;; FACE :keyword value [...]
         ((keywordp (cadr spec))
          `((,(car spec) ((t ,(cdr spec))))))
         ;; Fallback: Assume it's in Emacs' face spec already.
         (`((,(car spec) ,(cdr spec))))))
-;; (int<innit>:theme:face:set (list 'org-done :foreground "#506b50"))
-;; (int<innit>:theme:face:set (list '+org-todo-active :foreground "#a9a1e1" :background "#383838"))
+;; (--innit:theme:face:set (list 'org-done :foreground "#506b50"))
+;; (--innit:theme:face:set (list '+org-todo-active :foreground "#a9a1e1" :background "#383838"))
 
 
-(defmacro innit:theme:face:set (theme &rest specs)
+(defmacro innit:theme/face:set! (theme &rest specs)
   "Apply a list of face SPECS as user customizations for THEME(s).
 
 THEME can be a single symbol or list thereof. If nil, apply these settings to
 `user' theme (all themes). It will apply to all themes once they are loaded.
 
 Initially from Doom's `custom-theme-set-faces!'."
-  (declare (indent 1))
+  (declare (indent 1)) ;; `--innit!-tfs-' prefix for macroexpanded vars.
   ;; Make a function name for the hook based on THEME.
-  (let* ((macro<innit/theme>:func (gensym (concat "innit:theme:face:hook:"
+  (let* ((--innit!-tfs-func (gensym (concat "innit:theme/face:hook:"
                                                   (str:normalize:join theme "/")
                                                   ":"
                                                   ;; `gensym' will suffix the name with `gensym-counter' for a unique name.
                                                   ))))
     ;; Only eval inputs once.
-    `(let ((macro<innit/theme>:themes (elisp:list:listify (or ,theme 'user)))
-           (macro<innit/theme>:specs  (list ,@specs)))
+    `(let ((--innit!-tfs-themes (elisp:list:listify (or ,theme 'user)))
+           (--innit!-tfs-specs  (list ,@specs)))
        (progn
          ;; Create a function for applying the faces.
-         (defun ,macro<innit/theme>:func ()
+         (defun ,--innit!-tfs-func ()
            (let (custom--inhibit-theme-enable)
-             (dolist (theme/each macro<innit/theme>:themes)
+             (dolist (theme/each --innit!-tfs-themes)
                (when (or (eq theme/each 'user)
                          (custom-theme-enabled-p theme/each))
                  (apply #'custom-theme-set-faces theme/each
-                        (mapcan #'int<innit>:theme:face:set
-                                macro<innit/theme>:specs))))))
+                        (mapcan #'--innit:theme:face:set
+                                --innit!-tfs-specs))))))
          ;; Apply the changes immediately if the user is not using `innit' theme
          ;; variables or the theme has already loaded. This allows you to evaluate
          ;; these macros on the fly and customize your faces interactively.
-         (when innit:theme:feature
-           (funcall #',macro<innit/theme>:func))
+         (when innit:theme/feature
+           (funcall #',--innit!-tfs-func))
          ;; Always add to the customize hook.
-         (add-hook 'innit:theme:customize:hook #',macro<innit/theme>:func 100)))))
+         (add-hook 'innit:theme/customize:hook #',--innit!-tfs-func 100)))))
 
 
-(defmacro innit:face:set (&rest specs)
-  "Apply a list of face SPECS as user customizations.
+(defmacro innit:face:set! (&rest specs)
+  "Apply a list of face SPECS as `user' theme (global theme) customizations.
 
 This is a convenience macro alternative to `custom-set-face' which allows for a
 simplified face format, and takes care of load order issues. See
-`innit:theme:face:set' for details - this will set SPECS in the `user' theme.
+`innit:theme/face:set' for details - this will set SPECS in the `user' theme.
 
 Initially from Doom's `custom-set-faces!'."
   (declare (indent defun))
-  `(innit:theme:face:set 'user ,@specs))
+  `(innit:theme/face:set 'user ,@specs))
 
 
 ;;------------------------------------------------------------------------------
@@ -244,7 +249,7 @@ Initially from Doom's `custom-set-faces!'."
   "Get a specific color NAME's value from COLORS-ALIST.
 
 NAME should be a symbol or a hexadecimal color string.
-  - If NAME is a string, the value of `innit:color:name->hex' is returned.
+  - If NAME is a string, the value of `innit:color/name->hex' is returned.
   - If NAME is a symbol, the value is searched for in the COLORS-ALIST.
 
 COLORS-ALIST should be an alist of NAME symbols to color values.
@@ -263,7 +268,7 @@ TYPE should be `nil', 256, 16, or 8.
 Return a hexadecimal string from COLORS-ALIST or nil."
   ;; NAME is a string, not a symbol, so just convert it to a hex value.
   (cond ((stringp name)
-         (innit:color:name->hex name))
+         (innit:color/name->hex name))
 
         ;; Find NAME in the COLORS-ALIST.
         ((and colors-alist
@@ -291,7 +296,7 @@ Return a hexadecimal string from COLORS-ALIST or nil."
 ;; (innit:color 'magenta)
 
 
-(defun innit:color:name->rgb (name)
+(defun innit:color/name->rgb (name)
   "Get the hexidecimal string repesenting the color NAME.
 
 NAME should be either:
@@ -307,14 +312,14 @@ NAME should be either:
                for x in (tty-color-standard-values (downcase name))
                collect (/ x div))
     ;; Invalid input?
-    (error "innit:color:name->rgb: Invalid color NAME. Should be a string or quoted symbol, got: %S"
+    (error "innit:color/name->rgb: Invalid color NAME. Should be a string or quoted symbol, got: %S"
            name)))
-;; (innit:color:name->rgb 'red)
-;; (innit:color:name->rgb "red")
-;; (innit:color:name->rgb "#ff0000")
+;; (innit:color/name->rgb 'red)
+;; (innit:color/name->rgb "red")
+;; (innit:color/name->rgb "#ff0000")
 
 
-(defun innit:color:rgb->hex (red green blue)
+(defun innit:color/rgb->hex (red green blue)
   "Convert RED, GREEN, and BLUE numbers into a hex color string.
 
 RED, GREEN, and BLUE /should/ be between 0.0 and 1.0 (inclusive).
@@ -323,7 +328,7 @@ They will be clamped to that range."
           (not (numberp green))
           (not (numberp blue)))
       ;; Invalid input?
-      (error "innit:color:rgb->hex: Invalid input(s); colors must be floats between 0 and 1! Got: RED: %S, GREEN: %S, BLUE: %S"
+      (error "innit:color/rgb->hex: Invalid input(s); colors must be floats between 0 and 1! Got: RED: %S, GREEN: %S, BLUE: %S"
              red
              green
              blue)
@@ -332,10 +337,10 @@ They will be clamped to that range."
             (* (color-clamp red)   255)
             (* (color-clamp green) 255)
             (* (color-clamp blue)  255))))
-;; (innit:color:rgb->hex 1 0 0)
+;; (innit:color/rgb->hex 1 0 0)
 
 
-(defun innit:color:name->hex (name)
+(defun innit:color/name->hex (name)
   "Get the hexidecimal string repesenting the color NAME.
 
 NAME should be either:
@@ -343,12 +348,12 @@ NAME should be either:
   - a quoted symbol (e.g. `'red')
 
 This is merely a convenience for:
-  (innit:color:rgb->hex (innit:color:name->rgb name))"
-  (apply #'innit:color:rgb->hex (innit:color:name->rgb name)))
-;; (innit:color:name->hex 'red)
+  (innit:color/rgb->hex (innit:color/name->rgb name))"
+  (apply #'innit:color/rgb->hex (innit:color/name->rgb name)))
+;; (innit:color/name->hex 'red)
 
 
-(defun innit:color:blend (color0 color1 alpha &optional colors-alist)
+(defun innit:color/blend (color0 color1 alpha &optional colors-alist)
   "Blend two colors together by an alpha coefficient.
 
 COLOR0 and COLOR1 should be:
@@ -373,7 +378,7 @@ Color values should be either:
     (cond ((and (symbolp color0)
                 (symbolp color1))
            ;; Convert to hex strings and recurse.
-           (innit:color:blend (innit:color color0 colors-alist)
+           (innit:color/blend (innit:color color0 colors-alist)
                               (innit:color color1 colors-alist)
                               alpha))
 
@@ -382,27 +387,27 @@ Color values should be either:
                (listp color1))
            (cl-loop for x in color0
                     when (if (listp color1) (pop color1) color1)
-                    collect (innit:color:blend x it alpha)))
+                    collect (innit:color/blend x it alpha)))
 
           ;; Both colors are hex color strings.
           ((and (string-prefix-p "#" color0)
                 (string-prefix-p "#" color1))
-           (apply #'innit:color:rgb->hex
-                  (cl-loop for it    in (innit:color:name->rgb color0)
-                           for other in (innit:color:name->rgb color1)
+           (apply #'innit:color/rgb->hex
+                  (cl-loop for it    in (innit:color/name->rgb color0)
+                           for other in (innit:color/name->rgb color1)
                            collect (+ (* alpha it) (* other (- 1 alpha))))))
 
           ;; Invalid input?
           (t
-           (error "innit:color:name->rgb: Invalid color(s): COLOR0: %S, COLOR1: %S"
+           (error "innit:color/name->rgb: Invalid color(s): COLOR0: %S, COLOR1: %S"
                   color0 color1)))
 
     ;; One nil color.
-    (error "innit:color:name->rgb: Colors cannot be `nil': COLOR0: %S, COLOR1: %S"
+    (error "innit:color/name->rgb: Colors cannot be `nil': COLOR0: %S, COLOR1: %S"
                   color0 color1)))
 
 
-(defun innit:color:darken (color alpha &optional colors-alist)
+(defun innit:color/darken (color alpha &optional colors-alist)
   "Darken a COLOR by a coefficient ALPHA.
 
 COLOR should be one of:
@@ -424,17 +429,17 @@ Color values should be either:
   3) `nil'"
   ;; Convert color symbol to hex string.
   (cond ((and color (symbolp color))
-         (innit:color:darken (innit:color color colors-alist) alpha colors-alist))
+         (innit:color/darken (innit:color color colors-alist) alpha colors-alist))
 
         ;; Recursively darken list of colors.
         ((listp color)
-         (cl-loop for c in color collect (innit:color:darken c alpha colors-alist)))
+         (cl-loop for c in color collect (innit:color/darken c alpha colors-alist)))
 
         ;; Darken color hex string by blending with black.
-        ((innit:color:blend color "#000000" (- 1 alpha) colors-alist))))
+        ((innit:color/blend color "#000000" (- 1 alpha) colors-alist))))
 
 
-(defun innit:color:lighten (color alpha &optional colors-alist)
+(defun innit:color/lighten (color alpha &optional colors-alist)
   "Brighten a COLOR by a coefficient ALPHA.
 
 COLOR should be one of:
@@ -456,14 +461,14 @@ Color values should be either:
   3) `nil'"
   ;; Convert color symbol to hex string.
   (cond ((and color (symbolp color))
-         (innit:color:lighten (innit:color color colors-alist) alpha colors-alist))
+         (innit:color/lighten (innit:color color colors-alist) alpha colors-alist))
 
         ;; Recursively lighten list of colors.
         ((listp color)
-         (cl-loop for c in color collect (innit:color:lighten c alpha collect)))
+         (cl-loop for c in color collect (innit:color/lighten c alpha collect)))
 
         ;; Lighten color hex string by blending with white.
-        ((innit:color:blend color "#FFFFFF" (- 1 alpha) colors-alist))))
+        ((innit:color/blend color "#FFFFFF" (- 1 alpha) colors-alist))))
 
 
 ;;------------------------------------------------------------------------------
