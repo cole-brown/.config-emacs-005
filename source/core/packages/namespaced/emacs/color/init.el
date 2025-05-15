@@ -19,12 +19,13 @@
 ;; "Proudly nicked from Doom."
 ;;   - namespaced
 ;; <this space reserved for next thief>
+;;   - <reserved>
 ;;
 ;;; Code:
 
-(require 'color) ; `color-clamp'
+(require 'cl-macs) ; `cl-loop'
+(require 'color)   ; `color-clamp'
 (require 'term/tty-colors) ; `tty-color-standard-values'
-(require 'cl-macs) ; `cl-loop' & friends
 
 
 ;;------------------------------------------------------------------------------
