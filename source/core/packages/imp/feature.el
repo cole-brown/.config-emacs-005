@@ -133,20 +133,19 @@ by `imp-features-locate'.")
                   "  => emacs: %S\n"
                   "Check your order of providing/loading, "
                   "or make sure it initializes its root and "
-                  "features with imp first.\n"
-                  "Error: %S\n"
-                  "  %S")
+                  "features with imp first.")
                 feature
                 (imp-feature-normalize-for-imp feature)
-                (imp-feature-normalize-for-emacs feature)
-                (car err)
-                (cdr err))))
+                (imp-feature-normalize-for-emacs feature))))
+;; (imp-feature-assert 'which-key)
+;; (imp-feature-assert :which-key)
+;; (imp-feature-assert :imp)
 
 
 (defun imp-mode? (mode)
   "Check if MODE exists and is enabled."
-  ;; Can't use `bound-and-true-p' due to MODE being passed in,
-  ;; so check bound and truthy separately.
+  ;; Can't use `bound-and-true-p' due to macro shenanigans, so check
+  ;; bound and truthy separately.
   (and (boundp mode)
        (symbol-value mode)))
 ;; (imp-mode? 'evil-mode)
