@@ -1,0 +1,104 @@
+#+title: README
+
+
+* Redirecting Output per Output Level
+
+#+begin_src emacs-lisp
+(defvar example:output:error nil
+  "A list of `:error' output messages if we are stealing `:error' verbosity.")
+
+
+(defvar example:output:warning nil
+  "A list of `:warning' output messages if we are stealing `:warning' verbosity.")
+;; example:output:warning
+;; (length example:output:warning)
+
+
+(defvar example:output:debug nil
+  "A list of `:debug' output messages if we are stealing `:debug' verbosity.
+NOTE: Does not include /test/ debug messages - just the normal nub
+debugging messages.")
+
+
+(defun example:redirect/output:error (msg &rest args)
+  "Steals all calls to `int<nub>:output' for `:error' level and puts them
+into `example:output:error' list instead."
+  (push (apply #'format msg args) example:output:error))
+
+
+(defun example:redirect/output:warning (msg &rest args)
+  "Steals all calls to `int<nub>:output' for `:warning' level and puts them
+into `example:output:warning' list instead."
+  (push (apply #'format msg args) example:output:warning))
+;; (example:redirect/output:warning "hello %s" "there")
+
+
+(defun example:redirect/output:debug (msg &rest args)
+  "Steals all calls to `int<nub>:output' for `:debug' level and puts them
+into `example:output:debug' list instead."
+  (push (apply #'format msg args) example:output:debug))
+
+
+;; The nub unit tests use something like this in order to have several
+;; "defaults" at its disposal:
+(defconst example:output:sinks
+  '(;; ------------------------------
+    ;; Defaults
+    ;; ------------------------------
+    ;; NOTE: The default doesn't need set. See `int<nub>:var:sink:backup' for
+    ;; what the output level to output sink function mapping is for default.
+
+    ;; ------------------------------
+    ;; Custom
+    ;; ------------------------------
+    ;; Output to our functions and allow to output as usual.
+    (:verbose . ((:error   . (example:redirect/output:error   :default))
+                 (:warning . (example:redirect/output:warning :default))
+                 (:debug   . (example:redirect/output:debug   :default))))
+
+    ;; Always output to our functions.
+    ;; Allow errors out to default; squelch warning & debugs.
+    (:errors . ((:error   . (example:redirect/output:error :default))
+                (:warning . example:redirect/output:warning)
+                (:debug   . example:redirect/output:debug)))
+
+    ;; Only output to our functions.
+    (:quiet . ((:error   . example:redirect/output:error)
+               (:warning . example:redirect/output:warning)
+               (:debug   . example:redirect/output:debug))))
+  "Direct the `nub' output messages based on `example:redirect/output:type'.")
+#+end_src
+
+
+* Initialize Nub for your User
+
+#+begin_src emacs-lisp
+(defconst example:nub:user :example
+  "Nub users are generally keywords.")
+
+;; Register your user and settings.
+;; At the most basic, just supply a user:
+(nub:vars:init example:nub:user)
+#+end_src
+
+You can set up more:
+  - debug tags for fine-tuning what is and isn't being output while debugging
+  - Override the prefixes for your output level messages.
+    - `int<nub>:var:prefix:backup' has the defaults.
+  - Default enabled/disabled setting per output level.
+  - Output sink functions per output level.
+
+For example, if you want to only use the example output sinks from above:
+#+begin_src emacs-lisp
+(nub:vars:init example:nub:user
+               :alist:enabled? (alist-get :quiet
+                                          test<nub>:redirect/output:sinks))
+#+end_src
+
+Or if you don't need that alist and always want the same sinks:
+#+begin_src emacs-lisp
+(nub:vars:init example:nub:user
+               :alist:enabled? '((:error   . example:redirect/output:error)
+                                 (:warning . example:redirect/output:warning)
+                                 (:debug   . example:redirect/output:debug)))
+#+end_src
