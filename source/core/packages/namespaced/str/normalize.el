@@ -1,4 +1,4 @@
-;;; core/modules/emacs/str/normalize.el --- String Normalization -*- lexical-binding: t; -*-
+;;; namespaced/str/normalize.el --- String Normalization -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -17,65 +17,86 @@
 ;;
 ;;; Code:
 
+(imp-require :elisp 'functions)
+
 
 ;;------------------------------------------------------------------------------
-;; Convert to a String
+;; Normalize TYPE to String
 ;;------------------------------------------------------------------------------
 
 (defun str:normalize:symbol (symbol)
   "Convert a SYMBOL/keyword name to a string.
-Remove \":\" from keyword symbols."
-  (replace-regexp-in-string ":" ""
-                            (symbol-name symbol)))
+
+Return string or nil."
+  ;; Accept more than we promised while still being KISS compared to `str:normalize:any'.
+  (cond ((stringp symbol)
+         symbol)
+        ((symbolp symbol)
+         (symbol-name symbol))
+        (t
+         nil)))
 ;; (str:normalize:symbol 'jeff)
 ;; (str:normalize:symbol :jeff)
 ;; (str:normalize:symbol 'str:normalize:symbol)
 ;; (let ((x 'jeff)) (str:normalize:symbol x))
+;; (let* ((jeff "geoff") (x 'jeff)) (str:normalize:symbol jeff))
 ;; (let* ((jeff "geoff") (x 'jeff)) (str:normalize:symbol x))
 
 
 ;;--------------------------------------------------------------------------------
-;; Normalize to String(s)
+;; Normalize Whatever to String(s)
 ;;--------------------------------------------------------------------------------
 
 (defun str:normalize:any (input)
   "Normalize INPUT to a string.
 
-INPUT should be a string, symbol (or keyword), function, or nil.
+INPUT can be:
   - nil:      nil
   - \"\":     nil
   - list:     nil; use `str:normalize:each' or `str:normalize:join' instead.
-  - string:   Use as-is.
+  - string:   Return as-is.
   - symbol:   Convert to string with `str:normalize:symbol'.
-  - function: Call it with no parameters and use the output string.
-    - If output is not a string, return nil.
+  - function: Call func (no parameters) and use the output string.
 
 Return a string or nil."
   (let ((input (elisp:unquote input)))
-    ;; nil and empty string -> nil
-    (cond ((or (null input)
-               (and (stringp input)
-                    (string= "" input))
-               ;; List? You should use `str:normalize:each' or `str:normalize:join' instead.
-               (listp input))
-           nil)
+    (cond
+     ;;----------------------------
+     ;; Errors: Known errors first; we need to weed out the empty string.
+     ;;----------------------------
+     ((or (null input)
+          (and (stringp input)
+               (string= "" input))
+          ;; List? You should use `str:normalize:each' or `str:normalize:join' instead.
+          (listp input))
+      nil)
 
-          ;; String? Direct to output.
-          ((stringp input)
-           input)
+     ;;----------------------------
+     ;; Normalize
+     ;;----------------------------
 
-          ;; Function? Call function, return string or nil.
-          ((or (functionp input)
-               (fboundp input))
-           (let ((value (funcall input)))
-             (if (stringp value)
-                 value
-               ;; Do not allow non-strings to escape a string normalization function.
-               nil)))
+     ;; String is String.
+     ((stringp input)
+      input)
 
-          ;; Symbol (or keyword)? Use its name.
-          ((symbolp input)
-           (str:normalize:symbol input)))))
+     ;; Function is its result.
+     ((or (functionp input)
+          (fboundp input))
+      (let ((value (funcall input)))
+        (if (stringp value)
+            value
+          ;; Do not allow non-strings to escape a string normalization function.
+          nil)))
+
+     ;; Symbol/Keyword is its name.
+     ((symbolp input)
+      (str:normalize:symbol input))
+
+     ;;----------------------------
+     ;; Error: Anything Else is "*shrug* IDK; nil"
+     ;;----------------------------
+     (t
+      nil))))
 ;; (str:normalize:any nil)
 ;; (str:normalize:any '(quote foo))
 ;; (str:normalize:any "")
@@ -120,9 +141,10 @@ If SEPARATOR is a string, use it to join strings. Else join with a space."
 
 
 ;;------------------------------------------------------------------------------
-;; Normalize/convert to... Not a string?!
+;; Keywords
 ;;------------------------------------------------------------------------------
 ;; confused-travolta.jpg
+;; TODO: Move to `symbol.el' or `keyword.el'
 
 (defun keyword:normalize:any (input)
   "Normalize INPUT to a keyword.
@@ -137,40 +159,49 @@ INPUT should be a keyword, symbol, string, function, or nil.
   - function: Call it with no parameters, return keyword or recurse.
 
 Return a keyword or nil."
-  ;; Return nil?
-  (cond ((or (null input)
-             (and (stringp input)
-                  (string= "" input))
-             (and (keywordp input)
-                  (eq : input)))
-         nil)
+  (cond
+   ;;----------------------------
+   ;; Errors: Known errors first; we need to weed out the empty string.
+   ;;----------------------------
+   ((or (null input)
+        (and (stringp input)
+             (string= "" input))
+        (and (keywordp input)
+             (eq : input)))
+    nil)
 
-        ;; Keyword? Use as-is.
-        ((keywordp input)
-         input)
+   ;;----------------------------
+   ;; Normalize
+   ;;----------------------------
 
-        ;; String? Ensure leading ":" and intern to get a keyword.
-        ((stringp input)
-         (intern
-          ;; INPUT is allowed to optionally have a ":", so ensure a ":" by:
-          ;;   1) Removing the leading ":" if it exists.
-          ;;   2) Always prefixing a new ":".
-          (concat ":"
-                  (string-remove-prefix ":" input))))
+   ;; Keyword is Keyword.
+   ((keywordp input)
+    input)
 
-        ;; Function? Call it for them and ask ourself to figure out what the
-        ;; hell happened. Need this separate from the fallback case in case
-        ;; the function returns a keyword - don't want `str:normalize:any' to
-        ;; nil that out.
-        ((or (functionp input)
-             (fboundp input))
-         (keyword:normalize:any (funcall input)))
+   ;; String: Ensure leading ":" and intern to get a keyword.
+   ((stringp input)
+    (intern
+     ;; INPUT is allowed to optionally have a ":", so ensure a ":" by:
+     ;;   1) Removing the leading ":" if it exists.
+     ;;   2) Always prefixing a new ":".
+     (concat ":"
+             (string-remove-prefix ":" input))))
 
-        ;; Something else? Normalize to a string and ask ourself to do the thing.
-        (t
-         ;; `str' already does a lot of work normalizing stuff.
-         ;; So use it.
-         (keyword:normalize:any (str:normalize:any input)))))
+   ;;----------------------------
+   ;; Normalize Recursively
+   ;;----------------------------
+
+   ;; Function: Call it for them and ask ourself to figure out how to convert
+   ;; the returned value to a keyword.
+   ((or (functionp input)
+        (fboundp input))
+    (keyword:normalize:any (funcall input)))
+
+   ;; Something else? Normalize to a string and ask ourself to do the thing.
+   (t
+    ;; `str' already does a lot of work normalizing stuff.
+    ;; So use it.
+    (keyword:normalize:any (str:normalize:any input)))))
 
 
 ;;------------------------------------------------------------------------------
