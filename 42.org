@@ -591,6 +591,38 @@ I think this requires more than minimum to fix....
 
 So the minimum is... fix the callers?
 
+* -- U R HERE --
+* innit
+
+Need the face funcs.
+So start porting.
+
+~/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/emacs/innit
+
+Just the face funcs for now:
+file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/emacs/innit/theme.el
+
+TODO U R HERE: [[file:source/core/packages/innit/face.el::defmacro innit-face-set-for-theme (theme &rest specs]]
+
+hm....
+Do I even want to keep this Doomism?
+Just convert to the Emacs version and just call the Emacs funcs?
+
+
+* zenburn
+
+~hc-zenburn-theme~ is unmaintained.
+
+Move from ~hc-zenburn-theme~ back to ~zenburn-theme~.
+
+Can I make ~hc-zenburn~ piggyback on top of ~zenburn~?
+  - Probably not... The colors are probably all hand-picked.
+    - But ~hc-zenburn~ does have a script to mess with brightness.
+      - https://github.com/edran/hc-zenburn-emacs/blob/master/change_brightness.py
+    - And I have funcs to mess with colors: 
+      - [[file:source/core/packages/innit/face.el::defun innit:color:darken (color alpha &optional colors-alist][here]] or [[file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/keyword.el][sn004]]
+
+
 * org
 
 imp works* now.
@@ -607,10 +639,15 @@ Copy
     ~2025-03-13_sn005/source/user/config/org~
 
 Start editting for content:
-  - [ ] init.el
+  - [X] init.el
+  - [ ] mode.el
+    - [ ] [[*innit][you need some of innit]]
+    - [ ] [[file:source/user/config/org/theme/zenburn.el::;; TODO: Now I need some innit funcs...][you are here]]
+    - [ ] need org func lib thingy from sn004 too:
+      - [ ] [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/keyword.el][keyword.el]]
+      - [ ] [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/link.el][link.el]]
   - [ ] contacts.el
   - [ ] journal.el
-  - [ ] mode.el
   - [ ] pretty.el
   - [ ] toggl.el
   - [ ] version-control.el
