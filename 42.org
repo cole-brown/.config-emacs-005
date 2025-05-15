@@ -863,7 +863,21 @@ lrwxrwxrwx 1 main main 53 Mar 14 15:30 /home/main/.config/emacs -> /home/main/oc
 
 So it thinks those paths are different when actually they're the same after following the symlink.
 
-** imp-path-root-set defaults
+** imp-path-root-set
+
+*** no error msg on repeat calls
+
+working on [[file:source/core/packages/namespaced/str/init.el][ns/str/init.el]] and calling `eval-buffer' to see if the errors are gone yet.
+
+So this gets called each time:
+(imp-path-root-set :str
+                   (imp-path-current-dir)
+                   (imp-file-current))
+
+Don't want the _same exact_ call to trigger the error message:
+  > apply: [ERROR--]: imp-path-root-set: FEATURE-BASE ’:str’ is already an imp root.
+
+*** defaults
 
 I do this a lot in init files:
 
