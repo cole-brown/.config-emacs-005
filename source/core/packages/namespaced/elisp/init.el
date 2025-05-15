@@ -24,38 +24,35 @@
 ;;------------------------------------------------------------------------------
 
 
-(imp:path:root/set :elisp
-                   (imp:path:parent (imp:path:current:dir))
-                   (imp:file:current))
+(imp-path-root-set :elisp
+                   (imp-path-current-dir)
+                   (imp-file-current))
 
 
 ;;------------------------------------------------------------------------------
 ;; Load our sub-module thingies.
 ;;------------------------------------------------------------------------------
 
-(imp:timing
-    '(:elisp utils)
-    (imp:file:current)
-    (imp:path:current:dir)
+(imp-timing
+    :elisp
+    (imp-file-current)
+    (imp-path-current-dir)
 
-  (imp:load :feature  '(:elisp utils types)
-            :path     (imp:path:current:dir/relative :elisp)
+  (imp-load :feature  '(:elisp types)
             :filename "types")
-  (imp:load :feature  '(:elisp utils functions)
-            :path     (imp:path:current:dir/relative :elisp)
+  (imp-load :feature  '(:elisp utils functions)
             :filename "functions")
-  (imp:load :feature  '(:elisp utils predicates)
-            :path     (imp:path:current:dir/relative :elisp)
-            :filename "predicates")
-  (imp:load :feature  '(:elisp utils test)
-            :path     (imp:path:current:dir/relative :elisp)
-            :filename "test")
-  (imp:load :feature  '(:elisp utils units)
-            :path     (imp:path:current:dir/relative :elisp)
-            :filename "units"))
+  ;; TODO: refactor the rest of 'em.
+  ;; (imp-load :feature  '(:elisp utils predicates)
+  ;;           :filename "predicates")
+  ;; (imp-load :feature  '(:elisp utils test)
+  ;;           :filename "test")
+  ;; (imp-load :feature  '(:elisp utils units)
+  ;;           :filename "units")
+  )
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :elisp 'utils)
+(imp-provide :elisp 'utils)

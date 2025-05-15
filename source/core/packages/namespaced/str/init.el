@@ -29,8 +29,7 @@
 
 (imp-path-root-set :str
                    (imp-path-current-dir)
-                   "init.el")
-
+                   (imp-file-current))
 
 ;;------------------------------------------------------------------------------
 ;; Set up custom vars.
@@ -45,36 +44,37 @@
 ;; Load files.
 ;;------------------------------------------------------------------------------
 
-(imp:timing
+(imp-timing
     :str
-    "init.el"
-    (imp:path:current:dir)
+    (imp-file-current)
+    (imp-path-current-dir)
 
-  (imp:load :feature  '(:str normalize)
+  (imp-load :feature  '(:str normalize)
             :filename "normalize")
-  ;; (imp:load :feature  '(:str regex)
+  ;; TODO: refactor the rest of 'em.
+  ;; (imp-load :feature  '(:str regex)
   ;;           :filename "regex")
-  ;; (imp:load :feature  '(:str buffer)
+  ;; (imp-load :feature  '(:str buffer)
   ;;           :filename "buffer")
-  ;; (imp:load :feature  '(:str string)
+  ;; (imp-load :feature  '(:str string)
   ;;           :filename "string")
-  ;; (imp:load :feature  '(:str propertize)
+  ;; (imp-load :feature  '(:str propertize)
   ;;           :filename "propertize")
-  ;; (imp:load :feature  '(:str hash)
+  ;; (imp-load :feature  '(:str hash)
   ;;           :filename "hash")
 
   ;; ;; Requires 'normalize', 'regex', and 'string'.
-  ;; (unless (imp:flag? :str -case)
-  ;;   (imp:load :feature  '(:str +case)
+  ;; (unless (imp-flag? :str -case)
+  ;;   (imp-load :feature  '(:str +case)
   ;;             :filename "+case")
 
-  ;;   (unless (imp:flag? :str -hydra)
-  ;;     (imp:load :feature  '(:str +hydra +case)
+  ;;   (unless (imp-flag? :str -hydra)
+  ;;     (imp-load :feature  '(:str +hydra +case)
   ;;               :filename "+case-hydra")))
 
   ;; ;; Requires 'string'.
-  ;; (unless (imp:flag? :str -random)
-  ;;   (imp:load :feature  '(:str +random)
+  ;; (unless (imp-flag? :str -random)
+  ;;   (imp-load :feature  '(:str +random)
   ;;             :filename "+random"))
 
   ;; End load timing.
