@@ -24,8 +24,6 @@
 ;;
 ;;; Code:
 
-(imp-require :innit 'vars)
-(imp-require :path)
 (imp-require :str)
 (imp-require :elisp)
 
@@ -137,33 +135,35 @@ THEME can be a single symbol or list thereof. If nil, apply these settings to
 `user' theme (all themes). It will apply to all themes once they are loaded.
 
 Initially from Doom's `custom-theme-set-faces!'."
-  (declare (indent 1)) ;; `--innit!-tfs-' prefix for macroexpanded vars.
+  (declare (indent 1))
+  ;; `_m_theme-fs_' prefix for macroexpanded vars.
   ;; Make a function name for the hook based on THEME.
-  (let* ((--innit!-tfs-func (gensym (concat "theme:face:hook:"
+  (let* ((_m_theme-fs_func (gensym (concat "theme:face:set!:/"
                                             (str:normalize:join theme "/")
                                             ":"
-                                            ;; `gensym' will suffix the name with `gensym-counter' for a unique name.
+                                            ;; `gensym' will suffix the name with
+                                            ;; `gensym-counter' for a unique name.
                                             ))))
     ;; Only eval inputs once.
-    `(let ((--innit!-tfs-themes (elisp:list:listify (or ,theme 'user)))
-           (--innit!-tfs-specs  (list ,@specs)))
+    `(let ((_m_theme-fs_themes (elisp:list:listify (or ,theme 'user)))
+           (_m_theme-fs_specs  (list ,@specs)))
        (progn
          ;; Create a function for applying the faces.
-         (defun ,--innit!-tfs-func ()
+         (defun ,_m_theme-fs_func ()
            (let (custom--inhibit-theme-enable)
-             (dolist (theme/each --innit!-tfs-themes)
+             (dolist (theme/each _m_theme-fs_themes)
                (when (or (eq theme/each 'user)
                          (custom-theme-enabled-p theme/each))
                  (apply #'custom-theme-set-faces theme/each
                         (mapcan #'--theme:face:set
-                                --innit!-tfs-specs))))))
+                                _m_theme-fs_specs))))))
          ;; Apply the changes immediately if the user is not using `innit' theme
          ;; variables or the theme has already loaded. This allows you to evaluate
          ;; these macros on the fly and customize your faces interactively.
          (when theme:feature
-           (funcall #',--innit!-tfs-func))
+           (funcall #',_m_theme-fs_func))
          ;; Always add to the customize hook.
-         (add-hook 'theme:customize:hook #',--innit!-tfs-func 100)))))
+         (add-hook 'theme:customize:hook #',_m_theme-fs_func 100)))))
 
 
 (defmacro face:set! (&rest specs)

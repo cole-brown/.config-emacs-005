@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/init.el --- String Functions -*- lexical-binding: t; -*-
+;;; namespaced/str/init.el --- String Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-02-16
-;; Timestamp:  2023-06-23
+;; Timestamp:  2025-05-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -27,8 +27,8 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root/set :str
-                   (imp:path:current:dir)
+(imp-path-root-set :str
+                   (imp-path-current-dir)
                    "init.el")
 
 
