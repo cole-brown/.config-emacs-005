@@ -591,15 +591,29 @@ I think this requires more than minimum to fix....
 
 So the minimum is... fix the callers?
 
+* file timestamp auto-update
+
+mantle/config/dev-env/languages/emacs-lisp.el
+163     (emacs-lisp-mode-hook . mantle:hook:time-stamp:settings)
+
+[[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el]]
+
+[[file:init.el::;; PRIORITY: Everything: Emacs Settings]]
+;; TODO: More from: file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el
+;; (add-hook 'before-save-hook 'time-stamp)
+
+
+
 * -- U R HERE --
 * keybinds
+
+new funcs?
+  keymap-unset
+  keymap-global-unset
 
 Disable C-z
 Disable C-mousewheel (font size +/-)
 
-* namespaced
-
-Overall init file [[file:source/core/packages/namespaced/init.el][here]]
 
 * innit
 
@@ -608,23 +622,34 @@ So start porting.
 
 ~/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/emacs/innit
 
+steal funcs from sn004 or steal all namespaced libs?
+ - Turns out: first the one, then the other.
+
 Just the face funcs for now:
 file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/emacs/innit/theme.el
 
 Need:
-  - [ ] ns:str
+  - [X] ns:str
     - ~str:normalize:join~
-  - [ ] ns:list
-    - ~elisp:list:listify~
+  - [X] ns:list
+    - ~elisp:list:listify~ -> ~list:to-list~?
 
+back to the face funcs:      
+[[file:source/core/packages/namespaced/theme/face.el]]
+
+Annnd... it loads!
 
 hm....
 Do I even want to keep this Doomism?
 Just convert to the Emacs version and just call the Emacs funcs?
+Keep Doom->Emacs func but make others work on the converted?
 
-steal funcs from snoo4 or steal all namespaced libs?
 
 
+
+
+What the hell was I doing all this for?
+  - oh right; org-mode todo keywords. Go [[*org][here]].
 
 * zenburn
 
@@ -676,6 +701,27 @@ Start editting for content:
 
     
     
+* "REFACTOR": namespaced
+
+Need to refactor a buncha shite
+
+Make a func that does all the function/var find & replace stuff?
+
+M-x refactor-go-brrr
+
+
+(defvar refactoring
+  '(("imp:foo:bar/baz" . "imp-foo-bar-baz")
+    ("imp:old:name" . "imp-name-something-different")
+    ...)
+  "alist of strings: (rx-to-find . replacement-str)")
+
+Overall init file [[file:source/core/packages/namespaced/init.el][here]]
+  - [ ] finish elisp/
+  - [ ] finish str/
+  - [ ] finish init/
+  - [ ] start the rest...
+  
 * yasnippets
 
 Need my begin_src snippet...
@@ -699,24 +745,7 @@ O TODO TODO TODO TODO TODO TODO TODO TODO
 
 TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
 
-* file timestamp auto-update
-
-mantle/config/dev-env/languages/emacs-lisp.el
-163     (emacs-lisp-mode-hook . mantle:hook:time-stamp:settings)
-
-[[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el]]
-
-[[file:init.el::;; PRIORITY: Everything: Emacs Settings]]
-;; TODO: More from: file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el
-;; (add-hook 'before-save-hook 'time-stamp)
-
-
-
 * titlebar
-
-* install: packages
-
-
 
 * Secrets: 1Password CLI?
 
