@@ -1,4 +1,4 @@
-;;; namespaced/innit/init.el --- Emacs init "help", innit? -*- lexical-binding: t; -*-
+;;; namespaced/emacs/init/init.el --- Emacs init "help", innit? -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -22,9 +22,9 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp-path:root/set :innit
+(imp-path-root-set :init
                    (imp-path-current-dir)
-                   "init.el")
+                   (imp-file-current))
 
 
 ;;------------------------------------------------------------------------------
@@ -32,42 +32,39 @@
 ;;------------------------------------------------------------------------------
 
 (imp-timing
-    :innit
-    "init.el"
+    :init
+    (imp-file-current)
     (imp-path-current-dir)
 
-  (imp-load :feature  '(:innit face)
-            :filename "face")
-
-  ;; (imp-load :feature  '(:innit vars)
+  ;; (imp-load :feature  '(:init vars)
   ;;           :filename "vars")
-  ;; (imp-load :feature  '(:innit error)
+  ;; (imp-load :feature  '(:init error)
   ;;           :filename "error")
-  ;; (imp-load :feature  '(:innit debug)
+  ;; (imp-load :feature  '(:init debug)
   ;;           :filename "debug")
-  ;; (imp-load :feature  '(:innit nub)
+  ;; (imp-load :feature  '(:init nub)
   ;;           :filename "nub")
-  ;; (imp-load :feature  '(:innit os)
+  ;; (imp-load :feature  '(:init os)
   ;;           :filename "os")
-  ;; (imp-load :feature  '(:innit time)
+  ;; (imp-load :feature  '(:init time)
   ;;           :filename "time")
-  ;; (imp-load :feature  '(:innit optimize)
+  ;; (imp-load :feature  '(:init optimize)
   ;;           :filename "optimize")
-  ;; (imp-load :feature  '(:innit server)
+  ;; (imp-load :feature  '(:init server)
   ;;           :filename "server")
-  ;; (imp-load :feature  '(:innit package)
+  ;; (imp-load :feature  '(:init package)
   ;;           :filename "package")
-  ;; (imp-load :feature  '(:innit package upgrade mode)
+  ;; (imp-load :feature  '(:init package upgrade mode)
   ;;           :filename "package-upgrade-mode")
-  ;; (imp-load :feature  '(:innit package upgrade command)
+  ;; (imp-load :feature  '(:init package upgrade command)
   ;;           :filename "package-upgrade-command")
-  ;; (imp-load :feature  '(:innit squelch)
+  ;; (imp-load :feature  '(:init squelch)
   ;;           :filename "squelch")
-  ;; (imp-load :feature  '(:innit hook)
+  ;; (imp-load :feature  '(:init hook)
   ;;           :filename "hook")
-  ;; (imp-load :feature  '(:innit advice)
+  ;; (imp-load :feature  '(:init advice)
   ;;           :filename "advice")
-  ;; (imp-load :feature  '(:innit theme)
+  ;; (imp-load :feature  '(:init theme)
   ;;           :filename "theme")
 
   ;; End load timing.
@@ -77,4 +74,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :innit)
+(imp-provide :init)
