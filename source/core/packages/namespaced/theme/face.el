@@ -24,8 +24,8 @@
 ;;
 ;;; Code:
 
-(imp-require :str)
-(imp-require :elisp)
+(imp-require-assert :str 'normalize)
+(imp-require-assert :elisp 'functions) ;; :list 'normalize) or something eventally
 
 
 ;;------------------------------------------------------------------------------
@@ -136,34 +136,34 @@ THEME can be a single symbol or list thereof. If nil, apply these settings to
 
 Initially from Doom's `custom-theme-set-faces!'."
   (declare (indent 1))
-  ;; `_m_theme-fs_' prefix for macroexpanded vars.
+  ;; `_m/tfs/' prefix for macroexpanded vars.
   ;; Make a function name for the hook based on THEME.
-  (let* ((_m_theme-fs_func (gensym (concat "theme:face:set!:/"
+  (let* ((_m/tfs/func (gensym (concat "theme:face:set!:/"
                                             (str:normalize:join theme "/")
                                             ":"
                                             ;; `gensym' will suffix the name with
                                             ;; `gensym-counter' for a unique name.
                                             ))))
     ;; Only eval inputs once.
-    `(let ((_m_theme-fs_themes (elisp:list:listify (or ,theme 'user)))
-           (_m_theme-fs_specs  (list ,@specs)))
+    `(let ((_m/tfs/themes (elisp:list:listify (or ,theme 'user)))
+           (_m/tfs/specs  (list ,@specs)))
        (progn
          ;; Create a function for applying the faces.
-         (defun ,_m_theme-fs_func ()
+         (defun ,_m/tfs/func ()
            (let (custom--inhibit-theme-enable)
-             (dolist (theme/each _m_theme-fs_themes)
+             (dolist (theme/each _m/tfs/themes)
                (when (or (eq theme/each 'user)
                          (custom-theme-enabled-p theme/each))
                  (apply #'custom-theme-set-faces theme/each
                         (mapcan #'--theme:face:set
-                                _m_theme-fs_specs))))))
+                                _m/tfs/specs))))))
          ;; Apply the changes immediately if the user is not using `innit' theme
          ;; variables or the theme has already loaded. This allows you to evaluate
          ;; these macros on the fly and customize your faces interactively.
          (when theme:feature
-           (funcall #',_m_theme-fs_func))
+           (funcall #',_m/tfs/func))
          ;; Always add to the customize hook.
-         (add-hook 'theme:customize:hook #',_m_theme-fs_func 100)))))
+         (add-hook 'theme:customize:hook #',_m/tfs/func 100)))))
 
 
 (defmacro face:set! (&rest specs)
@@ -181,5 +181,5 @@ Initially from Doom's `custom-set-faces!'."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :ns 'theme)
+(imp-provide :theme 'face)
 
