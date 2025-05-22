@@ -38,11 +38,9 @@
   ;;     - requires: elisp
 
   (imp-load :feature  :elisp
-            :path     "elisp"
             :filename "init")
 
   (imp-load :feature  :str ; requires `elisp'
-            :path     "str"
             :filename "init")
   ;; TODO: refactor the rest of 'em.
 

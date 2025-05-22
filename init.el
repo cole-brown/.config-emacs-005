@@ -215,6 +215,29 @@
     (imp-path-current-dir)
 
   ;;------------------------------------------------------------------------------
+  ;; BASICALLY REQUIRED: `namespaced'
+  ;;------------------------------------------------------------------------------
+  ;; I've been making helpers for a few years because Emacs' naming scheme is...
+  ;; um...
+  ;; And also matching a function to its purpose is also...
+  ;; ...
+  ;;
+  ;; What does this does? What files can it be used on?
+  ;;   - `convert-standard-filename'
+  ;;
+  ;; Which one of these do you need?
+  ;;   - `directory-file-name'
+  ;;   - `file-name-directory'
+  ;;
+  ;; Anyways, the idea with `namespace' is to just do this and browse:
+  ;;   C-h f path<TAB>
+  ;;   C-h f str<TAB>
+
+  (imp-load :feature :namespaced
+            :path    "source/core/packages/namespaced/init.el") ; (imp-path-join :emacs.d 'source 'core 'packages 'namespaced 'init.el)
+
+
+  ;;------------------------------------------------------------------------------
   ;; PRIORITY: `no-littering'
   ;;------------------------------------------------------------------------------
   ;; Keep the `user-emacs-directory' clean by changing where Emacs & packages
