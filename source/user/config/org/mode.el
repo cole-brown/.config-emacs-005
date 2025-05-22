@@ -55,8 +55,11 @@
     "Set up buffer local vars."
     (setq-local yas-indent-line 'auto)
 
-    ;; Automatically becomes buffer local.
-    (setq tab-width --/tab/standard)
+    ;; `tab-width' automatically becomes buffer local.
+    ;; Do not do this:
+    ;;   (setq tab-width --/tab/standard)
+    ;; See `--/tab/bug/org' docstr for the rant on this.
+    (setq tab-width --/tab/bug/org)
 
     ;; Auto-indentation is more annoying than useful in org, I think.
     (electric-indent-local-mode -1))
