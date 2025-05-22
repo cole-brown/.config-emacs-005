@@ -225,7 +225,8 @@
   ;;   - `no-littering-var-directory'
 
   (use-package no-littering
-    ;; Make sure this loads ASAP. It's used for init/config of other packages.
+    ;; Make sure this loads ASAP.
+    ;; It's dictating where other packages can write their shit to.
     :demand t
 
     ;;------------------------------
@@ -233,17 +234,39 @@
     ;;------------------------------
     ;; Suggested settings: https://github.com/emacscollective/no-littering#suggested-settings
 
+    ;; backups
+    ;;--------
+    ;; Backups like auto-saves, `undo-tree' history, etc. should go in the
+    ;; `no-littering' directory. They should not be littered in the same dir as
+    ;; their real actual file.
+    ;; NOTE: "theme" is overloaded here. It has nothing to do with `zenburn' or
+    ;; whatever is theming my UI. It is "them[ing] locations where backups of
+    ;; various sorts are created".
+    (no-littering-theme-backups)
+
+    ;; `recentf'
+    ;;----------
     ;; `recentf' should ignore the files in the `no-littering' dirs.
     (imp-eval-after recentf
       (add-to-list 'recentf-exclude no-littering-etc-directory)
       (add-to-list 'recentf-exclude no-littering-var-directory))
 
-    ;; Auto-saves, `undo-tree' history, etc. should go in the `no-littering' directory.
-    ;; They should not be littered in the same dir as their real actual file.
-    (no-littering-theme-backups)
+    ;; 'custom.el'
+    ;;------------
+    ;; TODO: send to /dev/null instead. Get code for that from 2023's repo.
+    ;; NOTE: Not doing this because I want everything in my init.  No package or
+    ;; face will be added manually. I want my .emacs to be reproducable. To get
+    ;; a new computer up and running should just be:
+    ;;   1) install Emacs
+    ;;   2) pull this repo to the correct place
+    ;;   3) start Emacs
+    ;;---
+    ;; ;; Move `custom-set-variables' and `custom-set-faces' out if this file.
+    ;; ;; Put in `etc/' instead.
+    ;; (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
 
-
-    ;; Native Compliation (Emacs 29+):
+    ;; Native Compliation (Emacs 29+)
+    ;;-------------------------------
     (when (fboundp 'startup-redirect-eln-cache)
       (startup-redirect-eln-cache
        (convert-standard-filename
@@ -256,17 +279,23 @@
   ;; If this doesn't happen sooner, the Emacs frame will pop, flicker, and
   ;; maybe resize. Set theme ASAP and hope it gets resolved before the OS can
   ;; show Emacs to us.
+  ;;   Caveat: Or at least, it acted that way 5 or 10 years ago.
+  ;;   I've not done any science on it recently though.
 
+  ;; `emacs-theme-gruvbox'
+  ;;----------------------
   ;; https://github.com/greduan/emacs-theme-gruvbox
-  ;; https://github.com/bbatsov/zenburn-emacs
+  ;; Looks good.
+  ;; Will try as soon as `zenburn' is proven to cause cancer.
 
   ;; `hc-zenburn-theme'
   ;;-------------------
   ;; High Contrast Zenburn
   ;; https://github.com/edran/hc-zenburn-emacs
   ;;-----
-  ;; [2025-05-16] Oh. This is unmaintained. :(
-  ;;   Last commit was a decade ago.
+  ;; [2025-05-16] Oh. This is unmaintained. :( I was liking it.
+  ;;   But... last commit was a decade ago.
+  ;;   :thinking:
   ;;   Nah. Go back to regular zenburn.
   ;;   hc-zenburn doesn't even have all the named zenburn colors.
   ;;   ;; (use-package hc-zenburn-theme
@@ -275,9 +304,11 @@
 
   ;; `zenburn'
   ;;----------
-  ;; Back from the Dead.
+  ;; https://github.com/bbatsov/zenburn-emacs
+  ;;---
+  ;; It's just...... good.
   (imp-load :feature '(:user config theme zenburn)
-            :path  "config/theme/zenburn/init.el")  ;;(imp-path-join 'config 'theme 'zenburn 'init.el))
+            :path  "config/theme/zenburn/init.el") ; (imp-path-join 'config 'theme 'zenburn 'init.el))
 
 
   ;;------------------------------------------------------------------------------
@@ -305,7 +336,9 @@
   ;; The 'x' and 'c' keys are right the fuck next to each other.
   ;; My fingers are +fat+ big-boned.
   ;; C-x and C-c are the most and second most chocked full of shit keymaps.
-  ;; This accidentally happens almost as much the fuckin' Banishment of Emacs C-z.
+  ;; This accidentally happens almost as much the fuckin' "Banishment of Emacs"
+  ;; C-z. It accidentally happens so much that I don't care that I don't know
+  ;; how to close `emacsclient' (and leave server alone) right now.
   (keymap-global-unset "C-x C-c")
 
   ;;------------------------------
@@ -395,7 +428,7 @@ Why is this error absolutely useless for anything I'm asking here, Org?
   >   funcall-interactively(org-return nil nil 1)
   >   call-interactively(org-return nil nil)
   >   command-execute(org-return)
-  > 
+  >
   >  Please report this to Org mode mailing list (M-x org-submit-bug-report).
 
 Why, org, why?
@@ -409,7 +442,7 @@ https://github.com/doomemacs/doomemacs/commit/43870bf8318f6471c4ce5e14565c9f0a3f
   >   by editorconfig.
   > - Fix the hook in 2757a97 to run much later, ensuring (as a last resort)
   >   no other packages can overwrite tab-width either.
-  > 
+  >
   > Amend: 2757a97
   > Ref: #7670
 
