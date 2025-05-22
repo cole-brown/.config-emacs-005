@@ -1,0 +1,513 @@
+#+TITLE:       Theme Notes
+#+AUTHOR:      Cole Brown
+#+EMAIL:       code@brown.dev
+#+DATE:        [2021-05-04]
+#+TITLE:       Notes.2022-03-21_0_Emacs-27-Dedoomify
+#+AUTHOR:      Cole Brown
+#+EMAIL:       code@brown.dev
+#+DATE:        [2022-05-12]
+
+
+
+* --- FILE LOCATIONS ---
+* ├INFO───┤ Zenburn Theme & current init
+CLOSED: [2022-05-16 Mon 10:10]
+:LOGBOOK:
+- State "├INFO───┤"  from              [2022-05-16 Mon 10:10]
+:END:
+
+Copy/pasted here from Zenburn & my init code:
+  - =~/path/to/zenburn-theme-dir/zenburn-theme.el=
+    - [[file:~/.config/emacs-sn004/packages/elpa/zenburn-theme-20220412.2023/zenburn-theme.el::(defvar zenburn-default-colors-alist]]
+  - =./init.el=
+    - (aka =<git-root>/mantle/theme/zenburn/init.el=)
+    - [[file:init.el::zenburn-override-colors-alist '(("zenburn-magenta-bg" . "#4D464B"]]
+
+
+
+* ├INFO───┤ Doom theme files location
+:LOGBOOK:
+- State "├INFO───┤"  from              [2021-05-07 Fri 04:20]
+:END:
+
+Doom theme code source files:
+  - [ ] [[file:~/.config/emacs-doom/.local/straight/repos/themes/doom-themes-base.el::;;; doom-themes-base.el --- base faces for all doom themes -*- lexical-binding: t; -*-][doom-themes-base.el]]
+  - [ ] [[file:~/.config/emacs-doom/.local/straight/repos/themes/doom-themes.el::;;; doom-themes.el --- an opinionated pack of modern color-themes -*- lexical-binding: t; -*-][doom-themes.el]]
+
+
+
+Doom themes are here:
+  - /path/to/doom-emacs-d/.local/straight/repos/emacs-doom-themes/themes
+  - /path/to/doom-emacs-d/.local/straight/repos/emacs-doom-themes/themes/doom-zenburn-theme.el
+
+How to customize:
+  ;; from: ~/.emacs.d/modules/lang/emacs-lisp/demos.org
+  ;; (custom-theme-set-faces! 'doom-one
+  ;;   '(outline-1 :weight normal)
+  ;;   '(outline-2 :weight normal)
+  ;;   '(outline-3 :weight normal)
+  ;;   '(outline-4 :weight normal)
+  ;;   '(outline-5 :weight normal)
+  ;;   '(outline-6 :weight normal)
+  ;;   '(default :background "red" :weight bold)
+  ;;   '(region :background "red" :weight bold))
+  ;;
+  ;; ;; If you want to make use of the `doom-themes' package API (e.g. `doom-color',
+  ;; ;; `doom-lighten', `doom-darken', etc.), you must use `custom-set-faces!'
+  ;; ;; *after* the theme has been loaded. e.g.
+  ;; (load-theme 'doom-one t)
+  ;; (custom-theme-set-faces! 'doom-one
+  ;;  `(outline-1 :foreground ,(doom-color 'red))
+  ;;  `(outline-2 :background ,(doom-color 'blue)))
+
+
+* --- FACES ---
+* org-document-info-keyword - not as dark
+
+#+BEGIN_SRC emacs-lisp
+(custom-theme-set-faces! 'doom-zenburn
+  `(org-document-info-keyword :foreground ,(doom-color 'base7)))
+#+END_SRC
+
+* ├DONE───┤ org-mode 'done' - should not be quite as dark
+CLOSED: [2021-05-04 Tue 10:47]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2021-05-04 Tue 10:47]
+:END:
+
+org-done
+org-agenda-done
+org-headline-done
+org-checkbox-statistics-done
+
+- Todo: [1/2]
+  - [ ] Not done yet.
+  - [X] Done.
+
+- Todo: [2/2]
+  - [X] Done.
+  - [X] Also done.
+
+
+Original settings:
+  org-done
+    weight: bold
+    inherits: org-headline-done
+  org-headline-done
+    foreground: #4F4F4F == base4 aka zenburn-bg+1
+
+Try zenburn-bg+2 or +3?
+
+#+BEGIN_SRC emacs-lisp
+(custom-theme-set-faces! 'doom-zenburn
+  `(org-done :foreground ,(doom-darken (doom-color 'green-2) 0.15))
+  `(org-agenda-done :foreground ,(doom-color 'base7))
+  `(org-headline-done :foreground ,(doom-color 'base7))
+  `(org-checkbox-statistics-done :foreground ,(doom-darken (doom-color 'green-2) 0.15)))
+#+END_SRC
+
+
+
+* org-mode faces - headline levels: level 1
+
+Ideally: Headlines should be distinct and easily readable as they're headlines...
+
+Fallback: If not enough colors, just repeat the colors sooner. Ensure that no headline level +- about 2 levels share a color.
+
+org-level-1
+org-level-2
+org-level-3
+org-level-4
+org-level-5
+org-level-6
+org-level-7
+org-level-8
+
+defaults:
+   (outline-1 :foreground orange)
+   (outline-2 :foreground green+4)
+   (outline-3 :foreground blue-1)
+   (outline-4 :foreground yellow-2)
+   (outline-5 :foreground cyan)
+   (outline-6 :foreground green+2)
+   (outline-7 :foreground red-4)
+   (outline-8 :foreground blue-4)
+
+#+BEGIN_SRC emacs-lisp
+(custom-theme-set-faces! 'doom-zenburn
+  ;; Some unique, headliney colors.
+  `(outline-1 :foreground ,(doom-color 'orange))
+  `(outline-2 :foreground ,(doom-color 'green+2))
+  `(outline-3 :foreground ,(doom-color 'blue-1))
+  `(outline-4 :foreground ,(doom-color 'red-1))
+  ;; ...and repeat.
+  `(outline-5 :foreground ,(doom-color 'orange))
+  `(outline-6 :foreground ,(doom-color 'green+2))
+  `(outline-7 :foreground ,(doom-color 'blue-1))
+  `(outline-8 :foreground ,(doom-color 'red-1))
+  ;; ...and 9+ starts over at `outline-1'.
+  )
+#+END_SRC
+
+
+** level 2
+*** level 3
+**** level 4
+***** level 5
+****** level 6
+******* level 7
+******** level 8
+********* level 1 again
+
+
+* ├TODO───┤ org-mode faces - headline todo
+
+
+├DONE───┤
+
+
+Ideally: TODO states should never blend into a headline.
+
+Taken care of in [[*org-mode 'done' - should not be quite as dark][org-mode 'done' - should not be quite as dark]]:
+  - org-done
+  - org-checkbox-statistics-done
+
+These faces are all from Doom, I think:
+  - +org-todo-active
+    + (bold font-lock-constant-face org-todo)
+  - +org-todo-onhold
+    + (bold warning org-todo)
+  - +org-todo-project
+    + (bold font-lock-doc-face org-todo)
+  - warning
+    + #DFAF8F - zenburn: orange
+    + bold
+  - font-lock-constant-face
+    + #BFEBBF - zenburn: green+4
+  - font-lock-doc-face
+    + #9FC59F - zenburn: green+2
+  - org-todo
+    + #7F9F7F - zenburn: green
+    + bold
+
+org-todo-keywords
+org-todo-keyword-faces
+  - faces for keywords
+
+#+BEGIN_SRC emacs-lisp
+(let ((fg (doom-darken (doom-color 'magenta) 0.1))
+      (bg (doom-color 'bg-alt)))
+  (face-spec-set
+   'sss:zenburn/face/org/todo.keyword/todo
+   `((t  ;; display type
+      ;; Attributes plist:
+      :foreground ,fg
+      ;; whitespace-mode is on top of org-mode faces, so it fucks up the bg for
+      ;; the short ones like "├TODO───┤"...
+      :background ,bg
+      :weight bold
+      ;; :underline t
+      ))))
+  ;; (def-face
+  ;; <face-spec-set internals...>
+  ;; "Face for todo keyword in todo sequence."
+  ;; :group 'doom-zenburn-theme)
+
+;; NO: orange, green+2, blue-1, red-1
+(custom-theme-set-faces! 'doom-zenburn
+  ;; ├CURRENT┤
+  `(+org-todo-active :foreground ,(doom-color 'violet)
+                     :background ,(doom-color 'bg-alt))
+  ;; ├WAITING┤, ├HOLDING┤
+  `(+org-todo-onhold :foreground ,(doom-darken (doom-color 'magenta) 0.3)
+                     :background ,(doom-color 'bg-alt))
+  ;; ├PROJECT┤
+  `(+org-todo-project :foreground ,(doom-color 'blue-3)
+                      :background ,(doom-color 'bg-alt)))
+
+(let ((wrap "├─┤"))
+  (setq org-todo-keyword-faces
+        (list (list (mode:org:todo/keyword "TODO" wrap)    'sss:zenburn/face/org/todo.keyword/todo)
+              (cons (mode:org:todo/keyword "PROJECT" wrap) '+org-todo-project)
+
+              (cons (mode:org:todo/keyword "CURRENT" wrap) '+org-todo-active)
+              (cons (mode:org:todo/keyword "▶" wrap)       '+org-todo-active)
+
+              (cons (mode:org:todo/keyword "WAITING" wrap) '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "HOLDING" wrap) '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "?" wrap)       '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "…" wrap)       '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "⁈" wrap)       '+org-todo-onhold)
+
+              (cons (mode:org:todo/keyword "DONE" wrap)    'org-done)
+              (cons (mode:org:todo/keyword "X" wrap)       'org-done)
+              (cons (mode:org:todo/keyword "SUCCESS" wrap) 'org-done)
+              (cons (mode:org:todo/keyword "X" wrap)       'org-done)
+              (cons (mode:org:todo/keyword "FAILURE" wrap) 'org-done)
+              (cons (mode:org:todo/keyword "✘" wrap)       'org-done)
+              (cons (mode:org:todo/keyword "KILLED" wrap)  'org-done)
+              (cons (mode:org:todo/keyword "÷" wrap)       'org-done))))
+
+"hello there"
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+(-reduce (lambda (x y)
+           (if (stringp x)
+               (format "%s\n(\"%s\" . %s)" x (car y) (cdr y))
+             (format "(\"%s\" . %s)\n(\"%s\" . %s)" (car x) (cdr x) (car y) (cdr y))))
+         org-todo-keyword-faces)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+("├TODO───┤" . (warning bold))
+("├PROJECT┤" . +org-todo-project)
+("├CURRENT┤" . +org-todo-active)
+("├▶──────┤" . +org-todo-active)
+("├WAITING┤" . +org-todo-onhold)
+("├HOLDING┤" . +org-todo-onhold)
+("├?──────┤" . +org-todo-onhold)
+("├…──────┤" . +org-todo-onhold)
+("├⁈──────┤" . +org-todo-onhold)
+("├DONE───┤" . org-done)
+("├X──────┤" . org-done)
+("├SUCCESS┤" . org-done)
+("├X──────┤" . org-done)
+("├FAILURE┤" . org-done)
+("├✘──────┤" . org-done)
+("├KILLED─┤" . org-done)
+("├÷──────┤" . org-done)
+#+end_example
+
+
+** ├PROJECT┤ level 2
+** ├CURRENT┤ level 2 again
+:LOGBOOK:
+- State "├CURRENT┤"  from "├PROJECT┤"  [2021-05-04 Tue 10:42]
+:END:
+*** level 3
+**** level 4
+**** ├WAITING┤ level 4
+:LOGBOOK:
+- State "├WAITING┤"  from              [2021-05-04 Tue 12:45]
+:END:
+***** level 5
+***** ├PROJECT┤ level 5
+***** ├TODO───┤ level 5
+***** ├WAITING┤ level 5
+:LOGBOOK:
+- State "├WAITING┤"  from "├TODO───┤"  [2021-05-04 Tue 10:41]
+:END:
+***** ├HOLDING┤ level 5
+:LOGBOOK:
+- State "├HOLDING┤"  from "├TODO───┤"  [2021-05-04 Tue 10:41]
+:END:
+****** ├PROJECT┤ level 6
+****** ├CURRENT┤ level 6 again
+:LOGBOOK:
+- State "├CURRENT┤"  from "├PROJECT┤"  [2021-05-04 Tue 10:42]
+:END:
+******* ├PROJECT┤ level 7
+******* ├WAITING┤ level 7
+:LOGBOOK:
+- State "├WAITING┤"  from              [2021-05-04 Tue 12:42]
+:END:
+******** level 8
+********* ├DONE───┤ level 1 again
+CLOSED: [2021-05-04 Tue 10:41]
+:LOGBOOK:
+- State "├DONE───┤"  from "├TODO───┤"  [2021-05-04 Tue 10:41]
+:END:
+********* ├KILLED─┤ level 1 again 2
+CLOSED: [2021-05-05 Wed 10:39]
+:LOGBOOK:
+- State "├KILLED─┤"  from              [2021-05-05 Wed 10:39]
+:END:
+********* ├FAILURE┤ level 1 again 3
+CLOSED: [2021-05-05 Wed 10:39]
+:LOGBOOK:
+- State "├FAILURE┤"  from              [2021-05-05 Wed 10:39]
+:END:
+
+
+* --- COLORS ---
+* Color-Code Coloring "Mode"
+
+TODO-color-font-lock: Update to:
+  - [ ] Not use same /exact/ function name as code added to =.emacs=.
+  - [ ] Reference code added to =.emacs=.
+
+Code originally from: http://xahlee.info/emacs/emacs/emacs_CSS_colors.html
+
+
+1. Evaluate the block below (put cursor inside sourc block and =C-c C-c=).
+2. =M-x font:font-lock:color:hex= to enable.
+3. Look at color codes in this buffer, background will be colored to match code.
+
+
+#+begin_src emacs-lisp
+(defun font:font-lock:color:hex ()
+  "Syntax color text of the form 「#ff1100」 and 「#abc」 in current buffer.
+
+Originally from:
+  `http://xahlee.info/emacs/emacs/emacs_CSS_colors.html' version:2017-03-12"
+  (interactive)
+  (font-lock-add-keywords
+   nil
+   '(("#[[:xdigit:]]\\{3\\}"
+      (0 (put-text-property
+          (match-beginning 0)
+          (match-end 0)
+          'face (list :background
+                      (let* (
+                             (ms (match-string-no-properties 0))
+                             (r (substring ms 1 2))
+                             (g (substring ms 2 3))
+                             (b (substring ms 3 4)))
+                        (concat "#" r r g g b b))))))
+     ("#[[:xdigit:]]\\{6\\}"
+      (0 (put-text-property
+          (match-beginning 0)
+          (match-end 0)
+          'face (list :background (match-string-no-properties 0)))))))
+  (font-lock-flush))
+
+(font:font-lock:color:hex)
+#+end_src
+
+
+  (defvar zenburn-default-colors-alist
+    '(("zenburn-fg-1"     . "#656555")
+      ("zenburn-fg-05"    . "#989890") ; close: 'base7 lighten by 0.3
+      ("zenburn-fg"       . "#DCDCCC")
+      ("zenburn-fg+1"     . "#FFFFEF")
+      ("zenburn-fg+2"     . "#FFFFFD")
+      ("zenburn-bg-2"     . "#000000")
+      ("zenburn-bg-1"     . "#2B2B2B")
+      ("zenburn-bg-08"    . "#303030")
+      ("zenburn-bg-05"    . "#383838") ; doom: 'bg-alt
+      ("zenburn-bg"       . "#3F3F3F")
+      ("zenburn-bg+05"    . "#494949")
+      ("zenburn-bg+1"     . "#4F4F4F")
+      ("zenburn-bg+2"     . "#5F5F5F")
+      ("zenburn-bg+3"     . "#6F6F6F") ; doom: 'base7
+      ("zenburn-red-6"    . "#6C3333")
+      ("zenburn-red-5"    . "#7C4343") ; close: 'red-4 darken by 0.1
+      ("zenburn-red-4"    . "#8C5353") ; doom: 'red-4
+      ("zenburn-red-3"    . "#9C6363")
+      ("zenburn-red-2"    . "#AC7373")
+      ("zenburn-red-1"    . "#BC8383") ; doom: 'red-1
+      ("zenburn-red"      . "#CC9393")
+      ("zenburn-red+1"    . "#DCA3A3")
+      ("zenburn-red+2"    . "#ECB3B3")
+      ("zenburn-orange"   . "#DFAF8F") ; doom: 'orange
+      ("zenburn-yellow-2" . "#D0BF8F")
+      ("zenburn-yellow-1" . "#E0CF9F")
+      ("zenburn-yellow"   . "#F0DFAF")
+      ("zenburn-green-5"  . "#2F4F2F")
+      ("zenburn-green-4"  . "#3F5F3F")
+      ("zenburn-green-3"  . "#4F6F4F") ; close: 'green-2 darken by 0.15
+      ("zenburn-green-2"  . "#5F7F5F") ; doom: 'green-2
+      ("zenburn-green-1"  . "#6F8F6F")
+      ("zenburn-green"    . "#7F9F7F")
+      ("zenburn-green+1"  . "#8FB28F")
+      ("zenburn-green+2"  . "#9FC59F") ; doom: 'green+2
+      ("zenburn-green+3"  . "#AFD8AF")
+      ("zenburn-green+4"  . "#BFEBBF")
+      ("zenburn-cyan"     . "#93E0E3")
+      ("zenburn-blue+3"   . "#BDE0F3")
+      ("zenburn-blue+2"   . "#ACE0E3")
+      ("zenburn-blue+1"   . "#94BFF3")
+      ("zenburn-blue"     . "#8CD0D3")
+      ("zenburn-blue-1"   . "#7CB8BB") ; doom: 'blue-1
+      ("zenburn-blue-2"   . "#6CA0A3")
+      ("zenburn-blue-3"   . "#5C888B") ; doom: 'blue-3
+      ("zenburn-blue-4"   . "#4C7073")
+      ("zenburn-blue-5"   . "#366060")
+      ("zenburn-magenta"  . "#DC8CC3"))) ; doom: 'magenta
+
+(zenburn-override-colors-alist '(("zenburn-magenta-bg"   . "#4D464B")
+                                   ("zenburn-magenta-bg-1" . "#5C4D57")
+                                   ("zenburn-magenta-bg-2" . "#6A5463")
+                                   ("zenburn-magenta-bg-3" . "#785B6F")
+                                   ("zenburn-magenta-bg-4" . "#86627B")
+                                   ("zenburn-magenta-bg-5" . "#956987")
+                                   ("zenburn-violet"       . "#a9a1e1")
+                                   ("zenburn-magenta-01"   . "#c67eaf")
+                                   ("zenburn-magenta-03"   . "#9a6288")))
+
+
+(doom-darken (doom-color 'magenta) 0.3)  "#9a6288"
+
+* Default Colors
+
+Comments matching up a few of Doom's Zenburn colors or my customizations to actual Zenburn colors.
+
+#+begin_src emacs-lisp
+  (defvar zenburn-default-colors-alist
+    '(("zenburn-fg-1"     . "#656555")
+      ("zenburn-fg-05"    . "#989890") ; close: 'base7 lighten by 0.3
+      ("zenburn-fg"       . "#DCDCCC")
+      ("zenburn-fg+1"     . "#FFFFEF")
+      ("zenburn-fg+2"     . "#FFFFFD")
+      ("zenburn-bg-2"     . "#000000")
+      ("zenburn-bg-1"     . "#2B2B2B")
+      ("zenburn-bg-08"    . "#303030")
+      ("zenburn-bg-05"    . "#383838") ; doom: 'bg-alt
+      ("zenburn-bg"       . "#3F3F3F")
+      ("zenburn-bg+05"    . "#494949")
+      ("zenburn-bg+1"     . "#4F4F4F")
+      ("zenburn-bg+2"     . "#5F5F5F")
+      ("zenburn-bg+3"     . "#6F6F6F") ; doom: 'base7
+      ("zenburn-red-6"    . "#6C3333")
+      ("zenburn-red-5"    . "#7C4343") ; close: 'red-4 darken by 0.1
+      ("zenburn-red-4"    . "#8C5353") ; doom: 'red-4
+      ("zenburn-red-3"    . "#9C6363")
+      ("zenburn-red-2"    . "#AC7373")
+      ("zenburn-red-1"    . "#BC8383") ; doom: 'red-1
+      ("zenburn-red"      . "#CC9393")
+      ("zenburn-red+1"    . "#DCA3A3")
+      ("zenburn-red+2"    . "#ECB3B3")
+      ("zenburn-orange"   . "#DFAF8F") ; doom: 'orange
+      ("zenburn-yellow-2" . "#D0BF8F")
+      ("zenburn-yellow-1" . "#E0CF9F")
+      ("zenburn-yellow"   . "#F0DFAF")
+      ("zenburn-green-5"  . "#2F4F2F")
+      ("zenburn-green-4"  . "#3F5F3F")
+      ("zenburn-green-3"  . "#4F6F4F") ; close: 'green-2 darken by 0.15
+      ("zenburn-green-2"  . "#5F7F5F") ; doom: 'green-2
+      ("zenburn-green-1"  . "#6F8F6F")
+      ("zenburn-green"    . "#7F9F7F")
+      ("zenburn-green+1"  . "#8FB28F")
+      ("zenburn-green+2"  . "#9FC59F") ; doom: 'green+2
+      ("zenburn-green+3"  . "#AFD8AF")
+      ("zenburn-green+4"  . "#BFEBBF")
+      ("zenburn-cyan"     . "#93E0E3")
+      ("zenburn-blue+3"   . "#BDE0F3")
+      ("zenburn-blue+2"   . "#ACE0E3")
+      ("zenburn-blue+1"   . "#94BFF3")
+      ("zenburn-blue"     . "#8CD0D3")
+      ("zenburn-blue-1"   . "#7CB8BB") ; doom: 'blue-1
+      ("zenburn-blue-2"   . "#6CA0A3")
+      ("zenburn-blue-3"   . "#5C888B") ; doom: 'blue-3
+      ("zenburn-blue-4"   . "#4C7073")
+      ("zenburn-blue-5"   . "#366060")
+      ("zenburn-magenta"  . "#DC8CC3"))) ; doom: 'magenta
+#+end_src
+
+
+* Custom Colors
+
+#+begin_src emacs-lisp
+  (zenburn-override-colors-alist '(("zenburn-magenta-bg"   . "#4D464B")
+                                   ("zenburn-magenta-bg-1" . "#5C4D57")
+                                   ("zenburn-magenta-bg-2" . "#6A5463")
+                                   ("zenburn-magenta-bg-3" . "#785B6F")
+                                   ("zenburn-magenta-bg-4" . "#86627B")
+                                   ("zenburn-magenta-bg-5" . "#956987")
+                                   ("zenburn-violet"       . "#a9a1e1")
+                                   ("zenburn-magenta-01"   . "#c67eaf")
+                                   ("zenburn-magenta-03"   . "#9a6288")))
+#+end_src

@@ -265,12 +265,19 @@
   ;; High Contrast Zenburn
   ;; https://github.com/edran/hc-zenburn-emacs
   ;;-----
-  ;; [2025-05-16] Oh. This is unmaintained. Last commit was a decade ago.
-  ;; Nah. Go back to regular zenburn. hc-zenburn doesn't even have all the
-  ;; zenburn colors named.
-  (use-package hc-zenburn-theme
-    :demand t
-    :config (load-theme 'hc-zenburn t))
+  ;; [2025-05-16] Oh. This is unmaintained. :(
+  ;;   Last commit was a decade ago.
+  ;;   Nah. Go back to regular zenburn.
+  ;;   hc-zenburn doesn't even have all the named zenburn colors.
+  ;;   ;; (use-package hc-zenburn-theme
+  ;;   ;;   :demand t
+  ;;   ;;   :config (load-theme 'hc-zenburn t))
+
+  ;; `zenburn'
+  ;;----------
+  ;; Back from the Dead.
+  (imp-load :feature '(:user config theme zenburn)
+            :path  "config/theme/zenburn/init.el")  ;;(imp-path-join 'config 'theme 'zenburn 'init.el))
 
 
   ;;------------------------------------------------------------------------------
@@ -855,7 +862,9 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
+ '(package-selected-packages
+   '(colorful-mode deadgrep git-gutter-fringe git-modes gptel hc-zenburn-theme
+                   magit no-littering terraform-mode zenburn-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
