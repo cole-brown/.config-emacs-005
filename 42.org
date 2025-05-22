@@ -604,8 +604,7 @@ mantle/config/dev-env/languages/emacs-lisp.el
 
 
 
-* -- U R HERE --
-* keybinds
+* disable some annoying keybinds
 
 new funcs?
   keymap-unset
@@ -613,6 +612,13 @@ new funcs?
 
 Disable C-z
 Disable C-mousewheel (font size +/-)
+
+
+* switch to zenburn
+
+~hc-zenburn-theme~ is unmaintained.
+
+Move from ~hc-zenburn-theme~ back to ~zenburn-theme~.
 
 
 * innit
@@ -651,22 +657,10 @@ Keep Doom->Emacs func but make others work on the converted?
 What the hell was I doing all this for?
   - oh right; org-mode todo keywords. Go [[*org][here]].
 
-* zenburn
+* -- U R HERE --
+* zenburn & org
 
-~hc-zenburn-theme~ is unmaintained.
-
-Move from ~hc-zenburn-theme~ back to ~zenburn-theme~.
-
-Can I make ~hc-zenburn~ piggyback on top of ~zenburn~?
-  - Probably not... The colors are probably all hand-picked.
-    - But ~hc-zenburn~ does have a script to mess with brightness.
-      - https://github.com/edran/hc-zenburn-emacs/blob/master/change_brightness.py
-    - And I have funcs to mess with colors: 
-      - [[file:source/core/packages/innit/face.el::defun innit:color:darken (color alpha &optional colors-alist][here]] or [[file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/keyword.el][sn004]]
-
-TODO: make ~zenburn-high-contrast~ for ~zenburn~ somehow.
-
-
+Get my zenburn fixes for org-mode in.
 
 * org
 
@@ -721,7 +715,17 @@ Overall init file [[file:source/core/packages/namespaced/init.el][here]]
   - [ ] finish str/
   - [ ] finish init/
   - [ ] start the rest...
-  
+
+* "REFACTOR": zenburn
+
+Finish the zenburn refactor.
+
+do
+  - [ ] config/theme/zenburn/org.el
+  - [ ] config/theme/zenburn/whitespace.el
+  - [ ] config/theme/zenburn/init.el
+    - partially done; finish
+
 * yasnippets
 
 Need my begin_src snippet...
@@ -989,5 +993,18 @@ imp--load-parse
 ** ??? when I get to tests
 
 https://emacs.stackexchange.com/a/17202
+
+
+* zenburn: high contrast mode?
+
+Can I make ~hc-zenburn~ piggyback on top of ~zenburn~?
+  - Probably not... The colors are probably all hand-picked.
+    - But ~hc-zenburn~ does have a script to mess with brightness.
+      - https://github.com/edran/hc-zenburn-emacs/blob/master/change_brightness.py
+    - And I have funcs to mess with colors: 
+      - [[file:source/core/packages/innit/face.el::defun innit:color:darken (color alpha &optional colors-alist][here]] or [[file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/keyword.el][sn004]]
+        
+TODO: Make ~zenburn-high-contrast~ for ~zenburn~ somehow.
+
 
 
