@@ -37,11 +37,14 @@
   ;;   - string?
   ;;     - requires: elisp
 
+  ;; TODO: finish refactor of these:
   (imp-load :feature  :elisp
             :filename "init")
+  (imp-load :feature  :str
+            :filename "init") ; requires `:elisp'
+  (imp-load :feature  :theme
+            :filename "init") ; requires `:elisp', `:str'
 
-  (imp-load :feature  :str ; requires `elisp'
-            :filename "init")
   ;; TODO: refactor the rest of 'em.
 
 
