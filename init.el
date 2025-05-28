@@ -974,9 +974,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(colorful-mode deadgrep git-gutter-fringe git-modes gptel hc-zenburn-theme
-                   magit no-littering terraform-mode zenburn-theme)))
+ '(package-selected-packages nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -39,11 +39,14 @@
 
   ;; TODO: finish refactor of these:
   (imp-load :feature  :elisp
-            :filename "init")
+            :path "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/elisp"
+            :filename "init.el")
   (imp-load :feature  :str
-            :filename "init") ; requires `:elisp'
+            :path "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/str"
+            :filename "init.el") ; requires `:elisp'
   (imp-load :feature  :theme
-            :filename "init") ; requires `:elisp', `:str'
+  :path "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/theme"
+            :filename "init.el") ; requires `:elisp', `:str'
 
   ;; TODO: refactor the rest of 'em.
 

@@ -40,14 +40,15 @@
 
   (imp-load :feature  '(:elisp types)
             :filename "types")
-  (imp-load :feature  '(:elisp utils functions)
+  (imp-load :feature  '(:elisp functions)
             :filename "functions")
+            
   ;; TODO: refactor the rest of 'em.
-  ;; (imp-load :feature  '(:elisp utils predicates)
+  ;; (imp-load :feature  '(:elisp predicates)
   ;;           :filename "predicates")
-  ;; (imp-load :feature  '(:elisp utils test)
+  ;; (imp-load :feature  '(:elisp utest)
   ;;           :filename "test")
-  ;; (imp-load :feature  '(:elisp utils units)
+  ;; (imp-load :feature  '(:elisp units)
   ;;           :filename "units")
   )
 
@@ -55,4 +56,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :elisp 'utils)
+(imp-provide :elisp)

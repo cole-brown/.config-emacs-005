@@ -50,6 +50,7 @@
     (imp-path-current-dir)
 
   (imp-load :feature  '(:str normalize)
+  ;; :filename "/home/main/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/str/normalize")
             :filename "normalize")
   ;; TODO: refactor the rest of 'em.
   ;; (imp-load :feature  '(:str regex)
