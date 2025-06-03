@@ -110,7 +110,7 @@
 ;; Faces
 ;;------------------------------------------------------------------------------
 
-(defun --theme:face:set (spec)
+(defun theme:face:doom->emacs (spec)
   "Convert Doom's more user-friendly face SPEC into an Emacs' face spec.
 
 Initially from Doom's `doom--custom-theme-set-face'."
@@ -118,14 +118,14 @@ Initially from Doom's `doom--custom-theme-set-face'."
   (cond ((listp (car spec))
          (cl-loop for face in (car spec)
                   collect
-                  (car (--theme:face:set (cons face (cdr spec))))))
-        ;; FACE :keyword value [...]
+                  (car (theme:face:doom->emacs (cons face (cdr spec))))))
+        ;; Doom: FACE :keyword value [...]
         ((keywordp (cadr spec))
          `((,(car spec) ((t ,(cdr spec))))))
         ;; Fallback: Assume it's in Emacs' face spec already.
         (`((,(car spec) ,(cdr spec))))))
-;; (--theme:face:set (list 'org-done :foreground "#506b50"))
-;; (--theme:face:set (list '+org-todo-active :foreground "#a9a1e1" :background "#383838"))
+;; (theme:face:doom->emacs (list 'org-done :foreground "#506b50"))
+;; (theme:face:doom->emacs (list '+org-todo-active :foreground "#a9a1e1" :background "#383838"))
 
 
 (defmacro theme:face:set! (theme &rest specs)
@@ -155,7 +155,7 @@ Initially from Doom's `custom-theme-set-faces!'."
                (when (or (eq theme/each 'user)
                          (custom-theme-enabled-p theme/each))
                  (apply #'custom-theme-set-faces theme/each
-                        (mapcan #'--theme:face:set
+                        (mapcan #'theme:face:doom->emacs
                                 _m/tfs/specs))))))
          ;; Apply the changes immediately if the user is not using `innit' theme
          ;; variables or the theme has already loaded. This allows you to evaluate
