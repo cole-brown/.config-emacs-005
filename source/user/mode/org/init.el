@@ -22,20 +22,20 @@
 ;;------------------------------------------------------------------------------
 
 (imp-timing
- '(:mode org)
+ '(:user mode org)
  (imp-file-current)
  (imp-path-current-dir)
 
 
- (imp-load :feature  '(:mode org keyword)
-           :path     (imp-path-current-dir)
+ (imp-load :feature  '(:user mode org keyword)
+           :path     "mode/org" ;; (imp-path-current-dir)
            :filename "keyword")
- (imp-load :feature  '(: mode org link)
-           :path     (imp-path-current-dir)
+ (imp-load :feature  '(:user mode org link)
+           :path     "mode/org" ;; (imp-path-current-dir)
            :filename "link"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :mode 'org)
+(imp-provide :user 'mode 'org)

@@ -94,9 +94,7 @@ KEYWORD is an org keyword in the form of:
 ;; Org TODO Sequences
 ;;------------------------------------------------------------------------------
 
-(defun --/org/todo/keyword (word wrap
-                              &optional
-                              key on-enter on-exit-if)
+(defun --/org/todo/keyword (word wrap &optional key on-enter on-exit-if)
   "Create an org-todo-keyword with WORD.
 
 WRAP should be a string / sequence of chars of length 3:
@@ -406,4 +404,4 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :mode 'org 'keyword)
+(imp-provide :user 'mode 'org 'keyword)

@@ -61,6 +61,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-;; TODO: what to name this?
-;; :emacs.d source mode org link?
-(imp-provide :mode 'org 'link)
+(imp-provide :user 'mode 'org 'link)
