@@ -24,6 +24,43 @@
 ;;; Code:
 
 
+;; TODO MOVE TO ./scripts
+(defvar --/refactor/rx-replacements
+  ;; NOTE: Try to keep alphabetically sorted.
+  `(
+
+    ("core/modules/emacs/" . "namespaced/")
+
+    ;;---
+    ;; imp
+    ;;---
+    ("imp:file:current" . "imp-file-current")
+
+    (,(rx-to-string "imp:flag?" :no-group) . "imp-flag?")
+
+    ("imp:load" . "imp-load")
+
+    ("imp:path:root/set" . "imp-path-root-set")
+    ("imp:path:current:dir" . "imp-path-current-dir")
+
+    ("imp:provide" . "imp-provide")
+
+    ("imp:timing" . "imp-timing")
+    )
+  "alist of regex to replacement string")
+
+(defun --/refactor/cmd ()
+  "replace the old with the new"
+  (interactive)
+  (save-excursion
+    (dolist (pair --/refactor/rx-replacements)
+      (goto-char (point-min))
+
+      (while (re-search-forward (car pair) nil t)
+        (replace-match (cdr pair))))
+    (save-buffer)))
+
+
 ;;------------------------------------------------------------------------------
 ;; Init Settings
 ;;------------------------------------------------------------------------------
@@ -503,7 +540,6 @@ Sorry.")
   ;; NOTE: M-x tabify and M-x untabify exist and work on regions.
 
 
-
   ;;------------------------------------------------------------------------------
   ;; Chrome?: Colorize Color Codes
   ;;------------------------------------------------------------------------------
@@ -935,7 +971,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     (terraform-indent-level 2))
 
 
-
   ;;------------------------------------------------------------------------------
   ;; Fin: End of user Emacs init.
   ;;------------------------------------------------------------------------------
@@ -959,7 +994,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
 ;;------------------------------------------------------------------------------
 ;; The End of File.
 ;;------------------------------------------------------------------------------
-
+;; (imp-provide :emacs.d 'init)
 
 ;;------------------------------------------------------------------------------
 ;; TODO: Not in here.
