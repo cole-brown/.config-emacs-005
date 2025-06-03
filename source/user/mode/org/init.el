@@ -21,23 +21,21 @@
 ;; Org-Mode Stuff
 ;;------------------------------------------------------------------------------
 
-(let ((path/parent (imp:path:current:dir)))
-
-  (imp:timing
-      '(:mode org)
-      (imp:file:current)
-      path/parent
+(imp-timing
+ '(:mode org)
+ (imp-file-current)
+ (imp-path-current-dir)
 
 
-      (imp:load :feature  '(:mode org keyword)
-                :path     path/parent
-                :filename "keyword")
-      (imp:load :feature  '(:mode org link)
-                :path     path/parent
-                :filename "link")))
+ (imp-load :feature  '(:mode org keyword)
+           :path     (imp-path-current-dir)
+           :filename "keyword")
+ (imp-load :feature  '(: mode org link)
+           :path     (imp-path-current-dir)
+           :filename "link"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mode 'org)
+(imp-provide :mode 'org)

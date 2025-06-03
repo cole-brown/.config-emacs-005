@@ -19,7 +19,7 @@
 ;;; Code:
 
 
-(imp:require :buffer 'delete)
+(imp-require :buffer 'delete)
 
 
 ;;------------------------------------------------------------------------------
@@ -27,7 +27,7 @@
 ;;------------------------------------------------------------------------------
 
 ;; http://kitchingroup.cheme.cmu.edu/blog/2013/05/05/Getting-keyword-options-in-org-files/
-(defun mode:org:keywords/get ()
+(defun --/org/keywords/get ()
   "Parse the buffer and return a cons list of (property . value)
 from lines like:
 #+PROPERTY: value"
@@ -38,16 +38,16 @@ from lines like:
 
 
 ;; http://kitchingroup.cheme.cmu.edu/blog/2013/05/05/Getting-keyword-options-in-org-files/
-(defun mode:org:keyword/get (keyword)
+(defun --/org/keyword/get (keyword)
   "Get the value of a KEYWORD from the current (org-mode) buffer.
 
 KEYWORD is an org keyword in the form of:
 #+KEYWORD: value"
-  (cdr (assoc keyword (mode:org:keywords/get))))
-;; (mode:org:keyword/get "TICKET-ID")
+  (cdr (assoc keyword (--/org/keywords/get))))
+;; (--/org/keyword/get "TICKET-ID")
 
 
-(defun mode:org:keyword/set (keyword value)
+(defun --/org/keyword/set (keyword value)
   "Set the VALUE of a KEYWORD from the current (org-mode) buffer.
 
 KEYWORD is an org keyword in the form of:
@@ -94,7 +94,7 @@ KEYWORD is an org keyword in the form of:
 ;; Org TODO Sequences
 ;;------------------------------------------------------------------------------
 
-(defun mode:org:todo/keyword (word wrap
+(defun --/org/todo/keyword (word wrap
                               &optional
                               key on-enter on-exit-if)
   "Create an org-todo-keyword with WORD.
@@ -200,97 +200,97 @@ of `:notes' will only trigger if the next state doesn't have notes."
            ;; Return.
            ;;---
            keyword-string))))
-;; (mode:org:todo/keyword "bob" "├─┤")
-;; (mode:org:todo/keyword "bob" "[-]")
-;; (mode:org:todo/keyword "bob" "[-]" "b")
-;; (mode:org:todo/keyword "bob" "[-]" "b" :timestamp)
-;; (mode:org:todo/keyword "bob" "[-]" "b" :notes)
-;; (mode:org:todo/keyword "bob" "[-]" "b" nil :notes)
-;; (mode:org:todo/keyword "bob" "[-]" "b" nil :timestamp)
-;; (mode:org:todo/keyword "bob" "[-]" "b" :timestamp :notes)
+;; (--/org/todo/keyword "bob" "├─┤")
+;; (--/org/todo/keyword "bob" "[-]")
+;; (--/org/todo/keyword "bob" "[-]" "b")
+;; (--/org/todo/keyword "bob" "[-]" "b" :timestamp)
+;; (--/org/todo/keyword "bob" "[-]" "b" :notes)
+;; (--/org/todo/keyword "bob" "[-]" "b" nil :notes)
+;; (--/org/todo/keyword "bob" "[-]" "b" nil :timestamp)
+;; (--/org/todo/keyword "bob" "[-]" "b" :timestamp :notes)
 
 
-(defun mode:cmd:org:convert/todo (skip-bare)
-  "Convert old TODO sequence to new."
-  (interactive
-   (list (y-or-n-p "Skip bare->wrap? ")))
-  (org-with-wide-buffer
-   (save-excursion
-     ;; Bare->Wrapped ("TODO" -> "[TODO   ]"), for width consistency.
-     (unless skip-bare
-       (message "'TODO' -> '[TODO   ]'")
-       (let* ((wrap "[ ]")
-              (replacements
-               `(("TODO"      . ,(mode:org:todo/keyword "TODO" wrap))
-                 ("STARTED"   . ,(mode:org:todo/keyword "CURRENT" wrap))
-                 ("WAITING"   . ,(mode:org:todo/keyword "WAITING" wrap))
-                 ("DONE"      . ,(mode:org:todo/keyword "DONE" wrap))
-                 ("SUCCESS"   . ,(mode:org:todo/keyword "SUCCESS" wrap))
-                 ("FAILURE"   . ,(mode:org:todo/keyword "FAILURE" wrap))
-                 ("CANCELLED" . ,(mode:org:todo/keyword "KILLED" wrap)))))
-         (dolist (replacement replacements)
-           (funcall-interactively #'query-replace
-                                  (car replacement) (cdr replacement)
-                                  nil
-                                  (point-min) (point-max)))))
-
-     ;; "[TODO   ]" -> "├TODO───┤"
-     (let* ((wrap "[ ]")
-            (replacements/old (list
-                               (mode:org:todo/keyword "TODO" wrap)
-                               (mode:org:todo/keyword "PROJECT" wrap)
-                               (mode:org:todo/keyword "CURRENT" wrap)
-                               (mode:org:todo/keyword "WAITING" wrap)
-                               (mode:org:todo/keyword "HOLDING" wrap)
-                               (mode:org:todo/keyword "DONE" wrap)
-                               (mode:org:todo/keyword "SUCCESS" wrap)
-                               (mode:org:todo/keyword "FAILURE" wrap)
-                               (mode:org:todo/keyword "KILLED" wrap)
-                               (mode:org:todo/keyword " " wrap)
-                               (mode:org:todo/keyword "▶" wrap)
-                               (mode:org:todo/keyword "-" wrap)
-                               (mode:org:todo/keyword "?" wrap)
-                               (mode:org:todo/keyword "…" wrap)
-                               (mode:org:todo/keyword "⁈" wrap)
-                               (mode:org:todo/keyword "X" wrap)
-                               (mode:org:todo/keyword "X" wrap)
-                               (mode:org:todo/keyword "✘" wrap)
-                               (mode:org:todo/keyword "÷" wrap))))
-
-       (let* ((wrap "├─┤")
-              (replacements/new (list
-                                 (mode:org:todo/keyword "TODO" wrap)
-                                 (mode:org:todo/keyword "PROJECT" wrap)
-                                 (mode:org:todo/keyword "CURRENT" wrap)
-                                 (mode:org:todo/keyword "WAITING" wrap)
-                                 (mode:org:todo/keyword "HOLDING" wrap)
-                                 (mode:org:todo/keyword "DONE" wrap)
-                                 (mode:org:todo/keyword "SUCCESS" wrap)
-                                 (mode:org:todo/keyword "FAILURE" wrap)
-                                 (mode:org:todo/keyword "KILLED" wrap)
-                                 (mode:org:todo/keyword "_" wrap)
-                                 (mode:org:todo/keyword "▶" wrap)
-                                 (mode:org:todo/keyword "-" wrap)
-                                 (mode:org:todo/keyword "?" wrap)
-                                 (mode:org:todo/keyword "…" wrap)
-                                 (mode:org:todo/keyword "⁈" wrap)
-                                 (mode:org:todo/keyword "X" wrap)
-                                 (mode:org:todo/keyword "X" wrap)
-                                 (mode:org:todo/keyword "✘" wrap)
-                                 (mode:org:todo/keyword "÷" wrap))))
-
-         ;; "[TODO   ]" -> "├TODO───┤"
-         (message "'[TODO   ]' -> '├TODO───┤'")
-
-         ;; And... find/replace 'em.
-         (dotimes (index (length replacements/new))
-           (let ((old (nth index replacements/old))
-                 (new (nth index replacements/new)))
-             (unless (string= old new)
-               (funcall-interactively #'query-replace
-                                      old new
-                                      nil
-                                      (point-min) (point-max))))))))))
+;; (defun --/org/cmd/todo-keywords-convert-old (skip-bare)
+;;   "Convert old TODO sequence to new."
+;;   (interactive
+;;    (list (y-or-n-p "Skip bare->wrap? ")))
+;;   (org-with-wide-buffer
+;;    (save-excursion
+;;      ;; Bare->Wrapped ("TODO" -> "[TODO   ]"), for width consistency.
+;;      (unless skip-bare
+;;        (message "'TODO' -> '[TODO   ]'")
+;;        (let* ((wrap "[ ]")
+;;               (replacements
+;;                `(("TODO"      . ,(--/org/todo/keyword "TODO" wrap))
+;;                  ("STARTED"   . ,(--/org/todo/keyword "CURRENT" wrap))
+;;                  ("WAITING"   . ,(--/org/todo/keyword "WAITING" wrap))
+;;                  ("DONE"      . ,(--/org/todo/keyword "DONE" wrap))
+;;                  ("SUCCESS"   . ,(--/org/todo/keyword "SUCCESS" wrap))
+;;                  ("FAILURE"   . ,(--/org/todo/keyword "FAILURE" wrap))
+;;                  ("CANCELLED" . ,(--/org/todo/keyword "KILLED" wrap)))))
+;;          (dolist (replacement replacements)
+;;            (funcall-interactively #'query-replace
+;;                                   (car replacement) (cdr replacement)
+;;                                   nil
+;;                                   (point-min) (point-max)))))
+;; 
+;;      ;; "[TODO   ]" -> "├TODO───┤"
+;;      (let* ((wrap "[ ]")
+;;             (replacements/old (list
+;;                                (--/org/todo/keyword "TODO" wrap)
+;;                                (--/org/todo/keyword "PROJECT" wrap)
+;;                                (--/org/todo/keyword "CURRENT" wrap)
+;;                                (--/org/todo/keyword "WAITING" wrap)
+;;                                (--/org/todo/keyword "HOLDING" wrap)
+;;                                (--/org/todo/keyword "DONE" wrap)
+;;                                (--/org/todo/keyword "SUCCESS" wrap)
+;;                                (--/org/todo/keyword "FAILURE" wrap)
+;;                                (--/org/todo/keyword "KILLED" wrap)
+;;                                (--/org/todo/keyword " " wrap)
+;;                                (--/org/todo/keyword "▶" wrap)
+;;                                (--/org/todo/keyword "-" wrap)
+;;                                (--/org/todo/keyword "?" wrap)
+;;                                (--/org/todo/keyword "…" wrap)
+;;                                (--/org/todo/keyword "⁈" wrap)
+;;                                (--/org/todo/keyword "X" wrap)
+;;                                (--/org/todo/keyword "X" wrap)
+;;                                (--/org/todo/keyword "✘" wrap)
+;;                                (--/org/todo/keyword "÷" wrap))))
+;; 
+;;        (let* ((wrap "├─┤")
+;;               (replacements/new (list
+;;                                  (--/org/todo/keyword "TODO" wrap)
+;;                                  (--/org/todo/keyword "PROJECT" wrap)
+;;                                  (--/org/todo/keyword "CURRENT" wrap)
+;;                                  (--/org/todo/keyword "WAITING" wrap)
+;;                                  (--/org/todo/keyword "HOLDING" wrap)
+;;                                  (--/org/todo/keyword "DONE" wrap)
+;;                                  (--/org/todo/keyword "SUCCESS" wrap)
+;;                                  (--/org/todo/keyword "FAILURE" wrap)
+;;                                  (--/org/todo/keyword "KILLED" wrap)
+;;                                  (--/org/todo/keyword "_" wrap)
+;;                                  (--/org/todo/keyword "▶" wrap)
+;;                                  (--/org/todo/keyword "-" wrap)
+;;                                  (--/org/todo/keyword "?" wrap)
+;;                                  (--/org/todo/keyword "…" wrap)
+;;                                  (--/org/todo/keyword "⁈" wrap)
+;;                                  (--/org/todo/keyword "X" wrap)
+;;                                  (--/org/todo/keyword "X" wrap)
+;;                                  (--/org/todo/keyword "✘" wrap)
+;;                                  (--/org/todo/keyword "÷" wrap))))
+;; 
+;;          ;; "[TODO   ]" -> "├TODO───┤"
+;;          (message "'[TODO   ]' -> '├TODO───┤'")
+;; 
+;;          ;; And... find/replace 'em.
+;;          (dotimes (index (length replacements/new))
+;;            (let ((old (nth index replacements/old))
+;;                  (new (nth index replacements/new)))
+;;              (unless (string= old new)
+;;                (funcall-interactively #'query-replace
+;;                                       old new
+;;                                       nil
+;;                                       (point-min) (point-max))))))))))
 
 
 ;;------------------------------------------------------------------------------
@@ -298,7 +298,7 @@ of `:notes' will only trigger if the next state doesn't have notes."
 ;;------------------------------------------------------------------------------
 
 ;; TODO: Need a face param; replace `mode:theme.face/org.todo.keyword/todo'.
-(defun mode:cmd:org:file:todo/keywords (todo-sequence)
+(defun --/org/cmd/todo-keywords-in-file-header (todo-sequence)
   "Create 'per-file' keyword lines using TODO-SEQUENCE (or the prompt input).
 
 See here for acceptable inputs:
@@ -320,7 +320,7 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
   (let* ((keyword/todo "TODO")
          (keyword/face-var "org-todo-keyword-faces")
          (todo/wrap "├─┤")
-         (todo/existing (mode:org:keyword/get keyword/todo))
+         (todo/existing (--/org/keyword/get keyword/todo))
          todo/new.list
          todo/new.str
          keywords-set)
@@ -331,7 +331,7 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
           ;; Leave as-is - it's the todo/done separator.
           (push keyword todo/new.list)
         ;; Wrap it.
-        (push (mode:org:todo/keyword keyword todo/wrap) todo/new.list)))
+        (push (--/org/todo/keyword keyword todo/wrap) todo/new.list)))
 
     ;; Convert the wrapped list into a wrapped string.
     (setq todo/new.str (mapconcat #'identity
@@ -345,7 +345,7 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
                                       todo/existing todo/new.str)))
             (message "Ok; changed nothing.")
 
-          (mode:org:keyword/set keyword/todo todo/new.str)
+          (--/org/keyword/set keyword/todo todo/new.str)
           (message "Updated keywords to: \"%S\"" todo/new.str)
           (setq keywords-set t))
 
@@ -406,4 +406,4 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mode 'org 'keyword)
+(imp-provide :mode 'org 'keyword)

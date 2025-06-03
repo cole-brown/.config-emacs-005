@@ -19,7 +19,7 @@
 ;;; Code:
 
 
-(imp:require :buffer 'region)
+(imp-require :buffer 'region)
 
 
 ;;------------------------------------------------------------------------------
@@ -27,7 +27,7 @@
 ;;------------------------------------------------------------------------------
 
 ;; Easy paste of e.g. URLs.
-(defun mode:cmd:org:here/yank (start end)
+(defun --/org/cmd/here/yank (start end)
   "Insert item from kill ring as an org-mode link with description 'here'."
   (interactive "r")
   ;; (let ((text "here")
@@ -49,7 +49,7 @@
                        "here")))
 
 
-(defun mode:cmd:org:here/link (start end)
+(defun --/org/cmd/here/link (start end)
   "Insert stored org link as an org-mode link with description 'here'."
   (interactive "r")
   (org-insert-link nil
@@ -61,4 +61,6 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mode 'org 'link)
+;; TODO: what to name this?
+;; :emacs.d source mode org link?
+(imp-provide :mode 'org 'link)
