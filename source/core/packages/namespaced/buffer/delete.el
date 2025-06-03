@@ -1,4 +1,4 @@
-;;; core/modules/emacs/buffer/delete.el --- Functions for Deleting (in) Buffers -*- lexical-binding: t; -*-
+;;; namespaced/buffer/delete.el --- Functions for Deleting (in) Buffers -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -32,4 +32,4 @@ Kill characters forward until encountering the end of a word."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'delete)
+(imp-provide :buffer 'delete)

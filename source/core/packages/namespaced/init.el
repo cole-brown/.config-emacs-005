@@ -33,25 +33,31 @@
   ;; They use each other.
 
   ;; TODO: order?
-  ;;   - elisp?
-  ;;   - string?
+  ;;   - elisp
+  ;;   - string
   ;;     - requires: elisp
 
   ;; TODO: finish refactor of these:
   (imp-load :feature  :elisp
-            :path "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/elisp"
-            :filename "init.el")
+            :path     "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/elisp"
+            :filename "init.el") ; standalone
+
+  (imp-load :feature  :buffer
+            :path     "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/buffer"
+            :filename "init.el") ; standalone... so far
+
   (imp-load :feature  :str
-            :path "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/str"
+            :path     "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/str"
             :filename "init.el") ; requires `:elisp'
+
   (imp-load :feature  :theme
-  :path "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/theme"
+            :path     "~/ocean/vault/.config/emacs/sn005/source/core/packages/namespaced/theme"
             :filename "init.el") ; requires `:elisp', `:str'
 
   ;; TODO: refactor the rest of 'em.
 
 
-  ;; Add something like one of theses to early ones?
+  ;; TODO: Add something like one of theses to early ones?
   ;;
   ;; ;;-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
   ;; ;; Imports

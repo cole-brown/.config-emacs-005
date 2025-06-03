@@ -1,4 +1,4 @@
-;;; core/modules/emacs/buffer/region.el --- Buffer Region Functions -*- lexical-binding: t; -*-
+;;; namespaced/buffer/region.el --- Buffer Region Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -154,4 +154,4 @@ TODO-meow: Anything special for meow?"
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'region)
+(imp-provide :buffer 'region)
