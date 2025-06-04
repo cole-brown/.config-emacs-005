@@ -1,4 +1,8 @@
-* .emacs.d layout
+* ├DONE───┤ .emacs.d layout
+CLOSED: [2025-06-03 Tue 22:33]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-06-03 Tue 22:33]
+:END:
 
 source/user/config
   - dev-env?
@@ -81,7 +85,11 @@ source/user/config
 │   ├── sh-mode
 │   └── yaml-mode
 
-* imp
+* ├DONE───┤ imp
+CLOSED: [2025-06-03 Tue 22:33]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-06-03 Tue 22:33]
+:END:
 
 ** refactor symbol names
 
@@ -591,7 +599,13 @@ I think this requires more than minimum to fix....
 
 So the minimum is... fix the callers?
 
-* file timestamp auto-update
+* ├DONE───┤ file timestamp auto-update
+CLOSED: [2025-06-03 Tue 22:38]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-06-03 Tue 22:38]
+- State "├CURRENT┤"  from "├DONE───┤"  [2025-06-03 Tue 22:37]
+- State "├DONE───┤"  from              [2025-06-03 Tue 22:33]
+:END:
 
 mantle/config/dev-env/languages/emacs-lisp.el
 163     (emacs-lisp-mode-hook . mantle:hook:time-stamp:settings)
@@ -604,7 +618,11 @@ mantle/config/dev-env/languages/emacs-lisp.el
 
 
 
-* disable some annoying keybinds
+* ├DONE───┤ disable some annoying keybinds
+CLOSED: [2025-06-03 Tue 22:34]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-06-03 Tue 22:34]
+:END:
 
 new funcs?
   keymap-unset
@@ -614,14 +632,22 @@ Disable C-z
 Disable C-mousewheel (font size +/-)
 
 
-* switch to zenburn
+* ├DONE───┤ switch to zenburn
+CLOSED: [2025-06-03 Tue 22:38]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-06-03 Tue 22:38]
+:END:
 
 ~hc-zenburn-theme~ is unmaintained.
 
 Move from ~hc-zenburn-theme~ back to ~zenburn-theme~.
 
 
-* innit
+* ├DONE───┤ innit
+CLOSED: [2025-06-03 Tue 22:38]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-06-03 Tue 22:38]
+:END:
 
 Need the face funcs.
 So start porting.
@@ -650,17 +676,68 @@ Do I even want to keep this Doomism?
 Just convert to the Emacs version and just call the Emacs funcs?
 Keep Doom->Emacs func but make others work on the converted?
 
-
-
-
+meh. As-is works for Doom and[or Emacs face specs.
 
 What the hell was I doing all this for?
   - oh right; org-mode todo keywords. Go [[*org][here]].
 
-* -- U R HERE --
-* zenburn & org
+* ├DONE───┤ zenburn & org
+CLOSED: [2025-06-03 Tue 22:39]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-06-03 Tue 22:39]
+:END:
+
+old zen+org: [[file:source/user/config/theme/zenburn/org-mode.el][here]]
+new zen+org: [[file:source/user/config/org/theme/zenburn.el][here]]
 
 Get my zenburn fixes for org-mode in.
+
+~mode:org:todo/keyword~ is what now?
+
+Where'd I put this func again???
+mode:org:todo/keywords
+
+rg '(mode)?.*org.*todo.*keyword'
+find -name link.el
+find -name keyword.el
+
+mmh... nowhere, looks like.
+
+copied:
+  - file:/home/main/ocean/vault/.config/emacs/sn005/source/user/mode/org/init.el
+  - file:/home/main/ocean/vault/.config/emacs/sn005/source/user/mode/org/keyword.el
+  - file:/home/main/ocean/vault/.config/emacs/sn005/source/user/mode/org/link.el
+
+Need:
+  - ~buffer:region:get~
+  - :buffer 'delete
+k
+
+Where was I?..
+back to new zen+org: [[file:source/user/config/org/theme/zenburn.el][here]]
+  - k
+
+...and then?
+everything done?
+
+* -- U R HERE --
+* completion
+
+corfu, vertico, etc
+
+get from sn-004
+
+* whitespace
+
+cleanup
+butler
+visuals
+etc
+
+* elisp
+
+Get settings and stuff.
+Need my timestamp working.
 
 * org
 
@@ -679,12 +756,14 @@ Copy
 
 Start editting for content:
   - [X] init.el
-  - [ ] mode.el
-    - [ ] [[*innit][you need some of innit]]
-    - [ ] [[file:source/user/config/org/theme/zenburn.el::;; TODO: Now I need some innit funcs...][you are here]]
-    - [ ] need org func lib thingy from sn004 too:
-      - [ ] [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/keyword.el][keyword.el]]
-      - [ ] [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/link.el][link.el]]
+  - [X] mode.el
+    - [X] [[*innit][you need some of innit]]
+    - [X] [[file:source/user/config/org/theme/zenburn.el::;; TODO: Now I need some innit funcs...][you are here]]
+    - [X] need org func lib thingy from sn004 too:
+      - [X] [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/keyword.el][keyword.el]]
+      - [X] [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/link.el][link.el]]
+
+And then...
   - [ ] contacts.el
   - [ ] journal.el
   - [ ] pretty.el
