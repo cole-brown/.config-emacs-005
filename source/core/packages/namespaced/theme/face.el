@@ -157,13 +157,17 @@ Initially from Doom's `custom-theme-set-faces!'."
                  (apply #'custom-theme-set-faces theme/each
                         (mapcan #'theme:face:doom->emacs
                                 _m/tfs/specs))))))
-         ;; Apply the changes immediately if the user is not using `innit' theme
-         ;; variables or the theme has already loaded. This allows you to evaluate
-         ;; these macros on the fly and customize your faces interactively.
-         (when theme:feature
-           (funcall #',_m/tfs/func))
-         ;; Always add to the customize hook.
-         (add-hook 'theme:customize:hook #',_m/tfs/func 100)))))
+
+         ;; ;; Apply the changes immediately if the user is not using `innit' theme
+         ;; ;; variables or the theme has already loaded. This allows you to evaluate
+         ;; ;; these macros on the fly and customize your faces interactively.
+         ;; (when theme:feature
+         ;;   (funcall #',_m/tfs/func))
+         ;; ;; Always add to the customize hook.
+         ;; (add-hook 'theme:customize:hook #',_m/tfs/func 100)
+
+         ;; Apply immediately and hope themes don't go floppin' around.
+         (funcall #',_m/tfs/func)))))
 
 
 (defmacro face:set! (&rest specs)
@@ -182,4 +186,3 @@ Initially from Doom's `custom-set-faces!'."
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp-provide :theme 'face)
-

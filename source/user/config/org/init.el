@@ -21,13 +21,13 @@
 ;;------------------------------------------------------------------------------
 
 (imp-load :feature  '(:user config org mode)
-          :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
+          :path     "config/org" ;; (imp-path-current-dir-relative :user)
           :filename "mode")
 
 ;; ...And now theme org mode itself...
 (imp-eval-after zenburn-theme
   (imp-load :feature  '(:user config org theme zenburn)
-            :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
+            :path     "config/org" ;; (imp-path-current-dir-relative :user)
             :filename "theme/zenburn"))
 ;; TODO: another one for `hc-zenburn-theme'
 

@@ -28,33 +28,33 @@
   ;; Don't see any reason not to demand the theme.
   :demand t
 
-  ;; ;;----------------------------------------------------------------------------
-  ;; :custom
-  ;; ;;----------------------------------------------------------------------------
-  ;; 
-  ;; ;;------------------------------
-  ;; ;; Colors
-  ;; ;;------------------------------
-  ;; ;; NOTE: 'zenburn' uses "-N" for lighter and "+N" for darker in their names
-  ;; ;; in the `zenburn-default-colors-alist' variable.
-  ;; ;;
-  ;; ;; These are some additional colors I'm testing out.
-  ;; ;;
-  ;; ;; Went to this website and plugged in `zenburn-magenta' and `zenburn-bg'
-  ;; ;; with 10 midpoints:
-  ;; ;;   https://meyerweb.com/eric/tools/color-blend/#3F3F3F:DC8CC3:10:hex
-  ;; ;;
-  ;; ;; NOTE: Currently none of these actually override Zenburn's colors;
-  ;; ;; they're just additive.
-  ;; (zenburn-override-colors-alist '(("zenburn-magenta-bg"   . "#4D464B")
-  ;;                                  ("zenburn-magenta-bg-1" . "#5C4D57")
-  ;;                                  ("zenburn-magenta-bg-2" . "#6A5463")
-  ;;                                  ("zenburn-magenta-bg-3" . "#785B6F")
-  ;;                                  ("zenburn-magenta-bg-4" . "#86627B")
-  ;;                                  ("zenburn-magenta-bg-5" . "#956987")
-  ;;                                  ("zenburn-violet"       . "#a9a1e1")
-  ;;                                  ("zenburn-magenta-01"   . "#c67eaf")
-  ;;                                  ("zenburn-magenta-03"   . "#9a6288")))
+  ;;----------------------------------------------------------------------------
+  :custom
+  ;;----------------------------------------------------------------------------
+
+  ;;------------------------------
+  ;; Colors
+  ;;------------------------------
+  ;; NOTE: 'zenburn' uses "-N" for lighter and "+N" for darker in their names
+  ;; in the `zenburn-default-colors-alist' variable.
+  ;;
+  ;; These are some additional colors I'm testing out.
+  ;;
+  ;; Went to this website and plugged in `zenburn-magenta' and `zenburn-bg'
+  ;; with 10 midpoints:
+  ;;   https://meyerweb.com/eric/tools/color-blend/#3F3F3F:DC8CC3:10:hex
+  ;;
+  ;; NOTE: Currently none of these actually override Zenburn's colors;
+  ;; they're just additive.
+  (zenburn-override-colors-alist '(("zenburn-magenta-bg"   . "#4D464B")
+                                   ("zenburn-magenta-bg-1" . "#5C4D57")
+                                   ("zenburn-magenta-bg-2" . "#6A5463")
+                                   ("zenburn-magenta-bg-3" . "#785B6F")
+                                   ("zenburn-magenta-bg-4" . "#86627B")
+                                   ("zenburn-magenta-bg-5" . "#956987")
+                                   ("zenburn-violet"       . "#a9a1e1")
+                                   ("zenburn-magenta-01"   . "#c67eaf")
+                                   ("zenburn-magenta-03"   . "#9a6288")))
 
 
   ;;----------------------------------------------------------------------------
