@@ -720,13 +720,22 @@ back to new zen+org: [[file:source/user/config/org/theme/zenburn.el][here]]
 ...and then?
 everything done?
 
-* -- U R HERE --
-* completion
+* ├DONE───┤ completion
+CLOSED: [2025-06-04 Wed 16:27]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-06-04 Wed 16:27]
+:END:
 
 corfu, vertico, etc
 
 get from sn-004
+  - k
 
+[[file:source/user/config/completion.el]]
+
+
+
+* -- U R HERE --
 * whitespace
 
 cleanup

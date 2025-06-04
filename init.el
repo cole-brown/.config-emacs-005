@@ -12,6 +12,20 @@
 ;;
 ;;; Commentary:
 ;;
+;; NOTE: Personal Namespaces for `defun', `defvar', `def.*':
+;;---------------------------
+;;   Private - Things that will only be used in my init code, probably.
+;;     `--/' - general purpose "I made this" prefix
+;;   Public:
+;;     `/'   - general purpose "I made this" prefix
+;;
+;; NOTE:
+;;------
+;;
+;;
+;; Anyway
+;;-------
+;;
 ;; In the beginning...
 ;;   -what?
 ;; No, early-beginning doesn't count.
@@ -24,32 +38,39 @@
 ;;; Code:
 
 
+
+
+
+;;------------------------------------------------------------------------------
+;; TEMP Scripts for Recovering from Emacs Bankruptcy
+;;------------------------------------------------------------------------------
 ;; TODO MOVE TO ./scripts
+
 (defvar --/refactor/rx-replacements
   ;; NOTE: Try to keep alphabetically sorted.
   `(
 
     ("core/modules/emacs/" . "namespaced/")
 
-    ;;---
-    ;; imp
-    ;;---
+    ;; `imp'
+    ;;------
+    ("imp:eval:after" . "imp-eval-after")
     ("imp:file:current" . "imp-file-current")
-
     (,(rx-to-string "imp:flag?" :no-group) . "imp-flag?")
-
     ("imp:load" . "imp-load")
-
     ("imp:path:root/set" . "imp-path-root-set")
     ("imp:path:current:dir" . "imp-path-current-dir")
-
     ("imp:provide" . "imp-provide")
-
     ("imp:timing" . "imp-timing")
+    ("imp:use-package" . "use-package")
+
+
+    ("mantle/config/" . "source/user/config/")
+    (":mantle 'config" . ":user 'config")
     )
   "alist of regex to replacement string")
 
-(defun --/refactor/cmd ()
+(defun /cmd/refactor/by-rx ()
   "replace the old with the new"
   (interactive)
   (save-excursion
@@ -595,6 +616,26 @@ Sorry.")
 
 
   ;;--------------------------------------------------------------------------------
+  ;; Completion Frameworks
+  ;;--------------------------------------------------------------------------------
+  ;; "VMOCE Stack": Vertico & Friends
+  ;;   - `vertico':    https://github.com/minad/vertico
+  ;;   - `marginalia': https://github.com/minad/marginalia
+  ;;   - `orderless':  https://github.com/oantolin/orderless
+  ;;   - `consult':    https://github.com/minad/consult
+  ;;   - `embark':     https://github.com/oantolin/embark
+  ;;   - `embark-consult'
+  ;;
+  ;; Also Other Stuff, Inculding:
+  ;;   - `corfu':   https://github.com/minad/corfu
+  ;;   - `cape':    https://github.com/minad/cape
+  ;;   - `dabbrev': https://www.gnu.org/software/emacs/manual/html_node/emacs/Dynamic-Abbrevs.html
+
+  (imp-load :feature '(:user config completion)
+            :path    "config/completion.el")
+
+
+  ;;--------------------------------------------------------------------------------
   ;; (Automatic) Time Stamps
   ;;--------------------------------------------------------------------------------
 
@@ -1009,7 +1050,11 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
+ '(package-selected-packages
+   '(cape colorful-mode consult corfu deadgrep embark embark-consult
+          git-gutter-fringe git-modes gptel magit marginalia
+          no-littering orderless ox-gfm terraform-mode vertico
+          zenburn-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
