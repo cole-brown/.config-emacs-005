@@ -790,10 +790,9 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   ;; Org-Mode
   ;;------------------------------------------------------------------------------
 
-  ;; TODO THIS
-  ;; (imp-load :feature '(:user config org)
-  ;;           :path  "config/org/init.el"  ;;(imp-path-join 'config 'org 'init.el)
-  ;;           )
+  (imp-load :feature '(:user config org)
+            :path  "config/org/init.el"  ;;(imp-path-join 'config 'org 'init.el)
+            )
 
 
   ;;------------------------------------------------------------------------------
