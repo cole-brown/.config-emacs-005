@@ -953,19 +953,20 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
        "\n")
       "For adding to alist `gptel-directives' and/or var `gptel--system-message'.")
 
-    ;; My directive wasn't getting set as default when this was in
-    ;; `:congfig'. Does it work better if added to the list here in
-    ;; `:init'?
-    ;; `default' doesn't provide examples as often as I want.
-    (add-to-list 'gptel-directives
-                 (cons '--/gptel/directive/default --/gptel/directive/default))
-    ;; (pp gptel-directives)
-
     
     ;;------------------------------
     :hook
     ;;------------------------------
     (gptel-mode-hook . visual-line-mode)
+
+
+    ;;------------------------------
+    :config
+    ;;------------------------------
+
+    (add-to-list 'gptel-directives
+                 (cons '--/gptel/directive/default --/gptel/directive/default))
+    ;; (pp gptel-directives)
 
 
     ;;------------------------------
@@ -997,18 +998,18 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;;------------------------------
 
     (defun --/hook/yaml/settings ()
-        "Settings for YAML mode. Non-LSP stuff."
+      "Settings for YAML mode. Non-LSP stuff."
 
-        ;; `fill-column' is always a buffer-local var (see its help).
-        ;; Use `setq-local' so we remember what to use for things that aren't auto-buffer-local?
-        (setq-local fill-column --/fill-column/standard)
+      ;; `fill-column' is always a buffer-local var (see its help).
+      ;; Use `setq-local' so we remember what to use for things that aren't auto-buffer-local?
+      (setq-local fill-column --/fill-column/standard)
 
-        ;; TODO: Disable highlighting of long lines in whitespace-mode?
+      ;; TODO: Disable highlighting of long lines in whitespace-mode?
 
-        ;; NOTE [OLD]: `yaml-mode' does not use `tab-width'. It uses its own var: `yaml-indent-offset'.
-        ;; ;; Use smaller indents than is standard for code.
-        ;; (setq tab-width yaml-indent-offset)
-     )
+      ;; NOTE [OLD]: `yaml-mode' does not use `tab-width'. It uses its own var: `yaml-indent-offset'.
+      ;; ;; Use smaller indents than is standard for code.
+      ;; (setq tab-width yaml-indent-offset)
+      )
 
 
     ;;------------------------------
@@ -1108,11 +1109,11 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(cape colorful-mode consult corfu deadgrep embark embark-consult
-          git-gutter-fringe git-modes gptel hurl-mode magit marginalia
-          no-littering orderless ox-gfm terraform-mode vertico
-          yaml-mode zenburn-theme)))
+ '(org-fold-catch-invisible-edits 'show-and-error nil nil "Customized with use-package org")
+ '(package-selected-packages nil)
+ '(package-vc-selected-packages
+   '((hurl-mode :vc-backend Git :url
+                "https://github.com/JasZhe/hurl-mode"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

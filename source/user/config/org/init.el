@@ -35,7 +35,7 @@
           :filename "mode")
 
 ;; ...And now theme org mode itself...
-(imp-eval-after zenburn-theme
+(imp-eval-after (:and zenburn-theme org)
   (imp-load :feature  '(:user config org theme zenburn)
             :path     "config/org" ;; (imp-path-current-dir-relative :user)
             :filename "theme/zenburn"))
