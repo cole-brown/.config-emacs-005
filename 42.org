@@ -736,6 +736,12 @@ get from sn-004
 
 
 * -- U R HERE --
+* imp fixes
+
+Make provide and require macros
+
+Make load not a macro
+
 * whitespace
 
 cleanup
@@ -743,6 +749,9 @@ butler
 visuals
 etc
 
+old sn004: [[file:~/ocean/vault/.config/emacs/sn004/mantle/config/whitespace.el]]
+
+* treesitter
 * elisp
 
 Get settings and stuff.
@@ -773,13 +782,15 @@ Start editting for content:
       - [X] [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/link.el][link.el]]
 
 And then...
-  - [ ] contacts.el
   - [ ] journal.el
   - [ ] pretty.el
-  - [ ] toggl.el
   - [ ] version-control.el
+
+Skip/avoid for now?
   - [ ] agenda.el
-    - Skip/avoid for now?
+  - [ ] contacts.el
+  - [ ] toggl.el
+
 
     
     
@@ -845,59 +856,6 @@ Is there a package for 1Password?
 Should I use 1Password CLI instead of secret repo?
 
 * imp improvements
-** strip ~use-package~ down and make an argparser from it
-
-;;------------------------------------------------------------------------------
-;; Load Parsing Like Use-Package
-;;------------------------------------------------------------------------------
-;; `use-package' (macro)
-;;   - `use-package-core' (macro)
-;;     - `use-package-normalize-keywords'
-;;       - `use-package-normalize-plist'
-;;         - `use-package-normalize/:keyword'
-
-;; (defun use-package-merge-keys (key new old)
-;;   "Originally borrowed from `use-package-merge-keys'"
-;;   (let ((merger (assq key use-package-merge-key-alist)))
-;;     (if merger
-;;         (funcall (cdr merger) new old)
-;;       (append new old))))
-
-;; (defun imp--load-normalize (name input &optional plist)
-;;   "Given a pseudo-plist INPUT, normalize it to a regular plist.
-;; The normalized key/value pairs from input are added to PLIST,
-;; extending any keys already present.
-
-;; Originally borrowed from `use-package-normalize-plist'"
-;;   (if (null input)
-;;       plist
-;;     (let* ((keyword (car input))
-;;            (xs (use-package-split-list #'keywordp (cdr input)))
-;;            (args (car xs))
-;;            (tail (cdr xs))
-;;            (normalizer
-;;             (intern-soft (concat "use-package-normalize/"
-;;                                  (symbol-name keyword))))
-;;            (arg (and (functionp normalizer)
-;;                      (funcall normalizer name keyword args)))
-;;            (error-string (format "Unrecognized keyword: %s" keyword)))
-;;       (if (memq keyword use-package-keywords)
-;;           (progn
-;;             (setq plist (imp--load-normalize
-;;                          name tail plist))
-;;             (plist-put plist keyword
-;;                        (if (plist-member plist keyword)
-;;                            (funcall merge-function keyword arg
-;;                                     (plist-get plist keyword))
-;;                          arg)))
-;;         (if use-package-ignore-unknown-keywords
-;;             (progn
-;;               (display-warning 'use-package error-string)
-;;               (imp--load-normalize
-;;                name tail plist))
-;;           (use-package-error error-string))))))
-
-
 ** use-package integration via keyword
 
 [[file:source/core/packages/imp/package.el::;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Creating-an-extension.html][here]]
@@ -962,6 +920,59 @@ use-package-defaults is alist of (keyword form-for-default-value form-for-whethe
             (and use-package-always-ensure
                  (not (plist-member args :load-path)))))
  (:pin use-package-always-pin use-package-always-pin))
+
+** strip ~use-package~ down and make an argparser from it
+
+;;------------------------------------------------------------------------------
+;; Load Parsing Like Use-Package
+;;------------------------------------------------------------------------------
+;; `use-package' (macro)
+;;   - `use-package-core' (macro)
+;;     - `use-package-normalize-keywords'
+;;       - `use-package-normalize-plist'
+;;         - `use-package-normalize/:keyword'
+
+;; (defun use-package-merge-keys (key new old)
+;;   "Originally borrowed from `use-package-merge-keys'"
+;;   (let ((merger (assq key use-package-merge-key-alist)))
+;;     (if merger
+;;         (funcall (cdr merger) new old)
+;;       (append new old))))
+
+;; (defun imp--load-normalize (name input &optional plist)
+;;   "Given a pseudo-plist INPUT, normalize it to a regular plist.
+;; The normalized key/value pairs from input are added to PLIST,
+;; extending any keys already present.
+
+;; Originally borrowed from `use-package-normalize-plist'"
+;;   (if (null input)
+;;       plist
+;;     (let* ((keyword (car input))
+;;            (xs (use-package-split-list #'keywordp (cdr input)))
+;;            (args (car xs))
+;;            (tail (cdr xs))
+;;            (normalizer
+;;             (intern-soft (concat "use-package-normalize/"
+;;                                  (symbol-name keyword))))
+;;            (arg (and (functionp normalizer)
+;;                      (funcall normalizer name keyword args)))
+;;            (error-string (format "Unrecognized keyword: %s" keyword)))
+;;       (if (memq keyword use-package-keywords)
+;;           (progn
+;;             (setq plist (imp--load-normalize
+;;                          name tail plist))
+;;             (plist-put plist keyword
+;;                        (if (plist-member plist keyword)
+;;                            (funcall merge-function keyword arg
+;;                                     (plist-get plist keyword))
+;;                          arg)))
+;;         (if use-package-ignore-unknown-keywords
+;;             (progn
+;;               (display-warning 'use-package error-string)
+;;               (imp--load-normalize
+;;                name tail plist))
+;;           (use-package-error error-string))))))
+
 
 ** path: handle symlinks
 

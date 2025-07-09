@@ -474,6 +474,8 @@
   ;; PRIORITY: Everything: Emacs Settings
   ;;------------------------------------------------------------------------------
 
+  (defvar --/fill-column/standard 80 "80")
+  
   (defvar --/tab/standard 4 "4")
   (defvar --/tab/small    2 "2")
   (defvar --/tab/bug/org  8
@@ -951,7 +953,15 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
        "\n")
       "For adding to alist `gptel-directives' and/or var `gptel--system-message'.")
 
+    ;; My directive wasn't getting set as default when this was in
+    ;; `:congfig'. Does it work better if added to the list here in
+    ;; `:init'?
+    ;; `default' doesn't provide examples as often as I want.
+    (add-to-list 'gptel-directives
+                 (cons '--/gptel/directive/default --/gptel/directive/default))
+    ;; (pp gptel-directives)
 
+    
     ;;------------------------------
     :hook
     ;;------------------------------
@@ -971,37 +981,71 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
 
     ;; Default: `markdown-mode' if available, else `text-mode'
     ;; ...why would you ever not use org?
-    (gptel-default-mode 'org-mode)
+    (gptel-default-mode 'org-mode))
+
+
+  ;;------------------------------------------------------------------------------
+  ;; dev-env: Language: YAML
+  ;;------------------------------------------------------------------------------
+  ;; 2023-07-23_sn004:sn004/mantle/config/dev-env/languages/yaml.el
+
+  ;; `yaml-mode'
+  ;;------------
+  (use-package yaml-mode
+    ;;------------------------------
+    :init
+    ;;------------------------------
+
+    (defun --/hook/yaml/settings ()
+        "Settings for YAML mode. Non-LSP stuff."
+
+        ;; `fill-column' is always a buffer-local var (see its help).
+        ;; Use `setq-local' so we remember what to use for things that aren't auto-buffer-local?
+        (setq-local fill-column --/fill-column/standard)
+
+        ;; TODO: Disable highlighting of long lines in whitespace-mode?
+
+        ;; NOTE [OLD]: `yaml-mode' does not use `tab-width'. It uses its own var: `yaml-indent-offset'.
+        ;; ;; Use smaller indents than is standard for code.
+        ;; (setq tab-width yaml-indent-offset)
+     )
 
 
     ;;------------------------------
-    :config
+    :hook
     ;;------------------------------
-
-    ;; `default' doesn't provide examples as often as I want.
-    (add-to-list 'gptel-directives
-                 (cons '--/gptel/directive/default --/gptel/directive/default)))
-  ;; (pp gptel-directives)
+    (yaml-mode-hook . --/hook/yaml/settings)
 
 
+    ;;------------------------------
+    :custom
+    ;;------------------------------
+    
+    ;; Use smaller indents than is standard for code.
+    ;; NOTE: `yaml-indent-offset' is 2 by default. Set it explicitly in case I change my mind about tab sizes.
+    (yaml-indent-offset --/tab/small))
+
+  
   ;;------------------------------------------------------------------------------
   ;; dev-env: Language: Terraform (HCL)
   ;;------------------------------------------------------------------------------
   ;; 2023-07-23_sn004:/mantle/config/dev-env/languages/terraform.el
 
-  ;; ;;------------------------------------------------------------------------------
-  ;; ;; Sanity Check
-  ;; ;;------------------------------------------------------------------------------
+  ;;------------------------------------------------------------------------------
+  ;; Sanity Check
+  ;;------------------------------------------------------------------------------
 
   ;; Lodge a complaint if 'terraform' isn't installed on the system. But don't
   ;; skip the `terraform-mode' `use-package', since it only needs the exe for the
   ;; compile stuff.
   (--/exe/optional "terraform")
 
-  ;; ;;------------------------------------------------------------------------------
-  ;; ;; Syntax Highlighting
-  ;; ;;------------------------------------------------------------------------------
+  ;;------------------------------------------------------------------------------
+  ;; Syntax Highlighting
+  ;;------------------------------------------------------------------------------
 
+  ;; `terraform-mode'
+  ;;-----------------
   (use-package terraform-mode
     ;;------------------------------
     :custom
@@ -1010,12 +1054,27 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;; `terraform fmt` uses 2 spaces per indent level
     (terraform-indent-level 2))
 
+  ;;------------------------------------------------------------------------------
+  ;; dev-env: Rest Client/Language: Hurl
+  ;;------------------------------------------------------------------------------
+  
+  ;;`hurl-mode'
+  ;;-----------
+  ;; Not on (M)ELPA. Tell Emacs where/how to get it.
+  (package-vc-install "https://github.com/JasZhe/hurl-mode")
+
+  ;; https://hurl.dev/docs/installation.html
+  ;; https://github.com/JasZhe/hurl-mode
+  (use-package hurl-mode
+    :mode "\\.hurl\\'")
+
 
   ;;------------------------------------------------------------------------------
   ;; Fin: End of user Emacs init.
   ;;------------------------------------------------------------------------------
   ;; Clean up, final hellos, load summeries...
 
+  ;; TODO: Can I put this in the `imp' section?
   ;; Prep imp for outputting the timing summary.
   ;; Just starts a timer to do something after a second of activity after Emacs
   ;; runs its "init it done(ish), guys" hook.
@@ -1051,9 +1110,9 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(cape colorful-mode consult corfu deadgrep embark embark-consult
-          git-gutter-fringe git-modes gptel magit marginalia
+          git-gutter-fringe git-modes gptel hurl-mode magit marginalia
           no-littering orderless ox-gfm terraform-mode vertico
-          zenburn-theme)))
+          yaml-mode zenburn-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

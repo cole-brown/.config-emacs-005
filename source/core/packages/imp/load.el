@@ -727,6 +727,91 @@ Return nil for failure, non-nil for success."
 ;; (imp--unprovide-from-emacs :test)
 
 
+;; TODO: only :path; remove :filename
+;; TODO: add optional `:after' that will delay the whole file load until after the prereqs are met via `imp-eval-after'?
+(defun imp-load-v2 (&rest kwargs)
+  "Load a file relative to the current executing file (`load-file-name').
+
+KWARGS is a plist of load args:
+  - Required:
+    + `:feature'
+  - One or both:
+    + `:filename'
+    + `:path'
+  - Optional:
+    + `:error'
+      - Defaults to `t'; supply `:error nil' to change.
+    + `:optional'
+    + `:skip'
+      - Defaults to `t'; supply `:skip nil' to change.
+
+`:feature' value should be a list of keywords and symbols.
+  - example: '(:imp load)
+
+`:filename' value (aka FILENAME) can be:
+  - A path string (to a file).
+  - A list of strings to join into a path (to a file).
+  - A form that should evaluate to one of the above.
+
+When FILENAME is a relative path and PATH is nil, this looks
+for FILENAME relative to the 'current file' (see below).
+
+`:path' value (aka PATH) can be:
+  - A path string.
+  - A list of strings to join into a path.
+  - A form that should evaluate to one of the above.
+
+PATH is (nominally) where to look for the file (a string representing a
+directory path). If omitted, the lookup is relative to either
+`load-file-name', `byte-compile-current-file' or `buffer-file-name'
+(see func `imp-path-current-file').
+
+NOTE: If FILENAME is nil but PATH refers to a file, PATH will be use as FILENAME.
+
+`:error' value (aka ERROR) can be:
+  - nil
+  - non-nil (default)
+If ERROR is nil, the function will not raise an error if:
+  - The file doesn't exist.
+  - The FEATURE isn't provided after loading the file.
+It will still raise an error if:
+  - It cannot parse the inputs.
+  - It cannot determine where to /look/ for the file.
+
+`:optional' value (aka OPTIONAL) can be:
+  - nil (default)
+  - non-nil
+If OPTIONAL is non-nil, the file load will be considered optional. It will load
+if it exists and not error if it does not exist.
+  - Basically, it is a more specific `:error nil'.
+
+`:skip' value (aka SKIP) can be:
+  - non-nil (default)
+  - nil
+If SKIP is non-nil:
+  - Only loads the file if the FEATURE is not already provided in `imp-features'.
+If SKIP is nil:
+  - Always loads the file.
+
+Return nil for failure, non-nil for success."
+  (let* ((func-name "imp-load-v2")
+         (kwarg/parsed (imp--load-parse func-name
+                                        (imp-path-current-dir)
+                                        (upcase (symbol-name 'kwargs))
+                                        kwargs)))
+    (when imp--debugging?
+      (require 'pp)
+      (imp--debug func-name
+                  '("KWARGS:\n%s\n"
+                    "parsed:\n%s\n")
+                  (pp-to-string kwargs)
+                  (pp-to-string kwarg/parsed)))
+
+    
+    ))
+;; (imp-load-v2 :feature :user :path (imp-path-current-dir))
+
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
