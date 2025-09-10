@@ -1,0 +1,27 @@
+# -*- mode: snippet -*-
+# contributor: Cole Brown <code@brown.dev>
+# name: /header: new file.org header
+# key: /header
+# notes: Double time stamps were being inserted. Found reason:
+#   "This happens because org-insert-time-stamp inserts a time stamp (like the
+# name says), but also returns the time stamp. Yasnippit inserts the return
+# value but you're also left with the one inserted by the function call. A fix
+# is to capture the return value, leaving only the inserted value: (let ((x
+# (org-insert-time-stamp nil t t ))))."
+#   - erikstokes - https://emacs.stackexchange.com/a/13219
+# Can also see what we can change about `C-c C-e #'.
+# --
+#+TITLE:       ${1:`(let ((file-name (file-name-nondirectory (file-name-sans-extension (buffer-file-name)))))
+                      (if (string= (file-name-extension file-name) "notes")
+                          (concat
+                           (capitalize (file-name-extension file-name))
+                           "."
+                           (mapconcat #'capitalize
+                                      (split-string (file-name-sans-extension file-name) "_")
+                                      "_"))
+                        (capitalize file-name)))`}
+#+AUTHOR:      ${2:`(signature:string 'id 'name :default (user-full-name))`}
+#+EMAIL:       ${3:`(signature:get 'id 'email :namespace (jerky:namespace:get) :default (message-user-mail-address))`}
+#+DATE:        ${4:`(datetime:format 'rfc-3339 'date)`}
+#+TIMESTAMP:   0000-00-00
+$0

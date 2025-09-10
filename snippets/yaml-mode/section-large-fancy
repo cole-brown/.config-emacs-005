@@ -1,0 +1,29 @@
+# -*- mode: snippet -*-
+# contributor: Cole Brown <code@brown.dev>
+# name: /sec/fancy: section fancy: fancy prog-mode comment header section
+# key: /sec/fancy
+# --
+
+${1:Will do its thing on exit.$(when yas/moving-away-p
+  (if yas-text
+      (mis :buffer 'current
+           (mis:comment :align 'center
+                        :padding "-"
+                        yas-text))
+      (mis :buffer 'current
+           (mis:comment :padding "-"
+                        (mis:line "-")))))}
+${2:`yas-selected-text`$(when yas/moving-away-p
+  (mis :buffer 'current
+       (mis:comment :align 'center
+                    :padding " "
+                    yas-text)))}
+${3:Will do its thing on exit.$(when yas/moving-away-p
+  (if yas-text
+      (mis :buffer 'current
+           (mis:comment :align 'center
+                        :padding "-"
+                        yas-text))
+      (mis :buffer 'current
+           (mis:comment :padding "-"
+                        (mis:line "-")))))}$0

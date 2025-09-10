@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: Cole Brown <code@brown.dev>
+# name: /time/start: org start/finish list timestamps
+# key: /time/start
+# --
+- started:  `(datetime:format 'rfc-3339 'datetime)`
+- finished: $0

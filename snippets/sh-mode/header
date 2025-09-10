@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# contributor: Cole Brown <code@brown.dev>
+# name: /header: new file.org header
+# key: /header
+# --
+
+#!/usr/bin/env bash
+
+# https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+# -e          = exit on first error
+# -o pipefail = set exit code of a sequence of piped commands to an error if any of them errored
+# -u          = treat unset variables as an error
+# -x          = print a trace of each command
+set -eo pipefail
+
+_script_path="\$( cd "$( dirname "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+
+#-------------------------------------------------------------------------------
+# Script
+#-------------------------------------------------------------------------------

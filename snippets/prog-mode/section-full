@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# contributor: Cole Brown <code@brown.dev>
+# name: /sec/full: section full: prog-mode full-width comment header section
+# key: /sec/full
+# --
+`(mis :buffer 'current (mis:comment :padding " " (mis:line "-")))`
+`(mis :buffer 'current (mis:comment ""))` ${1:`yas-selected-text`}
+`(mis :buffer 'current (mis:comment :padding " " (mis:line "-")))`$0

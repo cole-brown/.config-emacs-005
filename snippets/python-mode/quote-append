@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: Cole Brown <code@brown.dev>
+# name: /quote: append single quotes to start and end of region
+# key: /quote
+# --
+"'" + ${1:`yas-selected-text`} + "'"$0
