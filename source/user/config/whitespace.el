@@ -293,7 +293,7 @@ this will disable it in child frames to fix all that visual noise.
 Add to `whitespace-enable-predicate' via `add-function'."
     (null (frame-parameter nil 'parent-frame)))
 
-  (defun --/hook/whitespace/settings/org ()
+  (defun --/hook/whitespace/settings/wide ()
     "I like some whitespace-mode stuff in org-mode, but want less than other modes."
     ;; Make a local copy of `whitespace-style' we can modify and...
     (set (make-local-variable 'whitespace-style)
@@ -309,7 +309,8 @@ Add to `whitespace-enable-predicate' via `add-function'."
   ;;------------------------------
   :hook
   ;;------------------------------
-  ((org-mode-hook    . --/hook/whitespace/settings/org)
+  ((org-mode-hook    . --/hook/whitespace/settings/wide)
+   (yaml-mode-hook   . --/hook/whitespace/settings/wide)
    (before-save-hook . --/hook/whitespace/before-save))
 
 

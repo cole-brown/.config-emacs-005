@@ -931,8 +931,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
       ;; Use `setq-local' so we remember what to use for things that aren't auto-buffer-local?
       (setq-local fill-column --/fill-column/standard)
 
-      ;; TODO: Disable highlighting of long lines in whitespace-mode?
-
       ;; NOTE [OLD]: `yaml-mode' does not use `tab-width'. It uses its own var: `yaml-indent-offset'.
       ;; ;; Use smaller indents than is standard for code.
       ;; (setq tab-width yaml-indent-offset)
