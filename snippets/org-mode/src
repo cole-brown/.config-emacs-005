@@ -5,7 +5,7 @@
 # notes: Block of source code with syntax highlighting, etc.
 # --
 
-#+begin_src ${1:`(mantle:yas:choose/no-match/history mantle:yas:choose/no-match/history:src "shell")`$(mantle:yas:choose/no-match "Language" 'mantle:yas:choose/no-match/history:src org-src-lang-modes)}
+#+begin_src $1
 $2
 #+end_src
 $0
