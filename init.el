@@ -475,92 +475,6 @@
   ;;------------------------------------------------------------------------------
 
   (defvar --/fill-column/standard 80 "80")
-  
-  (defvar --/tab/standard 4 "4")
-  (defvar --/tab/small    2 "2")
-  (defvar --/tab/bug/org  8
-    "Org barfs up a warning about tab widths that are not 8.
-
-I don't recall this Warning getting plastered all over the place in any of my
-previous configs. Maybe it's because I haven't done my org unbinds & rebinds yet?
-
-I'm going to call this a bug. Org probably disagrees. I will counter with...
-If you absolutely require tab to be:
-  1. exactly 8,
-  2. only 8,
-  3. and never anything except 8...
-
-Why the _fuck_ do you not just hard-code it to 8 for all of org-mode or lexically
-bind it to 8 for the function that requires it or anything proactive at all?
-
-Why the fuck you gotta just dump a warining on top of me, leave my org buffer
-indentation broken, and wander off?!
-
-Was this some setting I changed, Org?
-Which setting was it, Org?
-Why is this error absolutely useless for anything I'm asking here, Org?
-
-  > Warning (org-element): org-element--cache: Org parser error in notes.org::1212. Resetting.
-  >  The error was: (error \"Tab width in Org files must be 8, not 4.  Please adjust your ‘tab-width’ settings for Org mode\")
-  >  Backtrace:
-  >   backtrace-to-string(nil)
-  >   org-element-at-point()
-  >   #f(compiled-function (&optional indent arg interactive) \"Goto next table row or insert a newline.\\n\\nCalls `org-table-next-row' or `newline', depending on context.\\n\\nWhen optional INDENT argument is non-nil, call\\n`newline-and-indent' with ARG, otherwise call `newline' with ARG\\nand INTERACTIVE.\\n\\nWhen `org-return-follows-link' is non-nil and point is on\\na timestamp, a link or a citation, call `org-open-at-point'.\\nHowever, it will not happen if point is in a table or on a \\\"dead\\\"\\nobject (e.g., within a comment).  In these case, you need to use\\n`org-open-at-point' directly.\" (interactive \"i\\nP\\np\") #<bytecode 0x127fc01a1aa4c85e>)(nil nil 1)
-  >   apply(#f(compiled-function (&optional indent arg interactive) \"Goto next table row or insert a newline.\\n\\nCalls `org-table-next-row' or `newline', depending on context.\\n\\nWhen optional INDENT argument is non-nil, call\\n`newline-and-indent' with ARG, otherwise call `newline' with ARG\\nand INTERACTIVE.\\n\\nWhen `org-return-follows-link' is non-nil and point is on\\na timestamp, a link or a citation, call `org-open-at-point'.\\nHowever, it will not happen if point is in a table or on a \\\"dead\\\"\\nobject (e.g., within a comment).  In these case, you need to use\\n`org-open-at-point' directly.\" (interactive \"i\\nP\\np\") #<bytecode 0x127fc01a1aa4c85e>) (nil nil 1))
-  >   org-return(nil nil 1)
-  >   funcall-interactively(org-return nil nil 1)
-  >   call-interactively(org-return nil nil)
-  >   command-execute(org-return)
-  >
-  >  Please report this to Org mode mailing list (M-x org-submit-bug-report).
-
-Why, org, why?
-WHY DO YOU ALLOW THIS TO HAPPEN, ORG?!?!?!?
-Why are you wasting my and hlissner's time, Org?
-
-https://github.com/doomemacs/doomemacs/commit/43870bf8318f6471c4ce5e14565c9f0a3fb6e368
-  > fix(editorconfig): prevent changes to tab-width in org-mode
-  > - Add another measure for preventing changes to tab-width in org-mode.
-  >   The hook introduced in 2757a97 runs too early and could be overwritten
-  >   by editorconfig.
-  > - Fix the hook in 2757a97 to run much later, ensuring (as a last resort)
-  >   no other packages can overwrite tab-width either.
-  >
-  > Amend: 2757a97
-  > Ref: #7670
-
-You need a fucking setting, Org:
-(defcustom org-tab-width-force-to-8-because-org-is-so-complicated-we-cant-support-anything-except-the-OG-tab-width t)
-
-/rant
-Sorry.")
-
-  ;; Set Emacs' standard to our's.
-  (customize-set-variable 'standard-indent --/tab/standard)
-
-  ;; Long would be... 8, I think? But that's ridiculous and I don't like it so
-  ;; it's not here until it's needed.
-
-
-  ;;------------------------------
-  ;; Tab Settings
-  ;;------------------------------
-  ;; https://www.emacswiki.org/emacs/NoTabs
-  ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Just-Spaces.html
-  ;; https://www.emacswiki.org/emacs/TabsAreEvil
-  ;; https://www.emacswiki.org/emacs/SmartTabs
-
-  ;; Always use spaces; never use tabs.
-  (customize-set-variable 'indent-tabs-mode nil)
-
-  ;; Set default tab width for all buffers.
-  (customize-set-variable 'tab-width --/tab/standard)
-
-  ;; Make sure this is at it's default of nil, because:
-  ;;   "A value of nil means a tab stop every `tab-width' columns."
-  (customize-set-variable 'tab-stop-list nil)
-
-  ;; NOTE: M-x tabify and M-x untabify exist and work on regions.
 
 
   ;;------------------------------------------------------------------------------
@@ -642,6 +556,13 @@ Sorry.")
   (imp-load :feature '(:user config snippets)
             :path    "config/snippets.el")
 
+
+  ;;------------------------------------------------------------------------------
+  ;; Whitespace
+  ;;------------------------------------------------------------------------------
+
+  (imp-load :feature '(:user config whitespace)
+            :path    "config/whitespace.el")
 
   ;;--------------------------------------------------------------------------------
   ;; (Automatic) Time Stamps
@@ -959,7 +880,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
        "\n")
       "For adding to alist `gptel-directives' and/or var `gptel--system-message'.")
 
-    
+
     ;;------------------------------
     :hook
     ;;------------------------------
@@ -1027,12 +948,12 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;;------------------------------
     :custom
     ;;------------------------------
-    
+
     ;; Use smaller indents than is standard for code.
     ;; NOTE: `yaml-indent-offset' is 2 by default. Set it explicitly in case I change my mind about tab sizes.
     (yaml-indent-offset --/tab/small))
 
-  
+
   ;;------------------------------------------------------------------------------
   ;; dev-env: Language: Terraform (HCL)
   ;;------------------------------------------------------------------------------
@@ -1064,7 +985,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   ;;------------------------------------------------------------------------------
   ;; dev-env: Rest Client/Language: Hurl
   ;;------------------------------------------------------------------------------
-  
+
   ;;`hurl-mode'
   ;;-----------
   ;; Not on (M)ELPA. Tell Emacs where/how to get it.
