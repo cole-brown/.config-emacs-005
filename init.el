@@ -636,6 +636,12 @@ Sorry.")
   (imp-load :feature '(:user config completion)
             :path    "config/completion.el")
 
+  ;;------------------------------
+  ;; Completion: `yasnippets'
+  ;;------------------------------
+  (imp-load :feature '(:user config snippets)
+            :path    "config/snippets.el")
+
 
   ;;--------------------------------------------------------------------------------
   ;; (Automatic) Time Stamps
