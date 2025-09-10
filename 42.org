@@ -735,21 +735,160 @@ get from sn-004
 
 
 
+* ├DONE───┤ yasnippets
+CLOSED: [2025-09-09 Tue 23:50]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-09-09 Tue 23:50]
+- State "├CURRENT┤"  from              [2025-09-09 Tue 22:34]
+:END:
+
+** ├DONE───┤ 004's snippets
+CLOSED: [2025-09-09 Tue 22:34]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-09-09 Tue 22:34]
+:END:
+
+Need my begin_src snippet...
+#+begin_src bash
+cd /home/main/ocean/vault/.config/emacs/2023-07-23_sn004
+cp -r snippets ../2025-03-13_sn005/
+#+end_src
+
+** ├DONE───┤ use package
+CLOSED: [2025-09-09 Tue 23:41]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-09-09 Tue 23:41]
+- State "├CURRENT┤"  from              [2025-09-09 Tue 22:37]
+:END:
+
+Where is it in 004?
+#+begin_src console
+2023-07-23_sn004 on  main [!?] 
+❯ rg "use-package.*yas"
+mantle/config/dev-env/snippets.el
+111:(imp:use-package yasnippet
+574:(imp:use-package yasnippet
+636:(imp:use-package yasnippet
+#+end_src
+
+file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/dev-env/snippets.el
+
+test:
+
+#+begin_src yaml
+foo:
+  bar:
+    - baz
+    - qux
+#+end_src
+
+
+
+
+** ├DONE───┤ new snippets
+CLOSED: [2025-09-09 Tue 23:48]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-09-09 Tue 23:48]
+- State "├CURRENT┤"  from              [2025-09-09 Tue 23:41]
+:END:
+
+/todo/penis
+                             TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO.
+TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ODO TODO TODO TODO TODO TODO TODO TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO TODO
+DO TODO TODO TODO TODO TODO TODO TODO TODO'
+O TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO
+
+/todo/penis
+                             TODO TODO
+                             TODO TODO TODO TODO TODO TODO TODO TODO.
+                             TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                             ODO TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                             DO TODO TODO TODO TODO TODO TODO TODO TODO'
+                             O TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO
+meh.
+hm...
+back to drawing board...
+
+
 * -- U R HERE --
-* imp fixes
+* line/column
 
-Make provide and require macros
+old sn004: file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/emacs.el
+new sn005: file:~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/emacs.el
 
-Make load not a macro
 
-* whitespace
+* ├CURRENT┤ whitespace
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-09-09 Tue 23:55]
+:END:
 
 cleanup
 butler
 visuals
 etc
 
-old sn004: [[file:~/ocean/vault/.config/emacs/sn004/mantle/config/whitespace.el]]
+old sn004: [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/whitespace.el]]
+new sn005: file:/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/whitespace.el
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+get theme fixes for whitespace mode
+[[file:source/user/config/theme/zenburn/whitespace.el]]
+
+* FIX: timestamps
+
+...timestamps stopped working???
+[[file:init.el::;; (Automatic) Time Stamps]]
+
+* imp fixes
+
+Make load parse its args like use-package does?
+  - ur [[file:source/core/packages/imp/parser.el::provide 'use-package-core][here]]
+
+Make load not a macro
+  - ur [[file:source/core/packages/imp/load.el::;; (imp-load-v2 :feature :user :path (imp-path-current-dir))][here]]
+
+Make provide and require macros
+  - find an example of what is wanted from this?
+
+* snippet: /todo/penis
+
+Make a snippet friendly TODO penis.
+This one indents badly:
+
+desired:/todo/penis
+                             TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO.
+TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ODO TODO TODO TODO TODO TODO TODO TODO TODO
+ TODO TODO TODO TODO TODO TODO TODO TODO TODO
+DO TODO TODO TODO TODO TODO TODO TODO TODO'
+O TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO
+
+actual:/todo/penis
+                             TODO TODO
+                             TODO TODO TODO TODO TODO TODO TODO TODO.
+                             TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                             ODO TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                             DO TODO TODO TODO TODO TODO TODO TODO TODO'
+                             O TODO TODO TODO TODO TODO TODO TODO TODO
+                             TODO TODO
 
 * treesitter
 * elisp
@@ -825,25 +964,6 @@ do
   - [ ] config/theme/zenburn/init.el
     - partially done; finish
 
-* yasnippets
-
-Need my begin_src snippet...
-
-** new snippets
-
-/todo/penis
-                             TODO TODO
- TODO TODO TODO TODO TODO TODO TODO TODO.
-TODO TODO TODO TODO TODO TODO TODO TODO TODO
- TODO TODO TODO TODO TODO TODO TODO TODO TODO
-ODO TODO TODO TODO TODO TODO TODO TODO TODO
- TODO TODO TODO TODO TODO TODO TODO TODO TODO
-DO TODO TODO TODO TODO TODO TODO TODO TODO'
-O TODO TODO TODO TODO TODO TODO TODO TODO
-                             TODO TODO
-
-
-** evil
 * repo buffernames
 
 TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
