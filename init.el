@@ -729,6 +729,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   (imp-load :feature '(:user config org)
             :path  "config/org/init.el"  ;;(imp-path-join 'config 'org 'init.el)
             )
+  (message "/org")
 
 
   ;;------------------------------------------------------------------------------
@@ -791,6 +792,8 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;; ;;   - `deadgrep-project-root-overrides'
     ;; ;;   - `deadgrep-project-root-function'
     )
+  (message "/deadgrep")
+
 
   ;;------------------------------------------------------------------------------
   ;; Magit & Friends
@@ -828,6 +831,8 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;;                         :modified
     ;;                         :process))
     )
+  (message "/magit")
+
 
   ;;------------------------------------------------------------------------------
   ;; Git Gutter
@@ -844,6 +849,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     :config
     ;;------------------------------
     (global-git-gutter-mode +1))
+  (message "/git-gutter-fringe")
 
   ;;------------------------------------------------------------------------------
   ;; Git File Modes
@@ -860,8 +866,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;; `gitignore-mode' for it.
     (add-to-list 'auto-mode-alist
                  (cons "/.dockerignore\\'" 'gitignore-mode)))
-
-
+  (message "/git-modes")
 
 
   ;;------------------------------------------------------------------------------
@@ -917,6 +922,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;; Default: `markdown-mode' if available, else `text-mode'
     ;; ...why would you ever not use org?
     (gptel-default-mode 'org-mode))
+  (message "/gptel")
 
 
   ;;------------------------------------------------------------------------------
@@ -957,6 +963,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;; Use smaller indents than is standard for code.
     ;; NOTE: `yaml-indent-offset' is 2 by default. Set it explicitly in case I change my mind about tab sizes.
     (yaml-indent-offset --/tab/small))
+  (message "/yaml")
 
 
   ;;------------------------------------------------------------------------------
@@ -986,6 +993,8 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
 
     ;; `terraform fmt` uses 2 spaces per indent level
     (terraform-indent-level 2))
+  (message "/terraform-mode")
+
 
   ;;------------------------------------------------------------------------------
   ;; dev-env: Rest Client/Language: Hurl
@@ -1008,6 +1017,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     (unless (package-installed-p 'hurl-mode)
       ;; Not on (M)ELPA. Tell Emacs where/how to get it.
       (package-vc-install "https://github.com/JasZhe/hurl-mode")))
+  (message "/hurl-mode")
 
 
   ;;------------------------------------------------------------------------------
@@ -1052,8 +1062,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  '(org-fold-catch-invisible-edits 'show-and-error nil nil "Customized with use-package org")
  '(package-selected-packages nil)
  '(package-vc-selected-packages
-   '((hurl-mode :vc-backend Git :url
-                "https://github.com/JasZhe/hurl-mode"))))
+   '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
