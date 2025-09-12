@@ -86,8 +86,10 @@
 ;; Bit Fancier:
 ;; Can't propertize text in the frame title? :'(
 (customize-set-variable 'frame-title-format '(;; Buffer Name
-                                              (:eval (or (path:buffer:project nil :pretty)
-                                                         "%b"))
+                                              (:eval "%b"
+                                                     ;; (or (path:buffer:project nil :pretty)
+                                                     ;;     "%b")
+                                                     )
                                               ;; Remote Host Name
                                               (:eval (when-let ((host/remote (file-remote-p default-directory 'host)))
                                                        (concat " ⊶ " host/remote)))
