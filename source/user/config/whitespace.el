@@ -108,7 +108,7 @@ Sorry.")
 ;; `tab-width'
 ;;-------
 ;; Set default tab width for all buffers.
-(customize-set-variable 'tab-width (jerky:get 'code 'tab 'standard))
+(customize-set-variable 'tab-width --/tab/standard)
 
 
 ;; `tab-stop-list'
