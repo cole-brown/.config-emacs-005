@@ -993,13 +993,21 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
 
   ;;`hurl-mode'
   ;;-----------
-  ;; Not on (M)ELPA. Tell Emacs where/how to get it.
-  (package-vc-install "https://github.com/JasZhe/hurl-mode")
-
   ;; https://hurl.dev/docs/installation.html
   ;; https://github.com/JasZhe/hurl-mode
   (use-package hurl-mode
-    :mode "\\.hurl\\'")
+    :mode "\\.hurl\\'"
+
+    ;;------------------------------
+    :init
+    ;;------------------------------
+    ;; `package-vs-install' "bug":
+    ;;   1. It wants to be interactive.
+    ;;   2. It doesn't know what to do if the package is already installed.
+    ;; Therefore, hide behind installed check:
+    (unless (package-installed-p 'hurl-mode)
+      ;; Not on (M)ELPA. Tell Emacs where/how to get it.
+      (package-vc-install "https://github.com/JasZhe/hurl-mode")))
 
 
   ;;------------------------------------------------------------------------------
