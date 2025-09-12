@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
 # name: quote: org-mode quote block
-# key: quote
+# key: /quote
 # notes: Block of quoted text.
 # --
 
