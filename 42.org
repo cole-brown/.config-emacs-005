@@ -877,6 +877,19 @@ CLOSED: [2025-09-22 Mon 16:37]
 :END:
 
 * -- U R HERE --
+* IMP-FIX: imp-load
+
+** use-package parser
+
+Make load parse its args like use-package does?
+  - ur [[file:source/core/packages/imp/parser.el::provide 'use-package-core][here]]
+    - Refactor that to be useful to imp.
+
+** imp-load: non-macro version
+
+Make load not a macro
+  - ur [[file:source/core/packages/imp/load.el::;; (imp-load-v2 :feature :user :path (imp-path-current-dir))][here]]
+
 * ├CURRENT┤ elisp mode config
 :LOGBOOK:
 - State "├CURRENT┤"  from "├DONE───┤"  [2025-09-12 Fri 14:29]
@@ -903,14 +916,6 @@ Get these errors:
 And I guess these need fixed too:
 (remove-hook 'emacs-lisp-mode-hook 'highlight-quoted-mode)
 (remove-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
-
-* IMP-FIX: imp-load
-
-Make load parse its args like use-package does?
-  - ur [[file:source/core/packages/imp/parser.el::provide 'use-package-core][here]]
-
-Make load not a macro
-  - ur [[file:source/core/packages/imp/load.el::;; (imp-load-v2 :feature :user :path (imp-path-current-dir))][here]]
 
 * fix: treesit & JSON
 
