@@ -79,8 +79,8 @@
 
   ;; Periodically save the list of recent files: https://www.emacswiki.org/emacs/RecentFiles#toc1
   ;; Otherwise they're only saved during a graceful shutdown.
-  (run-with-timer (* 30 60) ;; TODO: need `ns:unit': (unit:second 30 'mins) ;; Wait 30 mins to run.
-                  (* 30 60) ;; TODO: need `ns:unit': (unit:second 30 'mins) ;; Repeat every 30 mins.
+  (run-with-timer (unit:second 30 'mins) ;; Wait 30 mins to run.
+                  (unit:second 30 'mins) ;; Repeat every 30 mins.
                   'recentf-save-list)
 
   ;; Recentf and TRAMP need some peace-keeping to get along.

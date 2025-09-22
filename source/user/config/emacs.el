@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-24
-;; Timestamp:  2025-09-10
+;; Timestamp:  2025-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -161,8 +161,7 @@
 ;; Cursor / Point
 ;;------------------------------
 
-;; TODO: fix ns/unit lib for (unit:second 0.75 'sec)
-(customize-set-variable 'blink-cursor-interval 0.75) ; default is 0.5 seconds
+(customize-set-variable 'blink-cursor-interval (unit:second 0.75 'sec)) ; default is 0.5 seconds
 (customize-set-variable 'blink-matching-paren  nil)
 
 ;; Don't stretch the cursor to fit wide characters; it is disorienting,
