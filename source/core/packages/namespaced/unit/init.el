@@ -1,4 +1,4 @@
-;;; core/modules/elisp/utils/init.el --- The Utilities -*- lexical-binding: t; -*-
+;;; namespaced/unit/init.el --- Units of Measurements, Conversions, etc -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -12,9 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; The Utilities
-;;
-;; Useful functions that have no home elsewhere.
+;; Kilobytes, hogsheads, nautical miles...
 ;;
 ;;; Code:
 
@@ -24,7 +22,7 @@
 ;;------------------------------------------------------------------------------
 
 
-(imp-path-root-set :elisp
+(imp-path-root-set :unit
                    (imp-path-current-dir)
                    (imp-file-current))
 
@@ -34,26 +32,16 @@
 ;;------------------------------------------------------------------------------
 
 (imp-timing
-    :elisp
+    :unit
     (imp-file-current)
     (imp-path-current-dir)
 
-  (imp-load :feature  '(:elisp types)
-            :filename "types")
-  (imp-load :feature  '(:elisp functions)
-            :filename "functions")
-
-  ;; TODO: refactor the rest of 'em.
-  ;; (imp-load :feature  '(:elisp predicates)
-  ;;           :filename "predicates")
-  ;; (imp-load :feature  '(:elisp utest)
-  ;;           :filename "test")
-  ;; (imp-load :feature  '(:elisp units)
-  ;;           :filename "units")
+  (imp-load :feature  '(:unit units)
+            :filename "units")
   )
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :elisp)
+(imp-provide :unit)

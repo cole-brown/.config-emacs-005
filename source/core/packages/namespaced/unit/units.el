@@ -1,9 +1,9 @@
-;;; core/modules/elisp/utils/units.el --- Nicer units? -*- lexical-binding: t; -*-
+;;; namespaced/unit/units.el --- Nicer units? -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2023-02-24
-;; Timestamp:  2023-09-15
+;; Timestamp:  2025-09-22
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
