@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-03-16
-;; Timestamp:  2023-08-22
+;; Timestamp:  2025-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -43,7 +43,7 @@
   ;;---
   (jerky:set 'org 'journal 'file 'format
              :namespace :home
-             :value (concat (datetime:format/get 'iso-8601 'date)
+             :value (concat (datetime:format:get :iso-8601:date)
                             ;; TODO: 'notebook' not quickest to
                             ;; auto-complete to. Find better.
                             ".notebook.org")
@@ -54,7 +54,7 @@
   ;;---
   (jerky:set 'org 'journal 'file 'format
              :namespace :work
-             :value (concat (datetime:format/get 'iso-8601 'date)
+             :value (concat (datetime:format:get :iso-8601:date)
                             ;; TODO: 'logbook' not quickest to
                             ;; auto-complete to. Find better.
                             ".logbook.org")
@@ -157,7 +157,7 @@ But TIME is just nil."
                               :namespace (jerky:get 'namespace 'system)))
 
   ;; Tack (full) day name onto our format for the org-journal headline.
-  (org-journal-date-format (concat (datetime:format/get 'iso-8601 'date)
+  (org-journal-date-format (concat (datetime:format:get :iso-8601:date)
                                    ", %A"))
   ;; This can be a function if more is wanted. E.g. inserting new header text
   ;; into empty files.

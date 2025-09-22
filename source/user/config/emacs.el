@@ -143,16 +143,16 @@
 ;; File Time Formats
 ;;------------------------------
 
-;; TODO: fix ns/datetime lib
-;; ;; Set time format for e.g. dired to a better format:
-;; ;;   RFC-3339 (human-readable ISO-8601)
-;; ;; Original value:
-;; ;;   '(\"%d.%m.%Y %H:%M\" \"%d.%m.%Y %H:%M\"))
-;; (customize-set-variable 'ls-lisp-format-time-list (list
-;;                            ;; Recent Time Format:
-;;                            (datetime:format/get 'rfc-3339 'datetime)
-;;                            ;; Not-Recent Time Format:
-;;                            (datetime:format/get 'rfc-3339 'datetime)))
+;; Set time format for e.g. dired to a better format:
+;;   RFC-3339 (human-readable ISO-8601)
+;; Original value:
+;;   '(\"%b %e %H:%M\" \"%b %e  %Y\")
+(customize-set-variable 'ls-lisp-format-time-list
+                        (list
+                         ;; Recent Time Format:
+                         (datetime:format:get :rfc-3339:datetime)
+                         ;; Not-Recent Time Format:
+                         (datetime:format:get :rfc-3339:datetime)))
 
 ;; Force use of `ls-lisp-format-time-list' regardless of locale.
 (customize-set-variable 'ls-lisp-use-localized-time-format t)
