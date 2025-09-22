@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-03-13
+;; Timestamp:  2025-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -723,76 +723,31 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
 
 
   ;;------------------------------------------------------------------------------
+  ;; Files
+  ;;------------------------------------------------------------------------------
+
+  (imp-load :feature '(:user config files)
+            :path  "config/files.el"  ;;(imp-path-join 'config 'files.el)
+            )
+
+
+  ;;------------------------------------------------------------------------------
   ;; Org-Mode
   ;;------------------------------------------------------------------------------
 
   (imp-load :feature '(:user config org)
             :path  "config/org/init.el"  ;;(imp-path-join 'config 'org 'init.el)
             )
-  (message "/org")
 
 
   ;;------------------------------------------------------------------------------
-  ;; Search: Deadgrep (uses Ripgrep)
+  ;; Languages
   ;;------------------------------------------------------------------------------
 
-  ;;------------------------------
-  ;; ripgrep
-  ;;------------------------------
-  ;; https://github.com/BurntSushi/ripgrep
-  ;;
-  ;; This needs installed on the computer separately from Emacs.
-  ;;
-  ;;   "ripgrep is a line-oriented search tool that recursively searches your
-  ;; current directory for a regex pattern. By default, ripgrep will respect your
-  ;; .gitignore and automatically skip hidden files/directories and binary files.
-  ;; ripgrep has first class support on Windows, macOS and Linux, with binary
-  ;; downloads available for every release. ripgrep is similar to other popular
-  ;; search tools like The Silver Searcher, ack and grep."
-
-
-  ;;------------------------------
-  ;; deadgrep
-  ;;------------------------------
-  ;; https://github.com/Wilfred/deadgrep
-  ;; "Deadgrep is the fast, beautiful text search that your Emacs deserves."
-  (use-package deadgrep
-    :demand t
-
-    ;;------------------------------
-    :init
-    ;;------------------------------
-
-    (defun //deadgrep/default-directory (search-term)
-      "Search for SEARCH-TERM with `deadgrep' at `default-directory'."
-      (interactive (list (deadgrep--read-search-term)))
-      (call-interactively #'deadgrep
-                          search-term
-                          default-directory))
-
-
-    (defun //deadgrep/buffer/kill-all ()
-      "Kill all deadgrep buffers."
-      (interactive)
-      (message "[%s] Kill 'deadgrep' buffers..."
-               (datetime:format 'rfc-3339 'datetime))
-      (buffer:kill:matching ".*deadgrep.*"
-                            :internal
-                            :modified
-                            :process))
-
-    ;; ;;------------------------------
-    ;; :config
-    ;; ;;------------------------------
-    ;;
-    ;; ;;---
-    ;; ;; Project Root Overrides
-    ;; ;;---
-    ;; ;; TODO: Search per-comp configs for `deadgrep-project-root' to find what's set?
-    ;; ;;   - `deadgrep-project-root-overrides'
-    ;; ;;   - `deadgrep-project-root-function'
-    )
-  (message "/deadgrep")
+  (imp-load :feature '(:user config languages elisp)
+            ;; TODO: make/load "config/languages/init.el", which will load all
+            :path  "config/languages/elisp.el"  ;; (imp-path-join 'config 'org 'init.el)
+            )
 
 
   ;;------------------------------------------------------------------------------
@@ -831,7 +786,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;;                         :modified
     ;;                         :process))
     )
-  (message "/magit")
 
 
   ;;------------------------------------------------------------------------------
@@ -849,7 +803,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     :config
     ;;------------------------------
     (global-git-gutter-mode +1))
-  (message "/git-gutter-fringe")
 
   ;;------------------------------------------------------------------------------
   ;; Git File Modes
@@ -866,7 +819,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;; `gitignore-mode' for it.
     (add-to-list 'auto-mode-alist
                  (cons "/.dockerignore\\'" 'gitignore-mode)))
-  (message "/git-modes")
 
 
   ;;------------------------------------------------------------------------------
@@ -922,7 +874,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;; Default: `markdown-mode' if available, else `text-mode'
     ;; ...why would you ever not use org?
     (gptel-default-mode 'org-mode))
-  (message "/gptel")
 
 
   ;;------------------------------------------------------------------------------
@@ -963,7 +914,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     ;; Use smaller indents than is standard for code.
     ;; NOTE: `yaml-indent-offset' is 2 by default. Set it explicitly in case I change my mind about tab sizes.
     (yaml-indent-offset --/tab/small))
-  (message "/yaml")
 
 
   ;;------------------------------------------------------------------------------
@@ -993,7 +943,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
 
     ;; `terraform fmt` uses 2 spaces per indent level
     (terraform-indent-level 2))
-  (message "/terraform-mode")
 
 
   ;;------------------------------------------------------------------------------
@@ -1017,7 +966,6 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
     (unless (package-installed-p 'hurl-mode)
       ;; Not on (M)ELPA. Tell Emacs where/how to get it.
       (package-vc-install "https://github.com/JasZhe/hurl-mode")))
-  (message "/hurl-mode")
 
 
   ;;------------------------------------------------------------------------------
