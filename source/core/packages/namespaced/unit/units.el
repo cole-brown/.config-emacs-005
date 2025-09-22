@@ -21,21 +21,21 @@
 ;; Units in Symbol Properties
 ;;--------------------------------------------------------------------------------
 
-(defconst int<unit>:symbol:property 'unit
+(defconst _:unit:symbol:property 'unit
   "Symbol Property name for units.")
 
 
 (defun unit:set (symbol unit)
   "Store UNIT in SYMBOL's properties."
-  (put symbol int<unit>:symbol:property unit))
+  (put symbol _:unit:symbol:property unit))
 
 
 (defun unit:get (symbol)
   "Get UNIT from SYMBOL's properties."
-  (get symbol int<unit>:symbol:property))
+  (get symbol _:unit:symbol:property))
 
 
-(defmacro int<unit>:convert (caller value unit dictionary)
+(defmacro _:unit:convert (caller value unit dictionary)
   "Convert VALUE of UNIT into an amount of base units given DICTIONARY.
 
 VALUE should be a `numberp' (float or int number).
@@ -43,14 +43,14 @@ VALUE should be a `numberp' (float or int number).
 UNIT should be a symbol (and a key from DICTIONARY).
 
 DICTIONARY should be an alist of cons: (unit-symbol . amount-of-base-units)
-e.g.: See variables `int<units>:bytes' and `int<units>:seconds'.
+e.g.: See variables `_:unit:bytes' and `_:unit:seconds'.
 
 CALLER should be a string of calling function's name.
 
 Example:
-  (int<unit>:convert \"example\" 1   'h  int<units>:seconds)
+  (_:unit:convert \"example\" 1   'h  _:unit:seconds)
     -> 3600.0
-  (int<unit>:convert \"example\" 0.5 'kb int<units>:bytes)
+  (_:unit:convert \"example\" 0.5 'kb _:unit:bytes)
     -> 500.0"
   (declare (pure t) (side-effect-free t))
   (let ((macro:dictionary/name (format "%s" dictionary))) ; for more helpful error message.
@@ -64,20 +64,20 @@ Example:
        ;;------------------------------
        (unless macro:unit/multiplier
          (nub:error
-             :innit
-             macro:func/name
-           "Unknown unit name '%S'! See `%s' for allowed units."
-           macro:unit
-           ,macro:dictionary/name))
+          :innit
+          macro:func/name
+          "Unknown unit name '%S'! See `%s' for allowed units."
+          macro:unit
+          ,macro:dictionary/name))
 
        ;; Allow floats as well as ints for e.g.: (unit:second 0.5 'gb)
        (unless (numberp macro:value)
          (nub:error
-             :innit
-             macro:func/name
-           "VALUE should be a number (int or float). Got %S: %S"
-           (type-of macro:value)
-           macro:value))
+          :innit
+          macro:func/name
+          "VALUE should be a number (int or float). Got %S: %S"
+          (type-of macro:value)
+          macro:value))
 
        ;;------------------------------
        ;; Unit Conversion
@@ -85,101 +85,101 @@ Example:
        ;; Calculate & return as float value; caller can cast to int w/ `floor' if needed.
        (* (float macro:value)
           macro:unit/multiplier))))
-;; (int<unit>:convert "example" 0.5 'kb int<units>:bytes)
+;; (_:unit:convert "example" 0.5 'kb _:unit:bytes)
 ;; Errors w/ "example" caller name?
-;;   (int<unit>:convert "example" 0.5 'kb nil)
+;;   (_:unit:convert "example" 0.5 'kb nil)
 
 
 ;;------------------------------------------------------------------------------
 ;; Bytes
 ;;------------------------------------------------------------------------------
 
-(defconst int<units>:bytes:multiplier/decimal (expt 10 3)
+(defconst _:unit:base:decimal (expt 10 3)
   "Decimal / IEC / SI units are multiplied by 1000.")
 
 
-(defconst int<units>:bytes:multiplier/binary  (expt 2 10)
+(defconst _:unit:base:binary  (expt 2 10)
   "Binary units are multiplied by the closest power of 2 to 1000.")
 
 
-(defconst int<units>:bytes
+(defconst _:unit:bytes
   (list
    (cons 'b           1)
    (cons 'B           1)
    (cons 'byte        1)
    (cons 'bytes       1)
 
-   (cons 'kb          (expt int<units>:bytes:multiplier/decimal 1))
-   (cons 'kB          (expt int<units>:bytes:multiplier/decimal 1))
-   (cons 'kilobyte    (expt int<units>:bytes:multiplier/decimal 1))
-   (cons 'kilobytes   (expt int<units>:bytes:multiplier/decimal 1))
-   (cons 'kib         (expt int<units>:bytes:multiplier/binary  1))
-   (cons 'kiB         (expt int<units>:bytes:multiplier/binary  1))
-   (cons 'kibibyte    (expt int<units>:bytes:multiplier/binary  1))
-   (cons 'kibibytes   (expt int<units>:bytes:multiplier/binary  1))
+   (cons 'kb          (expt _:unit:base:decimal 1))
+   (cons 'kB          (expt _:unit:base:decimal 1))
+   (cons 'kilobyte    (expt _:unit:base:decimal 1))
+   (cons 'kilobytes   (expt _:unit:base:decimal 1))
+   (cons 'kib         (expt _:unit:base:binary  1))
+   (cons 'kiB         (expt _:unit:base:binary  1))
+   (cons 'kibibyte    (expt _:unit:base:binary  1))
+   (cons 'kibibytes   (expt _:unit:base:binary  1))
 
-   (cons 'mb          (expt int<units>:bytes:multiplier/decimal 2))
-   (cons 'MB          (expt int<units>:bytes:multiplier/decimal 2))
-   (cons 'megabyte    (expt int<units>:bytes:multiplier/decimal 2))
-   (cons 'megabytes   (expt int<units>:bytes:multiplier/decimal 2))
-   (cons 'mib         (expt int<units>:bytes:multiplier/binary  2))
-   (cons 'MiB         (expt int<units>:bytes:multiplier/binary  2))
-   (cons 'mebibyte    (expt int<units>:bytes:multiplier/binary  2))
-   (cons 'mebibytes   (expt int<units>:bytes:multiplier/binary  2))
+   (cons 'mb          (expt _:unit:base:decimal 2))
+   (cons 'MB          (expt _:unit:base:decimal 2))
+   (cons 'megabyte    (expt _:unit:base:decimal 2))
+   (cons 'megabytes   (expt _:unit:base:decimal 2))
+   (cons 'mib         (expt _:unit:base:binary  2))
+   (cons 'MiB         (expt _:unit:base:binary  2))
+   (cons 'mebibyte    (expt _:unit:base:binary  2))
+   (cons 'mebibytes   (expt _:unit:base:binary  2))
 
-   (cons 'gb          (expt int<units>:bytes:multiplier/decimal 3))
-   (cons 'GB          (expt int<units>:bytes:multiplier/decimal 3))
-   (cons 'gigabyte    (expt int<units>:bytes:multiplier/decimal 3))
-   (cons 'gigabytes   (expt int<units>:bytes:multiplier/decimal 3))
-   (cons 'gib         (expt int<units>:bytes:multiplier/binary  3))
-   (cons 'GiB         (expt int<units>:bytes:multiplier/binary  3))
-   (cons 'gibibyte    (expt int<units>:bytes:multiplier/binary  3))
-   (cons 'gibibytes   (expt int<units>:bytes:multiplier/binary  3))
+   (cons 'gb          (expt _:unit:base:decimal 3))
+   (cons 'GB          (expt _:unit:base:decimal 3))
+   (cons 'gigabyte    (expt _:unit:base:decimal 3))
+   (cons 'gigabytes   (expt _:unit:base:decimal 3))
+   (cons 'gib         (expt _:unit:base:binary  3))
+   (cons 'GiB         (expt _:unit:base:binary  3))
+   (cons 'gibibyte    (expt _:unit:base:binary  3))
+   (cons 'gibibytes   (expt _:unit:base:binary  3))
 
-   (cons 'tb          (expt int<units>:bytes:multiplier/decimal 4))
-   (cons 'TB          (expt int<units>:bytes:multiplier/decimal 4))
-   (cons 'terabyte    (expt int<units>:bytes:multiplier/decimal 4))
-   (cons 'terabytes   (expt int<units>:bytes:multiplier/decimal 4))
-   (cons 'tib         (expt int<units>:bytes:multiplier/binary  4))
-   (cons 'TiB         (expt int<units>:bytes:multiplier/binary  4))
-   (cons 'tebibyte    (expt int<units>:bytes:multiplier/binary  4))
-   (cons 'tebibytes   (expt int<units>:bytes:multiplier/binary  4))
+   (cons 'tb          (expt _:unit:base:decimal 4))
+   (cons 'TB          (expt _:unit:base:decimal 4))
+   (cons 'terabyte    (expt _:unit:base:decimal 4))
+   (cons 'terabytes   (expt _:unit:base:decimal 4))
+   (cons 'tib         (expt _:unit:base:binary  4))
+   (cons 'TiB         (expt _:unit:base:binary  4))
+   (cons 'tebibyte    (expt _:unit:base:binary  4))
+   (cons 'tebibytes   (expt _:unit:base:binary  4))
 
-   (cons 'pb          (expt int<units>:bytes:multiplier/decimal 5))
-   (cons 'PB          (expt int<units>:bytes:multiplier/decimal 5))
-   (cons 'petabyte    (expt int<units>:bytes:multiplier/decimal 5))
-   (cons 'petabytes   (expt int<units>:bytes:multiplier/decimal 5))
-   (cons 'pib         (expt int<units>:bytes:multiplier/binary  5))
-   (cons 'PiB         (expt int<units>:bytes:multiplier/binary  5))
-   (cons 'pebibyte    (expt int<units>:bytes:multiplier/binary  5))
-   (cons 'pebibytes   (expt int<units>:bytes:multiplier/binary  5))
+   (cons 'pb          (expt _:unit:base:decimal 5))
+   (cons 'PB          (expt _:unit:base:decimal 5))
+   (cons 'petabyte    (expt _:unit:base:decimal 5))
+   (cons 'petabytes   (expt _:unit:base:decimal 5))
+   (cons 'pib         (expt _:unit:base:binary  5))
+   (cons 'PiB         (expt _:unit:base:binary  5))
+   (cons 'pebibyte    (expt _:unit:base:binary  5))
+   (cons 'pebibytes   (expt _:unit:base:binary  5))
 
-   (cons 'eb          (expt int<units>:bytes:multiplier/decimal 6))
-   (cons 'EB          (expt int<units>:bytes:multiplier/decimal 6))
-   (cons 'exabyte     (expt int<units>:bytes:multiplier/decimal 6))
-   (cons 'exabytes    (expt int<units>:bytes:multiplier/decimal 6))
-   (cons 'eib         (expt int<units>:bytes:multiplier/binary  6))
-   (cons 'EiB         (expt int<units>:bytes:multiplier/binary  6))
-   (cons 'exbibyte    (expt int<units>:bytes:multiplier/binary  6))
-   (cons 'exbibytes   (expt int<units>:bytes:multiplier/binary  6))
+   (cons 'eb          (expt _:unit:base:decimal 6))
+   (cons 'EB          (expt _:unit:base:decimal 6))
+   (cons 'exabyte     (expt _:unit:base:decimal 6))
+   (cons 'exabytes    (expt _:unit:base:decimal 6))
+   (cons 'eib         (expt _:unit:base:binary  6))
+   (cons 'EiB         (expt _:unit:base:binary  6))
+   (cons 'exbibyte    (expt _:unit:base:binary  6))
+   (cons 'exbibytes   (expt _:unit:base:binary  6))
 
-   (cons 'zb          (expt int<units>:bytes:multiplier/decimal 7))
-   (cons 'ZB          (expt int<units>:bytes:multiplier/decimal 7))
-   (cons 'zettabyte   (expt int<units>:bytes:multiplier/decimal 7))
-   (cons 'zettabytes  (expt int<units>:bytes:multiplier/decimal 7))
-   (cons 'zib         (expt int<units>:bytes:multiplier/binary  7))
-   (cons 'ZiB         (expt int<units>:bytes:multiplier/binary  7))
-   (cons 'zebibyte    (expt int<units>:bytes:multiplier/binary  7))
-   (cons 'zebibytes   (expt int<units>:bytes:multiplier/binary  7))
+   (cons 'zb          (expt _:unit:base:decimal 7))
+   (cons 'ZB          (expt _:unit:base:decimal 7))
+   (cons 'zettabyte   (expt _:unit:base:decimal 7))
+   (cons 'zettabytes  (expt _:unit:base:decimal 7))
+   (cons 'zib         (expt _:unit:base:binary  7))
+   (cons 'ZiB         (expt _:unit:base:binary  7))
+   (cons 'zebibyte    (expt _:unit:base:binary  7))
+   (cons 'zebibytes   (expt _:unit:base:binary  7))
 
-   (cons 'yb          (expt int<units>:bytes:multiplier/decimal 8))
-   (cons 'YB          (expt int<units>:bytes:multiplier/decimal 8))
-   (cons 'yottabyte   (expt int<units>:bytes:multiplier/decimal 8))
-   (cons 'yottabytes  (expt int<units>:bytes:multiplier/decimal 8))
-   (cons 'yib         (expt int<units>:bytes:multiplier/binary  8))
-   (cons 'YiB         (expt int<units>:bytes:multiplier/binary  8))
-   (cons 'yobibyte    (expt int<units>:bytes:multiplier/binary  8))
-   (cons 'yobibytes   (expt int<units>:bytes:multiplier/binary  8)))
+   (cons 'yb          (expt _:unit:base:decimal 8))
+   (cons 'YB          (expt _:unit:base:decimal 8))
+   (cons 'yottabyte   (expt _:unit:base:decimal 8))
+   (cons 'yottabytes  (expt _:unit:base:decimal 8))
+   (cons 'yib         (expt _:unit:base:binary  8))
+   (cons 'YiB         (expt _:unit:base:binary  8))
+   (cons 'yobibyte    (expt _:unit:base:binary  8))
+   (cons 'yobibytes   (expt _:unit:base:binary  8)))
   "Alist of byte units in terms of how many bytes they are.")
 
 
@@ -188,7 +188,7 @@ Example:
 
 VALUE should be a float or int number.
 
-UNIT should be a symbol (and a key from alist `int<units>:bytes').
+UNIT should be a symbol (and a key from alist `_:unit:bytes').
 
 Example:
   (unit:byte 2 'kb)
@@ -197,15 +197,15 @@ Example:
     -> 2048"
   (declare (pure t) (side-effect-free t))
   (floor ; No fractional bytes; cast to int.
-   (int<unit>:convert "unit:byte"
-                      value
-                      unit
-                      int<units>:bytes)))
+   (_:unit:convert "unit:byte"
+                   value
+                   unit
+                   _:unit:bytes)))
 ;; (unit:byte 100 'kb)
 ;; (unit:byte 0.5 'kb)
 
 
-;; TODO:units: Convert unit to human-readable value:
+;; TODO:unit: Convert unit to human-readable value:
 ;; (defun unit:byte:human (value unit)
 ;;   "Convert VALUE of UNIT bytes to a pretty, human-readable value/unit.
 ;;
@@ -223,7 +223,7 @@ Example:
 ;; Time
 ;;--------------------------------------------------------------------------------
 
-(defconst int<units>:seconds
+(defconst _:unit:seconds
   (list
    (cons 's       1)
    (cons 'sec     1)
@@ -263,7 +263,7 @@ Example:
 
 VALUE should be a `numberp' (float or int number).
 
-UNIT should be a symbol (and a key from alist `int<units>:seconds').
+UNIT should be a symbol (and a key from alist `_:unit:seconds').
 
 Example:
   (unit:second 1 'h)
@@ -271,15 +271,15 @@ Example:
   (unit:second 0.5 'm)
     -> 30.0"
   (declare (pure t) (side-effect-free t))
-  (int<unit>:convert "unit:second"
-                     value
-                     unit
-                     int<units>:seconds))
+  (_:unit:convert "unit:second"
+                  value
+                  unit
+                  _:unit:seconds))
 ;; (unit:second 1 'h)
 ;; (unit:second 0.5 'm)
 
 
-;; TODO:units: Convert unit to human-readable value:
+;; TODO:unit: Convert unit to human-readable value:
 ;; (defun unit:second:human (value unit)
 ;;   "Convert VALUE of UNIT seconds to a pretty, human-readable value/unit.
 ;;
@@ -296,4 +296,4 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :elisp 'utils 'units)
+(imp-provide :unit 'units)

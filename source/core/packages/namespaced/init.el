@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-05-15
-;; Timestamp:  2025-05-15
+;; Timestamp:  2025-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -53,6 +53,10 @@
   (imp-load :feature  :theme
             :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/theme"
             :filename "init.el") ; requires `:elisp', `:str'
+
+  (imp-load :feature  :unit
+            :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit"
+            :filename "init.el") ; standalone... so far
 
   ;; TODO: refactor the rest of 'em.
 
