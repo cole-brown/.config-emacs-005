@@ -1,10 +1,10 @@
-;;; core/modules/elisp/datetime/format.el --- Datetime Formatting & Formats -*- lexical-binding: t; -*-
+;;; namespaced/datetime/format.el --- Datetime Formatting & Formats -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-07-21
+;; Timestamp:  2025-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -14,62 +14,105 @@
 ;;
 ;; Datetime Formatting & Formats
 ;;
+;; Fomat: Dates, Times, Datetimes, Timedates...
+;;
+;; (Format, not reformat... Don't, like, delete time.)
+;;
 ;;; Code:
 
+(require 'cl-lib)
 
-;;------------------------------Formatting Time---------------------------------
-;;--                 Dates, Times, Datetimes, Timedates...                    --
-;;------------(Format, not reformat... Don't, like, delete time.)---------------
-
-(imp:require :elisp 'utils)
-(imp:require :jerky)
-
-(imp:require :datetime 'datetime)
+(imp-require :datetime 'datetime)
 
 
 ;;------------------------------------------------------------------------------
 ;; Format: Getters, Setters.
 ;;------------------------------------------------------------------------------
 
-(defun datetime:format/get (&rest name)
-  "Return a datetime format string by NAME.
+(defvar _:datetime:formats
+  `(
+    ;;--------------------
+    ;; ISO-8601 / RFC-3339 Formats
+    ;;--------------------
 
-NAME can be strings, symbols, or list(s) of such.
+    ;;---
+    ;; Date Only
+    ;;---
+    ;; ISO-8601: short (date only; no timestamp)
+    (:iso-8601:date "%Y-%m-%d" "ISO-8601/RFC-3339; date-only.")
+    ;; RFC-3339: short (date only; no timestamp)
+    (:rfc-3339:date "%Y-%m-%d" "ISO-8601/RFC-3339; date-only.")
 
-Prepends '(datetime format) to the NAME before asking `jerky' so that all values
-are stored under that \"namespace\" or tree branch."
-  (apply #'jerky:get 'datetime 'format name))
-;; (datetime:format/get 'rfc-3339 'datetime)
-;; (datetime:format 'iso-8601 'datetime)
+    ;; ISO-8601: But meh. No separators makes it much less useful to the brain.
+    (:yyyymmdd "%Y%m%d" "ISO-8601 no separators")
+
+    ;;---
+    ;; Date & Time
+    ;;---
+    ;; RFC-3339: full (space separator)
+    (:rfc-3339:datetime "%Y-%m-%d %H:%M:%S" "RFC-3339; datetime with space separator.")
+
+    ;; ISO-8601: full ('T' separator; for logs, etc)
+    (:iso-8601:datetime "%Y-%m-%dT%T%z" "ISO-8601; full datetime with 'T' separator for in logs, etc.")
+
+    ;;--------------------
+    ;; Org-Mode Formats
+    ;;--------------------
+
+    ;;---
+    ;; Org-Mode Inactive
+    ;;---
+    (:org:inactive:date     "[%Y-%m-%d]"
+     "org-time-stamp-inactive sans day name e.g.: [2022-06-01]")
+    (:org:inactive:date-day "[%Y-%m-%d %a]"
+     "org-time-stamp-inactive e.g.: [2022-06-01 Wed]")
+    (:org:inactive:rfc-3339 "[%Y-%m-%d %H:%M:%S]"
+     "org-time-stamp-inactive but RFC-3339 e.g.: [2022-06-01 22:05:11]")
+    (:org:inactive:full     "[%Y-%m-%d %a %H:%M:%S]"
+     "org-time-stamp-inactive with time e.g.: [2022-06-01 Wed 22:05:11]")
+
+    ;; Could do the same for active, but I use them less outside org files...
+
+    ;;--------------------
+    ;; Misc Formats
+    ;;--------------------
+
+    ;; Filename: full ('-T-' date/time separator & '-' time field separator; for filenames)
+    (:file:datetime "%Y-%m-%d-T-%H-%M-%S"
+     ,(concat "ISO-8601/RFC-3339...ish format, but works on Windows. "
+              "Can strip hypens to get to ISO-8601 basic "
+              "format (YYYYMMDDThhmmss)."))
+
+    ;; USA Date: Pretty much the worst format ever invented.
+    (:usa:date "%m-%d-%Y")
+
+    ;; USA Date w/ 24 hr time: Pretty much the worst format ever invented, plus
+    ;; extra confusion because no one understands 24 hour time over here...
+    (:usa:datetime "%m-%d-%Y %H:%M:%S"))
+  "Saved/named datetime formats.")
 
 
-(defun datetime:format/set (&rest args)
-  "Set a datetime format string.
+(defun datetime:format:get (key)
+  "Look up KEY in `_:datetime:formats' and return the format string."
+  (nth 0 (alist-get key _:datetime:formats)))
+;; (datetime:format:get :rfc-3339:datetime)
+;; (datetime:format:get :iso-8601:datetime)
 
-Splits ARGS out into a 'name' and 'keyword-args'.
 
-The 'name' is everything that comes before any of our keywords. Prepends
-'(datetime format) to the 'name' before asking `jerky' so that all values are
-stored under that \"namespace\" or tree branch.
-
-'keywords-args' are:
-  `:value'  - datetime format string
-  `:docstr' - documentation string"
-  (apply #'jerky:set 'datetime 'format args))
+(defun datetime:format:set (key format docstr)
+  "Add a datetime format entry to `_:datetime:formats' alist."
+  (push (list key format docstr) _:datetime:formats))
 
 
 ;;--------------------------------------------------------------------------------
 ;; Formatters
 ;;--------------------------------------------------------------------------------
 
-(defun datetime:format (&rest args)
-  "Return a formatted datetime string based on ARGS.
+(cl-defun datetime:format (key &key time zone)
+  "Return a formatted datetime string based on KEY.
 
-Use `datetime:format/get' to get a datetime format and then calls
+Use `datetime:format:get' to get a datetime format and then calls
 `format-time-string' with format and options to get a time string.
-
-Splits ARGS out into a 'name' and a 'keyword-args' plist.
-The 'name' is everything that comes before any of our keywords.
 
 Optional Keywords:
   `:time' - A time to use instead of now.
@@ -94,11 +137,7 @@ additions:
     - integer      - as from `decode-time'
 
 Return string from `format-time-string'."
-  (let* ((name-and-kwargs (elisp:parse:args+kwargs args :time :zone))
-         (name   (car name-and-kwargs))
-         (kwargs (cdr name-and-kwargs))
-         (time   (plist-get kwargs :time))
-         (zone   (plist-get kwargs :zone))
+  (let* ((format (datetime:format:get key))
          ;; Translate TIME to something `format-time-string' understands.
          (time (if (memq time '(nil :now now))
                    (current-time)
@@ -122,115 +161,25 @@ Return string from `format-time-string'."
                   ;; lists/integers from `current-time-zone'/`decode-time'.
                   zone))))
 
+    (when (not format)
+      (error "datetime:format: Unknown format KEY '%s'" key))
+
     ;; Should have a "Lisp Timestamp" now.
     (if (or (= time/len 2)
             (= time/len 4))
-        (format-time-string (apply #'datetime:format/get name) time)
+        (format-time-string format time zone)
       (error "datetime:format: Unknown TIME type/form: (type-of %s) %S"
              (type-of time)
              time))))
-;; (datetime:format 'rfc-3339 'datetime)
-;; (datetime:format 'rfc-3339 'datetime :zone 'wall)
-;; (datetime:format 'rfc-3339 'datetime :zone 'utc)
-;; (datetime:format 'rfc-3339 'datetime :time (current-time))
-;; (datetime:format 'rfc-3339 'datetime :time (decode-time (current-time)))
-;; (datetime:format 'rfc-3339 'datetime :time (datetime:replace (current-time) :day 1 :hour 0 :minute 0 :second 0))
-
-
-;;------------------------------------------------------------------------------
-;; Some useful formats.
-;;------------------------------------------------------------------------------
-
-(defun datetime:init ()
-  "Set the predefined datetime format strings into jerky."
-  ;;--------------------
-  ;; ISO-8601 / RFC-3339 Formats
-  ;;--------------------
-
-  ;;---
-  ;; Date Only
-  ;;---
-  ;; ISO-8601: short (date only; no timestamp)
-  (datetime:format/set 'iso-8601 'date ;; was: 'iso-8601 'short
-                       :value  "%Y-%m-%d"
-                       :docstr "ISO-8601/RFC-3339; date-only.")
-  ;; aka: 'rfc-3339 'date
-  (datetime:format/set 'rfc-3339 'date
-                       :value  "%Y-%m-%d"
-                       :docstr "ISO-8601/RFC-3339; date-only.")
-
-  ;; ISO-8601: But meh. No separators makes it much less useful to the brain.
-  (datetime:format/set 'yyyymmdd
-                       :value  "%Y%m%d"
-                       :docstr "Why would you use this?! Give my eyes a break.")
-
-  ;;---
-  ;; Date & Time
-  ;;---
-  ;; RFC-3339: full (space separator)
-  (datetime:format/set 'rfc-3339 'datetime
-                       :value  "%Y-%m-%d %H:%M:%S"
-                       :docstr "RFC-3339; datetime with space separator for in text.")
-
-  ;; ISO-8601: full ('T' separator; for logs, etc)
-  (datetime:format/set 'iso-8601 'datetime
-                       :value  "%Y-%m-%dT%T%z"
-                       :docstr "ISO-8601; full datetime with 'T' separator for in logs, etc.")
-
-  ;;--------------------
-  ;; Org-Mode Formats
-  ;;--------------------
-
-  ;; org-mode inactive: useful even when not in org-mode.
-  (datetime:format/set 'org 'inactive 'date ;; was: 'org-inactive
-                       :value  "[%Y-%m-%d]"
-                       :docstr "org-time-stamp-inactive sans day name e.g.: [2022-06-01]")
-
-  ;; org-mode inactive: useful even when not in org-mode.
-  (datetime:format/set 'org 'inactive 'date-day
-                       :value  "[%Y-%m-%d %a]"
-                       :docstr "org-time-stamp-inactive e.g.: [2022-06-01 Wed]")
-
-  ;; org-mode inactive: useful even when not in org-mode.
-  (datetime:format/set 'org 'inactive 'rfc-3339
-                       :value  "[%Y-%m-%d %H:%M:%S]"
-                       :docstr "org-time-stamp-inactive but RFC-3339 e.g.: [2022-06-01 22:05:11]")
-
-  ;; org-mode inactive: useful even when not in org-mode.
-  (datetime:format/set 'org 'inactive 'full
-                       :value  "[%Y-%m-%d %a %H:%M:%S]"
-                       :docstr "org-time-stamp-inactive with time e.g.: [2022-06-01 Wed 22:05:11]")
-
-  ;; Could do the same for active, but I use them less outside org files...
-
-  ;;--------------------
-  ;; Misc Formats
-  ;;--------------------
-
-  ;; Filename: full ('-T-' date/time separator & '-' time field separator; for filenames)
-  (datetime:format/set 'file 'datetime
-                       :value  "%Y-%m-%d-T-%H-%M-%S"
-                       :docstr (concat "ISO-8601/RFC-3339...ish format, but works on Windows. "
-                                       "Can strip hypens to get to ISO-8601 basic "
-                                       "format (YYYYMMDDThhmmss)."))
-
-  ;; USA Date: Pretty much the worst format ever invented.
-  (datetime:format/set 'usa 'date
-                       :value  "%m-%d-%Y"
-                       :docstr (concat "Bad, US American format. "
-                                       "Just terrible - why do we use this? "
-                                       "I am ashamed."))
-
-  ;; USA Date w/ 24 hr time: Pretty much the worst format ever invented, plus
-  ;; extra confusion because no one understands 24 hour time over here...
-  (datetime:format/set 'usa 'datetime
-                       :value  "%m-%d-%Y %H:%M:%S"
-                       :docstr (concat "Bad, US American format. "
-                                       "Just terrible - why do we use this? "
-                                       "I am ashamed.")))
+;; (datetime:format :rfc-3339:datetime)
+;; (datetime:format :rfc-3339:datetime :zone 'wall)
+;; (datetime:format :rfc-3339:datetime :zone 'utc)
+;; (datetime:format :rfc-3339:datetime :time (current-time))
+;; (datetime:format :rfc-3339:datetime :time (decode-time (current-time)))
+;; (datetime:format :rfc-3339:datetime :time (datetime:replace (current-time) :day 1 :hour 0 :minute 0 :second 0))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :datetime 'format)
+(imp-provide :datetime 'format)

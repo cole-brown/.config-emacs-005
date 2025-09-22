@@ -1,10 +1,10 @@
-;;; core/modules/elisp/datetime/datetime.el --- Datetime Conversions -*- lexical-binding: t; -*-
+;;; namespaced/datetime/datetime.el --- Datetime Conversions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-07-11
-;; Timestamp:  2023-09-08
+;; Timestamp:  2025-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -14,7 +14,7 @@
 ;;
 ;; Datetime Conversions
 ;;
-;; NOTE: For unit conversions, see "core/modules/elisp/utils/units.el" for e.g.
+;; NOTE: For unit conversions, see: namespaced/unit" for e.g.
 ;; `unit:second`. Example:
 ;;   (unit:second 3.2 'hours)
 ;;
@@ -235,4 +235,4 @@ Return a \"Lisp Calendrical Information\" list, which see `decode-time'."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :datetime 'datetime)
+(imp-provide :datetime 'datetime)

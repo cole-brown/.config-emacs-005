@@ -1,10 +1,10 @@
-;;; core/modules/elisp/datetime/timestamp.el --- Stamp Things with Times -*- lexical-binding: t; -*-
+;;; namespaced/datetime/timestamp.el --- Stamp Things with Times -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-07-19
+;; Timestamp:  2025-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -14,34 +14,33 @@
 ;;
 ;; Stamp Things with Times
 ;;
-;; Named datetime snamping.
-;;
 ;;; Code:
 
-(imp:require :datetime 'format)
-
-
-;;-------------------------------Stamping Time----------------------------------
-;;--                 Dates, Times, Datetimes, Timedates...                    --
-;;------------------------------------------------------------------------------
+(imp-require :datetime 'format)
 
 
 ;;------------------------------------------------------------------------------
 ;; Timestamp Functions (Also Datestamp)
 ;;------------------------------------------------------------------------------
 
-(defun datetime:timestamp:insert (&rest name)
-  "Insert a timestamp NAME into current buffer at point.
+(defun datetime:timestamp:insert (key)
+  "Insert timestamp with KEY format into current buffer at point.
 
 Timestamp is of current time and is inserted into current buffer at point."
-  (insert (apply #'datetime:format name)))
+  (insert (datetime:format
+           (cond ((symbolp key)
+                  key)
+                 ((stringp key)
+                  (intern-soft key))
+                 (t
+                  (error "KEY must be keyword, symbol, or string."))))))
 
 
-;;--------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;; Interactive: Prompt for Timestamp
-;;--------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 
-(defvar int<datetime>:timestamp:insert/prompt:history nil
+(defvar _:datetime:timestamp:insert/prompt:history nil
   "History variable for `datetime:cmd:timestamp:insert/prompt'.
 
 Just a bucket to hold history for datetime commands to keep segregated from general
@@ -58,20 +57,11 @@ formats."
   (datetime:timestamp:insert
    ;; Prompt user for what format to use.
    (completing-read "Datetime Format: "
-                    ;; List of Format Names
-                    (seq-map
-                     ;; Trim the prefix string off for display purposes.
-                     (lambda (format)
-                       (let ((name (car format)))
-                         (string-trim-left name
-                                           (string-trim-right (jerky:key:string 'datetime 'format 'xTRIMx)
-                                                              "xTRIMx"))))
-                     ;; Get all datetime formats.
-                     (jerky:has (jerky:key:string 'datetime 'format)))
+                    _:datetime:formats
                     nil
                     t ; Must get a match.
                     nil
-                    int<datetime>:timestamp:insert/prompt:history
+                    _:datetime:timestamp:insert/prompt:history
                     nil) ; No default value?
    ))
 
@@ -80,29 +70,29 @@ formats."
 ;; Interactive: Insert Specific Timestamp
 ;;------------------------------------------------------------------------------
 
-(defun datetime:cmd:timestamp:insert/rfc-3339 ()
+(defun datetime:cmd:timestamp:insert:rfc-3339 ()
   "Insert a full (date & time) rfc-3339 formatted timestamp.
 
 Timestamp is of current time and is inserted into current buffer at point."
   (interactive)
-  (datetime:timestamp:insert 'rfc-3339 'datetime))
+  (datetime:timestamp:insert :rfc-3339:datetime))
 
 
-(defun datetime:cmd:timestamp:insert/iso-8601 ()
+(defun datetime:cmd:timestamp:insert:iso-8601 ()
   "Insert a full (date & time) ISO-8601 formatted timestamp.
 
 Timestamp is of current time and is inserted into current buffer at point."
   (interactive)
-  (datetime:timestamp:insert 'iso-8601 'datetime))
-;; (datetime:cmd:timestamp:insert/iso-8601)
+  (datetime:timestamp:insert :iso-8601:datetime))
+;; (datetime:cmd:timestamp:insert:iso-8601)
 
 
-(defun datetime:cmd:timestamp:insert/org ()
+(defun datetime:cmd:timestamp:insert:org ()
   "Insert a timestamp formatted \"[yyyy-mm-dd]\".
 
 Timestamp is of current time and is inserted into current buffer at point."
   (interactive)
-  (datetime:timestamp:insert 'org 'inactive 'date))
+  (datetime:timestamp:insert :org:inactive:date))
 
 
 ;;------------------------------------------------------------------------------
@@ -126,4 +116,4 @@ Timestamp is of current time and is inserted into current buffer at point."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :datetime 'timestamp)
+(imp-provide :datetime 'timestamp)

@@ -37,26 +37,41 @@
   ;;   - string
   ;;     - requires: elisp
 
-  ;; TODO: finish refactor of these:
+  ;;------------------------------
+  ;; Standalone Libraries
+  ;;------------------------------
+  ;; TODO: finish refactor
   (imp-load :feature  :elisp
             :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp"
             :filename "init.el") ; standalone
 
+  ;; TODO: finish refactor
   (imp-load :feature  :buffer
             :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/buffer"
             :filename "init.el") ; standalone... so far
 
+  (imp-load :feature  :unit
+            :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit"
+            :filename "init.el") ; standalone... so far
+
+  (imp-load :feature  :datetime
+            :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/datetime"
+            :filename "init.el") ; standalone... so far
+
+  ;;------------------------------
+  ;; Libraries
+  ;;------------------------------
+
+  ;; TODO: finish refactor
   (imp-load :feature  :str
             :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/str"
             :filename "init.el") ; requires `:elisp'
 
+  ;; TODO: finish refactor
   (imp-load :feature  :theme
             :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/theme"
             :filename "init.el") ; requires `:elisp', `:str'
 
-  (imp-load :feature  :unit
-            :path     "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit"
-            :filename "init.el") ; standalone... so far
 
   ;; TODO: refactor the rest of 'em.
 
