@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-12
-;; Timestamp:  2023-06-27
+;; Timestamp:  2025-09-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -79,17 +79,17 @@
 
 
 
-;; ;;------------------------------------------------------------------------------
-;; ;; Load Other Zenburn Files
-;; ;;------------------------------------------------------------------------------
-;;
+;;------------------------------------------------------------------------------
+;; Load Other Zenburn Files
+;;------------------------------------------------------------------------------
+
 ;; (imp:load :feature  '(:mantle theme zenburn org-mode)
 ;;           :path     (imp:path:current:dir)
 ;;           :filename "org-mode")
-;;
-;; (imp:load :feature  '(:mantle theme zenburn whitespace)
-;;           :path     (imp:path:current:dir)
-;;           :filename "whitespace")
+
+(imp-load :feature  '(:user config theme zenburn whitespace)
+          :path     "config/theme/zenburn"
+          :filename "whitespace")
 
 
 ;;------------------------------------------------------------------------------
