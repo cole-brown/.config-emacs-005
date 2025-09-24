@@ -1,10 +1,10 @@
-;;; mantle/config/dev-env/emacs-lisp.el --- Configure Emacs Lisp -*- lexical-binding: t; -*-
+;;; user/config/languages/elisp.el --- Configure Emacs Lisp -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-28
-;; Timestamp:  2025-09-12
+;; Timestamp:  2025-09-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -118,8 +118,6 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
    ;; ;; emacs configs, so we disable `emacs-lisp-checkdoc' and reduce the
    ;; ;; `emacs-lisp' checker's verbosity.
    ;; (flycheck-mode-hook #'+emacs-lisp-reduce-flycheck-errors-in-emacs-config-h)
-   ;; TODO: rainbow-delimiters!?!!!
-   ;; (emacs-lisp-mode-hook . rainbow-delimiters-mode)
    (emacs-lisp-mode-hook . --/hook/time-stamp/settings)
    (before-save-hook     . --/hook/time-stamp/before-save))
 
@@ -164,17 +162,13 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 ;; Highlight Quoted Symbols
 ;;------------------------------------------------------------------------------
 
-;; TODO: Why can't this be installed? It's on Melpa.
-;; TODO: its installed. why does hook not work?!
-;; ;; > File mode specification error: (file-missing Cannot open load file No such file or directory highlight-quoted)
-;; ;; > apply: Symbol’s function definition is void: elisp-demos-advice-describe-function-1
-;; ;; Make quoted symbols easier to distinguish from free variables
-;; ;; https://github.com/Fanael/highlight-quoted
-;; (use-package highlight-quoted
-;;   ;;------------------------------
-;;   :hook
-;;   ;;------------------------------
-;;   (emacs-lisp-mode-hook . highlight-quoted-mode))
+;; Make quoted symbols easier to distinguish from free variables
+;; https://github.com/Fanael/highlight-quoted
+(use-package highlight-quoted
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+  (emacs-lisp-mode-hook . highlight-quoted-mode))
 
 
 ;; TODO-elisp: Add `elisp-def' package?
@@ -324,9 +318,8 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 ;; Macros
 ;;------------------------------------------------------------------------------
 
-;; TODO: Why this error? "Cannot load macrostep"
-;; ;; Provides a very helpful elisp macro debugging tool: `macrostep-expand'
-;; (use-package macrostep)
+;; Provides a very helpful elisp macro debugging tool: `macrostep-expand'
+(use-package macrostep)
 
 
 ;; TODO: General Flycheck set-up in "common.el"? Steal from Doom?
@@ -374,73 +367,75 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 ;;------------------------------------------------------------------------------
 ;; https://github.com/xuchunyang/elisp-demos
 
-;; TODO: Why this error? "Cannot load elisp-demos"
-;; (use-package elisp-demos
-;;   ;;------------------------------
-;;   :init
-;;   ;;------------------------------
+(use-package elisp-demos
+  ;;------------------------------
+  :init
+  ;;------------------------------
 
-;;   ;; (defun --/elisp-demos/search/file (symbol filepath)
-;;   ;;   "Search for SYMBOL's demo/example for `elisp-demos' in FILEPATH."
-;;   ;;   (with-temp-buffer
-;;   ;;     (insert-file-contents filepath)
-;;   ;;     (goto-char (point-min))
-;;   ;;     (when (re-search-forward
-;;   ;;            (format "^\\* %s$" (regexp-quote (symbol-name symbol)))
-;;   ;;            nil t)
-;;   ;;       (let (beg end)
-;;   ;;         (forward-line 1)
-;;   ;;         (setq beg (point))
-;;   ;;         (if (re-search-forward "^\\*" nil t)
-;;   ;;             (setq end (line-beginning-position))
-;;   ;;           (setq end (point-max)))
-;;   ;;         (string-trim (buffer-substring-no-properties beg end))))))
+  ;; (defun --/elisp-demos/search/file (symbol filepath)
+  ;;   "Search for SYMBOL's demo/example for `elisp-demos' in FILEPATH."
+  ;;   (with-temp-buffer
+  ;;     (insert-file-contents filepath)
+  ;;     (goto-char (point-min))
+  ;;     (when (re-search-forward
+  ;;            (format "^\\* %s$" (regexp-quote (symbol-name symbol)))
+  ;;            nil t)
+  ;;       (let (beg end)
+  ;;         (forward-line 1)
+  ;;         (setq beg (point))
+  ;;         (if (re-search-forward "^\\*" nil t)
+  ;;             (setq end (line-beginning-position))
+  ;;           (setq end (point-max)))
+  ;;         (string-trim (buffer-substring-no-properties beg end))))))
 
-;;   ;; (defun --/elisp-demos/search/all (symbol)
-;;   ;;   "Search all non-`elisp-demos' demo files for SYMBOL's demo/example."
-;;   ;;   (let ((filename "elisp-demos.org")
-;;   ;;         ;; TODO: Make demos for all of my shit, and add them in here?
-;;   ;;         ;; See Doom's 'demos.org' file: "modules/lang/emacs-lisp/demos.org"
-;;   ;;         ;; NOTE: Raise error if one of our packages/modules goes AWOL.
-;;   ;;         (paths (list (imp:path:root/get :mis      :error)
-;;   ;;                      (imp:path:root/get :datetime :error)))
-;;   ;;         demo)
-;;   ;;     ;;------------------------------
-;;   ;;     ;; Search each path.
-;;   ;;     ;;------------------------------
-;;   ;;     (while (and (null demo)
-;;   ;;                 (not (null paths)))
-;;   ;;       ;; If the demo file exists, search it for SYMBOL.
-;;   ;;       (let ((path (imp:path:join (pop paths) filename)))
-;;   ;;         (when (path:exists? path :file)
-;;   ;;           (setq demo (--/elisp-demos/search/file symbol path)))))
+  ;; (defun --/elisp-demos/search/all (symbol)
+  ;;   "Search all non-`elisp-demos' demo files for SYMBOL's demo/example."
+  ;;   (let ((filename "elisp-demos.org")
+  ;;         ;; TODO: Make demos for all of my shit, and add them in here?
+  ;;         ;; See Doom's 'demos.org' file: "modules/lang/emacs-lisp/demos.org"
+  ;;         ;; NOTE: Raise error if one of our packages/modules goes AWOL.
+  ;;         (paths (list (imp:path:root/get :mis      :error)
+  ;;                      (imp:path:root/get :datetime :error)))
+  ;;         demo)
+  ;;     ;;------------------------------
+  ;;     ;; Search each path.
+  ;;     ;;------------------------------
+  ;;     (while (and (null demo)
+  ;;                 (not (null paths)))
+  ;;       ;; If the demo file exists, search it for SYMBOL.
+  ;;       (let ((path (imp:path:join (pop paths) filename)))
+  ;;         (when (path:exists? path :file)
+  ;;           (setq demo (--/elisp-demos/search/file symbol path)))))
 
-;;   ;;     ;;------------------------------
-;;   ;;     ;; Return demo string found or nil for "not found".
-;;   ;;     ;;------------------------------
-;;   ;;     demo))
+  ;;     ;;------------------------------
+  ;;     ;; Return demo string found or nil for "not found".
+  ;;     ;;------------------------------
+  ;;     demo))
 
 
-;;   ;;------------------------------
-;;   :config
-;;   ;;------------------------------
+  ;;------------------------------
+  :config
+  ;;------------------------------
 
-;;   (advice-add #'describe-function-1 :after #'elisp-demos-advice-describe-function-1)
-;;   (advice-add #'helpful-update      :after #'elisp-demos-advice-helpful-update)
+  (advice-add #'describe-function-1 :after #'elisp-demos-advice-describe-function-1)
 
-;; ;;   (define-advice elisp-demos--search (:around (fn symbol) --/advice/elisp-demos/add)
-;; ;;     "Add our own demos to help buffers.
+  ;; TODO: eval-after or imp-after or whatever
+  (when (fboundp #'helpful-update)
+    (advice-add #'helpful-update :after #'elisp-demos-advice-helpful-update))
 
-;; ;; NOTE: This function is called when the help buffer is being built - no caching
-;; ;; or anything is done."
-;; ;;     ;;------------------------------
-;; ;;     ;; Search for SYMBOL's example in:
-;; ;;     ;;------------------------------
-;; ;;     ;; 1. `elisp-demos' file.
-;; ;;     (or (funcall fn symbol)
-;; ;;         ;; 2. Our file(s).
-;; ;;         (--/elisp-demos/search/all symbol)))
-;;   )
+;;   (define-advice elisp-demos--search (:around (fn symbol) --/advice/elisp-demos/add)
+;;     "Add our own demos to help buffers.
+
+;; NOTE: This function is called when the help buffer is being built - no caching
+;; or anything is done."
+;;     ;;------------------------------
+;;     ;; Search for SYMBOL's example in:
+;;     ;;------------------------------
+;;     ;; 1. `elisp-demos' file.
+;;     (or (funcall fn symbol)
+;;         ;; 2. Our file(s).
+;;         (--/elisp-demos/search/all symbol)))
+  )
 
 
 ;;------------------------------------------------------------------------------
