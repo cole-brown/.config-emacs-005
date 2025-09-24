@@ -876,22 +876,10 @@ CLOSED: [2025-09-22 Mon 16:37]
 - State "├DONE───┤"  from              [2025-09-22 Mon 16:37]
 :END:
 
-* -- U R HERE --
-* IMP-FIX: imp-load
-
-** use-package parser
-
-Make load parse its args like use-package does?
-  - ur [[file:source/core/packages/imp/parser.el::provide 'use-package-core][here]]
-    - Refactor that to be useful to imp.
-
-** imp-load: non-macro version
-
-Make load not a macro
-  - ur [[file:source/core/packages/imp/load.el::;; (imp-load-v2 :feature :user :path (imp-path-current-dir))][here]]
-
-* ├CURRENT┤ elisp mode config
+* ├DONE───┤ elisp mode config
+CLOSED: [2025-09-23 Tue 23:04]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-09-23 Tue 23:04]
 - State "├CURRENT┤"  from "├DONE───┤"  [2025-09-12 Fri 14:29]
 - State "├DONE───┤"  from              [2025-09-12 Fri 14:15]
 :END:
@@ -903,7 +891,11 @@ these have weird complaints when evaluating right now
 +Ok. Restarted Emacs and init for those works fine now.+
 load of elisp.el was not added to init.
 
-** Errors
+** ├DONE───┤ Errors
+CLOSED: [2025-09-23 Tue 22:19]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-09-23 Tue 22:19]
+:END:
 
 Get these errors:
 #+begin_src warnings
@@ -911,18 +903,78 @@ Get these errors:
 ⛔ Error (use-package): Cannot load elisp-demos
 #+end_src
 
-** Hooks
+https://github.com/jwiegley/use-package/issues/768
+use this to debug?:
+#+begin_src elisp
+(setq use-package-verbose t
+            use-package-expand-minimally nil
+            use-package-compute-statistics t
+            debug-on-error t)
+
+(defun use-package-require (name &optional no-require body)
+  (if use-package-expand-minimally
+      (use-package-concat
+       (unless no-require
+         (list (use-package-load-name name)))
+       body)
+    (if no-require
+        body
+      (use-package-with-elapsed-timer
+          (format "Loading package %s" name)
+        `((if (not ,(use-package-load-name name))
+              (display-warning 'use-package
+                               (format "Cannot load %s" ',name)
+                               :error)
+            ,@body))))))
+
+(use-package macrostep)
+#+end_src
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (file-missing "Cannot open load file" "No such file or directory" "macrostep")
+  require(macrostep nil nil)
+  (not (require 'macrostep nil nil))
+  (if (not (require 'macrostep nil nil)) (display-warning 'use-package (format "Cannot load %s" 'macrostep) :error) (use-package-statistics-gather :config 'macrostep nil) (use-package-statistics-gather :config 'macrostep t))
+  (prog1 (if (not (require 'macrostep nil nil)) (display-warning 'use-package (format "Cannot load %s" 'macrostep) :error) (use-package-statistics-gather :config 'macrostep nil) (use-package-statistics-gather :config 'macrostep t)) (let ((elapsed (float-time (time-subtract (current-time) now)))) (if (> elapsed 0) (message "%s...done (%.3fs)" "Loading package macrostep" elapsed) (message "%s...done" "Loading package macrostep"))))
+  (let ((now (current-time))) (message "%s..." "Loading package macrostep") (prog1 (if (not (require 'macrostep nil nil)) (display-warning 'use-package (format "Cannot load %s" 'macrostep) :error) (use-package-statistics-gather :config 'macrostep nil) (use-package-statistics-gather :config 'macrostep t)) (let ((elapsed (float-time (time-subtract (current-time) now)))) (if (> elapsed 0) (message "%s...done (%.3fs)" "Loading package macrostep" elapsed) (message "%s...done" "Loading package macrostep")))))
+  (progn (use-package-statistics-gather :init 'macrostep nil) (let ((now (current-time))) (message "%s..." "Loading package macrostep") (prog1 (if (not (require 'macrostep nil nil)) (display-warning 'use-package (format "Cannot load %s" 'macrostep) :error) (use-package-statistics-gather :config 'macrostep nil) (use-package-statistics-gather :config 'macrostep t)) (let ((elapsed (float-time (time-subtract ... now)))) (if (> elapsed 0) (message "%s...done (%.3fs)" "Loading package macrostep" elapsed) (message "%s...done" "Loading package macrostep"))))) (use-package-statistics-gather :init 'macrostep t))
+  (condition-case err (progn (use-package-statistics-gather :init 'macrostep nil) (let ((now (current-time))) (message "%s..." "Loading package macrostep") (prog1 (if (not (require 'macrostep nil nil)) (display-warning 'use-package (format "Cannot load %s" 'macrostep) :error) (use-package-statistics-gather :config 'macrostep nil) (use-package-statistics-gather :config 'macrostep t)) (let ((elapsed (float-time ...))) (if (> elapsed 0) (message "%s...done (%.3fs)" "Loading package macrostep" elapsed) (message "%s...done" "Loading package macrostep"))))) (use-package-statistics-gather :init 'macrostep t)) ((debug error) (funcall use-package--warning50 :catch err)))
+  (progn (use-package-statistics-gather :use-package 'macrostep nil) (use-package-ensure-elpa 'macrostep '(t) 'nil) (defvar use-package--warning50 #'(lambda (keyword err) (let ((msg (format "%s/%s: %s" ... keyword ...))) (display-warning 'use-package msg :error)))) (condition-case err (progn (use-package-statistics-gather :init 'macrostep nil) (let ((now (current-time))) (message "%s..." "Loading package macrostep") (prog1 (if (not (require ... nil nil)) (display-warning 'use-package (format "Cannot load %s" ...) :error) (use-package-statistics-gather :config 'macrostep nil) (use-package-statistics-gather :config 'macrostep t)) (let ((elapsed ...)) (if (> elapsed 0) (message "%s...done (%.3fs)" "Loading package macrostep" elapsed) (message "%s...done" "Loading package macrostep"))))) (use-package-statistics-gather :init 'macrostep t)) ((debug error) (funcall use-package--warning50 :catch err))) (use-package-statistics-gather :use-package 'macrostep t))
+  (progn (progn (use-package-statistics-gather :use-package 'macrostep nil) (use-package-ensure-elpa 'macrostep '(t) 'nil) (defvar use-package--warning50 #'(lambda (keyword err) (let ((msg ...)) (display-warning 'use-package msg :error)))) (condition-case err (progn (use-package-statistics-gather :init 'macrostep nil) (let ((now (current-time))) (message "%s..." "Loading package macrostep") (prog1 (if (not ...) (display-warning ... ... :error) (use-package-statistics-gather :config ... nil) (use-package-statistics-gather :config ... t)) (let (...) (if ... ... ...)))) (use-package-statistics-gather :init 'macrostep t)) ((debug error) (funcall use-package--warning50 :catch err))) (use-package-statistics-gather :use-package 'macrostep t)))
+  eval((progn (progn (use-package-statistics-gather :use-package 'macrostep nil) (use-package-ensure-elpa 'macrostep '(t) 'nil) (defvar use-package--warning50 #'(lambda (keyword err) (let (...) (display-warning ... msg :error)))) (condition-case err (progn (use-package-statistics-gather :init 'macrostep nil) (let ((now ...)) (message "%s..." "Loading package macrostep") (prog1 (if ... ... ... ...) (let ... ...))) (use-package-statistics-gather :init 'macrostep t)) ((debug error) (funcall use-package--warning50 :catch err))) (use-package-statistics-gather :use-package 'macrostep t))) t)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0x8fa3722e129a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0x8fa3722e129a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+so..... it didn't install the package?
+
+maybe I need melpa at front of list instead of back?
+  nope
+
+maybe I need to delete a bad install?
+
+restart emacs to clean up package stuff?
+  - that worked. ~use-package macrostep~ worked; ~macrostep~ is installed.
+
+Uncomment ~elisp-demos~ & eval
+  - k; good
+
+** ├DONE───┤ Hooks
+CLOSED: [2025-09-23 Tue 23:04]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-09-23 Tue 23:04]
+:END:
 
 And I guess these need fixed too:
 (remove-hook 'emacs-lisp-mode-hook 'highlight-quoted-mode)
 (remove-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
 
-* fix: treesit & JSON
-
-⛔ Warning (treesit): Cannot activate tree-sitter, because language grammar for json is unavailable (not-found): /home/main/.config/emacs/tree-sitter/libtree-sitter-json: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.14.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.13.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.0.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.14.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.13.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.0.0: cannot open shared object file: No such file or directory libtree-sitter-json: cannot open shared object file: No such file or directory libtree-sitter-json.14.0: cannot open shared object file: No such file or directory libtree-sitter-json.13.0: cannot open shared object file: No such file or directory libtree-sitter-json.0: cannot open shared object file: No such file or directory libtree-sitter-json.0.0: cannot open shared object file: No such file or directory libtree-sitter-json.so: cannot open shared object file: No such file or directory libtree-sitter-json.so.14.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.13.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.0.0: cannot open shared object file: No such file or directory
-
-
-
+* -- U R HERE --
 * ├CURRENT┤ whitespace
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2025-09-09 Tue 23:55]
@@ -945,6 +997,25 @@ new sn005: file:/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/use
 get theme fixes for whitespace mode
 [[file:source/user/config/theme/zenburn/whitespace.el]]
 
+* IMP-FIX: imp-load
+
+** use-package parser
+
+Make load parse its args like use-package does?
+  - ur [[file:source/core/packages/imp/parser.el::provide 'use-package-core][here]]
+    - Refactor that to be useful to imp.
+
+** imp-load: non-macro version
+
+Make load not a macro
+  - ur [[file:source/core/packages/imp/load.el::;; (imp-load-v2 :feature :user :path (imp-path-current-dir))][here]]
+
+* fix: treesit & JSON
+
+⛔ Warning (treesit): Cannot activate tree-sitter, because language grammar for json is unavailable (not-found): /home/main/.config/emacs/tree-sitter/libtree-sitter-json: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.14.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.13.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.0.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.14.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.13.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.0.0: cannot open shared object file: No such file or directory libtree-sitter-json: cannot open shared object file: No such file or directory libtree-sitter-json.14.0: cannot open shared object file: No such file or directory libtree-sitter-json.13.0: cannot open shared object file: No such file or directory libtree-sitter-json.0: cannot open shared object file: No such file or directory libtree-sitter-json.0.0: cannot open shared object file: No such file or directory libtree-sitter-json.so: cannot open shared object file: No such file or directory libtree-sitter-json.so.14.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.13.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.0.0: cannot open shared object file: No such file or directory
+
+
+
 * namespace
 
 most wanted:
@@ -957,6 +1028,19 @@ most wanted:
 
 Make provide and require macros
   - find an example of what is wanted from this?
+
+* snippet: notes directive
+
+Fix these warnings in *Messages* during init?
+#+begin_src txt
+Ignoring unknown directive "notes" in file: /home/main/.config/emacs/snippets/org-mode/header
+Ignoring unknown directive "notes" in file: /home/main/.config/emacs/snippets/org-mode/pass
+Ignoring unknown directive "notes" in file: /home/main/.config/emacs/snippets/org-mode/quote
+Ignoring unknown directive "notes" in file: /home/main/.config/emacs/snippets/org-mode/src
+Ignoring unknown directive "notes" in file: /home/main/.config/emacs/snippets/org-mode/src-insert
+Ignoring unknown directive "notes" in file: /home/main/.config/emacs/snippets/org-mode/src-yank
+#+end_src
+
 
 * snippet: /todo/penis
 
