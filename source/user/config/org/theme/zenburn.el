@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-12
-;; Timestamp:  2023-06-27
+;; Timestamp:  2025-09-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -186,7 +186,7 @@
     `(org-done                     :foreground ,zenburn-green-3)
     `(org-agenda-done              :foreground ,zenburn-bg+3)
     `(org-checkbox-statistics-done :foreground ,zenburn-green-3)
-    
+
     ;; "Done" Headlines - success/fail/info/etc.
     ;;    - Would be nice to have green, red, and gray... but we only have the one 'done' face.
     ;;    - So a lighter gray?
@@ -201,7 +201,7 @@
     `(outline-2 :foreground ,zenburn-green+2)
     `(outline-3 :foreground ,zenburn-blue-1)
     `(outline-4 :foreground ,zenburn-red-1)
-    ;; ...and repeat.       
+    ;; ...and repeat.
     `(outline-5 :foreground ,zenburn-orange)
     `(outline-6 :foreground ,zenburn-green+2)
     `(outline-7 :foreground ,zenburn-blue-1)
