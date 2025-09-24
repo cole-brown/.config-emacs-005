@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-09-22
+;; Timestamp:  2025-09-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -743,6 +743,11 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   ;;------------------------------------------------------------------------------
   ;; Languages
   ;;------------------------------------------------------------------------------
+  ;; TODO: make/load "config/languages/init.el", which will load all
+
+  (imp-load :feature '(:user config languages common)
+            :path  "config/languages/common.el"  ;; (imp-path-join 'config 'org 'init.el)
+            )
 
   (imp-load :feature '(:user config languages elisp)
             ;; TODO: make/load "config/languages/init.el", which will load all
@@ -1008,7 +1013,11 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(org-fold-catch-invisible-edits 'show-and-error nil nil "Customized with use-package org")
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(cape colorful-mode corfu deadgrep elisp-demos embark-consult git-gutter-fringe
+          git-modes gptel hc-zenburn-theme highlight-quoted hurl-mode macrostep
+          magit marginalia no-littering orderless ox-gfm rainbow-delimiters
+          terraform-mode vertico ws-butler yaml-mode yasnippet zenburn-theme))
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode"))))
 (custom-set-faces

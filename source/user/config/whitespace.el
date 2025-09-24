@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2025-09-10
+;; Timestamp:  2025-09-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -23,10 +23,17 @@
 ;;------------------------------------------------------------------------------
 ;; Fill Column
 ;;------------------------------------------------------------------------------
+;; A measuring stick:
+;;                                                                              80                                      120                 140       150
+(defconst --/fill-column/standard 80
+  "Ye olde default 80 columns.")
 
-(defvar --/fill-column/standard  80  "80")
-(defvar --/fill-column/wide     120 "120")
+(defconst --/fill-column/wide 120
+  "Current Year should be able to handle more than 80, right? How about 120 columns?")
 
+
+;; `fill-column'
+;;--------------
 ;; Increase default from 70 to 80.
 (customize-set-variable 'fill-column --/fill-column/standard)
 
