@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-12
-;; Timestamp:  2025-09-23
+;; Timestamp:  2025-09-24
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -13,7 +13,7 @@
 ;;; Commentary:
 ;;
 ;; Low-Contrast Dark Theme
-;; Best Theme Since Sliced Bread
+;; Best Theme Since Sliced Bread's Toast Theme
 ;;
 ;;; Code:
 
