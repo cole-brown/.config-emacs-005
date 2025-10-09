@@ -1041,9 +1041,99 @@ ls
 
 yay
 
-* -- U R HERE --
-* csharp & treesit?
+* ├DONE───┤ fix: treesit & JSON
+CLOSED: [2025-10-08 Wed 22:25]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-08 Wed 22:25]
+:END:
 
+** ├DONE───┤ install tree-sitter grammar
+CLOSED: [2025-10-08 Wed 22:32]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-08 Wed 22:32]
+:END:
+
+#+begin_quote
+⛔ Warning (treesit): Cannot activate tree-sitter, because language grammar for json is unavailable (not-found): /home/main/.config/emacs/tree-sitter/libtree-sitter-json: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.14.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.13.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.0.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.14.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.13.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.0.0: cannot open shared object file: No such file or directory libtree-sitter-json: cannot open shared object file: No such file or directory libtree-sitter-json.14.0: cannot open shared object file: No such file or directory libtree-sitter-json.13.0: cannot open shared object file: No such file or directory libtree-sitter-json.0: cannot open shared object file: No such file or directory libtree-sitter-json.0.0: cannot open shared object file: No such file or directory libtree-sitter-json.so: cannot open shared object file: No such file or directory libtree-sitter-json.so.14.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.13.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.0.0: cannot open shared object file: No such file or directory
+#+end_quote
+
+google:
+Cannot activate tree-sitter, because language grammar for json is unavailable (not-found)
+
+https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
+~M-x treesit-install-language-grammar~
+
+So... do that thing then.
+
+** ├DONE───┤ use treesit when viewing JSON
+CLOSED: [2025-10-08 Wed 22:49]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-08 Wed 22:49]
+:END:
+
+So... now am I using treesit when I open JSON file?
+  - no. I'm using ~js-json-mode~ instead of ~json-ts-mode~.
+
+Need a JSON config file.
+  - old one? file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/dev-env/languages/json.el
+
+make:
+file:~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/languages/json.el
+
+** ├DONE───┤ Get json highlights working in src blocks
+CLOSED: [2025-10-08 Wed 22:51]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-08 Wed 22:51]
+:END:
+
+#+begin_src json
+{
+    "test": true,
+    "greeting": "Hello there."
+}
+#+end_src
+
+fix in [[file:source/user/config/org/mode.el::push '("json" . json-ts) org-src-lang-modes][org/mode.el]]
+#+begin_src elisp
+  (push '("json"                    . json-ts)    org-src-lang-modes)
+#+end_src
+
+
+
+* ├DONE───┤ helpful & which-key
+CLOSED: [2025-10-09 Thu 14:29]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-09 Thu 14:29]
+- State "├CURRENT┤"  from              [2025-10-09 Thu 14:25]
+:END:
+
+old: file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/help.el
+make:
+file:~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/help.el
+
+
+* -- U R HERE --
+* namespaced window
+
+want my ~window:kill-or-quit~
+  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
+
+* ├CURRENT┤ csharp & treesit?
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-10-08 Wed 23:01]
+:END:
+
+~M-x treesit-install-language-grammar~
+
+NO:   https://github.com/tree-sitter/csharp-tree-sitter
+YES?: https://github.com/tree-sitter/tree-sitter-c-sharp
+
+mmmh... yay. -_-
+#+begin_quote
+⛔ Warning (treesit): The installed language grammar for csharp cannot be located or has problems (symbol-error): /home/main/.config/emacs/tree-sitter/libtree-sitter-csharp.so: undefined symbol: tree_sitter_csharp
+#+end_quote
+
+TODO: make csharp config file
 
 
 * ├CURRENT┤ IMP-FIX: imp-load
@@ -1132,10 +1222,44 @@ Make load not a macro
 
 
 
-* fix: treesit & JSON
+* eval after
 
-⛔ Warning (treesit): Cannot activate tree-sitter, because language grammar for json is unavailable (not-found): /home/main/.config/emacs/tree-sitter/libtree-sitter-json: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.14.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.13.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.0.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.14.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.13.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.0: cannot open shared object file: No such file or directory /home/main/.config/emacs/tree-sitter/libtree-sitter-json.so.0.0: cannot open shared object file: No such file or directory libtree-sitter-json: cannot open shared object file: No such file or directory libtree-sitter-json.14.0: cannot open shared object file: No such file or directory libtree-sitter-json.13.0: cannot open shared object file: No such file or directory libtree-sitter-json.0: cannot open shared object file: No such file or directory libtree-sitter-json.0.0: cannot open shared object file: No such file or directory libtree-sitter-json.so: cannot open shared object file: No such file or directory libtree-sitter-json.so.14.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.13.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.0: cannot open shared object file: No such file or directory libtree-sitter-json.so.0.0: cannot open shared object file: No such file or directory
+Find ~(when (imp-feature?~
+example
+  - [[file:source/user/config/help.el::;; TODO: change to eval-after:][here]]
 
+Fix to eval after said feature.
+
+
+
+* treesit: how can you do it in the init file?
+
+prev treesits:
+  - [[*fix: treesit & JSON][fix: treesit & JSON]]
+  - [[*csharp & treesit?][csharp & treesit?]]
+
+how to install grammers via elisp?
+  - and how not to reinstall existing ones every time.
+
+Is there some package already that helps?
+  - like ~treesit-auto~ for Emacs 29
+    - but I think that uses the ~tree-sitter~ package instead of the built in ~treesit~.
+
+** do it in the init file for
+
+...probably everything in the langs dir?
+file:source/user/config/languages/
+  - JSON
+
+
+** decide between foo-ts and foo for org-src-lang-modes
+
+[[file:source/user/config/org/mode.el::;; TODO: how to decide between `json' and `json-ts'?]]
+#+begin_src elisp
+  ;; TODO: how to decide between `json' and `json-ts'?
+  ;; TODO: ...config var? `--/foo/bar/use-treesit'???
+  (push '("json"                    . json-ts)    org-src-lang-modes)
+#+end_src
 
 
 * namespace
