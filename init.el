@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-09-23
+;; Timestamp:  2025-10-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -752,6 +752,11 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   (imp-load :feature '(:user config languages elisp)
             ;; TODO: make/load "config/languages/init.el", which will load all
             :path  "config/languages/elisp.el"  ;; (imp-path-join 'config 'org 'init.el)
+            )
+
+  (imp-load :feature '(:user config languages elisp)
+            ;; TODO: make/load "config/languages/init.el", which will load all
+            :path  "config/languages/json.el"  ;; (imp-path-join 'config 'org 'init.el)
             )
 
 
