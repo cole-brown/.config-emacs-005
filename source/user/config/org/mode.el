@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-02
-;; Timestamp:  2023-09-18
+;; Timestamp:  2025-10-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -45,7 +45,7 @@
   ;;---
   ;; Create Org-Mode Hooks
   ;;---
-  
+
   ;; (defun --/hook/org/jump-to-now-target ()
   ;;   "Jump point to \"now\" link, if it's in the first part of the file."
   ;;   (when-let ((location (buffer:search:header "[[--now")))
@@ -64,7 +64,7 @@
     ;; Auto-indentation is more annoying than useful in org, I think.
     (electric-indent-local-mode -1))
 
-  
+
   ;;------------------------------
   :hook
   ;;------------------------------
@@ -114,7 +114,7 @@
   ;; > Non-nil means insert state change notes and time stamps into a drawer.
   ;; > When nil, state changes notes will be inserted after the headline and
   ;; > any scheduling and clock lines, but not inside a drawer.
-  ;; > 
+  ;; >
   ;; > The value of this variable should be the name of the drawer to use.
   ;; > LOGBOOK is proposed as the default drawer for this purpose, you can
   ;; > also set this to a string to define the drawer of your choice.
@@ -193,7 +193,7 @@
   :config
   ;;------------------------------
 
-  
+
   ;; `org-agenda-files'
   ;;-------------------
   ;; TODO: Does this belong in `org-mode' or `org-agenda'?
@@ -203,7 +203,7 @@
   ;;   (customize-set-variable org-agenda-files
   ;;                           agenda-files
   ;;                           "My paths to search for agenda items."))
-  
+
 
   ;; `org-src-lang-modes'
   ;;---------------------
@@ -233,7 +233,7 @@
   (push '("t-sql"                   . sql)        org-src-lang-modes)
 
   ;; `kusto' is Azure App Insights log query language.
-  (push '("kusto"                   . kusto)      org-src-lang-modes) 
+  (push '("kusto"                   . kusto)      org-src-lang-modes)
   (push '("azure-log-query"         . kusto)      org-src-lang-modes)
   (push '("azure-app-insight-query" . kusto)      org-src-lang-modes)
 
@@ -263,7 +263,7 @@
   (push '("jinja2"                  . web)        org-src-lang-modes)
 
   ;; `just' recipe runner: https://github.com/casey/just
-  (push '("just"                    . just)       org-src-lang-modes) 
+  (push '("just"                    . just)       org-src-lang-modes)
 
   ;; Shellses:
   ;; (push '("shell"                . sh)         org-src-lang-modes)
@@ -329,7 +329,13 @@
   ;;               ))))
   ;;   (advice-add 'org-indent--compute-prefixes
   ;;               :after #'org:advice/org-indent/prefix-munger)
-  )
+
+  ;; Org Babel
+  ;;----------
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   ;; Shells: `sh', `bash', `zsh', `fish', `csh', `ash', `dash', `ksh', `mksh', and `posh'.
+   '((shell . t))))
 
 
 
