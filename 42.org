@@ -974,9 +974,10 @@ And I guess these need fixed too:
 (remove-hook 'emacs-lisp-mode-hook 'highlight-quoted-mode)
 (remove-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
 
-* -- U R HERE --
-* ├CURRENT┤ whitespace
+* ├DONE───┤ whitespace
+CLOSED: [2025-09-24 Wed 14:07]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-09-24 Wed 14:07]
 - State "├CURRENT┤"  from              [2025-09-09 Tue 23:55]
 :END:
 
@@ -988,27 +989,148 @@ etc
 old sn004: [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/whitespace.el]]
 new sn005: file:/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/whitespace.el
 
+get theme fixes for whitespace mode
+[[file:source/user/config/theme/zenburn/whitespace.el]]
+
+* ├DONE───┤ org eval src blocks: shells
+CLOSED: [2025-10-08 Wed 21:57]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-08 Wed 21:57]
+- State "├CURRENT┤"  from              [2025-10-08 Wed 21:50]
+:END:
+
+Want to be able to eval bash...
+
+InternGPT says:
+#+begin_quote
+To enable evaluating source blocks for Bash in Emacs Lisp when using Org-mode,
+you need to ensure that the =ob-shell= package is loaded or required, and the
+language is included in the list of supported languages for evaluation. You can
+achieve this by adding the following code to your Emacs configuration:
+
+#+begin_src lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((shell . t))) ; Enable evaluation for shell scripts (including bash)
+#+end_src
+
+Make sure Org-mode is installed and configured in your Emacs setup. After adding
+this code, you can evaluate shell source blocks within Org-mode documents. Note
+that it's important to be cautious and understand the security implications of
+executing code blocks.
+#+end_quote
+
+#+begin_src bash
+ls
+#+end_src
+
+#+RESULTS:
+| 42.org         |
+| auto-save-list |
+| early-init.el  |
+| eln-cache      |
+| elpa           |
+| etc            |
+| init.el        |
+| LICENSE        |
+| scripts        |
+| snippets       |
+| source         |
+| symlink.sh     |
+| var            |
+
+yay
+
+* -- U R HERE --
+* csharp & treesit?
+
+
+
+* ├CURRENT┤ IMP-FIX: imp-load
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
+:END:
+
+** ├CURRENT┤ use-package parser
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
+:END:
+
+Make load parse its args like use-package does?
+  - ur [[file:source/core/packages/imp/parser.el::provide 'use-package-core][here]]
+    - Refactor that to be useful to imp.
+
+Mmh...
+(setq imp-parser-verbose 'debug)
+then see how it goes?
+
+
+(setq imp-parser-verbose nil)
+(setq imp-parser-verbose 'errors)
+(setq imp-parser-verbose 'debug)
+(imp-parser foo)
+(imp-parser foo :optional t)
+(imp-parser foo :optional t :error t)
+
+(imp-parser foo :path (imp-path-current-dir))
+
+And then:
+  - [X] make defaults [[file:source/core/packages/imp/parser.el::(defcustom imp-parser-defaults][here]]
+  - [ ] Make bare minimum work:
+    - (imp-parser foo)
+      - load from PWD or load-paths?
+    - (imp-parser :user test)
+      - load test from :user root?
+      - Should I change to something like (imp-parser user/test)?
+
+So... I need the handlers to call the load func once they're all done?
+So... ~imp-parser-process-keywords~ needs the logic.
+  - [[file:source/core/packages/imp/parser.el::;; TODO: (if (null plist)][imp-parser-process-keywords]]
+  - [[file:source/core/packages/imp/parser.el::defun imp-parser-load (name state][imp-parser-load]]
+
+(setq imp-parser-verbose nil)
+(setq imp-parser-verbose 'debug)
+(imp-parser foo)
+(imp-parser foo :optional t)
+(imp-parser foo :optional t :error t)
+
 ╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ╠══TODO══╣            ║                                                                                                          ║
 ╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
 ╠══TODO══╣            ║                                                                                                          ║
 ╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-get theme fixes for whitespace mode
-[[file:source/user/config/theme/zenburn/whitespace.el]]
+Check path normalizer/handler.
+Make file that can be loaded many times.
+  - w/ just a message or something in it.
 
-* IMP-FIX: imp-load
+(imp-parser foo :optional t :error t)
+(imp-parser foo :path (imp-path-current-dir))
 
-** use-package parser
 
-Make load parse its args like use-package does?
-  - ur [[file:source/core/packages/imp/parser.el::provide 'use-package-core][here]]
-    - Refactor that to be useful to imp.
+And then:
+  - [X] make defaults [[file:source/core/packages/imp/parser.el::(defcustom imp-parser-defaults][here]]
+  - [ ] Make bare minimum work:
+    - (imp-parser foo)
+      - load from PWD or load-paths?
+    - (imp-parser :user test)
+      - load test from :user root?
+      - Should I change to something like (imp-parser user/test)?
+
+How to do feature name?
+  (imp-load foo/bar/baz :optional t)
+  (imp-load :foo/bar/baz :optional t)
+  (imp-load (:foo bar baz) :optional t)
+
 
 ** imp-load: non-macro version
 
 Make load not a macro
   - ur [[file:source/core/packages/imp/load.el::;; (imp-load-v2 :feature :user :path (imp-path-current-dir))][here]]
+
+** imp path feature root
+
+
 
 * fix: treesit & JSON
 
