@@ -21,8 +21,8 @@
 ;;                                 ──────────
 ;;
 ;; Provide to just Emacs:  `provide'
-;; Provide to just imp:    `imp-provide'
-;; Provide to imp & Emacs: `imp-provide' w/ `imp-only' flag
+;; Provide to just imp:    `imp-provide' w/ `imp-only' flag
+;; Provide to imp & Emacs: `imp-provide'
 ;;
 ;;; Code:
 
