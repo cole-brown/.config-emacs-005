@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-08-18
+;; Timestamp:  2025-10-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -188,9 +188,11 @@ Example:
 (defun imp-path-canonical (path &optional root)
   "Expand PATH to a full/absolute/canonical path, based off of ROOT if relative.
 
+Follow symlinks to find true path.
+
 If ROOT is nil, `default-directory' is used if needed."
   (declare (pure t) (side-effect-free t))
-  (expand-file-name path root))
+  (file-truename (expand-file-name path root)))
 
 
 (defun imp-path-join-canonical (&rest path)
@@ -934,6 +936,33 @@ Return a string."
   (file-name-sans-extension (imp-path-join path)))
 ;; (imp--path-sans-extension "foo" "bar/")
 ;; (imp--path-sans-extension "foo" "bar/" "baz.el")
+
+
+(defun imp--path-with-extension (path ext)
+  "Ensure PATH has an extension of EXT.
+
+(imp--path-with-extension \"jeff/jill.el\" \".el\")
+  ->\"jeff/jill.el\"
+
+(imp--path-with-extension \"jeff/jill\" \"el\")
+  ->\"jeff/jill.el\"
+
+(imp--path-with-extension \"jeff/jill..\" \"...el\")
+  ->\"jeff/jill.el\""
+  (if (string-suffix-p ext path 'ignore-case)
+      ;; PATH has suffix already. Do nothing.
+      path
+    ;; Clear all periods so we can just glue 'em together with one regardless.
+    (file-name-with-extension
+     (replace-regexp-in-string (rx (one-or-more ".") string-end)
+                               ""
+                               path)
+     (replace-regexp-in-string (rx (one-or-more ".") string-end)
+                                        ""
+                                        ext))))
+;; (imp--path-with-extension "foo/bar/baz" ".el")
+;; (imp--path-with-extension "foo/bar/baz.el" "el")
+;; (imp--path-with-extension nil "el")
 
 
 (defun imp--path-canonical (root relative &optional assert-exists sans-extension)
