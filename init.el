@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-10-08
+;; Timestamp:  2025-10-09
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -562,6 +562,9 @@
   (imp-load :feature '(:user config emacs)
             :path  "config/emacs.el")
 
+  (imp-load :feature '(:user config help)
+            :path  "config/help.el")
+
 
   ;;------------------------------------------------------------------------------
   ;; Whitespace
@@ -1020,9 +1023,10 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  '(org-fold-catch-invisible-edits 'show-and-error nil nil "Customized with use-package org")
  '(package-selected-packages
    '(cape colorful-mode corfu deadgrep elisp-demos embark-consult git-gutter-fringe
-          git-modes gptel hc-zenburn-theme highlight-quoted hurl-mode macrostep
-          magit marginalia no-littering orderless ox-gfm rainbow-delimiters
-          terraform-mode vertico ws-butler yaml-mode yasnippet zenburn-theme))
+          git-modes gptel hc-zenburn-theme helpful highlight-quoted hurl-mode
+          macrostep magit marginalia no-littering orderless ox-gfm
+          rainbow-delimiters terraform-mode vertico ws-butler yaml-mode
+          yasnippet zenburn-theme))
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode"))))
 (custom-set-faces
