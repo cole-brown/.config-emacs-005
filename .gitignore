@@ -2,6 +2,8 @@
 # ╠════════════════════════════════╣ Emacs ╠═════════════════════════════════╣ #
 # ╠════════════════════════════════╝       ╚═════════════════════════════════╣ #
 
+# tree-sitter libraries
+/tree-sitter
 
 # [2022-03-23] Lovingly stolen from Doom Emacs.
 #   - https://github.com/hlissner/doom-emacs
