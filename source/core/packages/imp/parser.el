@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-10-08
+;; Timestamp:  2025-10-09
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -641,6 +641,7 @@ next value for the STATE."
   (if (null plist)
       ;; No more keywords to process; do the thing!
       (imp-parser-load name state)
+
     ;; Process the next keyword.
     (let* ((keyword (car plist))
            (arg (cadr plist))
@@ -660,8 +661,8 @@ next value for the STATE."
 
 (defun imp-parser-load (name state)
   "Actually load the file, maybe."
-  ;; Handle STATE: `:path'
   (let* ((funcname "imp-parser-load") ; for debug & errors
+         ;; Handle STATE: `:path'
          (path (plist-get state :path)))
 
       (when imp--debugging?
@@ -767,6 +768,25 @@ The argument LABEL is ignored."
          `(funcall #',arg))
         (t arg)))
 
+(defun imp-parser-normalize-eval (arg)
+  "Eval ARG if a form/function. Otherwise return arg."
+  (cond ((null arg) nil)
+        ((eq t arg) t)
+        ((stringp arg) arg)
+        ((symbolp arg) arg)
+        (t
+         (eval arg))))
+
+(defsubst imp-parser-normalize-symbol-or-string (_label arg)
+  "Normalize the Lisp value given by ARG.
+The argument LABEL is ignored."
+  (cond ((null arg) nil)
+        ((eq t arg) t)
+        ((stringp arg) arg)
+        ((functionp arg)
+         `(funcall #',arg))
+        (t arg)))
+
 (defun imp-parser-normalize-symbols (label arg &optional recursed)
   "Normalize a list of symbols."
   (cond
@@ -788,6 +808,11 @@ The argument LABEL is ignored."
       '(t)
     (imp-parser-only-one (symbol-name keyword) args
       #'imp-parser-normalize-value)))
+
+(defun imp-parser-normalize-only-one-symbol-or-string (_name keyword args)
+  (imp-parser-only-one (symbol-name keyword)
+    args
+    #'imp-parser-normalize-value))
 
 (defun imp-parser-normalize-only-one-value (_name keyword args)
   (imp-parser-only-one (symbol-name keyword) args
@@ -1154,52 +1179,110 @@ See also `imp-parser-statistics'."
 ;;;; `:path'
 ;;------------------------------
 
-(defun imp-parser-normalize/:path (name keyword arg)
+(defun imp-parser-normalize-path-to-string (feature path)
+  "Normalize path symbol-or-string to a string.
+
+Replace path symbols with their strings.
+Replace path prefix strings with path roots."
+  (let ((funcname 'imp-parser-normalize-path-to-string))
+    ;; Finally, make sure output is string.
+    (imp-parser-as-string
+     ;; Normalize if symbol
+     (cond ((symbolp path)
+            ;; path == working directory
+            ;; NOTE: Can't allow `pwd' because it's a func and its output is bad for this.
+            (cond ((memq path '(cwd current-dir current-directory working-dir working-directory))
+                   (imp-path-current-dir))
+
+                  ;; path == rooted @ FEATURE
+                  ((memq path '(feature root feature-root from-feature relative-to-feature))
+                   (if (imp--path-root-dir feature :no-error)
+                       (imp--path-root-dir feature :no-error)
+                     (imp--error funcname
+                                 '("`:path' wants to be feature's root. "
+                                   "Cannot find feature root for: '%s'")
+                                 path)))
+
+                  ;; path == user emacs root
+                  ((memq path '(emacs .emacs .emacs.d))
+                   user-emacs-directory)
+
+                  ;; path as-is
+                  (t path)))
+
+           ;; Normalize if string
+           ((stringp path)
+            ;; path == pwd
+            (cond ((string-prefix-p "./" path)
+                   (imp-path-join (imp-path-current-dir)
+                                  (string-remove-prefix "./" path)))
+
+                  ;; path == rooted @ FEATURE
+                  ((string-prefix-p ":/" path)
+                   (imp-path-join (imp--path-root-dir feature :no-error) (string-remove-prefix ":/" path)))
+
+                  ;; TODO: look for "FEATURE-ROOT:/..."
+                  ;; TODO: get root of FEATURE
+
+                  ;; path as-is
+                  (t path)))
+           ;; Error if not string or symbol.
+           (t
+            (imp--error funcname
+                        "`:path' should be string or symbol: got %s: '%s'"
+                        (type-of path)
+                        path))))))
+
+(defun imp-parser-normalize/:path (feature keyword arg)
   "Normalize `:path' ARG to absolute & canonical path string.
 
-If ARG is `guess', make a guess at where the path to NAME probably is:
-  1) Using NAME's feature root path.
+If ARG is `guess', make a guess at where the path to FEATURE probably is:
+  1) Using FEATURE's root path.
   2) Using Emacs's current working directory.
 Else ARG will be used as-is for the path.
 
 If the path is relative, root it in one of:
-  1) NAME's feature root path
+  1) FEATURE's root path
   2) `user-emacs-directory'"
-  (let* ((funcname "imp-parser-normalize/:path")
-         (path-arg (imp-parser-only-one (symbol-name keyword) args #'imp-parser-normalize-value))
-         (path-feature-root (imp--path-root-dir name :no-error))
-         (path-out path-arg))
+  (let* ((funcname 'imp-parser-normalize/:path)
+         ;; Normalize path to symbol or string.
+         ;; Normalize default (nil) to the current dir.
+         (path-arg (or (imp-parser-normalize-eval
+                        (imp-parser-only-one (symbol-name keyword)
+                               arg
+                               #'imp-parser-normalize-symbol-or-string))
+                       (imp-path-current-dir)))
+         ;; Normalize path to a string.
+         (path-out (imp-parser-normalize-path-to-string feature path-arg)))
 
-    ;; Normalize default value: `guess'
-    (when (eq 'guess path-arg)
-      (let ((path-guess (or (imp--path-root-dir name :no-error)
-                            (imp-path-current-dir)))
-            (filename-guess (imp-parser-as-string name)))
-
-        (unless (and (stringp path-guess)
-                     (stringp filename-guess))
-          (imp--error funcname
-                      '("Could not guess a path to look for '%s'. "
-                        "Guesses do not exist. "
-                        "path-arg: '%s', "
-                        "path-feature-root: '%s', "
-                        "path-pwd: '%s', "
-                        "filename-guess: '%s'")
-                      name
-                      path-arg
-                      path-feature-root
-                      path-pwd
-                      filename-guess))
-
-        (setq path-out (imp-path-join path-guess filename-guess))))
-
-    ;; Normalize to an absolute path by rooting in feature root or `user-emacs-directory'.
     (unless (file-name-absolute-p path-out)
-      (setq path-out (imp-path-join (or path-feature-root user-emacs-directory)
-                                    path-out)))
+      (imp--error funcname
+                  "`:path' should end up as absolute: got: '%s' -> '%s' -> '%s'"
+                  arg
+                  path-arg
+                  path-out))
 
     ;; Normalize absolute path: remove symlinks & shortcuts.
-    (imp-path-canonical path-out)))
+    (setq path-out (imp-path-canonical path-out))
+
+    ;; Check what path is. If it's a directory, add FEATURE to end of path.
+    ;;---
+    ;; TODO: remove root from feature if needed?
+    ;; TODO: don't want .../source/user/user/init.el for FEATURE `:user/init'
+    ;; (imp-parser-as-string feature)
+    ;;---
+    ;; See TODO: file:path.el::;; TODO: move this to new func... `imp-path-exists' or something?
+    ;; (pcase (imp-path-file-exists? ...)
+    ;;   (:file
+    ;;    ...)
+    ;;   (:file:load
+    ;;    ...)
+    ;;   (:dir
+    ;;    ...)
+    ;;   (_
+    ;;    ...))
+
+    path-out))
 
 (defalias 'imp-parser-handler/:path 'imp-parser-handle-state)
 
