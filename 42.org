@@ -1113,29 +1113,6 @@ file:~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/help.el
 
 
 * -- U R HERE --
-* namespaced window
-
-want my ~window:kill-or-quit~
-  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
-
-* ├CURRENT┤ csharp & treesit?
-:LOGBOOK:
-- State "├CURRENT┤"  from              [2025-10-08 Wed 23:01]
-:END:
-
-~M-x treesit-install-language-grammar~
-
-NO:   https://github.com/tree-sitter/csharp-tree-sitter
-YES?: https://github.com/tree-sitter/tree-sitter-c-sharp
-
-mmmh... yay. -_-
-#+begin_quote
-⛔ Warning (treesit): The installed language grammar for csharp cannot be located or has problems (symbol-error): /home/main/.config/emacs/tree-sitter/libtree-sitter-csharp.so: undefined symbol: tree_sitter_csharp
-#+end_quote
-
-TODO: make csharp config file
-
-
 * ├CURRENT┤ IMP-FIX: imp-load
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
@@ -1184,6 +1161,13 @@ So... ~imp-parser-process-keywords~ needs the logic.
 (imp-parser foo :optional t)
 (imp-parser foo :optional t :error t)
 
+Make path normalizer more dumb?
+  - Make the defaults an ordered list?
+  - Make people use ":/" or ~FOO:/blah~ or ~(from-)feature(-root)~ for feature-rooted paths?
+  - Make people use "./" or ~pwd~ for ~imp-path-current-dir~?
+  - Maybe get it down to the only guess being ~user-emacs-directory~?
+
+
 ╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ╠══TODO══╣            ║                                                                                                          ║
 ╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
@@ -1191,6 +1175,13 @@ So... ~imp-parser-process-keywords~ needs the logic.
 ╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 Check path normalizer/handler.
+
+(imp-parser-normalize/:path :user/foo :path '(nil))
+(imp-parser-normalize/:path :user/foo :path '(root))
+(imp-parser-normalize/:path :user/foo :path '(.emacs.d))
+(imp-parser-normalize/:path :user/foo :path '(pwd))
+
+
 Make file that can be loaded many times.
   - w/ just a message or something in it.
 
@@ -1220,6 +1211,30 @@ Make load not a macro
 
 ** imp path feature root
 
+
+
+* namespaced window
+
+want my ~window:kill-or-quit~
+  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
+  - and ~deadgrep~ maybe?
+
+* ├CURRENT┤ csharp & treesit?
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-10-08 Wed 23:01]
+:END:
+
+~M-x treesit-install-language-grammar~
+
+NO:   https://github.com/tree-sitter/csharp-tree-sitter
+YES?: https://github.com/tree-sitter/tree-sitter-c-sharp
+
+mmmh... yay. -_-
+#+begin_quote
+⛔ Warning (treesit): The installed language grammar for csharp cannot be located or has problems (symbol-error): /home/main/.config/emacs/tree-sitter/libtree-sitter-csharp.so: undefined symbol: tree_sitter_csharp
+#+end_quote
+
+TODO: make csharp config file
 
 
 * eval after
