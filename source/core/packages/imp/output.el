@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-04-16
-;; Timestamp:  2025-04-16
+;; Timestamp:  2025-10-09
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -33,16 +33,25 @@
 Return nil if no callers."
   (declare (pure t)
            (side-effect-free t))
-  (if (stringp callers)
-      callers
-    (seq-reduce (lambda (output next)
-                  "nil-aware concat"
-                  (if (and output next)
-                      (concat next " ⇐ " output)
-                    (or output next)))
-                (seq-map #'imp--string-or-nil
-                         (reverse callers))
-                nil)))
+  (cond ((null callers)
+         nil)
+        ((stringp callers)
+         callers)
+        ((symbolp callers)
+         (symbol-name callers))
+        (t ; assume a list of strings/symbols
+         (seq-reduce (lambda (output next)
+                       "nil-aware concat"
+                       (if (and output next)
+                           (concat next " ⇐ " output)
+                         (or output next)))
+                     ;; filter out nils
+                     (seq-keep #'identity
+                               ;; recurse to get all strings or nils
+                               (seq-map #'imp--output-callers
+                                        (reverse callers)))
+                     nil))))
+;; (imp--output-callers nil)
 ;; (imp--output-callers "bob")
 ;; (imp--output-callers '("bob" nil))
 ;; (imp--output-callers '("bob" "alice"))
