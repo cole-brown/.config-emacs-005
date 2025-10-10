@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-10-09
+;; Timestamp:  2025-10-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -835,59 +835,11 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
 
 
   ;;------------------------------------------------------------------------------
-  ;; AI: ChatGPT
+  ;; AI: ChatGPT & Friends!
   ;;------------------------------------------------------------------------------
 
-  ;; https://github.com/karthink/gptel
-  (use-package gptel
-
-    ;;------------------------------
-    :init
-    ;;------------------------------
-
-    (defvar --/gptel/directive/default
-      (string-join
-       '("You are a large language model living in Emacs and a helpful assistant."
-         "Respond concisely and provide reference links or code examples."
-         ""
-         "Default to C# for code."
-         "There are 2 important .NET versions in use:"
-         "1. .NET Framework ≥4.8.1 (latest release of .NET Framework)"
-         "2. .NET ≥8 (latest LTS release of .NET (Core))")
-       "\n")
-      "For adding to alist `gptel-directives' and/or var `gptel--system-message'.")
-
-
-    ;;------------------------------
-    :hook
-    ;;------------------------------
-    (gptel-mode-hook . visual-line-mode)
-
-
-    ;;------------------------------
-    :config
-    ;;------------------------------
-
-    (add-to-list 'gptel-directives
-                 (cons '--/gptel/directive/default --/gptel/directive/default))
-    ;; (pp gptel-directives)
-
-
-    ;;------------------------------
-    :custom
-    ;;------------------------------
-
-    (gptel-api-key (plist-get --/secret/key/openai :key))
-
-    (gptel-model 'gpt-4o)
-
-    ;; Customize prompt.
-    (gptel--system-message --/gptel/directive/default)
-
-    ;; Default: `markdown-mode' if available, else `text-mode'
-    ;; ...why would you ever not use org?
-    (gptel-default-mode 'org-mode))
-
+  (imp-load :feature '(:user config ai)
+            :path    "config/ai.el")
 
   ;;------------------------------------------------------------------------------
   ;; dev-env: Language: YAML
