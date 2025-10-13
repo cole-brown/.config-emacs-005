@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-08
+;; Timestamp:  2025-10-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -192,7 +192,12 @@ Follow symlinks to find true path.
 
 If ROOT is nil, `default-directory' is used if needed."
   (declare (pure t) (side-effect-free t))
-  (file-truename (expand-file-name path root)))
+  ;; remove trailing slash
+  (directory-file-name
+   ;; follow symlinks, remove ".."
+   (file-truename
+    ;; get absolute path
+    (expand-file-name path root))))
 
 
 (defun imp-path-join-canonical (&rest path)
