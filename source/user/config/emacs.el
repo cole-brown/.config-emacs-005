@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-24
-;; Timestamp:  2025-09-22
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -387,6 +387,16 @@ Example:
   ;; Translate ANSI SGR control sequences into text properties.
   ;; https://en.wikipedia.org/wiki/ANSI_escape_code#SGR
   (ansi-color-for-comint-mode t))
+
+
+;;------------------------------------------------------------------------------
+;; Modeline
+;;------------------------------------------------------------------------------
+
+;; Hide minor modes in a menu in the modeline.
+;; https://github.com/tarsius/minions
+(use-package minions
+  :config (minions-mode +1))
 
 
 ;;------------------------------------------------------------------------------
