@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-10-10
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -976,7 +976,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
  '(package-selected-packages
    '(cape colorful-mode corfu deadgrep elisp-demos embark-consult git-gutter-fringe
           git-modes gptel hc-zenburn-theme helpful highlight-quoted hurl-mode
-          macrostep magit marginalia no-littering orderless ox-gfm
+          macrostep magit marginalia minions no-littering orderless ox-gfm
           rainbow-delimiters terraform-mode vertico ws-butler yaml-mode
           yasnippet zenburn-theme))
  '(package-vc-selected-packages
