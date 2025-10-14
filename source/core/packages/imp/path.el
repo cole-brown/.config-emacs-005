@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-13
+;; Timestamp:  2025-10-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -1118,7 +1118,7 @@ Returns normalized path."
 ;; Public API: Feature Root Directories
 ;;------------------------------------------------------------------------------
 
-(defun imp-path-root-set (feature-base path-dir-root &optional path-file-init path-file-features)
+(defun imp-path-root-set (feature-base path-dir-root &optional path-file-init)
   "Set the root path(s) of FEATURE-BASE for future `imp-require' calls.
 
 PATH-DIR-ROOT is the directory under which all of FEATURE-BASE's features exist.
@@ -1127,13 +1127,12 @@ PATH-FILE-INIT is nil or the file to load if only FEATURE-BASE is used in an
 `imp-require', and the feature isn't loaded, AND we have the entry... somehow...
 in `imp-path-roots'.
   - This can be either an absolute or relative path. If relative, it will be
-    relative to PATH-DIR-ROOT.
+    relative to PATH-DIR-ROOT."
+  (cond ((not (symbolp feature-base))
+         (imp--error "imp-path-root-set"
+                     "FEATURE-BASE must be a symbol"))
 
-PATH-FILE-FEATURES is nil or a minimal file with a call to `imp-feature-at'.
-  - If a sub-feature (that isn't provided) is requested for your feature and there
-    is no entry in `imp-features', this file will be loaded in order to populate
-    `imp-features' so the feature can be looked for."
-  (cond ((imp--path-root-contains? feature-base)
+        ((imp--path-root-contains? feature-base)
          (imp--error "imp-path-root-set"
                      '("FEATURE-BASE '%S' is already an imp root.\n"
                        "path: %s\n"
@@ -1141,10 +1140,6 @@ PATH-FILE-FEATURES is nil or a minimal file with a call to `imp-feature-at'.
                      feature-base
                      (imp--path-root-dir feature-base :no-error)
                      (imp--path-root-file-init feature-base :no-error)))
-
-        ((not (keywordp feature-base))
-         (imp--error "imp-path-root-set"
-                     "FEATURE-BASE must be a keyword (e.g. `:foo' `:bar' etc)"))
 
         ;; imp--path-root-valid? will error with better reason, so the error here
         ;; isn't actually triggered... I think?
@@ -1156,9 +1151,9 @@ PATH-FILE-FEATURES is nil or a minimal file with a call to `imp-feature-at'.
         (t
          (push (list feature-base
                      path-dir-root
-                     path-file-init
-                     path-file-features)
+                     path-file-init)
                imp-path-roots))))
+;; (imp-path-root-set 'imp "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp")
 
 
 (defun imp-path-root-get (feature-base &optional no-error?)
@@ -1169,6 +1164,7 @@ signals an error.
 
 Return path string from `imp-path-roots' or nil."
   (imp--path-root-dir feature-base no-error?))
+;; (imp-path-root-get 'imp)
 
 
 ;;------------------------------------------------------------------------------

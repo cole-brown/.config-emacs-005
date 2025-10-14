@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-10-13
+;; Timestamp:  2025-10-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -160,14 +160,17 @@ Return count of leaf nodes."
    ;; Not allowed for specific reasons:
    ;;------------------------------
    ;; Features have to be symbols sometimes, so no whitespace.
-   (list (rx-to-string '(any whitespace) :no-group)
+   (list (rx-to-string '(or (any whitespace) "\n") :no-group)
          "")
 
    ;; Features use colon to denote the feature root (a feature with an entry
    ;; in `imp-path-roots'). eg `imp:/feature' is this file.
+   ;; Disallow it everywhere, then carefully insert it in the correct place?
    '(":" "")
 
-   ;; TODO: disallow or allow `imp--feature-replace-separator'?
+   ;; TODO: disallow or allow `imp--feature-separator-chain'?
+   ;; I think allow, so that normalizing works consistently.
+   ;; eg: '(root:/path/to dir feature) -> root:/path/to/dir/feature
 
    ;;------------------------------
    ;; Not allowed for no real reason, in Qwerty keyboard order:
@@ -188,41 +191,21 @@ translating an imp symbol chain into one symbol for Emacs.")
 ;; (imp-feature-normalize :imp 'test?-xx:y::z '+!@$%^&*| 'symbols)
 
 
-(defconst imp--feature-replace-separator
+(defconst imp--feature-separator-chain
   "/"
-  "Used for 'imp' -> Emacs feature normalization.
-
-String to use in between symbols when translating an imp symbol chain to
-an Emacs symbol.")
+  "Separator to use in between chain links when translating an imp feature
+chain to a single, normalized symbol.")
 
 
-(defun imp--feature-normalize-link (name)
-  "Normalize NAME to a string.
+(defconst imp--feature-separator-root
+  ":"
+  "Separator to use in between a feature root and subfeatures.")
 
-Uses `imp--feature-replace-rx' to replace invalid characters in the NAME
-string or symbol name.
-
-Return a string."
-
-  (let ((funcname 'imp--feature-normalize-link)
-        (name (string-trim name))
-
-    (seq-reduce (lambda (value rx-pair)
-                  (let ((replaced (replace-regexp-in-string (nth 0 rx-pair)
-                                                            (nth 1 rx-pair)
-                                                            value)))
-                    (if (or (null replaced)
-                            (string-empty-p replaced))
-                      (imp--error funcname
-                                  "Cannot convert to string; ended up with nothing: '%s'"
-                                  name))
-                    replaced))
-
-                imp--feature-replace-rx
-
-                (cond ((null name)
+(defun imp--feature-string (name)
+  (let*((funcname 'imp--feature-string)
+        (string (cond ((null name)
                        (imp--error funcname
-                                   "Cannot convert nil to string: '%s'"
+                                   "Cannot convert nil to string: %S"
                                    (type-of name)
                                    name))
                       ((stringp name)
@@ -231,46 +214,130 @@ Return a string."
                        (symbol-name name))
                       (t
                        (imp--error funcname
-                                   "Cannot convert %s to string: '%s'"
+                                   "Cannot convert %s to string: %S"
                                    (type-of name)
-                                   name))))))
-;; (imp--feature-normalize-link nil)
-;; (imp--feature-normalize-link "!@$%^&*|")
+                                   name)))))
+    ;; A bare root (eg "imp:") should trim off root separator.
+    (if (string-suffix-p imp--feature-separator-root string)
+        (string-remove-suffix imp--feature-separator-root string)
+      string)))
+;; (imp--feature-string 'imp)
+;; (imp--feature-string 'imp:)
+
+
+(defun imp--feature-symbol (name)
+  (when name
+    (intern (imp--feature-string name))))
+;; (imp--feature-symbol "imp")
+;; (imp--feature-symbol "imp:")
+;; (imp--feature-symbol 'imp)
+;; (imp--feature-symbol 'imp:)
+
+
+(defun imp--feature-split (name)
+  (string-split name imp--feature-separator-chain))
+;; (imp--feature-split "imp:/foo/bar/baz")
+
+
+(defun imp--feature-join (&rest name)
+  (mapconcat #'identity
+             name
+             imp--feature-separator-chain))
+;; (apply #'imp--feature-join (imp--feature-split "imp:/foo/bar/baz"))
+
+
+(defun imp--feature-normalize-link (name)
+  "Normalize NAME to a list of strings.
+
+Uses `imp--feature-replace-rx' to replace invalid characters in the NAME
+string or symbol name."
+  (let ((funcname 'imp--feature-normalize-link))
+    (imp--feature-split ; Split on "/".
+     ;; Run string through rx replacements.
+     (seq-reduce (lambda (value rx-pair)
+                   (let ((replaced (replace-regexp-in-string (nth 0 rx-pair)
+                                                             (nth 1 rx-pair)
+                                                             value)))
+                     (if (or (null replaced)
+                             (string-empty-p replaced))
+                         (imp--error funcname
+                                     "Cannot convert to string; ended up with nothing: '%s'"
+                                     name))
+                     replaced))
+                 imp--feature-replace-rx
+                 ;; Normalize name to string.
+                 (imp--feature-string name)))))
+;; (imp--feature-normalize-link 'imp:/foo/bar/baz)
+;; (imp--feature-normalize-link "foo:/bar")
+;; (imp--feature-normalize-link "	white  space\n")
 ;; (imp--feature-normalize-link "foo")
 ;; (imp--feature-normalize-link :foo)
+;; (imp--feature-normalize-link 'foo)
 ;; (imp--feature-normalize-link 'test?-xx:y::z)
 ;; (imp--feature-normalize-link "+!@$%^&*|")
+;; (imp--feature-normalize-link nil)
+;; (imp--feature-normalize-link "!@$%^&*|")
 
 
 (defun imp--feature-normalize-chain (&rest chain)
   "Normalize CHAIN to a list of normalized strings."
   (let ((funcname 'imp--feature-normalize-chain)
-        (normalized (seq-map #'imp--feature-normalize-link (imp--list-flatten chain))))
-    (cond ((seq-some #'imp--string-empty? normalized)
-           (imp--error funcname
-                       "No normalized strings produced from CHAIN: %S"
-                       normalized))
-          ((null normalized)
-           (imp--error funcname
-                    "Nothing normalized from CHAIN: %S"
-                    chain))
-          (t
-           normalized))))
+        (normalized (imp--list-flatten (seq-map #'imp--feature-normalize-link
+                                                (imp--list-flatten chain)))))
+    (if normalized
+        normalized
+      (imp--error funcname
+                  "Nothing normalized from CHAIN: %S"
+                  chain))))
+;; (imp--feature-normalize-chain 'imp:/foo/bar/baz)
+;; (imp--feature-normalize-chain "	white  space\n")
 ;; (imp--feature-normalize-chain "+spydez" "foo" "bar")
 ;; (imp--feature-normalize-chain "+spydez/foo/bar")
 ;; (imp--feature-normalize-chain '((nil)))
 ;; (imp--feature-normalize-chain 'test?-xx:y::z)
 ;; (imp--feature-normalize-chain '+!@$%^&*|)
 ;; (imp--feature-normalize-chain :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
+;; (imp--feature-normalize-chain :imp)
+
+
+(defun imp--feature-root? (normalized-chain)
+  (let ((root-maybe (imp--feature-symbol (car-safe normalized-chain))))
+    (when (imp--path-root-dir root-maybe :no-error)
+        root-maybe)))
+;; (imp--feature-root? (imp--feature-normalize-chain :imp 'foo 'bar "baz"))
+;; (imp--feature-root? '("imp"))
+;; (imp--feature-root? '(":dne"))
+
+
+(defun imp-feature-root (&rest feature)
+  "Return root of FEATURE, if any. Else nil."
+  (imp--feature-root? (apply #'imp--feature-normalize-chain feature)))
+;; (imp-feature-root nil)
+;; (imp-feature-root 'imp:/foo/bar/baz)
+;; (imp-feature-root :imp 'foo 'bar "baz")
+;; (imp-feature-root 'imp)
+;; (imp-feature-root "imp")
+;; (imp-feature-root '+layout/spydez)
+;; (imp-feature-root ":spydez")
+;; (imp-feature-root ":spydez" "foo" "bar")
+;; (imp-feature-root "spydez" "foo" "bar")
+;; (imp-feature-root '("+spydez" "foo" "bar"))
 
 
 (defun imp-feature-join (&rest feature)
-  (mapconcat #'identity
-             (seq-filter (lambda (x) (not (imp--string-empty? x)))
-                         (imp--feature-normalize-chain feature))
-             imp--feature-replace-separator))
-;; (imp-feature-join "+spydez/foo/bar")
-;; (imp-feature-join "+spydez" "foo" "bar")
+  (let* ((normalized (apply #'imp--feature-normalize-chain feature))
+         (rooted (apply #'imp-feature-root normalized)))
+    (apply #'imp--feature-join
+           (if rooted
+               (cons (concat (imp--feature-string rooted)
+                             imp--feature-separator-root)
+                     (cdr normalized))
+             normalized))))
+;; (imp-feature-join 'imp:/foo/bar/baz)
+;; (imp-feature-join :imp 'foo 'bar "baz")
+;; (imp-feature-join '(:imp foo bar "baz"))
+;; (imp-feature-join "+foo/bar/baz")
+;; (imp-feature-join "+foo" "bar" "baz")
 ;; (imp-feature-join '((nil)))
 ;; (imp-feature-join 'test?-xx:y::z)
 ;; (imp-feature-join '+!@$%^&*|)
@@ -279,38 +346,18 @@ Return a string."
 
 (defun imp-feature-split (&rest feature)
   "`:foo/bar/baz' -> '(\":foo\" \"bar\" \"baz\")"
-  (string-split (apply #'imp-feature-join feature)
-                imp--feature-replace-separator))
+  (let ((split (apply #'imp--feature-normalize-chain feature)))
+    (cons (string-remove-suffix imp--feature-separator-root
+                                (car split))
+          (cdr split))))
 ;; (imp-feature-split nil)
 ;; (imp-feature-split '+layout/spydez)
-;; (imp-feature-split :foo/bar/baz)
+;; (imp-feature-split 'foo:/bar/baz)
+;; (imp-feature-split 'dne)
+;; (imp-feature-split 'dne:/thing)
+;; (imp-feature-split :imp 'foo 'bar "baz")
+;; (imp-feature-split (imp-feature-join :imp 'foo 'bar "baz"))
 ;; (imp-feature-split (imp-feature-join "+spydez" "foo" "bar"))
-
-
-(defun imp-feature-root (&rest feature)
-  "Return root of FEATURE, if any. Else nil."
-  (when feature
-    (let ((root (car-safe (imp-feature-split (apply #'imp--feature-normalize-chain feature)))))
-      (when (string-prefix-p ":" root)
-        root))))
-;; (imp-feature-root '+layout/spydez)
-;; (imp-feature-root :spydez)
-;; (imp-feature-root "spydez")
-;; (imp-feature-root ":spydez")
-;; (imp-feature-root ":spydez" "foo" "bar")
-;; (imp-feature-root "spydez" "foo" "bar")
-;; (imp-feature-root '("+spydez" "foo" "bar"))
-
-
-
-
-
-;; TODO-HERE: Which is a rooted feature?
-;; :root/first/second
-;; root:/first/second
-
-
-
 
 
 (defun imp-feature-normalize (&rest feature)
@@ -321,13 +368,9 @@ FEATURE should be:
   2) or a list of keywords/symbols.
 
 FEATURE will be normalized, then converted into a single symbol."
-  (intern
-   (mapconcat #'identity
-              (seq-filter (lambda (x) (not (imp--string-empty? x)))
-                          (imp--feature-normalize-chain feature))
-              imp--feature-replace-separator)))
+  (imp--feature-symbol (apply #'imp-feature-join feature)))
 ;; (imp-feature-normalize :imp 'test 'symbols)
-;; (imp-feature-normalize '(:imp test symbols))
+;; (imp-feature-normalize '(:imp test symbols)
 ;; (imp-feature-normalize '(:imp test) 'symbols)
 ;; (imp-feature-normalize '(:imp provide))
 ;; (imp-feature-normalize :imp 'provide)
@@ -340,26 +383,28 @@ FEATURE will be normalized, then converted into a single symbol."
 ;; Feature Getters & Setters
 ;;------------------------------------------------------------------------------
 
-(defun imp--feature-add (normalized)
+(defun imp--feature-add (&rest feature)
   "Add the NORMALIZED features to the `imp-features' tree.
 
-NORMALIZED must already be a normalized (by `imp--feature-normalize-for-imp')
-list of keywords/symbols."
-  (imp--debug "imp--feature-add" "Adding to imp-features...")
-  (imp--debug "imp--feature-add" "  feature: %S" normalized)
+NORMALIZED must already be a normalized (by `imp-feature-normalize') symbol."
+  ;; (imp--debug "imp--feature-add" "Adding to imp-features...")
+  ;; (imp--debug "imp--feature-add" "  feature: %S" normalized)
   ;; (imp--debug "imp--feature-add" "imp-features before:\n%s"
   ;;                 (pp-to-string imp-features))
 
-  ;; Add normalized features to `imp-features' tree & set updated tree back
-  ;; to `imp-features'.
-  (imp--tree-update normalized nil imp-features)
+  (let ((symbols (seq-map #'imp--feature-symbol
+                          (apply #'imp--feature-normalize-chain feature))))
+    ;; Add normalized features to `imp-features' tree & set updated tree back
+    ;; to `imp-features'.
+    (imp--tree-update symbols nil imp-features)
 
-  (imp--debug "imp--feature-add" "imp-features after:\n%s"
-              (pp-to-string imp-features))
-  ;; Not sure what to return, but the updated features seems decent enough.
-  imp-features)
+    ;; (imp--debug "imp--feature-add" "imp-features after:\n%s"
+    ;;             (pp-to-string imp-features))
+
+    ;; Not sure what to return, but the updated features seems decent enough.
+    imp-features))
 ;; (setq imp-features nil)
-;; (imp--feature-add '(:imp test))
+;; (imp--feature-add '(:test foo))
 ;; imp-features
 ;; (imp--feature-add '(:imp or something here))
 ;; (imp--alist-get-value :imp imp-features)
@@ -375,84 +420,6 @@ list of keywords/symbols."
 (defun imp--feature-delete (normalized)
   "Remove the NORMALIZED feature, and all subfeatures, from `imp-features'."
   (imp--tree-delete normalized imp-features))
-
-
-;;------------------------------------------------------------------------------
-;; Features & Paths to Them
-;;------------------------------------------------------------------------------
-
-;; TODO-LOAD: DELETE THIS WHEN imp-parser becomes imp-load.
-(defun imp--feature-paths (&rest feature)
-  "Find (relative) path(s) to files for FEATURE-ROOT + FEATURE.
-
-This will only provide the paths for the feature itself, each of which may
-`imp-require' more features.
-
-Return list of: '(path-root . (paths-relative))
-
-Error if:
-  - No root path for FEATURE root.
-  - No paths found for input parameters."
-  (let* ((func-name "imp--feature-paths")
-         (features-normal (imp--feature-normalize-chain feature)))
-
-    ;;------------------------------
-    ;; Error Check Inputs
-    ;;------------------------------
-    ;; FEATURE-ROOT must:
-    ;; 1) Be an imp feature.
-    ;; (imp-feature-assert feature-root)
-    ;;   ...must it be a feature? Not so sure. All I /think/ we need is the entry in `imp-path-roots'.
-
-    ;; 2) Have registered a root path.
-    (unless (imp--path-root-contains? (car features-normal))
-      (imp--error func-name
-                  "Feature `%S' does not have a root path in imp."
-                  (car features-normal)))
-
-    ;;------------------------------
-    ;; Get the paths and load them?
-    ;;------------------------------
-    (let* ((path-root (imp--path-root-dir (car features-normal)))
-           (feature-locations (imp--feature-locations (car features-normal)))
-           (paths (imp--alist-get-value features-normal
-                                        feature-locations
-                                        imp--features-locate-equal)))
-      (imp--debug func-name
-                  '("Get feature paths:\n"
-                    "  - feature-root: %S\n"
-                    "  - path-root:    %s\n"
-                    "  - feature-locations: %S\n"
-                    "  - paths: %S")
-                  (car features-normal)
-                  path-root
-                  feature-locations
-                  paths)
-
-      ;;---
-      ;; Error Checks
-      ;;---
-      (unless feature-locations
-        (imp--error func-name
-                    "No feature locations found for: %S"
-                    (car features-normal)))
-
-      (unless paths
-        (imp--error func-name
-                    "No feature paths found for: %S"
-                    features-normal))
-
-      ;;---
-      ;; Done; return.
-      ;;---
-      (imp--debug func-name
-                  '("Return feature paths for `%S':\n"
-                    "  - path-root:    %s\n"
-                    "  - paths: %S")
-                  (car features-normal)
-                  path-root
-                  paths)
-      (cons path-root paths))))
 
 
 ;;------------------------------------------------------------------------------
