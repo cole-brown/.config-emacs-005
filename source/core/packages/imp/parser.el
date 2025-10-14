@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-10-10
+;; Timestamp:  2025-10-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -1316,6 +1316,8 @@ If the path is relative, root it in one of:
                   path))
 
     ;; Add (some of) FEATURE to end of path?
+
+
     ;;---
     ;; TODO: remove root from feature if needed?
     ;; TODO: don't want .../source/user/user/init.el for FEATURE `:user/init'

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-12-18
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -42,9 +42,7 @@
   "The most heavy-handed approach to clearing the clutter away.
 
 Set to nil:
-  - `imp-features'
-  - `imp-features-locate'"
+  - `imp-features'"
   (interactive)
-  (setq imp-features        nil)
-  (setq imp-features-locate nil))
+  (setq imp-features nil))
 ;; (imp-cmd-features-nuke)

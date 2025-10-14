@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-22
-;; Timestamp:  2024-10-02
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -625,7 +625,7 @@ Return nil."
              ;; Eat the leaf of the null tree.
              ;;----------------------------
              (imp--tree-debug func-name "TREE(NULL):%d: %S" dbg-depth tree)
-             (imp--tree-debug func-name "LEAF(EAT):%d:  %S" dbg-depth (imp-feature-normalize-for-display chain-leaf))
+             (imp--tree-debug func-name "LEAF(EAT):%d:  %S" dbg-depth (imp-feature-normalize chain-leaf))
 
              ;; Do the thing to this leaf's chain.
              (funcall function chain-leaf)

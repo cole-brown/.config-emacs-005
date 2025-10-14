@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-10
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -616,8 +616,6 @@ Use `imp--path-replace-rx' translations."
 ;;   (imp--path-safe-string "~/emacs.d/")
 ;; Should remain the same:
 ;;   (imp--path-safe-string "config")
-;; Test func name -> valid path:
-;;   (imp--path-safe-string "test<imp-feature/at>::imp--feature-paths")
 
 
 (defun imp--path-safe-list (feature)
@@ -932,7 +930,7 @@ Return a string."
 ;; (imp-path-join "foo" "bar.el")
 ;; (imp-path-join "foo")
 
-
+;; TODO: change to pass in EXT, check for EXT, remove if matching.
 (defun imp--path-sans-extension (&rest path)
   "Join PATH elements together and then remove any extension.
 
@@ -1038,6 +1036,8 @@ Returns normalized path."
                     root
                     relative
                     path))
+       ;; TODO: move this to new func... `imp-path-exists' or something?
+       ;; TODO: return :file, :file:load, :dir...?
 
        ;;---
        ;; ASSERT-EXISTS != nil

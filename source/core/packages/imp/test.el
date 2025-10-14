@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-31
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -205,9 +205,9 @@ Returns a plist:
           (if (eq :imp-dne (car in:feature/pre))
               ;; Don't let `:imp-dne' get normalized to `:impdne'.
               (setq out:feature/pre (list :imp-dne
-                                          (imp--feature-normalize-to-list (cdr in:feature/pre))))
+                                          (imp--feature-normalize-chain (cdr in:feature/pre))))
             ;; Normalize to a list.
-            (setq out:feature/pre (imp--feature-normalize-to-list in:feature/pre)))
+            (setq out:feature/pre (imp--feature-normalize-chain in:feature/pre)))
 
         ;; Handlers:
         ((error user-error) (imp--error caller
@@ -221,9 +221,9 @@ Returns a plist:
           (if (eq :imp-dne (car in:feature/post))
               ;; Don't let `:imp-dne' get normalized to `:impdne'.
               (setq out:feature/post (list :imp-dne
-                                           (imp--feature-normalize-to-list (cdr in:feature/post))))
+                                           (imp--feature-normalize-chain (cdr in:feature/post))))
             ;; Normalize to a list.
-            (setq out:feature/post (imp--feature-normalize-to-list in:feature/post)))
+            (setq out:feature/post (imp--feature-normalize-chain in:feature/post)))
 
         ;; Handlers:
         ((error user-error) (imp--error caller

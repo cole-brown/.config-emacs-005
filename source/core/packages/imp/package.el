@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-20
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -245,14 +245,14 @@ This is a wrapper around `eval-after-load' that:
                ;; macro expansion from pulling (or failing to pull) in autoloaded
                ;; macros/features.
                `(eval-after-load ',(if (keywordp feature)
-                                       (imp-feature-normalize-for-emacs feature)
+                                       (imp-feature-normalize feature)
                                      feature)
                   ',(macroexp-progn body))))
 
         ((and (listp feature)
               (not (memq (car feature) '(:and :all :or :any))))
          ;; Convert imp feature list to Emacs feature symbol & recurse to hit the above case.
-         `(imp-eval-after ,(apply #'imp-feature-normalize-for-emacs feature) ,@body))
+         `(imp-eval-after ,(apply #'imp-feature-normalize feature) ,@body))
 
         ;;------------------------------
         ;; Multiple Features

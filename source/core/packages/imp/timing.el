@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-07
-;; Timestamp:  2023-07-19
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -481,7 +481,7 @@ TYPE should be either `:root' or `:leaf'. Uses TYPE to get the indent string."
 Message depends on `imp--timing-format-load'."
   (imp--timing-message :root
                        imp--timing-format-load
-                       (imp-feature-normalize-for-display feature)
+                       (imp-feature-normalize feature)
                        filename
                        path))
 
@@ -507,7 +507,7 @@ Message depends on `imp--timing-format-skip'."
     ;; Skip message.
     (imp--timing-message :root
                          imp--timing-format-skip
-                         (imp-feature-normalize-for-display feature)
+                         (imp-feature-normalize feature)
                          filename
                          path)
     ;; Increase indent level for reason.
@@ -516,7 +516,7 @@ Message depends on `imp--timing-format-skip'."
       (imp--timing-message :leaf
                            (concat imp--timing-reason
                                    imp--timing-format-skip-already-provided)
-                           (imp-feature-normalize-for-display feature)
+                           (imp-feature-normalize feature)
                            filename
                            path))))
 
@@ -529,7 +529,7 @@ Message depends on `imp--timing-format-optional'."
     ;; Skip message.
     (imp--timing-message :root
                          imp--timing-format-skip
-                         (imp-feature-normalize-for-display feature)
+                         (imp-feature-normalize feature)
                          filename
                          path)
     ;; Increase indent level for reason.
@@ -538,7 +538,7 @@ Message depends on `imp--timing-format-optional'."
       (imp--timing-message :leaf
                            (concat imp--timing-reason
                                    imp--timing-format-skip-optional-dne)
-                           (imp-feature-normalize-for-display feature)
+                           (imp-feature-normalize feature)
                            filename
                            path))))
 
@@ -547,7 +547,7 @@ Message depends on `imp--timing-format-optional'."
   "imp timing for use in use-package handler.
 
 TODO better docstr"
-  (let ((feature (imp--feature-normalize-to-list feature)))
+  (let ((feature (imp--feature-normalize-chain feature)))
     (if (not (and (imp-timing-enabled?)
                   ;; Don't do (another) timing block/level for a duplicated call.
                   (not (imp--timing-feature-duplicate? feature))))
@@ -590,7 +590,7 @@ Output message depends on `imp--timing-format-time'.
 Return result of evaluating BODY."
   (declare (indent 3))
 
-  `(let ((imp--macro-feature (imp--feature-normalize-to-list ,feature)))
+  `(let ((imp--macro-feature (imp--feature-normalize-chain ,feature)))
      (if (and (imp-timing-enabled?)
               ;; Don't do (another) timing block/level for a duplicated call.
               (not (imp--timing-feature-duplicate? imp--macro-feature)))

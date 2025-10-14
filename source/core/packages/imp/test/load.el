@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-05
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -172,10 +172,8 @@
     ;;---
     ;; Supply feature paths:
     ;;---
-    (should-not imp-features-locate)
     (should (imp--load-file (imp-path-join test<imp>:path:root:loading
                                                imp-path-filename-features)))
-    (should imp-features-locate)
 
     ;;---
     ;; Load a feature:
@@ -280,10 +278,8 @@ find/load 'imp-features.el'."
     ;;---
     ;; Do _NOT_ supply feature paths:
     ;;---
-    (should-not imp-features-locate)
     ;; (should (imp--load-file (imp-path-join test<imp>:path:root:loading
     ;;                                            imp-path-filename-features)))
-    ;; (should imp-features-locate)
 
     ;; But do make sure the expected file is present.
     (should (file-exists-p (imp-path-join test<imp>:path:root:loading

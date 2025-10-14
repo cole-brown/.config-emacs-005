@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -67,7 +67,7 @@ If you want to provide the feature to emacs as well, you can either:
      - imp will translate the FEATURE symbol chain via `imp-feature-normalize-imp->emacs'.
   2. Do it yourself by also calling Emacs' `provide' with a symbol of your
      choosing."
-  (let ((feature-imp (imp--feature-normalize-to-list feature)))
+  (let ((feature-imp (imp--feature-normalize-chain feature)))
     (if (null feature-imp)
         (imp--error "imp-provide"
                     '("No features to provide? "
@@ -92,11 +92,11 @@ Each FEATURE should be one of:
   - A symbol.
   - A string to be passed through `imp-feature-normalize'.
 
-imp will translate the FEATURE symbol chain via `imp-feature-normalize-for-emacs' and use
+imp will translate the FEATURE symbol chain via `imp-feature-normalize' and use
 the result for the call to Emacs' `provide'.
 
 Returns the Emacs feature symbol created/used."
-  (let ((feature-emacs (imp-feature-normalize-for-emacs feature)))
+  (let ((feature-emacs (imp-feature-normalize feature)))
     (imp--debug "imp--provide-to-emacs" "Providing to emacs as '%S'..."
                 feature-emacs)
     (provide feature-emacs)
@@ -130,7 +130,7 @@ If you want to provide the feature to emacs as well, you can either:
 
 Delete exactly/only FEATURE."
   (let ((func-name "imp--unprovide-feature-from-emacs")
-        (normalized (imp-feature-normalize-for-emacs feature)))
+        (normalized (imp-feature-normalize feature)))
     (when (featurep normalized)
       ;; Filter it out of the `features' list.
       (setq features (seq-filter (lambda (f) (not (eq f normalized))) features))
@@ -152,7 +152,7 @@ Delete exactly/only FEATURE."
 Delete from:
   - imp: `imp-features'
   - emacs: `features'"
-  (let* ((feature-imp (imp--feature-normalize-to-list feature))
+  (let* ((feature-imp (imp--feature-normalize-chain feature))
          (tree (imp--feature-get-tree feature-imp)))
     ;; Does imp know about this?
     (if (null tree)

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-08-18
+;; Timestamp:  2025-10-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -106,17 +106,13 @@ FEATURE is only for `imp-timing' use."
 (defun imp--load-feature (&rest feature)
   "Load a FEATURE.
 
-Load the feature based on its entries in `imp-path-roots' and
-`imp-features-locate'.
+Load the feature based on its entries in `imp-path-roots'.
 
 FEATURE must be a keyword or list of keywords/symbols.
 
 Let `feature-base' be FEATURE (if just a keyword) or `(car FEATURE)' if a list.
   - `feature-base' must be an entry in the `imp-path-roots' alist
     (set via the `imp-path-root'function).
-  - `feature-base' must be an entry in the `imp-features-locate' alist, its
-     value should be an alist, and `feature:rest' must exist in that value's
-     alist.
 
 For Example:
   When:
@@ -133,17 +129,17 @@ For Example:
 Does nothing if:
   1) `imp' already has the feature, or
   2) Emacs already has a feature named:
-     `(imp-feature-normalize-for-emacs FEATURE)'
+     `(imp-feature-normalize FEATURE)'
 
 Returns non-nil if loaded."
   (let* ((func-name "imp--load-feature")
-         (feature-normal (imp--feature-normalize-to-list feature))
+         (feature-normal (imp--feature-normalize-chain feature))
          (feature-base (car feature-normal))
          (feature-rest (cdr feature-normal))
          (feature-emacs (imp-feature-normalize--for-emacs feature-normal))
-         (feature-emacs-base (imp-feature-normalize-for-emacs feature-base))
+         (feature-emacs-base (imp-feature-normalize feature-base))
          (feature-emacs-rest (if feature-rest
-                                 (imp-feature-normalize-for-emacs feature-rest)
+                                 (imp-feature-normalize feature-rest)
                                nil)))
     (imp--debug func-name
                 '("Inputs:\n"
@@ -426,7 +422,7 @@ Returns a plist:
                   "Required `:feature' value not present."))
 
     ;; Normalize FEATURE to a list.
-    (setq out-feature (imp--feature-normalize-to-list in-feature))
+    (setq out-feature (imp--feature-normalize-chain in-feature))
     (imp--debug caller "out-feature:  %S" out-feature)
 
     ;;---
