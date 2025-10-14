@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    TODO:(datetime:timestamp:insert :rfc-3339:date)
-;; Timestamp:  2025-10-10
+;; Timestamp:  2025-10-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -32,7 +32,7 @@
     (defconst --/gptel/name/llm '("InternGPT" . "intern")
       "Cons of (FULL-NAME . FAMILIAR-NAME)")
     (defconst --/gptel/name/human '("human" . "human"))
-    (defconst --/gptel/name/suffix "❯")
+    (defconst --/gptel/name/suffix "❯ ")
 
     (defun --/gptel/name/prompt (&optional human? short?)
       (if-let* ((namecons (if human?
