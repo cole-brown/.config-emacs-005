@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-02
-;; Timestamp:  2025-10-08
+;; Timestamp:  2025-10-09
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -221,8 +221,8 @@
   ;;---
   ;; Professionally Used:
   ;;---
-  (push '("C#"                      . csharp)     org-src-lang-modes) ; dotnet
-  (push '("csharp"                  . csharp)     org-src-lang-modes)
+  (push '("C#"                      . csharp-ts)     org-src-lang-modes) ; dotnet
+  (push '("csharp"                  . csharp-ts)     org-src-lang-modes)
 
   (push '("hcl"                     . hcl)        org-src-lang-modes) ; HashiCorp Configuration Language
   (push '("terraform"               . hcl)        org-src-lang-modes)
@@ -257,7 +257,9 @@
   (push '("web"                     . web)        org-src-lang-modes)
   (push '("html"                    . web)        org-src-lang-modes)
 
-  (push '("json"                    . json)       org-src-lang-modes)
+  ;; TODO: how to decide between `json' and `json-ts'?
+  ;; TODO: ...config var? `--/foo/bar/use-treesit'???
+  (push '("json"                    . json-ts)    org-src-lang-modes)
   (push '("yaml"                    . yaml)       org-src-lang-modes)
   (push '("toml"                    . toml)       org-src-lang-modes)
   (push '("jinja2"                  . web)        org-src-lang-modes)
@@ -330,8 +332,8 @@
   ;;   (advice-add 'org-indent--compute-prefixes
   ;;               :after #'org:advice/org-indent/prefix-munger)
 
-  ;; Org Babel
-  ;;----------
+  ;; `org-babel': run/evaluate src code blocks
+  ;;------------------------------------------
   (org-babel-do-load-languages
    'org-babel-load-languages
    ;; Shells: `sh', `bash', `zsh', `fish', `csh', `ash', `dash', `ksh', `mksh', and `posh'.
