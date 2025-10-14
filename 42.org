@@ -1,3 +1,6 @@
+[[file:source/user/template.el::;;; user/config/TODO-FILENAME.el --- TODO-SHORT-DESCRIPTION -*- lexical-binding: t; -*-][template.el]]
+GOTO [[here][U R HERE]]
+
 * ├DONE───┤ .emacs.d layout
 CLOSED: [2025-06-03 Tue 22:33]
 :LOGBOOK:
@@ -1112,13 +1115,31 @@ make:
 file:~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/help.el
 
 
+* ├DONE───┤ gptel: GPT 5?
+CLOSED: [2025-10-10 Fri 15:42]
+:LOGBOOK:
+- State "├DONE───┤"  from "├SUCCESS┤"  [2025-10-10 Fri 15:42]
+- State "├SUCCESS┤"  from "├CURRENT┤"  [2025-10-10 Fri 15:42]
+- State "├CURRENT┤"  from              [2025-10-10 Fri 14:32]
+:END:
+
+move config to ~source/user/config/ai.el~
+
+update from 4o to 5
+  - [[file:source/user/config/ai.el::gptel-model 'gpt-5][here]]
+
 * -- U R HERE --
+<<here>>
+
 * ├CURRENT┤ IMP-FIX: imp-load
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
 :END:
 
 ** ├CURRENT┤ use-package parser
+:PROPERTIES:
+:ORDERED:  t
+:END:
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
 :END:
@@ -1167,23 +1188,47 @@ Make path normalizer more dumb?
   - Make people use "./" or ~pwd~ for ~imp-path-current-dir~?
   - Maybe get it down to the only guess being ~user-emacs-directory~?
 
+Check path normalizer/handler.
+
+(imp-parser-normalize/:path :user/foo :path '(nil))
+(imp-parser-normalize/:path :user/foo :path '(root))
+(imp-parser-normalize/:path :user/foo :path '(.emacs.d))
+(imp-parser-normalize/:path :user/foo :path '(cwd))
+
+k
+
+maybe I should try an actually bound symbol?
+(imp-parser-normalize-path :user :path 'user-emacs-directory)
+(imp-parser-normalize/:path :user/foo :path '(user-emacs-directory))
+Yay. It follows its symlink.
+
+Make file that can be loaded many times.
+  - w/ just a message or something in it.
+file:/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test.el
+
 
 ╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ╠══TODO══╣            ║                                                                                                          ║
 ╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
 ╠══TODO══╣            ║                                                                                                          ║
 ╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Refactor ~imp/feature.el~ for new style features.
+  - [[file:source/core/packages/imp/feature.el][here]]
+look for ~TODO-HERE~
 
-Check path normalizer/handler.
+#+begin_src elisp
+;; TODO-HERE: Which is a rooted feature?
+;; :root/first/second
+;; root:/first/second
+#+end_src
+  - [[file:source/core/packages/imp/feature.el::;; TODO-HERE: Which is a rooted feature?][here]]
 
-(imp-parser-normalize/:path :user/foo :path '(nil))
-(imp-parser-normalize/:path :user/foo :path '(root))
-(imp-parser-normalize/:path :user/foo :path '(.emacs.d))
-(imp-parser-normalize/:path :user/foo :path '(pwd))
+Honestly I should be on an imp branch...
 
 
-Make file that can be loaded many times.
-  - w/ just a message or something in it.
+Fix default path w/ feature root:
+(imp-parser :imp/test/data/load/manual-test)
+
 
 (imp-parser foo :optional t :error t)
 (imp-parser foo :path (imp-path-current-dir))
@@ -1204,14 +1249,60 @@ How to do feature name?
   (imp-load (:foo bar baz) :optional t)
 
 
+
+** imp-path
+
+as;dlfkjlasdkjfasekjldf
+what was this for
+
 ** imp-load: non-macro version
 
 Make load not a macro
   - ur [[file:source/core/packages/imp/load.el::;; (imp-load-v2 :feature :user :path (imp-path-current-dir))][here]]
 
+#+begin_src elisp
+;; TODO-LOAD: DELETE THIS WHEN imp-parser becomes imp-load.
+(defun imp--feature-paths (&rest feature)
+#+end_src
+  - [[file:source/core/packages/imp/feature.el::;; TODO-LOAD: DELETE THIS WHEN imp-parser becomes imp-load.][here]]
+
 ** imp path feature root
 
 
+
+* my public IP(s)
+
+is there a package that will figure out my IP for me?
+
+else just make a call to the one that I used for the bash prompt
+
+* auth-source / 1pass
+
+what dis? ~gptel~ uses it by default to find API key.
+
+Can I hook in 1pass?
+
+
+* gptel: PrivateGPT
+
+gptel can support PrivateGPT
+  - see [[file:~/.config/emacs/elpa/gptel-20250818.648/gptel.el::;; - For PrivateGPT: define a backend with `gptel-make-privategpt', which see.][here]]
+
+https://github.com/zylon-ai/private-gpt
+
+Get that running on my work org notes?
+* gptel: modify org mode layout?
+
+Can I get, like...
+
+#+begin_quote
+human> blah blah blah
+
+InternGPT>
+lorem ipsum dolor sit amet...
+#+end_quote
+
+Look in [[file:~/.config/emacs/elpa/gptel-20250818.648/gptel-org.el::;;; gptel-org.el --- Org functions for gptel -*- lexical-binding: t; -*-][here]] somewhere.
 
 * namespaced window
 
