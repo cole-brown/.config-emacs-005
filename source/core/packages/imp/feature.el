@@ -168,10 +168,6 @@ Return count of leaf nodes."
    ;; Disallow it everywhere, then carefully insert it in the correct place?
    '(":" "")
 
-   ;; TODO: disallow or allow `imp--feature-separator-chain'?
-   ;; I think allow, so that normalizing works consistently.
-   ;; eg: '(root:/path/to dir feature) -> root:/path/to/dir/feature
-
    ;;------------------------------
    ;; Not allowed for no real reason, in Qwerty keyboard order:
    ;;------------------------------
@@ -322,6 +318,20 @@ string or symbol name."
 ;; (imp-feature-root ":spydez" "foo" "bar")
 ;; (imp-feature-root "spydez" "foo" "bar")
 ;; (imp-feature-root '("+spydez" "foo" "bar"))
+
+
+(defun imp-feature-rest (&rest feature)
+  "Return FEATURE sans root, if any. Else nil."
+  (let* ((normalized (apply #'imp--feature-normalize-chain feature))
+         (root (imp--feature-root? normalized)))
+    (seq-map #'imp--feature-symbol
+             (if root
+                 (cdr normalized)
+               normalized))))
+;; (imp-feature-rest 'imp:/foo/bar/baz)
+;; (imp-feature-rest :imp 'foo 'bar "baz")
+;; (imp-feature-rest 'imp)
+;; (imp-feature-rest 'dne:/foo/bar/baz)
 
 
 (defun imp-feature-join (&rest feature)
