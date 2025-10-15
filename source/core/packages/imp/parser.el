@@ -660,34 +660,46 @@ next value for the STATE."
 ;; and then immediately back to indent of `defun`?!
 (put 'imp-parser-process-keywords 'lisp-indent-function 'defun)
 
-(defun imp-parser-load (name state)
+(defun imp-parser-load (feature state)
   "Actually load the file, maybe."
-  (let* ((funcname "imp-parser-load") ; for debug & errors
+  (let* ((funcname 'imp-parser-load)
          ;; Handle STATE: `:path'
-         (path (plist-get state :path)))
+         (path (plist-get state :path))
+         (feature-root (imp-feature-root feature)))
 
-      (when imp--debugging?
-        (imp--debug funcname
-                    "load '%s'"
-                    ;; Don't love expanded path, but it does match what Emacs `load' outputs:
-                    ;; > "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
-                    path-load))
+    ;; Figure out path from FEATURE?
+    (when (and (not path)
+               feature-root)
+      (setq path (imp-path-root-get feature-root)))
+
+    ;; Add rest of NAME to path; is a relative path.
+    (setq path (apply #'imp-path-join
+                      path
+                      (imp-feature-rest feature)))
+
+    ;;(when imp--debugging?
+      (imp--debug funcname
+                  "load '%s'"
+                  ;; Don't love expanded path, but it does match what Emacs `load' outputs:
+                  ;; > "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
+                  path)
+      ;;)
 
       ;; Time the minimum; only load, ideally.
       ;; TODO: make imp-timing take just a path, not separated path & filename.
-      (imp-timing
-          name
-          (imp--path-filename path)
-          (imp-path-parent path)
+      `((imp-timing
+          ',feature
+          ,(imp--path-filename path)
+          ,(imp-path-parent path)
 
         ;; Actually do the load.
         ;; Skip erroring out if STATE says so.
         ;; Return the results of `load'.
-        (load path
+        (load ,path
               ;; Handle STATE: `:error', `:optional'
               (not (or (plist-get state :error)
                        (plist-get state :optional)))
-              'nomessage))))
+              'nomessage)))))
 
 ;; (defun imp-parser-list-insert (elem xs &optional anchor after test)
 ;;   "Insert ELEM into the list XS.
@@ -1092,6 +1104,15 @@ See also `imp-parser-statistics'."
 ;;
 ;;; Handlers
 ;;
+
+;;------------------------------
+;;;; NAME
+;;------------------------------
+
+(defun imp-parser-normalize-name (name)
+  ;; TODO: make this func unqoute NAME?
+  (imp-feature-normalize name)) ; TODO: or this func?
+
 
 ;;------------------------------
 ;;;; `:disabled'
@@ -1534,27 +1555,28 @@ no keyword implies `:all'."
 ;;
 
 (defmacro imp-parser-core (name args)
-  `(let* ((args* (imp-parser-normalize-keywords ,name ,args))
+  `(let* ((name* (imp-parser-normalize-name ,name))
+          (args* (imp-parser-normalize-keywords name* ,args))
           (imp-parser--form
            (if (eq imp-parser-verbose 'debug)
                (concat "\n\n"
-                       (pp-to-string `(imp-parser ,name ,@,args))
+                       (pp-to-string `(imp-parser name* ,@,args))
                        "\n  -->\n\n"
-                       (pp-to-string `(imp-parser ,name ,@args*))
+                       (pp-to-string `(imp-parser name* ,@args*))
                        "\n  ==>\n\n"
                        (pp-to-string
                         (macroexp-progn
                          (let ((imp-parser-verbose 'errors)
                                (imp-parser-expand-minimally t))
-                           (imp-parser-process-keywords name args*)))))
+                           (imp-parser-process-keywords name* args*)))))
              "")))
      (when (eq imp-parser-verbose 'debug)
        (message (make-string 40 ?━))
-       (message "%s" name)
+       (message "%s" name*)
        (message (make-string 40 ?━))
        (message "%s" imp-parser--form))
 
-     (imp-parser-process-keywords name args*)
+     (imp-parser-process-keywords name* args*)
      ))
 
 
