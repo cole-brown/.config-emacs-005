@@ -1214,14 +1214,10 @@ Make file that can be loaded many times.
 file:/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test.el
 
 
-╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-╠══TODO══╣            ║                                                                                                          ║
-╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
-╠══TODO══╣            ║                                                                                                          ║
-╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 Refactor ~imp/feature.el~ for new style features.
   - [[file:source/core/packages/imp/feature.el][here]]
 look for ~TODO-HERE~
+  - [X] k
 
 #+begin_src elisp
 ;; TODO-HERE: Which is a rooted feature?
@@ -1229,12 +1225,71 @@ look for ~TODO-HERE~
 ;; root:/first/second
 #+end_src
   - [[file:source/core/packages/imp/feature.el::;; TODO-HERE: Which is a rooted feature?][here]]
+  - [X] k
 
 Honestly I should be on an imp branch...
+  - [X] k
 
+ok
+I think I have all the `imp-feature` things I need now.
 
 Fix default path w/ feature root:
-(imp-parser :imp/test/data/load/manual-test)
+#+begin_src elisp
+(imp-parser imp:/test/data/load/manual-test)
+(imp-parser '(imp test data/load manual-test))
+#+end_src
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (wrong-type-argument stringp nil)
+  file-name-nondirectory(nil)
+  imp--path-filename(nil)
+  (let ((imp--macro-filename (imp--path-filename path)) (imp--macro-path (imp-path-parent path)) (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-filename imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load path (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))
+  (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-filename (imp--path-filename path)) (imp--macro-path (imp-path-parent path)) (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-filename imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load path (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load path (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage))
+  (let ((imp--macro-feature (imp--feature-normalize-to-list name))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-filename (imp--path-filename path)) (imp--macro-path (imp-path-parent path)) (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-filename imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load path (not (or ... ...)) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load path (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)))
+  (let* ((funcname "imp-parser-load") (path (plist-get state :path))) (if imp--debugging? (progn (imp--debug funcname "load '%s'" path-load))) (let ((imp--macro-feature (imp--feature-normalize-to-list name))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-filename (imp--path-filename path)) (imp--macro-path (imp-path-parent path)) (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-filename imp--macro-path) (prog1 (let ((imp--timing-indent ...)) (load path (not ...) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load path (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage))))
+  imp-parser-load(imp:/test/data/load/manual-test nil)
+...
+#+end_src
+
+Hmmm... I need a normalizer and handler for NAME/FEATURE in imp-parser.
+
+#+begin_src elisp
+(imp-parser imp:/test/data/load/manual-test)
+(imp-parser (imp test data/load manual-test))
+#+end_src
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (wrong-type-argument listp t)
+  cdr(t)
+  macroexp-progn(t)
+  (pp-to-string (macroexp-progn (let ((imp-parser-verbose 'errors) (imp-parser-expand-minimally t)) (imp-parser-process-keywords name* args*))))
+  (concat "\n\n" (pp-to-string (cons 'imp-parser (cons 'name* args))) "\n  -->\n\n" (pp-to-string (cons 'imp-parser (cons 'name* args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ((imp-parser-verbose 'errors) (imp-parser-expand-minimally t)) (imp-parser-process-keywords name* args*)))))
+...
+#+end_src
+
+Now I need to return a form so the macro works.
+
+and then?
+#+begin_src elisp
+(imp-parser imp:/test/data/load/manual-test)
+#+end_src
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+...imp-timing macro is sad.
+make one that returns forms instead of evals them?
+or do I have one?
+
+
+
+and then?
+#+begin_src elisp
+(imp-parser imp:/test/data/load/manual-test)
+#+end_src
+
 
 
 (imp-parser foo :optional t :error t)
@@ -1275,6 +1330,37 @@ Make load not a macro
 
 ** imp path feature root
 
+* macrostep-expand broken?
+
+#+begin_src elisp
+(defmacro m-test ()
+  (message "Hello there!")
+  (range-map (apply-partially #'format "%S")
+             '((0 . 100000)))
+  (message "General Kenobi!"))
+;; m-x macrostep-expand this:
+(m-test)
+#+end_src
+
+* TRAMP into Win10 VM
+
+I probably need an ssh server running or something.
+
+* use-package-editor
+
+I wanna be able to eval a ~use-package~ custom var.
+
+#+begin_src elisp
+    ;;------------------------------
+    :custom
+    ;;------------------------------
+
+    ;; (setq gptel-model 'gpt-5)
+    (gptel-model 'gpt-4o)
+#+end_src
+
+I wanna be able to put the cusor after ~(gptel-model 'gpt-4o)~ and ~eval-last-sexp~.
+Instead of having to add ~setq~ (or ideally ~customize-set-variable~) to the front.
 
 
 * my public IP(s)
