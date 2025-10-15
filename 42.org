@@ -1342,6 +1342,10 @@ Make load not a macro
 (m-test)
 #+end_src
 
+IDFK. It hasn't been updated in 2 years.
+Delete it?
+
+
 * TRAMP into Win10 VM
 
 I probably need an ssh server running or something.
