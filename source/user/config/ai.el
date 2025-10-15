@@ -111,7 +111,8 @@
     ;;----------------
     ;; See variable help ("C-h v") or customize info for valid values.
     ;; Upgrade package to get updated options.
-    (gptel-model 'gpt-5)
+    ;; (setq gptel-model 'gpt-5)
+    (gptel-model 'gpt-4o)
 
     ;; `gptel-default-mode'
     ;;---------------------
