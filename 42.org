@@ -1473,35 +1473,149 @@ I wish I knew how to expand macros one step at a time....
     (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))
 #+end_example
 
+Hmm.... ~load.el~ won't load right now.
+#+begin_src elisp
+(load (expand-file-name "source/core/packages/imp/load.el" user-emacs-directory))
+#+end_src
+
+That fails because of ~imp--load-paths~
+~imp--load-paths~ because of ~imp-timing~
+~imp-timing~ still had a ~filename~ var; deleted.
+
+#+begin_src elisp
+(load (expand-file-name "source/core/packages/imp/load.el" user-emacs-directory))
+#+end_src
+yay
+
+so imp-parser-core works
+Why doesn't imp-parser work? :(
+I broke use-package's parser :((
+
+restart & reload...
+  - that always fixes things. :fingers-crossed:
+
+#+begin_src elisp
+(imp-parser imp:/test/data/load/manual-test)
+#+end_src
+
+ok. This is better than last night.
+#+begin_src backtrace
+Debugger entered--Lisp error: (void-variable state)
+  (plist-get state :error)
+  (or (plist-get state :error) (plist-get state :optional))
+  (not (or (plist-get state :error) (plist-get state :optional)))
+  (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)
+  (let ((imp--timing-indent (1+ imp--timing-indent))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage))
+  (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))
+  (let ((imp--macro-path "manual-test") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))
+  (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "manual-test") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage))
+  (let ((imp--macro-feature (imp--feature-normalize-chain 'imp/test/data/load/manual-test))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "manual-test") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or ... ...)) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)))
+  (progn (let ((imp--macro-feature (imp--feature-normalize-chain 'imp/test/data/load/manual-test))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "manual-test") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent ...)) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not ...) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage))))
+  eval((progn (let ((imp--macro-feature (imp--feature-normalize-chain 'imp/test/data/load/manual-test))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "manual-test") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let (...) "imp/test/data/load" (load "imp/test/data/load/manual-test" ... ...)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) "imp/test/data/load" (load "imp/test/data/load/manual-test" (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)))) t)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0xa2a0a50c829a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0xa2a0a50c829a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+Oh. It works-ish?
+#+begin_src elisp
+(imp-parser imp:/test/data/load/manual-test)
+#+end_src
+Didn't get any timing this time, but:
+
+#+begin_quote
+Loading ’manual-test.el’ for 0 time...
+t
+#+end_quote
+I loaded it for the first time.
+  - yay.
+I got back a ~t~ return value.
+  - yay.
+
+With timing this time tho?
+
+Oh; this is how macroexpand works. You gotta quote it.
+#+begin_src elisp :results scalar
+(macroexpand-1 '(imp-parser imp:/test/data/load/manual-test))
+#+end_src
+
+#+RESULTS:
+: (imp-timing 'imp:/test/data/load/manual-test "manual-test" "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load" (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test" (not (or nil nil)) 'nomessage))
+
+Oh. this still has filename & dir path.
+Need just filepath.
+#+begin_src elisp
+(imp-timing 'imp:/test/data/load/manual-test
+    "manual-test"
+    "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load"
+(load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test" (not (or nil nil)) 'nomessage))
+#+end_src
+
+#+begin_src elisp :results scalar
+(macroexpand-1 '(imp-parser imp:/test/data/load/manual-test))
+#+end_src
+
+#+RESULTS:
+: (imp-timing 'imp:/test/data/load/manual-test "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test" (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test" (not (or nil nil)) 'nomessage))
+
+Oh. I'm not using ~imp-timing-core~.
+:thinking:
+If it works, use it?
+
+#+begin_src elisp
+(macroexpand-1
+ (imp-timing 'imp:/test/data/load/manual-test
+     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+     (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+           (not (or nil nil))
+           'nomessage)))
+#+end_src
+
+#+RESULTS:
+: t
+
+Aw... Still no timing message.
+Is timing enabled?
+oh; clear current feature.
+#+begin_src
+imp--timing-feature-current
+(setq imp--timing-feature-current nil)
+#+end_src
+
+#+begin_src elisp
+(imp-timing 'imp:/test/data/load/manual-test
+     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+     (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+           (not (or nil nil))
+           'nomessage))
+#+end_src
+
+#+RESULTS:
+: t
+
+yay. got timing message.
+#+begin_quote
+loading imp:/test/data/load/manual-test...
+└─00.0075 seconds
+#+end_quote
+
+And then....?
+  - [X] commit
+  - [ ] test with args
+
 ╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ╠══TODO══╣            ║                                                                                                          ║
 ╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
 ╠══TODO══╣            ║                                                                                                          ║
 ╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-so imp-parser-core works
-Why doesn't imp-parser work? :(
-I broke use-package's parser :((
 
 #+begin_src elisp
-(imp-parser2 imp:/test/data/load/manual-test nil)
-#+end_src
-
-#+begin_src elisp
-(pp-to-string
- (macroexp-progn
-  (imp-parser-concat
-   (imp-parser2-core imp:/test/data/load/manual-test nil))))
-#+end_src
-
-#+begin_src elisp
-(pp-to-string
- (macroexp-progn
-  (imp-parser-concat
-   (imp-parser-core imp:/test/data/load/manual-test nil))))
-#+end_src
-
-#+begin_src elisp
-(imp-parser imp:/test/data/load/manual-test)
+(setq imp--timing-feature-current nil)
+(imp-parser imp:/test/data/load/manual-test :optional t :error t)
 #+end_src
 
 (imp-parser foo :optional t :error t)
