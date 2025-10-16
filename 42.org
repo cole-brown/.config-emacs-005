@@ -1143,6 +1143,13 @@ by source type (major-mode)?
 - State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
 :END:
 
+After restarting emacs & returning to this branch:
+#+begin_src elisp
+;; reload imp to get new code.
+(load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
+(imp-path-root-set 'imp "~/.config/emacs/source/core/packages/imp/")
+#+end_src
+
 ** ├CURRENT┤ use-package parser
 :PROPERTIES:
 :ORDERED:  t
@@ -1274,23 +1281,228 @@ and then?
 (imp-parser imp:/test/data/load/manual-test)
 #+end_src
 
+...imp-timing macro is sad.
+make one that returns forms instead of evals them?
+or do I have one?
+
+How do I debug the macro expansion anyways?
+  - ~macrostep~ doesn't work.
+
+How 'bout this?
+#+begin_src elisp
+(imp-parser-debug imp:/test/data/load/manual-test nil)
+#+end_src
+
+#+RESULTS:
+: ((imp-timing 'imp:/test/data/load/manual-test "manual-test"
+:              "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load"
+:    (load
+:     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:     (not (or (plist-get state :error) (plist-get state :optional))) 'nomessage)))
+
+need to eval all the state gets.
+  - k
+
+#+begin_src elisp
+(imp-parser-debug imp:/test/data/load/manual-test nil)
+#+end_src
+
+#+RESULTS:
+: ((imp-timing 'imp:/test/data/load/manual-test "manual-test"
+:              "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load"
+:    (load
+:     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:     (not (or nil nil)) 'nomessage)))
+
+...imp-timing macro is probably still sad.
+make one that returns forms instead of evals them
+  - ~imp-timing-core~?
+    - [[file:source/core/packages/imp/timing.el::defmacro imp-timing-core (feature filename path &rest body][yeah]]
+Make that thing work.
+And only take a path.
+[[file:source/core/packages/imp/timing.el::defmacro imp-timing-core (feature filename path &rest body][yeah]] go here.
+
+#+begin_src elisp
+(imp-timing-core 'imp:/test/data/load/manual-test/1
+    "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+    (message "Hello there."))
+#+end_src
+
+that might work maybe?
+
+#+begin_src elisp
+(imp-parser-debug imp:/test/data/load/manual-test nil)
+#+end_src
+
+#+RESULTS:
+: ((imp-timing-core 'imp:/test/data/load/manual-test
+:      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:      (load
+:       "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:       (not (or nil nil)) 'nomessage)))
+
+Maybe. Try it.
+
+#+begin_src elisp
+(imp-parser imp:/test/data/load/manual-test)
+#+end_src
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (invalid-function (let ((imp--macro-time (current-time))) (setq imp--timing-feature-current 'quote/name) (imp--timing-start 'quote/name "name") (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "name" (not (or nil nil)) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))))
+  ((let ((imp--macro-time (current-time))) (setq imp--timing-feature-current 'quote/name) (imp--timing-start 'quote/name "name") (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "name" (not (or nil nil)) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))))
+  (progn ((let ((imp--macro-time (current-time))) (setq imp--timing-feature-current 'quote/name) (imp--timing-start 'quote/name "name") (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "name" (not (or nil nil)) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))))
+  eval((progn ((let ((imp--macro-time (current-time))) (setq imp--timing-feature-current 'quote/name) (imp--timing-start 'quote/name "name") (prog1 (let ((imp--timing-indent ...)) (load "name" (not ...) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))))) t)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0x480b065b629a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0x480b065b629a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+
+#+begin_src elisp
+(pp-to-string (imp-parser-load 'imp:/test/data/load/manual-test nil))
+#+end_src
+
+#+RESULTS:
+#+begin_example elisp
+((let ((imp--macro-time (current-time)))
+   (setq imp--timing-feature-current 'imp:/test/data/load/manual-test)
+   (imp--timing-start 'imp:/test/data/load/manual-test
+                      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test")
+   (prog1
+       (let ((imp--timing-indent (1+ imp--timing-indent)))
+         (load
+          "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+          (not (or nil nil)) 'nomessage))
+     (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))))
+#+end_example
+
+That looks right, right?
+
+
+#+begin_src elisp
+(imp-parser-debug imp:/test/data/load/manual-test nil)
+#+end_src
+
+#+RESULTS:
+#+begin_example elisp
+((let ((imp--macro-time (current-time)))
+   (setq imp--timing-feature-current 'imp:/test/data/load/manual-test)
+   (imp--timing-start 'imp:/test/data/load/manual-test
+                      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test")
+   (prog1
+       (let ((imp--timing-indent (1+ imp--timing-indent)))
+         (load
+          "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+          (not (or nil nil)) 'nomessage))
+     (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))))
+#+end_example
+
+Also looks right, right?
+
+#+begin_src elisp
+(macroexpand (imp-parser imp:/test/data/load/manual-test))
+#+end_src
+
+Annd... I got:
+#+begin_quote
+loading name...
+└─00.0057 seconds
+#+end_quote
+
+#+begin_src elisp
+(imp-parser-handler/:requires 'foo :requires '(bar) nil nil)
+#+end_src
+hm....
+
+#+begin_src elisp
+(macroexpand (imp-parser imp:/test/data/load/manual-test))
+#+end_src
+
+#+begin_src elisp
+(pp-to-string (imp-timing-core imp:/test/data/load/manual-test/1
+    "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+    (message "Hello there.")))
+#+end_src
+better maybe?
+
+#+begin_src elisp
+(imp-parser imp:/test/data/load/manual-test)
+#+end_src
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (void-variable let)
+  (progn let ((imp--macro-time (current-time))) (setq imp--timing-feature-current 'feature) (imp--timing-start 'feature "feature") (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "feature" (not (or nil nil)) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))
+  (progn (progn let ((imp--macro-time (current-time))) (setq imp--timing-feature-current 'feature) (imp--timing-start 'feature "feature") (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "feature" (not (or nil nil)) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))))
+  eval((progn (progn let ((imp--macro-time (current-time))) (setq imp--timing-feature-current 'feature) (imp--timing-start 'feature "feature") (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "feature" (not (or nil nil)) 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))) t)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0x480b065b629a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0x480b065b629a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+nope.
+
+SIIIIIGH
+I wish I knew how to expand macros one step at a time....
+
+#+begin_src elisp
+(pp-to-string
+ (macroexp-progn
+  (imp-parser-concat
+   (imp-parser-core imp:/test/data/load/manual-test nil))))
+#+end_src
+
+#+RESULTS:
+#+begin_example elisp
+(let ((imp--macro-time (current-time)))
+  (setq imp--timing-feature-current 'imp:/test/data/load/manual-test)
+  (imp--timing-start 'imp:/test/data/load/manual-test
+                     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test")
+  (prog1
+      (let ((imp--timing-indent (1+ imp--timing-indent)))
+        (load
+         "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+         (not (or nil nil)) 'nomessage))
+    (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))
+#+end_example
+
 ╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ╠══TODO══╣            ║                                                                                                          ║
 ╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
 ╠══TODO══╣            ║                                                                                                          ║
 ╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-...imp-timing macro is sad.
-make one that returns forms instead of evals them?
-or do I have one?
+so imp-parser-core works
+Why doesn't imp-parser work? :(
+I broke use-package's parser :((
 
+#+begin_src elisp
+(imp-parser2 imp:/test/data/load/manual-test nil)
+#+end_src
 
+#+begin_src elisp
+(pp-to-string
+ (macroexp-progn
+  (imp-parser-concat
+   (imp-parser2-core imp:/test/data/load/manual-test nil))))
+#+end_src
 
-and then?
+#+begin_src elisp
+(pp-to-string
+ (macroexp-progn
+  (imp-parser-concat
+   (imp-parser-core imp:/test/data/load/manual-test nil))))
+#+end_src
+
 #+begin_src elisp
 (imp-parser imp:/test/data/load/manual-test)
 #+end_src
-
-
 
 (imp-parser foo :optional t :error t)
 (imp-parser foo :path (imp-path-current-dir))
@@ -1344,7 +1556,6 @@ Make load not a macro
 
 IDFK. It hasn't been updated in 2 years.
 Delete it?
-
 
 * TRAMP into Win10 VM
 
