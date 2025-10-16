@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-10-14
+;; Timestamp:  2025-10-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -685,20 +685,19 @@ next value for the STATE."
                   path)
       ;;)
 
-      ;; Time the minimum; only load, ideally.
-      ;; TODO: make imp-timing take just a path, not separated path & filename.
+      ;; We only really want to time the load.
+      ;; `imp-timing' will ignore itself if `imp-timing-enable?' is false.
       `((imp-timing
           ',feature
-          ,(imp--path-filename path)
-          ,(imp-path-parent path)
+          ,path
 
         ;; Actually do the load.
         ;; Skip erroring out if STATE says so.
         ;; Return the results of `load'.
         (load ,path
               ;; Handle STATE: `:error', `:optional'
-              (not (or (plist-get state :error)
-                       (plist-get state :optional)))
+              (not (or ,(when (plist-get state :error) 'error)
+                       ,(when (plist-get state :optional) 'optional)))
               'nomessage)))))
 
 ;; (defun imp-parser-list-insert (elem xs &optional anchor after test)
