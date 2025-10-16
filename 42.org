@@ -1131,6 +1131,13 @@ update from 4o to 5
 * -- U R HERE --
 <<here>>
 
+* org-babel no confirm
+
+write a func that ~org-confirm-babel-evaluate~ can use to decide
+whether to prompt with ~y-or-n-p~
+
+by source type (major-mode)?
+
 * ├CURRENT┤ IMP-FIX: imp-load
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
