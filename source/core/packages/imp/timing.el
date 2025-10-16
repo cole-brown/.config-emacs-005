@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-07
-;; Timestamp:  2025-10-13
+;; Timestamp:  2025-10-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -475,22 +475,22 @@ TYPE should be either `:root' or `:leaf'. Uses TYPE to get the indent string."
            (apply #'format formatting args))))
 
 
-(defun imp--timing-start (feature filename path)
-  "Print a loading message for this FEATURE, FILENAME, and/or PATH.
+(defun imp--timing-start (feature path)
+  "Print a loading message for FEATURE & PATH.
 
 Message depends on `imp--timing-format-load'."
   (imp--timing-message :root
                        imp--timing-format-load
                        (imp-feature-normalize feature)
-                       filename
+                       (imp--path-filename path)
                        path))
 
 
-(defun imp--timing-end (time:start)
-  "Print the time since TIME:START.
+(defun imp--timing-end (time-start)
+  "Print the time since TIME-START.
 
 Message depends on `imp--timing-format-time'."
-  (let ((elapsed (float-time (time-since time:start))))
+  (let ((elapsed (float-time (time-since time-start))))
     (imp--timing-message :leaf
                          imp--timing-format-time
                          elapsed)
@@ -499,8 +499,8 @@ Message depends on `imp--timing-format-time'."
       (setq imp-timing-sum (+ imp-timing-sum elapsed)))))
 
 
-(defun imp-timing-skip-already-provided (feature filename path)
-  "Print a message about skipping this FEATURE / FILENAME / PATH.
+(defun imp-timing-skip-already-provided (feature path)
+  "Print a message about skipping FEATURE & PATH.
 
 Message depends on `imp--timing-format-skip'."
   (when (imp-timing-enabled?)
@@ -508,7 +508,7 @@ Message depends on `imp--timing-format-skip'."
     (imp--timing-message :root
                          imp--timing-format-skip
                          (imp-feature-normalize feature)
-                         filename
+                         (imp--path-filename path)
                          path)
     ;; Increase indent level for reason.
     (let ((imp--timing-indent (1+ imp--timing-indent)))
@@ -517,12 +517,12 @@ Message depends on `imp--timing-format-skip'."
                            (concat imp--timing-reason
                                    imp--timing-format-skip-already-provided)
                            (imp-feature-normalize feature)
-                           filename
+                           (imp--path-filename path)
                            path))))
 
 
-(defun imp-timing-skip-optional-dne (feature filename path)
-  "Print a message about optional FEATURE / FILENAME / PATH that doesn't exist.
+(defun imp-timing-skip-optional-dne (feature path)
+  "Print a message about optional FEATURE & PATH that doesn't exist.
 
 Message depends on `imp--timing-format-optional'."
   (when (imp-timing-enabled?)
@@ -530,7 +530,7 @@ Message depends on `imp--timing-format-optional'."
     (imp--timing-message :root
                          imp--timing-format-skip
                          (imp-feature-normalize feature)
-                         filename
+                         (imp--path-filename path)
                          path)
     ;; Increase indent level for reason.
     (let ((imp--timing-indent (1+ imp--timing-indent)))
@@ -539,10 +539,11 @@ Message depends on `imp--timing-format-optional'."
                            (concat imp--timing-reason
                                    imp--timing-format-skip-optional-dne)
                            (imp-feature-normalize feature)
-                           filename
+                           (imp--path-filename path)
                            path))))
 
-;; TODO use in `imp-timing' macro below?
+
+;; TODO delete; use `imp--timing-core'
 (defun imp--timing-macro-helper (feature &rest body)
   "imp timing for use in use-package handler.
 
@@ -576,14 +577,51 @@ TODO better docstr"
           (imp--timing-end ,(current-time)))))))
 
 
-(defmacro imp-timing (feature filename path &rest body)
+(defmacro imp-timing-core (feature path &rest body)
+  "Return forms that measure & print the time it takes to evaluate BODY.
+
+FEATURE should be a list of keyword & symbol names.
+
+PATH should be a file path string.
+
+Output message depends on `imp--timing-format-time'.
+
+Prints timing to the `imp-timing-buffer' buffer.
+Return result of evaluating BODY."
+  (declare (indent 3))
+  (let ((feature-normalized (imp-feature-normalize feature)))
+    (if (or (not (imp-timing-enabled?))
+            ;; Don't do (another) timing block/level for a duplicated call.
+            (imp--timing-feature-duplicate? feature-normalized))
+        ;; Timing disabled: Just return BODY.
+        `(,@body)
+      ;; Timings enabled: Run BODY in between timing start/end messages.
+      `((let ((imp--macro-time (current-time)))
+          ;; Update current feature being timed.
+          (setq imp--timing-feature-current ',feature-normalized)
+          ;; Output load message.
+          (imp--timing-start ',feature-normalized
+                             ,path)
+          (prog1
+              ;; Increase indent level for body.
+              (let ((imp--timing-indent (1+ imp--timing-indent)))
+                ;; Run the body...
+                ,@body)
+
+            ;; Clear this feature from current.
+            (setq imp--timing-feature-current nil)
+
+            ;; Finish with the timing message.
+            (imp--timing-end imp--macro-time)))))))
+
+
+
+(defmacro imp-timing (feature path &rest body)
   "Measure & print the time it takes to evaluate BODY.
 
 FEATURE should be a list of keyword & symbol names.
 
-FILENAME should be the file's basename.
-
-PATH should be the path to FILENAME's parent directory.
+PATH should be a file path string.
 
 Output message depends on `imp--timing-format-time'.
 
