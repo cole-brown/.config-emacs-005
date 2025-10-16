@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-07
-;; Timestamp:  2025-10-15
+;; Timestamp:  2025-10-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -97,7 +97,7 @@ Example:
 Used to prevent duplicate start/end timing messages.
 
 List of imp keyword/symbol names.
-Example: '(:imp example feature)")
+Example: '(imp example feature)")
 
 
 (defvar imp-timing-sum 0.0
@@ -634,15 +634,12 @@ Return result of evaluating BODY."
               (not (imp--timing-feature-duplicate? imp--macro-feature)))
 
          ;; Timings enabled: Run body in between timing start/end messages.
-         (let ((imp--macro-filename ,filename)
-               (imp--macro-path     ,path)
+         (let ((imp--macro-path     ,path)
                (imp--macro-time     (current-time)))
            ;; Update current feature being timed.
            (setq imp--timing-feature-current imp--macro-feature)
            ;; Output load message.
-           (imp--timing-start imp--macro-feature
-                              imp--macro-filename
-                              imp--macro-path)
+           (imp--timing-start imp--macro-feature imp--macro-path)
            (prog1
                ;; Increase indent level for body.
                (let ((imp--timing-indent (1+ imp--timing-indent)))
