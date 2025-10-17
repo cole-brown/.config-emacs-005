@@ -685,32 +685,69 @@ next value for the STATE."
                       path
                       (imp-feature-rest feature)))
 
-    ;;(when imp--debugging?
-      (imp--debug funcname
-                  "load '%s'"
-                  ;; Don't love expanded path, but it does match what Emacs `load' outputs:
-                  ;; > "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
-                  path)
-      ;;)
+    ;; Convert path to a load path.
+    (let ((path-load (imp-path-load-file path)))
+      ;; Deal with non-existent file.
+      (if (null path-load)
+          ;; Handle STATE: `:optional'
+          (if (plist-get state :optional)
+              ;; Optional load and file does not exist.
+              ;; Return sexprs that will skip the file
+              `((progn
+                  ;; Skip w/ optional timing message.
+                  (imp-timing-skip-optional-dne ',feature ,path)
+                  ;; Return `nil' for load result.
+                  nil))
+            ;; Else requried, so error?
+            ;; TODO: Make some imp timing thing to say that this thing errored?
+            (imp--error funcname
+                        "Cannot find a file to load. path:'%s' -> load-path:'%s'"
+                        path
+                        path-load))
 
-      ;; We only really want to time the load.
-      ;; `imp-timing' will ignore itself if `imp-timing-enable?' is false.
-      `((imp-timing
-          ',feature
-          ,path
+        ;; Have a valid load path. Try loading it.
 
-        ;; Actually do the load.
-        ;; Skip erroring out if STATE says so.
-        ;; Return the results of `load'.
-        (load ,path
-              ;; Handle STATE: `:error', `:optional'
-              ;;   `:error':    non-nil means DO error
-              ;;   `:optional': non-nil means DO NOT error.
-              ;; NOTE: `:optional' overrides `:error' if both are true.
-              ,(when (or (not (plist-get state :error))
-                         (plist-get state :optional))
-                 ''noerror)
-              'nomessage)))))
+        (when imp--debugging?
+          ;; `load' outputs:
+          ;; > "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
+          (imp--debug funcname
+                      "load '%s' => '%s'"
+                      path
+                      path-load))
+
+        ;; Return sexprs that will time & load the file.
+        `((imp-timing
+              ',feature
+              ,path-load
+
+              ;; Actually do the load.
+              ;; Skip erroring out if STATE says so.
+              ;; Return the results of `load'.
+              (load ,path
+                    ;; Handle STATE: `:error'
+                    ',(when (not (plist-get state :error))
+                        'noerror)
+                    'nomessage)))))))
+
+
+;; TODO: MOVE TO path.el
+(defun imp-path-has-load-extension (path)
+  (seq-reduce (lambda (result ext)
+                (or result
+                    (string-suffix-p ext path)))
+              (get-load-suffixes)
+              nil))
+
+
+  ;; TODO: MOVE TO path.el
+(defun imp-path-load-file (path-absolute)
+  "Return string path to existing file or nil."
+  ;; Use the same function `load' uses to find its files: `locate-file'
+  (locate-file path-absolute
+               '("/") ; Don't use `load-paths'; we have an absolute path.
+               (unless (imp-path-has-load-extension path-absolute)
+                 (get-load-suffixes))))
+
 
 ;; (defun imp-parser-list-insert (elem xs &optional anchor after test)
 ;;   "Insert ELEM into the list XS.
@@ -1341,7 +1378,8 @@ If the path is relative, root it in one of:
       (setq path (car path)))
 
     ;; Double Check: We got an absolute path, right?
-    (unless (file-name-absolute-p path)
+    (unless (and (stringp path)
+                 (file-name-absolute-p path))
       (imp--error funcname
                   "`:path' should end up as absolute: got: '%s' -> '%s'"
                   arg
@@ -1650,17 +1688,24 @@ Usage:
      (imp-parser-concat
       ;; (when imp-parser-compute-statistics
       ;;   `((imp-parser-statistics-gather :imp-parser ',name nil)))
-      (if (memq imp-parser-verbose '(errors debug))
-          (imp-parser-core name args)
-        (condition-case-unless-debug err
-            (imp-parser-core name args)
-          (error
-           (ignore
-            (display-warning
-             'imp-parser
-             (format "Failed to parse package %s: %s"
-                     name (error-message-string err))
-             :error)))))
+
+      ;; Let errors bubble up for now. They're more useful for debugging
+      ;; and I don't have `imp-parser' integrated with imp's preexisting
+      ;; debug/error stuff.
+      (imp-parser-core name args)
+
+      ;; (if (memq imp-parser-verbose '(errors debug))
+      ;;     (imp-parser-core name args)
+      ;;   (condition-case-unless-debug err
+      ;;       (imp-parser-core name args)
+      ;;     (error
+      ;;      (ignore
+      ;;       (display-warning
+      ;;        'imp-parser
+      ;;        (format "Failed to parse package %s: %s"
+      ;;                name (error-message-string err))
+      ;;        :error)))))
+
       ;; (when imp-parser-compute-statistics
       ;;   `((imp-parser-statistics-gather :imp-parser ',name t)))
       ))
