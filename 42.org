@@ -1150,11 +1150,13 @@ After restarting emacs & returning to this branch:
 (imp-path-root-set 'imp "~/.config/emacs/source/core/packages/imp/")
 #+end_src
 
-** ├CURRENT┤ use-package parser
+** ├DONE───┤ use-package parser
+CLOSED: [2025-10-16 Thu 16:37]
 :PROPERTIES:
 :ORDERED:  t
 :END:
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-16 Thu 16:37]
 - State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
 :END:
 
@@ -1607,24 +1609,135 @@ And then....?
   - [X] commit
   - [ ] test with args
 
+I think that counts as
+  - [X] Make bare minimum work
+
+and this headline is long
+TO THE NEXT HEADLINE!
+
+** ├DONE───┤ imp-parser keywords: ~optional~, ~error~
+CLOSED: [2025-10-16 Thu 17:21]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-16 Thu 17:21]
+- State "├CURRENT┤"  from              [2025-10-16 Thu 16:41]
+:END:
+
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(pp-to-string (macroexpand-1 '(imp-parser imp:/test/data/load/manual-test :optional t :error t)))
+#+end_src
+
+#+RESULTS:
+: (imp-timing 'imp:/test/data/load/manual-test
+:     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:     (load
+:      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:      (not (or :error :optional)) 'nomessage))
+
+Ok, so the args show up in the macro output.
+
+optional file that DNE:
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(pp-to-string (macroexpand-1 '(imp-parser imp:/test/data/load/manual-test :optional t :error nil)))
+#+end_src
+
+#+RESULTS:
+: (imp-timing 'imp:/test/data/load/manual-test
+:     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:     (load
+:      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:      'noerror 'nomessage))
+
+Add defaults for:
+  -  ~:error~; should be true.
+  -  ~:optional~; should be false.
+
+and this should have a nil for ~noerror~ param
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(pp-to-string (macroexpand-1 '(imp-parser imp:/test/data/load/manual-test)))
+#+end_src
+
+#+RESULTS:
+: (imp-timing 'imp:/test/data/load/manual-test
+:     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:     (load
+:      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:      nil 'nomessage))
+
+yay
+
+so this should error
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser imp:/test/data/load/does-not-exist)
+#+end_src
+
+it did.
+
+and this should not error
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser imp:/test/data/load/does-not-exist :optional t)
+#+end_src
+
+#+RESULTS:
+
+it did not error.
+  - yay
+
+also this should not error
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser imp:/test/data/load/does-not-exist :error nil)
+#+end_src
+
+#+RESULTS:
+
+it did not error.
+  - yay
+
+However, imp-timing doesn't know about whether optionals exist or not.
+
+** more info about optional files
+
+We should get "optional file dne; skipping" info in the imp-timing buffer for this:
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser imp:/test/data/load/does-not-exist :optional t)
+#+end_src
+
+~imp-load~ does it like so:
+#+begin_src elisp
+;;---
+;; Optional?
+;;---
+;; Skip if optional and file doesn't exist.
+((and imp--macro-optional?
+      (not (file-exists-p imp--macro-path-file)))
+ ;; Skip w/ optional timing message.
+ (imp-timing-skip-optional-dne imp--macro-feature
+                               imp--macro-name-load
+                               imp--macro-path-file)
+ (setq imp--macro-load-file? nil)
+ ;; Return nil for 'did not load'.
+ (setq imp--macro-load-result nil))
+#+end_src
+  - [[file:source/core/packages/imp/load.el::;; Optional?][here]]
+
+
 ╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ╠══TODO══╣            ║                                                                                                          ║
 ╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
 ╠══TODO══╣            ║                                                                                                          ║
 ╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-#+begin_src elisp
-(setq imp--timing-feature-current nil)
-(imp-parser imp:/test/data/load/manual-test :optional t :error t)
-#+end_src
-
-(imp-parser foo :optional t :error t)
-(imp-parser foo :path (imp-path-current-dir))
 
 
 And then:
   - [X] make defaults [[file:source/core/packages/imp/parser.el::(defcustom imp-parser-defaults][here]]
-  - [ ] Make bare minimum work:
+  - [X] Make bare minimum work:
     - (imp-parser foo)
       - load from PWD or load-paths?
     - (imp-parser :user test)
@@ -1637,6 +1750,43 @@ How to do feature name?
   (imp-load (:foo bar baz) :optional t)
 
 
+** imp-parser keyword: ~:path~
+** imp-parser keyword: ~:rooted~ / ~root~?
+
+Allow adding a dir as a feature's root.
+
+so this should add to ~imp-path-roots~:
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+;; TODO: delete from root paths
+(imp-parser imp:/test/data/load/does-not-exist
+  :optional t
+  :root 'itdl
+)
+#+end_src
+
+expect ~(itdl "~/.config/emacs/source/core/packages/imp/" nil)~ in:
+#+begin_src elisp
+(pp-to-string imp-path-roots)
+#+end_src
+
+
+
+
+** imp-parser keyword: ~:load-message~?
+
+an option to disable the ~'nomessage~ param in call to ~load~
+  - [[file:source/core/packages/imp/parser.el::'nomessage)))))][here]]
+
+** imp-parser keyword: ~:timing~
+
+nil
+t
+"don't show buffer"
+
+** imp-parser keyword: ~:load-suffixes~?
+
+Modify ~load-suffixes~ for one thing's load.
 
 ** imp-path
 
