@@ -672,6 +672,14 @@ next value for the STATE."
                feature-root)
       (setq path (imp-path-root-get feature-root)))
 
+    (unless (and (stringp path)
+                 (file-name-absolute-p path))
+      ;; TODO: some imp timing thing to say that this thing errored?
+      (imp--error funcname
+                  `("Path is invalid or not absolute! "
+                    "path:'%s'")
+                  path))
+
     ;; Add rest of NAME to path; is a relative path.
     (setq path (apply #'imp-path-join
                       path
