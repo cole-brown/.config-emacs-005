@@ -145,8 +145,8 @@ then the expanded macros do their job silently."
 
 (defcustom imp-parser-defaults
   '(;; (KEYWORD DEFAULT-VALUE USAGE-PREDICATE)
-    ;;(:error t t)
-    ;;(:optional nil t)
+    (:error t t)
+    (:optional nil t)
     ;;(:path 'guess (lambda (name args) (not (plist-member args :path))))
     )
   "Default values for specified `imp-parser' keywords.
@@ -696,8 +696,12 @@ next value for the STATE."
         ;; Return the results of `load'.
         (load ,path
               ;; Handle STATE: `:error', `:optional'
-              (not (or ,(when (plist-get state :error) 'error)
-                       ,(when (plist-get state :optional) 'optional)))
+              ;;   `:error':    non-nil means DO error
+              ;;   `:optional': non-nil means DO NOT error.
+              ;; NOTE: `:optional' overrides `:error' if both are true.
+              ,(when (or (not (plist-get state :error))
+                         (plist-get state :optional))
+                 ''noerror)
               'nomessage)))))
 
 ;; (defun imp-parser-list-insert (elem xs &optional anchor after test)
