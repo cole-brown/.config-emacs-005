@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-16
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-10-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -23,7 +23,7 @@
 ;; A List Function.
 ;;------------------------------------------------------------------------------
 
-(defun imp--list-flatten (input)
+(defun imp--list-flatten (input &optional unquote?)
   "Take INPUT and return it as flat list.
 
 If INPUT is a list, flatten it.
@@ -37,15 +37,18 @@ NOTE: recursive"
   (declare (pure t)
            (side-effect-free t)
            (important-return-value t))
-  (apply 'append
-         (mapcar (lambda (x)
-                   (if (and (listp x) (listp (cdr x)))
-                       (imp--list-flatten x)
-                     (list x)))
-                 input)))
+  (apply #'append
+         (seq-map (lambda (x)
+                    (if (and (listp x) (listp (cdr x)))
+                        (test-ilf x)
+                      (list x)))
+                  (if unquote?
+                      (seq-map #'imp--unquote input)
+                    input))))
 ;; (imp--list-flatten '(foo bar (baz) (qux (quux))))
 ;; (imp--list-flatten '(foo bar (baz) (qux (quux (quuux)))))
 ;; (imp--list-flatten '(foo bar (baz) (qux . quux)))
+;; (imp--list-flatten '('foo 'bar '('baz) '('qux '('quux '('quuux)))) t)
 
 
 ;;------------------------------------------------------------------------------
