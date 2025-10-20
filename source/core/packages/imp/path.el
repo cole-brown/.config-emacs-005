@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-14
+;; Timestamp:  2025-10-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -1133,13 +1133,16 @@ in `imp-path-roots'.
                      "FEATURE-BASE must be a symbol"))
 
         ((imp--path-root-contains? feature-base)
-         (imp--error "imp-path-root-set"
-                     '("FEATURE-BASE '%S' is already an imp root.\n"
-                       "path: %s\n"
-                       "file: %s")
-                     feature-base
-                     (imp--path-root-dir feature-base :no-error)
-                     (imp--path-root-file-init feature-base :no-error)))
+         ;; ignore exact duplicates.
+         (unless (string= (imp-path-root-get feature-base)
+                          path-dir-root)
+           (imp--error "imp-path-root-set"
+                       '("FEATURE-BASE '%S' is already an imp root.\n"
+                         "path: %s\n"
+                         "file: %s")
+                       feature-base
+                       (imp--path-root-dir feature-base :no-error)
+                       (imp--path-root-file-init feature-base :no-error))))
 
         ;; imp--path-root-valid? will error with better reason, so the error here
         ;; isn't actually triggered... I think?
