@@ -1700,7 +1700,12 @@ it did not error.
 
 However, imp-timing doesn't know about whether optionals exist or not.
 
-** more info about optional files
+** ├DONE───┤ more info about optional files
+CLOSED: [2025-10-16 Thu 20:29]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-16 Thu 20:29]
+- State "├CURRENT┤"  from              [2025-10-16 Thu 17:23]
+:END:
 
 We should get "optional file dne; skipping" info in the imp-timing buffer for this:
 #+begin_src elisp
@@ -1726,32 +1731,187 @@ We should get "optional file dne; skipping" info in the imp-timing buffer for th
 #+end_src
   - [[file:source/core/packages/imp/load.el::;; Optional?][here]]
 
+make imp-path-has-load-extension work
+  - k
 
-╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-╠══TODO══╣            ║                                                                                                          ║
-╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
-╠══TODO══╣            ║                                                                                                          ║
-╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+fix imp-path-load-file to work if path already has ext
+  - k
+
+#+begin_src elisp
+(imp-path-load-file "~/.config/emacs/source/core/packages/imp/test/data/load/manual-test")
+(imp-path-load-file "~/.config/emacs/source/core/packages/imp/test/data/load/manual-test.el")
+(imp-path-has-load-extension "~/.config/emacs/source/core/packages/imp/test/data/load/manual-test")
+(imp-path-has-load-extension "~/.config/emacs/source/core/packages/imp/test/data/load/manual-test.el")
+#+end_src
+
+hokay...
+use those somewhere...
+~imp-parser-load~
+
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(pp-to-string (macroexpand-1 '(imp-parser imp:/test/data/load/does-not-exist :optional t)))
+#+end_src
+
+#+RESULTS:
+: (progn
+:   (imp-timing-skip-optional-dne 'imp:/test/data/load/does-not-exist
+:                                 "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist")
+:   nil)
 
 
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser imp:/test/data/load/does-not-exist :optional t)
+#+end_src
 
-And then:
-  - [X] make defaults [[file:source/core/packages/imp/parser.el::(defcustom imp-parser-defaults][here]]
-  - [X] Make bare minimum work:
-    - (imp-parser foo)
-      - load from PWD or load-paths?
-    - (imp-parser :user test)
-      - load test from :user root?
-      - Should I change to something like (imp-parser user/test)?
+#+begin_quote
+skip: imp:/test/data/load/does-not-exist
+│ └─reason: optional file does not exist: /home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist
+#+end_quote
 
-How to do feature name?
-  (imp-load foo/bar/baz :optional t)
-  (imp-load :foo/bar/baz :optional t)
-  (imp-load (:foo bar baz) :optional t)
+** ├DONE───┤ imp-parser keyword: ~:path~
+CLOSED: [2025-10-16 Thu 21:27]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-16 Thu 21:27]
+:END:
+
+So this works.
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser imp:/test/data/load/does-not-exist)
+#+end_src
+
+Will this work?
+Can't remember if it assumes ~user-emacs-directory~ if it has nothing.
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser source/core/packages/imp/test/data/load/manual-test)
+#+end_src
+
+Nope. It has no path so it assumes nothing.
+#+begin_quote
+Debugger entered--Lisp error: (error "[ERROR--]: imp-parser-load:
+Cannot find a file to load.
+path:’source/core/packages/imp/test/data/load/manual-test’ -> load-path:’nil’")
+#+end_quote
+
+er... now the warnings buffer says
+#+begin_quote
+⛔ Error (imp-parser): Failed to parse package source/core/packages/imp/test/data/load/manual-test: Wrong type argument: stringp, nil
+#+end_quote
+
+Oh. That's the condition case that catches the error.
+...do I even want to catch that error?
+  - No. Lose top level ~condition-case~
+    - k
+
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(pp-to-string (macroexpand-1 (imp-parser source/core/packages/imp/test/data/load/manual-test)))
+#+end_src
+
+#+begin_quote
+Debugger entered--Lisp error: (wrong-type-argument stringp nil)
+  file-name-absolute-p(nil)
+#+end_quote
+
+the new check is doin' it.
+  - fixed
+
+add a path
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser source/core/packages/imp/test/data/load/manual-test
+  :path .emacs)
+#+end_src
+
+#+begin_quote
+Debugger entered--Lisp error: (error "[ERROR--]:
+imp-parser-load: Cannot find a file to load.
+path:’/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test’
+ -> load-path:’nil’")
+#+end_quote
+
+That should be the path...?
+file:/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/
+file:/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test.el
+yeah, that's the file.
+
+So why is path-load nil?
+
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser source/core/packages/imp/test/data/load/manual-test
+    :path .emacs)))
+#+end_src
+
+#+RESULTS:
+: (progn
+:   (imp-timing 'source/core/packages/imp/test/data/load/manual-test
+:       "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:       (imp--error 'imp-parser-load
+:                   "Cannot find a file to load. path:'%s' -> load-path:'%s'"
+:                   "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:                   nil))
+:   nil)
+
+hmm... sus.
+#+begin_src elisp
+    (message "path: %S" path)
+    (message "load: %S "(imp-path-load-file path))
+
+    ;; Convert path to a load path.
+    (let (path-load (imp-path-load-file path))
+
+      (message "path: %S" path)
+      (message "path-load: %S " path-load)
+      (message "load: %S " (imp-path-load-file path))
+#+end_src
+
+#+begin_quote
+path: "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+load: "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test.el"
+path: "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+path-load: nil
+load: "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test.el"
+#+end_quote
+
+oh. Not enough parens.
+
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser source/core/packages/imp/test/data/load/manual-test
+    :path .emacs)))
+#+end_src
+
+#+RESULTS:
+: (imp-timing 'source/core/packages/imp/test/data/load/manual-test
+:     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test.el"
+:     (load
+:      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:      'nil 'nomessage))
+
+k.
+
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(imp-parser source/core/packages/imp/test/data/load/manual-test
+  :path user-emacs-directory)
+#+end_src
+  - works
+
+Good enough for now.
 
 
-** imp-parser keyword: ~:path~
-** imp-parser keyword: ~:rooted~ / ~root~?
+** ├CURRENT┤ imp-parser keyword: ~:root~?
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-10-16 Thu 21:55]
+:END:
 
 Allow adding a dir as a feature's root.
 
@@ -1765,18 +1925,184 @@ so this should add to ~imp-path-roots~:
 )
 #+end_src
 
-expect ~(itdl "~/.config/emacs/source/core/packages/imp/" nil)~ in:
+expect ~(itdl "~/.config/emacs/source/core/packages/imp/test/data/load/" nil)~ in:
 #+begin_src elisp
 (pp-to-string imp-path-roots)
 #+end_src
 
+I need to do a thing after load.
+  - which will probably mess up how load works, since it assumes it's last.
+Add a secret keyword for "load happens here in the turn order"?
+
+And I need the full real actual path so I can make the root.
+  - So load will need to put that in the plist when its done?
+
+Or I need to get the full real actual path during path handling.
+
+move code in
+  - [[file:source/core/packages/imp/parser.el::;; Figure out path from FEATURE?][imp-parser-load]]
+to
+  - [[file:source/core/packages/imp/parser.el::;; Add (some of) FEATURE to end of path?][imp-parser-normalize/:path]]
+
+Make ~:path~ default to nil so we always run the path normalization.
+Make ~:path~ handler also put load path into ~state~.
+
+Add ~:root~ to the vars
+  - [[file:source/core/packages/imp/parser.el::(defcustom imp-parser-keywords][imp-parser-keywords]]
+    - Put a comment in there for where the loading should happen.
+  - +[[file:source/core/packages/imp/parser.el::(defcustom imp-parser-defaults][imp-parser-defaults]]+
+    - Don't wanna do anything if keyword doesn't exist, so don't have a default.
+
+(imp-parser-normalize/:path :user/foo :path '(user-emacs-directory))
+
+(imp-feature-normalize 'test)
+
+#+begin_src elisp
+(let ((name 'test/foo/bar)
+      (keyword :root)
+      (args '(t))
+      ;;(args '(test))
+      (rest nil)
+      (state (list :path (imp-path-current-dir))))
+  (imp-parser-normalize/:root name keyword args))
+  (imp-parser-handler/:root name keyword (car args) rest state))
+#+end_src
+
+Hokay.
+
+Add to ~imp-parser~ docstr
+  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+kk
+
+~:root~ as flag.
+#+begin_src elisp
+(imp-parser-only-one
+ "hello"
+ '("test");(imp-parser-normalize-flag :_ nil)
+ #'imp-parser-normalize-symbol-or-string)
+#+end_src
+
+#+begin_src elisp
+(let ((name 'test/foo/bar)
+      (keyword :root)
+      args
+      ;;(args '(t))
+      ;;(args '(test))
+      (rest nil)
+      (state (list :path (imp-path-current-dir))))
+  (imp-parser-normalize/:root name keyword args))
+#+end_src
+  - k
+
+TEST!
+
+#+begin_src elisp
+(pp-to-string imp-path-roots)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+((imp "~/.config/emacs/source/core/packages/imp/" nil)
+ (:theme
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/theme"
+  "init.el" nil)
+ (:str
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/str"
+  "init.el" nil)
+ (:datetime
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/datetime"
+  "init.el" nil)
+ (:unit
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit"
+  "init.el" nil)
+ (:buffer
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/buffer"
+  "init.el" nil)
+ (:elisp
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp"
+  "init.el" nil)
+ (:user "~/.config/emacs/source/user" nil nil)
+ (:emacs.d "~/.config/emacs/" nil nil)
+ (:imp "/home/main/.config/emacs/source/core/packages/imp" "init.el" nil))
+#+end_example
+
+#+begin_src elisp :results scalar
+(macroexpand-1 '(imp-parser temp/init
+                  :root
+                  :path .emacs))
+#+end_src
+
+#+RESULTS:
+: (progn (imp-path-root-set 'temp "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp") (imp-timing 'temp/init "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init" (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init" 'nil 'nomessage)))
+
+yay?
+
+#+begin_src elisp :results scalar
+(list :result (imp-parser temp/init
+              :root
+              :path .emacs)
+      :roots imp-path-roots)
+#+end_src
+
+ok.
+butt.....
+Need to allow dupes in `imp-path-root-set'.
+
+Hm... why was the first set right but now it wants the parent of what it should have?
+#+begin_quote
+existing: "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp"
+new:      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005"
+e == n ?  nil
+#+end_quote
+
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser temp/init
+     :root
+     :path .emacs)))
+#+end_src
+
+#+RESULTS:
+: (progn
+:   (imp-path-root-set 'temp
+:                      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005")
+:   (imp-timing 'temp:/init
+:       "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/init"
+:       (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/init" 'nil
+:             'nomessage)))
+
+Maybe because root exists, and roots don't add to their path....
+So they should and get deduped?
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Commit as is
+
+debug with clean slate
 
 
+hm... maybe get this working again?
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser imp:/test/data/load/does-not-exist
+     :optional t)))
+#+end_src
 
 ** imp-parser keyword: ~:load-message~?
 
 an option to disable the ~'nomessage~ param in call to ~load~
   - [[file:source/core/packages/imp/parser.el::'nomessage)))))][here]]
+
+or maybe a ~:let~ / ~:lexical~?
+
+Add to ~imp-parser~ docstr
+  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+
 
 ** imp-parser keyword: ~:timing~
 
@@ -1784,28 +2110,59 @@ nil
 t
 "don't show buffer"
 
+Add to ~imp-parser~ docstr
+  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+
+
 ** imp-parser keyword: ~:load-suffixes~?
 
 Modify ~load-suffixes~ for one thing's load.
 
-** imp-path
+and something for ~load-file-rep-suffixes~ as well?
 
-as;dlfkjlasdkjfasekjldf
-what was this for
+Or just like a generic ~:vars~ or ~:custom~?
 
-** imp-load: non-macro version
+Add to ~imp-parser~ docstr
+  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
 
-Make load not a macro
-  - ur [[file:source/core/packages/imp/load.el::;; (imp-load-v2 :feature :user :path (imp-path-current-dir))][here]]
+** imp-parser keywords: ~:if~ ~:when~ ~:unless~
+** imp-parser keyword: ~:requires~
+** imp-parser keyword: ~:after~
+** imp-parser keyword: ~:~
+** imp-parser NAME
 
 #+begin_src elisp
-;; TODO-LOAD: DELETE THIS WHEN imp-parser becomes imp-load.
-(defun imp--feature-paths (&rest feature)
+;;------------------------------
+;;;; NAME
+;;------------------------------
+
+(defun imp-parser-normalize-name (name)
+  ;; TODO: make this func unqoute NAME?
+  (imp-feature-normalize name)) ; TODO: or this func?
 #+end_src
-  - [[file:source/core/packages/imp/feature.el::;; TODO-LOAD: DELETE THIS WHEN imp-parser becomes imp-load.][here]]
+  - [[file:source/core/packages/imp/parser.el::defun imp-parser-normalize-name (name][here]]
 
-** imp path feature root
+** imp-path
 
+*** Deduplicate when joining paths?
+
+This should give something like:
+  "~/.config/emacs/path/to/imp/init"
+not:
+  "~/.config/emacs/path/to/imp/imp/init"
+
+#+begin_src elisp
+(imp-parser imp/init
+  :path (imp-path-join user-emacs-directory
+                       \"path/to/imp\")
+  :root t)
+#+end_src
+
+*** path.el
+;; TODO: MOVE TO path.el
+  - [[file:source/core/packages/imp/parser.el::;; TODO: MOVE TO path.el][here]]
+
+** Do some TODOs
 * macrostep-expand broken?
 
 #+begin_src elisp
