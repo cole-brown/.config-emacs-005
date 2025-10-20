@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-10-16
+;; Timestamp:  2025-10-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -65,12 +65,15 @@
 
 (defcustom imp-parser-keywords
   '(:disabled
+    :path
+    :root
     :error
     :optional
-    :requires
     :if :when :unless
-    :path
-    :after)
+    :after
+    :requires
+    ;; NOTE: file load is parsed/handled here.
+    )
   "The set of valid keywords, in the order they are processed in.
 The order of this list is *very important*, so it is only
 advisable to insert new keywords, never to delete or reorder
@@ -79,7 +82,7 @@ default order ever changes, as they may have subtle effects on
 the semantics of `imp-parser' declarations and may necessitate
 changing where you had inserted a new keyword earlier.
 
-Note that `:disabled' is special in this list, as it causes
+NOTE: `:disabled' is special in this list, as it causes
 nothing at all to happen, even if the rest of the `imp-parser'
 declaration is incorrect."
   :type '(repeat symbol)
@@ -145,9 +148,9 @@ then the expanded macros do their job silently."
 
 (defcustom imp-parser-defaults
   '(;; (KEYWORD DEFAULT-VALUE USAGE-PREDICATE)
-    (:error t t)
+    (:error    t   t)
     (:optional nil t)
-    ;;(:path 'guess (lambda (name args) (not (plist-member args :path))))
+    (:path     nil t)
     )
   "Default values for specified `imp-parser' keywords.
 Each entry in the alist is a list of three elements:
@@ -665,12 +668,8 @@ next value for the STATE."
   (let* ((funcname 'imp-parser-load)
          ;; Handle STATE: `:path'
          (path (plist-get state :path))
+         (path-load (plist-get state :path-load))
          (feature-root (imp-feature-root feature)))
-
-    ;; Figure out path from FEATURE?
-    (when (and (not path)
-               feature-root)
-      (setq path (imp-path-root-get feature-root)))
 
     (unless (and (stringp path)
                  (file-name-absolute-p path))
@@ -680,54 +679,55 @@ next value for the STATE."
                     "path:'%s'")
                   path))
 
-    ;; Add rest of NAME to path; is a relative path.
-    (setq path (apply #'imp-path-join
-                      path
-                      (imp-feature-rest feature)))
+    (unless (and (stringp path-load)
+                 (file-name-absolute-p path-load))
+      ;; TODO: some imp timing thing to say that this thing errored?
+      (imp--error funcname
+                  `("Path is invalid or not absolute! "
+                    "path-load:'%s'")
+                  path-load))
 
-    ;; Convert path to a load path.
-    (let ((path-load (imp-path-load-file path)))
-      ;; Deal with non-existent file.
-      (if (null path-load)
-          ;; Handle STATE: `:optional'
-          (if (plist-get state :optional)
-              ;; Optional load and file does not exist.
-              ;; Return sexprs that will skip the file
-              `((progn
-                  ;; Skip w/ optional timing message.
-                  (imp-timing-skip-optional-dne ',feature ,path)
-                  ;; Return `nil' for load result.
-                  nil))
-            ;; Else requried, so error?
-            ;; TODO: Make some imp timing thing to say that this thing errored?
-            (imp--error funcname
-                        "Cannot find a file to load. path:'%s' -> load-path:'%s'"
-                        path
-                        path-load))
-
-        ;; Have a valid load path. Try loading it.
-
-        (when imp--debugging?
-          ;; `load' outputs:
-          ;; > "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
-          (imp--debug funcname
-                      "load '%s' => '%s'"
+    ;; Deal with non-existent file.
+    (if (null path-load)
+        ;; Handle STATE: `:optional'
+        (if (plist-get state :optional)
+            ;; Optional load and file does not exist.
+            ;; Return sexprs that will skip the file
+            `((progn
+                ;; Skip w/ optional timing message.
+                (imp-timing-skip-optional-dne ',feature ,path)
+                ;; Return `nil' for load result.
+                nil))
+          ;; Else requried, so error?
+          ;; TODO: Make some imp timing thing to say that this thing errored?
+          (imp--error funcname
+                      "Cannot find a file to load. path:'%s' -> load-path:'%s'"
                       path
                       path-load))
 
-        ;; Return sexprs that will time & load the file.
-        `((imp-timing
-              ',feature
-              ,path-load
+      ;; Have a valid load path. Try loading it.
 
-              ;; Actually do the load.
-              ;; Skip erroring out if STATE says so.
-              ;; Return the results of `load'.
-              (load ,path
-                    ;; Handle STATE: `:error'
-                    ',(when (not (plist-get state :error))
-                        'noerror)
-                    'nomessage)))))))
+      (when imp--debugging?
+        ;; `load' outputs:
+        ;; > "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
+        (imp--debug funcname
+                    "load '%s' => '%s'"
+                    path
+                    path-load))
+
+      ;; Return sexprs that will time & load the file.
+      `((imp-timing
+            ',feature
+            ,path-load
+
+            ;; Actually do the load.
+            ;; Skip erroring out if STATE says so.
+            ;; Return the results of `load'.
+            (load ,path
+                  ;; Handle STATE: `:error'
+                  ',(when (not (plist-get state :error))
+                      'noerror)
+                  'nomessage))))))
 
 
 ;; TODO: MOVE TO path.el
@@ -863,6 +863,16 @@ The argument LABEL is ignored."
   (imp-parser-as-one (symbol-name keyword) args
     #'imp-parser-normalize-symbols))
 
+(defun imp-parser-normalize-flag (name arg)
+  "Converts ARGS to '(t) if there are no args."
+  (if (null arg)
+      '(t)
+    arg))
+
+(defun imp-parser-normalize-only-one-symbol (name keyword args)
+  (imp-parser-only-one (symbol-name keyword) args
+    #'imp-parser-normalize-symbols))
+
 (defun imp-parser-normalize-only-one-value-or-flag (name keyword args)
   (if (null args)
       ;; keyword used as a flag (by itself; no value), so normalize to true.
@@ -989,42 +999,6 @@ The argument LABEL is ignored."
 ;;                   (cons (car x) (imp-parser-normalize-function (cdr x)))
 ;;                 x))
 ;;           args))
-
-;; (defun imp-parser-normalize-mode (name keyword args)
-;;   "Normalize arguments for keywords which add regexp/mode pairs to an alist."
-;;   (imp-parser-as-one (symbol-name keyword) args
-;;     (apply-partially #'imp-parser-normalize-pairs
-;;                      #'imp-parser-regex-p
-;;                      #'imp-parser-recognize-function
-;;                      name)))
-
-;; (defun imp-parser-autoloads-mode (_name _keyword args)
-;;   (mapcar
-;;    #'(lambda (x)
-;;        (cond
-;;         ((consp (cdr x))
-;;          (cons (cddr x) 'command))
-;;         ((consp x)
-;;          (cons (cdr x) 'command))))
-;;    (cl-remove-if-not #'(lambda (x)
-;;                          (or (and (consp x)
-;;                                   (imp-parser-non-nil-symbolp (cdr x)))
-;;                              (and (consp x)
-;;                                   (consp (cdr x))
-;;                                   (imp-parser-non-nil-symbolp (cddr x)))))
-;;                      args)))
-
-;; (defun imp-parser-handle-mode (name alist args rest state)
-;;   "Handle keywords which add regexp/mode pairs to an alist."
-;;   (imp-parser-concat
-;;    (imp-parser-process-keywords name rest state)
-;;    (mapcar
-;;     #'(lambda (thing)
-;;         `(add-to-list
-;;           ',alist
-;;           ',(cons (imp-parser-normalize-regex (car thing))
-;;                   (cdr thing))))
-;;     (imp-parser-normalize-commands args))))
 
 (defun imp-parser-handle-state (name keyword arg rest state)
   "Save KEYWORD & ARG into STATE plist for later use."
@@ -1161,7 +1135,6 @@ See also `imp-parser-statistics'."
   ;; TODO: make this func unqoute NAME?
   (imp-feature-normalize name)) ; TODO: or this func?
 
-
 ;;------------------------------
 ;;;; `:disabled'
 ;;------------------------------
@@ -1174,7 +1147,6 @@ See also `imp-parser-statistics'."
 
 ;; (defun imp-parser-handler/:disabled (name _keyword _arg rest state)
 ;;   (imp-parser-process-keywords name rest state))
-
 
 ;;------------------------------
 ;;;; `:error'
@@ -1210,7 +1182,6 @@ See also `imp-parser-statistics'."
   (let ((body (imp-parser-process-keywords name rest state)))
     `((unless ,pred ,@body))))
 
-
 ;;------------------------------
 ;;;; `:requires'
 ;;------------------------------
@@ -1225,7 +1196,6 @@ See also `imp-parser-statistics'."
                    `(not (member nil (mapcar #'featurep ',requires)))
                  `(featurep ',(car requires)))
           ,@body)))))
-
 
 ;;------------------------------
 ;;;; `:path'
@@ -1369,13 +1339,19 @@ If the path is relative, root it in one of:
   2) `user-emacs-directory'"
   (let ((funcname 'imp-parser-normalize/:path)
         ;; Normalize to canonical, absolute path(s).
-        (path (imp-parser-normalize-path feature keyword arg)))
+        (path (imp-parser-normalize-path feature keyword arg))
+        (feature-root (imp-feature-root feature)))
 
     ;; Normalize to one path.
     ;; `imp-parser-normalize-path' allows lists of paths.
     ;; We want just one; take the first.
     (when (proper-list-p path)
       (setq path (car path)))
+
+    ;; If no path supplied and feature is rooted, use feature root's path.
+    (when (and (not path)
+               feature-root)
+      (setq path (imp-path-root-get feature-root)))
 
     ;; Double Check: We got an absolute path, right?
     (unless (and (stringp path)
@@ -1385,23 +1361,11 @@ If the path is relative, root it in one of:
                   arg
                   path))
 
-    ;; Add (some of) FEATURE to end of path?
-
-
-    ;;---
-    ;; TODO: remove root from feature if needed?
-    ;; TODO: don't want .../source/user/user/init.el for FEATURE `:user/init'
-    ;;---
-    ;; See TODO: file:path.el::;; TODO: move this to new func... `imp-path-exists' or something?
-    ;; (pcase (imp-path-file-exists? ...)
-    ;;   (:file
-    ;;    ...)
-    ;;   (:file:load
-    ;;    ...)
-    ;;   (:dir
-    ;;    ...)
-    ;;   (_
-    ;;    ...))
+    ;; Add rest of NAME to path; is a relative path.
+    (setq path (apply #'imp-path-join
+                      path
+                      ;; FEATURE, sans root. eg `imp:/parser' -> `parser'
+                      (imp-feature-unrooted feature)))
 
     path))
 ;; (imp-parser-normalize/:path :user :path "/foo/bar")
@@ -1411,8 +1375,31 @@ If the path is relative, root it in one of:
 ;; (imp-parser-normalize/:path :user :path 'user-emacs-directory)
 ;; (imp-parser-normalize/:path :user :path 'foo)
 
-(defalias 'imp-parser-handler/:path 'imp-parser-handle-state)
+(defun imp-parser-handler/:path (name keyword arg rest state)
+  "Put `:path' and `:path-load' into state."
+  (setq state (imp-parser-plist-maybe-put state keyword arg))
+  (setq state (imp-parser-plist-maybe-put state :path-load (imp-path-load-file arg)))
+  (imp-parser-process-keywords name rest state))
 
+;;------------------------------
+;;;; `:root'
+;;------------------------------
+
+(defun imp-parser-normalize/:root (name keyword args)
+  (let ((root (imp-parser-only-one
+                name
+                (imp-parser-normalize-flag name args)
+                #'imp-parser-normalize-symbol-or-string)))
+    (imp-feature-first (if (eq t root) name root))))
+
+(defun imp-parser-handler/:root (name keyword arg rest state)
+  (imp-parser-concat
+   ;; Add root before load happens so that subfeatures can use their root.
+   ;; Example: Loading `imp/init.el' will load all of imp's files, some of which
+   ;; expect imp's root path to exist.
+   `((imp-path-root-set ',arg
+                        ,(imp-path-parent (plist-get state :path-load))))
+   (imp-parser-process-keywords name rest state)))
 
 ;;------------------------------
 ;;;; `:catch'
@@ -1635,11 +1622,27 @@ no keyword implies `:all'."
 
 Usage:
 
-  (imp-parser package-name
+  (imp-parser name
      [:keyword [option]]...)
 
 :disabled      Flag. Nothing happens; NAME is ignored completely if this keyword
                is present.
+
+:path PATH     Absolute, relative, or rooted path to file.
+               PATH can be:
+                 - A path string.
+                 - A list of strings to join into a path.
+                 - A form that should evaluate to one of the above.
+
+:root ROOT     Create an imp path root for ROOT at PATH given in `:path'.
+               See var `imp-path-roots' and func `imp-path-root-set'.
+               If ROOT is t, use first part of NAME.
+               Example:
+                 (imp-parser imp/init
+                             :path (imp-path-join user-emacs-directory
+                                                  \"path/to/imp\")
+                             :root t)
+                 => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)
 
 :error ERR     Value (aka ERROR) can be:
                  - nil
@@ -1653,7 +1656,6 @@ Usage:
                  - It cannot determine where to /look/ for the file.
 
 :optional OPT  Load NAME if it exists; do nothing if it does not.
-               Basically, it is a more specific `:error nil'.
                OPT can be:
                  - nil (default)
                  - non-nil
@@ -1670,12 +1672,6 @@ Usage:
 :when EXPR     See `:if'.
 :unless EXPR   Opposite of `:if'.
                Initialize and load only if EXPR evaluates to a nil value.
-
-:path PATH     Absolute, relative, or rooted path to file.
-               PATH can be:
-                 - A path string.
-                 - A list of strings to join into a path.
-                 - A form that should evaluate to one of the above.
 
 :after AFTER   Delay the effect of the imp-parser declaration
                until after the named libraries have loaded.

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-10-14
+;; Timestamp:  2025-10-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -320,7 +320,7 @@ string or symbol name."
 ;; (imp-feature-root '("+spydez" "foo" "bar"))
 
 
-(defun imp-feature-rest (&rest feature)
+(defun imp-feature-unrooted (&rest feature)
   "Return FEATURE sans root, if any. Else nil."
   (let* ((normalized (apply #'imp--feature-normalize-chain feature))
          (root (imp--feature-root? normalized)))
@@ -328,10 +328,18 @@ string or symbol name."
              (if root
                  (cdr normalized)
                normalized))))
-;; (imp-feature-rest 'imp:/foo/bar/baz)
-;; (imp-feature-rest :imp 'foo 'bar "baz")
-;; (imp-feature-rest 'imp)
-;; (imp-feature-rest 'dne:/foo/bar/baz)
+;; (imp-feature-unrooted 'imp:/foo/bar/baz)
+;; (imp-feature-unrooted :imp 'foo 'bar "baz")
+;; (imp-feature-unrooted 'imp)
+;; (imp-feature-unrooted 'dne:/foo/bar/baz)
+
+
+(defun imp-feature-first (&rest feature)
+  "Return first symbol in feature, regardless of root."
+  (imp--feature-symbol (car-safe (apply #'imp--feature-normalize-chain feature))))
+;; (imp-feature-first nil)
+;; (imp-feature-first 'imp:/foo/bar/baz)
+;; (imp-feature-first 'dne/foo/bar/baz)
 
 
 (defun imp-feature-join (&rest feature)
@@ -380,7 +388,8 @@ FEATURE should be:
 FEATURE will be normalized, then converted into a single symbol."
   (imp--feature-symbol (apply #'imp-feature-join feature)))
 ;; (imp-feature-normalize :imp 'test 'symbols)
-;; (imp-feature-normalize '(:imp test symbols)
+;; (imp-feature-normalize '(:imp test symbols))
+;; (imp-feature-normalize '(':imp 'test 'symbols))
 ;; (imp-feature-normalize '(:imp test) 'symbols)
 ;; (imp-feature-normalize '(:imp provide))
 ;; (imp-feature-normalize :imp 'provide)
