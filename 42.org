@@ -1908,8 +1908,10 @@ k.
 Good enough for now.
 
 
-** ├CURRENT┤ imp-parser keyword: ~:root~?
+** ├DONE───┤ imp-parser keyword: ~:root~?
+CLOSED: [2025-10-20 Mon 21:38]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-20 Mon 21:38]
 - State "├CURRENT┤"  from              [2025-10-16 Thu 21:55]
 :END:
 
@@ -2075,15 +2077,9 @@ e == n ?  nil
 Maybe because root exists, and roots don't add to their path....
 So they should and get deduped?
 
-╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-╠══TODO══╣            ║                                                                                                          ║
-╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
-╠══TODO══╣            ║                                                                                                          ║
-╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 Commit as is
 
 debug with clean slate
-
 
 hm... maybe get this working again?
 #+begin_src elisp
@@ -2093,39 +2089,450 @@ hm... maybe get this working again?
      :optional t)))
 #+end_src
 
-** imp-parser keyword: ~:load-message~?
+#+begin_src backtrace
+Debugger entered--Lisp error: (wrong-type-argument stringp nil)
+  locate-file-internal(nil ("/") (".so" ".so.gz" ".elc" ".elc.gz" ".el" ".el.gz") nil)
+  locate-file(nil ("/") (".so" ".so.gz" ".elc" ".elc.gz" ".el" ".el.gz"))
+  imp-path-load-file(nil)
+  (imp-parser-plist-maybe-put state :path-load (imp-path-load-file arg))
+  (setq state (imp-parser-plist-maybe-put state :path-load (imp-path-load-file arg)))
+  imp-parser-handler/:path(imp:/test/data/load/does-not-exist :path nil (:error t :optional t) nil)
+  funcall(imp-parser-handler/:path imp:/test/data/load/does-not-exist :path nil (:error t :optional t) nil)
+  (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler)))
+  (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))
+  (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler)))))
+  (if (null plist) (imp-parser-load name state) (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))))
+  imp-parser-process-keywords(imp:/test/data/load/does-not-exist (:path nil :error t :optional t))
+  (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp-parser (cons ... args))) "\n  -->\n\n" (pp-to-string (cons 'imp-parser (cons ... args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ... ...)))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*))
+  (imp-parser-concat (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons ... ...)) "\n  -->\n\n" (pp-to-string (cons ... ...)) "\n  ==>\n\n" (pp-to-string (macroexp-progn ...))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*)))
+  (macroexp-progn (imp-parser-concat (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string ...) "\n  -->\n\n" (pp-to-string ...) "\n  ==>\n\n" (pp-to-string ...)) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*))))
+  (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose ...) (concat "\n\n" ... "\n  -->\n\n" ... "\n  ==>\n\n" ...) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*)))))
+  #f(lambda (name &rest args) [t] "Load NAME.\n\nUsage:\n\n  (imp-parser name\n     [:keyword [option]]...)\n\n:disabled      Flag. Nothing happens; NAME is ignored completely if this keyword\n               is present.\n\n:path PATH     Absolute, relative, or rooted path to file.\n               PATH can be:\n                 - A path string.\n                 - A list of strings to join into a path.\n                 - A form that should evaluate to one of the above.\n\n:root ROOT     Create an imp path root for ROOT at PATH given in `:path'.\n               See var `imp-path-roots' and func `imp-path-root-set'.\n               If ROOT is t, use first part of NAME.\n               Example:\n                 (imp-parser imp/init\n                             :path (imp-path-join user-emacs-directory\n                                                  \"path/to/imp\")\n                             :root t)\n                 => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)\n\n:error ERR     Value (aka ERROR) can be:\n                 - nil\n                 - non-nil (default)\n                 - A form that should evaluate to one of the above.\n               If ERROR is nil, the function will not raise an error if:\n                 - The file doesn't exist.\n                 - NAME isn't provided after loading the file.\n               It will still raise an error if:\n                 - It cannot parse the inputs.\n                 - It cannot determine where to /look/ for the file.\n\n:optional OPT  Load NAME if it exists; do nothing if it does not.\n               OPT can be:\n                 - nil (default)\n                 - non-nil\n                 - A form that should evaluate to one of the above.\n\n:requires REQ  Assert that a feature already exists in `features'.\n               If assert fails, handle according to ERROR/OPTIONAL.\n               REQ can be:\n                 - nil\n                 - symbol\n                 - A form that should evaluate to one of the above.\n\n:if EXPR       Initialize and load only if EXPR evaluates to a non-nil value.\n:when EXPR     See `:if'.\n:unless EXPR   Opposite of `:if'.\n               Initialize and load only if EXPR evaluates to a nil value.\n\n:after AFTER   Delay the effect of the imp-parser declaration\n               until after the named libraries have loaded.\n               Before they have been loaded, no other keyword\n               has any effect at all, and once they have been\n               loaded it is as if `:after' was not specified." (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp-parser (cons 'name* args))) "\n  -->\n\n" (pp-to-string (cons 'imp-parser (cons 'name* args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ((imp-parser-verbose 'errors) (imp-parser-expand-minimally t)) (imp-parser-process-keywords name* args*))))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*))))))(imp:/test/data/load/does-not-exist :optional t)
+  apply(#f(lambda (name &rest args) [t] "Load NAME.\n\nUsage:\n\n  (imp-parser name\n     [:keyword [option]]...)\n\n:disabled      Flag. Nothing happens; NAME is ignored completely if this keyword\n               is present.\n\n:path PATH     Absolute, relative, or rooted path to file.\n               PATH can be:\n                 - A path string.\n                 - A list of strings to join into a path.\n                 - A form that should evaluate to one of the above.\n\n:root ROOT     Create an imp path root for ROOT at PATH given in `:path'.\n               See var `imp-path-roots' and func `imp-path-root-set'.\n               If ROOT is t, use first part of NAME.\n               Example:\n                 (imp-parser imp/init\n                             :path (imp-path-join user-emacs-directory\n                                                  \"path/to/imp\")\n                             :root t)\n                 => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)\n\n:error ERR     Value (aka ERROR) can be:\n                 - nil\n                 - non-nil (default)\n                 - A form that should evaluate to one of the above.\n               If ERROR is nil, the function will not raise an error if:\n                 - The file doesn't exist.\n                 - NAME isn't provided after loading the file.\n               It will still raise an error if:\n                 - It cannot parse the inputs.\n                 - It cannot determine where to /look/ for the file.\n\n:optional OPT  Load NAME if it exists; do nothing if it does not.\n               OPT can be:\n                 - nil (default)\n                 - non-nil\n                 - A form that should evaluate to one of the above.\n\n:requires REQ  Assert that a feature already exists in `features'.\n               If assert fails, handle according to ERROR/OPTIONAL.\n               REQ can be:\n                 - nil\n                 - symbol\n                 - A form that should evaluate to one of the above.\n\n:if EXPR       Initialize and load only if EXPR evaluates to a non-nil value.\n:when EXPR     See `:if'.\n:unless EXPR   Opposite of `:if'.\n               Initialize and load only if EXPR evaluates to a nil value.\n\n:after AFTER   Delay the effect of the imp-parser declaration\n               until after the named libraries have loaded.\n               Before they have been loaded, no other keyword\n               has any effect at all, and once they have been\n               loaded it is as if `:after' was not specified." (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((name* ...) (args* ...) (imp-parser--form ...)) (if (eq imp-parser-verbose ...) (progn ... ... ... ...)) (imp-parser-process-keywords name* args*)))))) (imp:/test/data/load/does-not-exist :optional t))
+  macroexpand-1((imp-parser imp:/test/data/load/does-not-exist :optional t))
+  (pp-to-string (macroexpand-1 '(imp-parser imp:/test/data/load/does-not-exist :optional t)))
+  (progn (pp-to-string (macroexpand-1 '(imp-parser imp:/test/data/load/does-not-exist :optional t))))
+  eval((progn (pp-to-string (macroexpand-1 '(imp-parser imp:/test/data/load/does-not-exist :optional t)))) t)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0xa2a0a50c829a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0xa2a0a50c829a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
 
-an option to disable the ~'nomessage~ param in call to ~load~
-  - [[file:source/core/packages/imp/parser.el::'nomessage)))))][here]]
+Hmmm....
+this works but that just has nil for path???
+#+begin_src elisp
+(imp-parser-normalize/:path 'imp:/test/data/load/does-not-exist :path nil)
+#+end_src
 
-or maybe a ~:let~ / ~:lexical~?
+#+begin_quote
+arg: nil
+ipnpa: nil
+path: nil
+feature-root: imp
+path: "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist"
+"/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist"
+#+end_quote
 
-Add to ~imp-parser~ docstr
-  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+#+begin_src elisp
+(imp-parser imp:/test/data/load/does-not-exist
+  :optional t)
+#+end_src
 
+Why is it not using normalizer???
+#+begin_quote
+Wrote /home/main/ocean/vault/.config/emacs/2025-03-13_sn005/42.org
+handler-arg:nil
+Entering debugger...
+#+end_quote
 
-** imp-parser keyword: ~:timing~
+oh. Default values are not normalized.
+[[file:source/core/packages/imp/parser.el::(setq args (imp-parser-normalize-plist name-symbol args nil][here]]
+-_-
+
+mmmmh.....
+Oh. We can put a form/function in that gets eval'd for default value.
+
+#+begin_src elisp
+(defun test-default-path (feature _)
+  (imp-parser-normalize/:path feature :path nil))
+
+(defcustom imp-parser-defaults
+  '(;; (KEYWORD DEFAULT-VALUE USAGE-PREDICATE)
+    (:path     test-default-path t)
+#+end_src
+
+#+begin_src elisp
+(imp-parser imp:/test/data/load/does-not-exist
+  :optional t)
+#+end_src
+It has ~:path~ now... but ~:path-load~ is still nil?
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (error "[ERROR--]: imp-parser-load: Path is invalid or not absolute! path-load:’nil’")
+  signal(error ("[ERROR--]: imp-parser-load: Path is invalid or not absolute! path-load:’nil’"))
+  error("[ERROR--]: imp-parser-load: Path is invalid or not absolute! path-load:'%s'" nil)
+  apply(error "[ERROR--]: imp-parser-load: Path is invalid or not absolute! path-load:'%s'" nil)
+  (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail)))
+  (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail))))
+  (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply ... string)))) args) (setq tail (cdr tail)))))
+  (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq lists (list sinks))) (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond (... string) (... nil) (... ...))) args) (setq tail (cdr tail))))))
+  (progn (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq lists (list sinks))) (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ... ... ...)) args) (setq tail (cdr tail)))))))
+  (if (imp--output-level-get level :sink) (progn (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq lists (list sinks))) (let ((tail sinks)) (while tail (let ((sink ...)) (apply sink (concat prefix caller ... ...) args) (setq tail (cdr tail))))))))
+  imp--output(:error imp-parser-load ("Path is invalid or not absolute! " "path-load:'%s'") (nil))
+  imp--error(imp-parser-load ("Path is invalid or not absolute! " "path-load:'%s'") nil)
+  (if (and (stringp path-load) (file-name-absolute-p path-load)) nil (imp--error funcname '("Path is invalid or not absolute! " "path-load:'%s'") path-load))
+  (let* ((funcname 'imp-parser-load) (path (plist-get state :path)) (path-load (plist-get state :path-load)) (feature-root (imp-feature-root feature))) (if (and (stringp path) (file-name-absolute-p path)) nil (imp--error funcname '("Path is invalid or not absolute! " "path:'%s'") path)) (if (and (stringp path-load) (file-name-absolute-p path-load)) nil (imp--error funcname '("Path is invalid or not absolute! " "path-load:'%s'") path-load)) (if (null path-load) (if (plist-get state :optional) (list (cons 'progn (cons (list 'imp-timing-skip-optional-dne (list ... feature) path) '(nil)))) (imp--error funcname "Cannot find a file to load. path:'%s' -> load-path:'%s'" path path-load)) (if imp--debugging? (progn (imp--debug funcname "load '%s' => '%s'" path path-load))) (list (list 'imp-timing (list 'quote feature) path-load (cons 'load (cons path (cons (list ... ...) '...)))))))
+  imp-parser-load(imp:/test/data/load/does-not-exist (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :path-load nil :error t :optional t))
+  (if (null plist) (imp-parser-load name state) (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))))
+  imp-parser-process-keywords(imp:/test/data/load/does-not-exist nil (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :path-load nil :error t :optional t))
+  imp-parser-handler/:optional(imp:/test/data/load/does-not-exist :optional t nil (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :path-load nil :error t :optional t))
+  funcall(imp-parser-handler/:optional imp:/test/data/load/does-not-exist :optional t nil (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :path-load nil :error t :optional t))
+  (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler)))
+  (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))
+  (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler)))))
+  (if (null plist) (imp-parser-load name state) (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))))
+  imp-parser-process-keywords(imp:/test/data/load/does-not-exist (:optional t) (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :path-load nil :error t :optional t))
+  imp-parser-handler/:error(imp:/test/data/load/does-not-exist :error t (:optional t) (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :path-load nil :error t :optional t))
+  funcall(imp-parser-handler/:error imp:/test/data/load/does-not-exist :error t (:optional t) (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :path-load nil :error t :optional t))
+  (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler)))
+  (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))
+  (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler)))))
+  (if (null plist) (imp-parser-load name state) (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))))
+  imp-parser-process-keywords(imp:/test/data/load/does-not-exist (:error t :optional t) (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :path-load nil :error t :optional t))
+  imp-parser-handler/:path(imp:/test/data/load/does-not-exist :path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" (:error t :optional t) nil)
+  funcall(imp-parser-handler/:path imp:/test/data/load/does-not-exist :path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" (:error t :optional t) nil)
+  (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler)))
+  (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))
+  (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler)))))
+  (if (null plist) (imp-parser-load name state) (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp-parser-error (format "%s is not a keyword" keyword))) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym name keyword arg rest state) (imp-parser-error (format "Keyword handler not defined: %s" handler))))))
+  imp-parser-process-keywords(imp:/test/data/load/does-not-exist (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist" :error t :optional t))
+  (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp-parser (cons ... args))) "\n  -->\n\n" (pp-to-string (cons 'imp-parser (cons ... args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ... ...)))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*))
+  (imp-parser-concat (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons ... ...)) "\n  -->\n\n" (pp-to-string (cons ... ...)) "\n  ==>\n\n" (pp-to-string (macroexp-progn ...))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*)))
+  (macroexp-progn (imp-parser-concat (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string ...) "\n  -->\n\n" (pp-to-string ...) "\n  ==>\n\n" (pp-to-string ...)) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*))))
+  (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose ...) (concat "\n\n" ... "\n  -->\n\n" ... "\n  ==>\n\n" ...) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*)))))
+  #f(lambda (name &rest args) [t] "Load NAME.\n\nUsage:\n\n  (imp-parser name\n     [:keyword [option]]...)\n\n:disabled      Flag. Nothing happens; NAME is ignored completely if this keyword\n               is present.\n\n:path PATH     Absolute, relative, or rooted path to file.\n               PATH can be:\n                 - A path string.\n                 - A list of strings to join into a path.\n                 - A form that should evaluate to one of the above.\n\n:root ROOT     Create an imp path root for ROOT at PATH given in `:path'.\n               See var `imp-path-roots' and func `imp-path-root-set'.\n               If ROOT is t, use first part of NAME.\n               Example:\n                 (imp-parser imp/init\n                             :path (imp-path-join user-emacs-directory\n                                                  \"path/to/imp\")\n                             :root t)\n                 => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)\n\n:error ERR     Value (aka ERROR) can be:\n                 - nil\n                 - non-nil (default)\n                 - A form that should evaluate to one of the above.\n               If ERROR is nil, the function will not raise an error if:\n                 - The file doesn't exist.\n                 - NAME isn't provided after loading the file.\n               It will still raise an error if:\n                 - It cannot parse the inputs.\n                 - It cannot determine where to /look/ for the file.\n\n:optional OPT  Load NAME if it exists; do nothing if it does not.\n               OPT can be:\n                 - nil (default)\n                 - non-nil\n                 - A form that should evaluate to one of the above.\n\n:requires REQ  Assert that a feature already exists in `features'.\n               If assert fails, handle according to ERROR/OPTIONAL.\n               REQ can be:\n                 - nil\n                 - symbol\n                 - A form that should evaluate to one of the above.\n\n:if EXPR       Initialize and load only if EXPR evaluates to a non-nil value.\n:when EXPR     See `:if'.\n:unless EXPR   Opposite of `:if'.\n               Initialize and load only if EXPR evaluates to a nil value.\n\n:after AFTER   Delay the effect of the imp-parser declaration\n               until after the named libraries have loaded.\n               Before they have been loaded, no other keyword\n               has any effect at all, and once they have been\n               loaded it is as if `:after' was not specified." (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((name* (imp-parser-normalize-name name)) (args* (imp-parser-normalize-keywords name* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp-parser (cons 'name* args))) "\n  -->\n\n" (pp-to-string (cons 'imp-parser (cons 'name* args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ((imp-parser-verbose 'errors) (imp-parser-expand-minimally t)) (imp-parser-process-keywords name* args*))))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" name*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords name* args*))))))(imp:/test/data/load/does-not-exist :optional t)
+  macroexpand((imp-parser imp:/test/data/load/does-not-exist :optional t))
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0xa2a0a50c829a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0xa2a0a50c829a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+#+begin_quote
+arg: nil
+ipnpa: nil
+path: nil
+feature-root: imp
+path: "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist"
+handler-arg:"/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist"
+#+end_quote
+
+What's this guy's problem?
+#+begin_src elisp
+(imp-path-load-file "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist")
+#+end_src
+
+....where the fuck is this guy?
+  - oh. ~;; TODO: MOVE TO path.el~
+    - [[file:source/core/packages/imp/parser.el::defun imp-path-load-file (path-absolute][here]]
+
+#+begin_src elisp
+(let ((path-absolute "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist"))
+  (locate-file path-absolute
+               '("/") ; Don't use `load-paths'; we have an absolute path.
+               (get-load-suffixes)))
+#+end_src
+
+oh; right; duh.
+does not exist
+so nil load path is correct.
+
+So does this work now?
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser imp:/test/data/load/does-not-exist
+     :optional t)))
+#+end_src
+
+#+RESULTS:
+: (progn
+:   (imp-timing-skip-optional-dne 'imp:/test/data/load/does-not-exist
+:                                 "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/does-not-exist")
+:   nil)
+
+yay.
+
+Where were we?
+Testing ~:root~?
+Oh. Debugging why path changes when re-running:
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser temp/init
+     :root
+     :path .emacs)))
+#+end_src
+
+#+RESULTS:
+: (progn
+:   (imp-path-root-set 'temp
+:                      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005")
+:   (imp-timing 'temp:/init
+:       "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/init.el"
+:       (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/init" 'nil
+:             'nomessage)))
+
+Cuz the first time, that path was correct:
+#+begin_src elisp
+(imp-path-root-get 'temp :no-error)
+#+end_src
+
+#+RESULTS:
+: /home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp
+
+...Is the path correct the first time now?
+Make a func to delete a root first.
+  - [X] k
+  - [X] use it to delete ~temp~ root
+
+go again:
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser temp/init
+     :root
+     :path .emacs)))
+#+end_src
+
+#+begin_quote
+arg: (\.emacs)
+ipnpa: (\.emacs)
+ipnpa: \.emacs
+ipnpa: "~/.config/emacs/"
+path: ("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005")
+feature-root: nil
+path: "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init"
+test-default-path: hello
+arg: nil
+ipnpa: nil
+path: nil
+feature-root: nil
+apply: [ERROR--]: imp-parser-normalize/:path: ‘:path’ should end up as absolute: got: ’nil’ -> ’nil’
+#+end_quote
+
+??????
+But it has a ~:path~ value. Why is it running the default value function???
+do I need a predicate?
+It just runs the defaults and then only inserts the results if it needs to.
+So predicate it or never error.
+So predicate for now?
+  - k
+
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser temp/init
+     :root
+     :path .emacs)))
+#+end_src
+
+#+RESULTS:
+: (progn
+:   (imp-path-root-set 'temp
+:                      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp")
+:   (imp-timing 'temp/init
+:       "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init.el"
+:       (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init"
+:             'nil 'nomessage)))
+
+See, this is good.
+But if root already exists...
+
+#+begin_src elisp
+(imp-path-root-set 'temp
+                   "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp")
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser temp/init
+     :root
+     :path .emacs)))
+#+end_src
+
+#+RESULTS:
+: (progn
+:   (imp-path-root-set 'temp
+:                      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005")
+:   (imp-timing 'temp:/init
+:       "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/init.el"
+:       (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/init" 'nil
+:             'nomessage)))
+
+It does wrong file now?!
+
+Oh; cuz it still has ~:path .emacs~
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser temp/init)))
+;;     :root
+;;     :path .emacs)))
+#+end_src
+
+#+RESULTS:
+: (imp-timing 'temp:/init
+:     "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init.el"
+:     (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init" 'nil
+:           'nomessage))
+
+Yah... hm...
+
+What /do/ you do when you have a root with a path and then also a path?
+Figure it out the same way you did the first time.
+
+could be the problem?
+#+begin_src elisp
+    ;; Add rest of NAME to path; is a relative path.
+    (setq path (apply #'imp-path-join
+                      path
+                      ;; FEATURE, sans root. eg `imp:/parser' -> `parser'
+                      (imp-feature-unrooted feature)))
+#+end_src
+  - [[file:source/core/packages/imp/parser.el::(setq path (apply #'imp-path-join][here]]
+
+#+begin_src elisp
+(imp-path-root-get 'temp :no-error)
+#+end_src
+
+#+begin_src elisp
+(imp-parser-normalize/:path 'temp:/init :path '(emacs))
+#+end_src
+
+#+RESULTS:
+: /home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init
+
+yay
+
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser temp/init
+    :root
+    :path .emacs)))
+#+end_src
+
+#+RESULTS:
+: (progn
+:   (imp-path-root-set 'temp
+:                      "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp")
+:   (imp-timing 'temp:/init
+:       "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init.el"
+:       (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/temp/init"
+:             'nil 'nomessage)))
+
+kay.
+
+** ├DONE───┤ imp-parser keyword: ~:timing~
+CLOSED: [2025-10-21 Tue 14:53]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-21 Tue 14:53]
+:END:
 
 nil
 t
 "don't show buffer"
 
-Add to ~imp-parser~ docstr
-  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+Should this be ~timing~ though?
+  - maybe ~load-tree~
+  - just ~tree~?
+  - ~display~?
 
+:display nil
+:display t / tree
+:display autoshow
 
-** imp-parser keyword: ~:load-suffixes~?
+:timing nil
+:timing t / tree
+:timing autoshow
 
-Modify ~load-suffixes~ for one thing's load.
+IDFK. Leave as timing for now.
 
-and something for ~load-file-rep-suffixes~ as well?
+Change buffer name to be "*imp*"?
+  - [X] yes
 
-Or just like a generic ~:vars~ or ~:custom~?
+make funcs
+  - [X] normalizer
+  - [ ] handler
 
-Add to ~imp-parser~ docstr
-  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+#+begin_src elisp
+(imp-parser-normalize/:timing 'testing :timing nil)
+(imp-parser-normalize/:timing 'testing :timing '(t))
+(imp-parser-normalize/:timing 'testing :timing '(autoshow))
+(imp-parser-normalize/:timing 'testing :timing '("hello"))
+#+end_src
 
-** imp-parser keywords: ~:if~ ~:when~ ~:unless~
+...can't actually do real timing in handler?
+because file can be missing and that's a different thing altogether
+So.... just... stuff it into the state?
+[[file:source/core/packages/imp/parser.el::defun imp-parser-handler/:timing (name keyword arg rest state][here]]
+
+Should this be ~timing~ though?
+  - What about ~stats~ / ~statistics~?
+:stats nil
+:stats t / timing
+:stats debug
+:stats autoshow
+:stats debug autoshow
+:stats (debug autoshow)
+
+Alright, fine. ~stats~.
+
+implement stat flags:
+  - [X] t / default
+  - [ ] timing
+  - [ ] autoshow
+  - [ ] debug
+
+Ok; this is more work than I want right here/now.
+  - Moved to [[*imp statistics][imp statistics]]
+
+** ├DONE───┤ imp-parser keywords: ~:if~ ~:when~ ~:unless~
+CLOSED: [2025-10-21 Tue 14:59]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-21 Tue 14:59]
+- State "├CURRENT┤"  from              [2025-10-21 Tue 14:54]
+:END:
+
+Implementation from ~use-package~.
+
+Test.
+
+#+begin_src elisp
+(setq imp--timing-feature-current nil)
+(setq test-toggle (when (boundp test-toggle) (not test-toggle)))
+(pp-to-string
+ (macroexpand-1
+  '(imp-parser imp:/test/data/load/manual-test
+     :unless test-toggle)))
+#+end_src
+
+#+RESULTS:
+: (when (not test-toggle)
+:   (imp-timing 'imp:/test/data/load/manual-test
+:       "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test.el"
+:       (load
+:        "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp/test/data/load/manual-test"
+:        'nil 'nomessage)))
+
+Hokay.
+
 ** imp-parser keyword: ~:requires~
 ** imp-parser keyword: ~:after~
 ** imp-parser keyword: ~:~
@@ -2163,6 +2570,59 @@ not:
   - [[file:source/core/packages/imp/parser.el::;; TODO: MOVE TO path.el][here]]
 
 ** Do some TODOs
+** imp-parser keyword: ~:load-message~?
+
+an option to disable the ~'nomessage~ param in call to ~load~
+  - [[file:source/core/packages/imp/parser.el::'nomessage)))))][here]]
+
+or maybe a ~:let~ / ~:lexical~?
+
+Add to ~imp-parser~ docstr
+  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+
+
+** imp-parser keyword: ~:load-suffixes~?
+
+Modify ~load-suffixes~ for one thing's load.
+
+and something for ~load-file-rep-suffixes~ as well?
+
+Or just like a generic ~:vars~ or ~:custom~?
+
+Add to ~imp-parser~ docstr
+  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+
+* imp statistics
+
+Uncomment ~:stats~ stuff in imp-parser.
+  - rg: TODO(stats): uncomment
+
+Implement ~:stats~ keyword's values:
+  - [ ] nil
+  - [ ] t / defaults
+  - [ ] timing
+  - [ ] debug
+  - [ ] autoshow
+
+rg: =TODO(stats)=
+
+Expand stats to more than just current timing.
+
+Store stats in feature tree.
+
+Make timing buffer show all stats.
+
+Make `imp-timing' take stats flags so it can decide whether to time or not?
+  - Make it just spit back body if timing flag not present (unless "always timing" custom is set).
+
+Make timing buffer fill in as you go with `debug' flag or something.
+
+Make timing buffer able to be generated after-the-fact via command.
+
+Add ~:stats~ info to ~imp-parser~ docstr.
+  - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+
+
 * macrostep-expand broken?
 
 #+begin_src elisp
