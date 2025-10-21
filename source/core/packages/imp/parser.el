@@ -148,9 +148,11 @@ then the expanded macros do their job silently."
 
 (defcustom imp-parser-defaults
   '(;; (KEYWORD DEFAULT-VALUE USAGE-PREDICATE)
+    (:path
+     (lambda (feature args) (imp-parser-normalize/:path feature :path nil))
+     (lambda (feature args) (not (plist-member args :path))))
     (:error    t   t)
     (:optional nil t)
-    (:path     nil t)
     )
   "Default values for specified `imp-parser' keywords.
 Each entry in the alist is a list of three elements:
