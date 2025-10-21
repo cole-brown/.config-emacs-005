@@ -185,29 +185,27 @@ attempted."
                 (choice :tag "Enable if non-nil" sexp function)))
   :group 'imp-parser)
 
-;; (defcustom imp-parser-merge-key-alist
-;;   '((:if    . (lambda (new old) `(and ,new ,old)))
-;;     (:after . (lambda (new old) `(:all ,new ,old)))
-;;     (:defer . (lambda (new old) old))
-;;     (:bind  . (lambda (new old) (append new (list :break) old))))
-;;   "Alist of keys and the functions used to merge multiple values.
-;; For example, if the following form is provided:
+(defcustom imp-parser-merge-key-alist
+  '((:if    . (lambda (new old) `(and ,new ,old)))
+    (:after . (lambda (new old) `(:all ,new ,old))))
+  "Alist of keys and the functions used to merge multiple values.
+For example, if the following form is provided:
 
-;;   (imp-parser foo :if pred1 :if pred2)
+  (imp-parser foo :if pred1 :if pred2)
 
-;; Then based on the above defaults, the merged result will be:
+Then based on the above defaults, the merged result will be:
 
-;;   (imp-parser foo :if (and pred1 pred2))
+  (imp-parser foo :if (and pred1 pred2))
 
-;; This is done so that, at the stage of invoking handlers, each
-;; handler is called only once."
-;;   :type `(repeat
-;;           (cons (choice :tag "Keyword"
-;;                         ,@(mapcar #'(lambda (k) (list 'const k))
-;;                                   imp-parser-keywords)
-;;                         (const :tag "Any" t))
-;;                 function))
-;;   :group 'imp-parser)
+This is done so that, at the stage of invoking handlers, each
+handler is called only once."
+  :type `(repeat
+          (cons (choice :tag "Keyword"
+                        ,@(mapcar #'(lambda (k) (list 'const k))
+                                  imp-parser-keywords)
+                        (const :tag "Any" t))
+                function))
+  :group 'imp-parser)
 
 ;; (defcustom imp-parser-hook-name-suffix "-hook"
 ;;   "Text append to the name of hooks mentioned by :hook.
@@ -889,21 +887,21 @@ The argument LABEL is ignored."
   (imp-parser-only-one (symbol-name keyword) args
     #'imp-parser-normalize-value))
 
-;; (defun imp-parser-normalize-recursive-symbols (label arg)
-;;   "Normalize a list of symbols."
-;;   (cond
-;;    ((imp-parser-non-nil-symbolp arg)
-;;     arg)
-;;    ((and (listp arg) (listp (cdr arg)))
-;;     (mapcar #'(lambda (x) (imp-parser-normalize-recursive-symbols label x))
-;;             arg))
-;;    (t
-;;     (imp-parser-error
-;;      (concat label " wants a symbol, or nested list of symbols")))))
+(defun imp-parser-normalize-recursive-symbols (label arg)
+  "Normalize a list of symbols."
+  (cond
+   ((imp-parser-non-nil-symbolp arg)
+    arg)
+   ((and (listp arg) (listp (cdr arg)))
+    (mapcar #'(lambda (x) (imp-parser-normalize-recursive-symbols label x))
+            arg))
+   (t
+    (imp-parser-error
+     (concat label " wants a symbol, or nested list of symbols")))))
 
-;; (defun imp-parser-normalize-recursive-symlist (_name keyword args)
-;;   (imp-parser-as-one (symbol-name keyword) args
-;;     #'imp-parser-normalize-recursive-symbols))
+(defun imp-parser-normalize-recursive-symlist (_name keyword args)
+  (imp-parser-as-one (symbol-name keyword) args
+    #'imp-parser-normalize-recursive-symbols))
 
 (defun imp-parser-normalize-predicate (_name keyword args)
   (if (null args)
