@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-10-20
+;; Timestamp:  2025-10-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -278,8 +278,10 @@ string or symbol name."
 (defun imp--feature-normalize-chain (&rest chain)
   "Normalize CHAIN to a list of normalized strings."
   (let ((funcname 'imp--feature-normalize-chain)
-        (normalized (imp--list-flatten (seq-map #'imp--feature-normalize-link
-                                                (imp--list-flatten chain)))))
+        (normalized (imp--list-flatten
+                     (seq-map #'imp--feature-normalize-link
+                              (imp--list-flatten chain :unqoute))
+                     :unqoute)))
     (if normalized
         normalized
       (imp--error funcname

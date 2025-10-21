@@ -1130,8 +1130,7 @@ See also `imp-parser-statistics'."
 ;;------------------------------
 
 (defun imp-parser-normalize-name (name)
-  ;; TODO: make this func unqoute NAME?
-  (imp-feature-normalize name)) ; TODO: or this func?
+  (imp-feature-normalize name))
 
 ;;------------------------------
 ;;;; `:disabled'
@@ -1361,7 +1360,9 @@ If the path is relative, root it in one of:
     (unless (and (stringp path)
                  (file-name-absolute-p path))
       (imp--error funcname
-                  "`:path' should end up as absolute: got: '%s' -> '%s'"
+                  "%S: `%S' should end up as absolute: got: %S -> %S"
+                  feature
+                  keyword
                   arg
                   path))
 
