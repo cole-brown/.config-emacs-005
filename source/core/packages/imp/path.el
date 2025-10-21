@@ -1156,7 +1156,7 @@ in `imp-path-roots'.
                      path-dir-root
                      path-file-init)
                imp-path-roots))))
-;; (imp-path-root-set 'imp "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp")
+;; (imp-path-root-set 'imp (imp-path-current-dir))
 
 
 (defun imp-path-root-get (feature-base &optional no-error?)
@@ -1168,6 +1168,13 @@ signals an error.
 Return path string from `imp-path-roots' or nil."
   (imp--path-root-dir feature-base no-error?))
 ;; (imp-path-root-get 'imp)
+
+
+(defun imp-path-root-delete (feature-base &optional no-error?)
+  "Delete the root path for FEATURE-BASE."
+  (imp--alist-delete feature-base imp-path-roots))
+;; imp-path-roots
+;; (imp-path-root-delete 'imp)
 
 
 ;;------------------------------------------------------------------------------
