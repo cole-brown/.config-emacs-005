@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-04-16
-;; Timestamp:  2025-04-16
+;; Timestamp:  2025-10-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -91,7 +91,8 @@ See also `use-package-defaults', which uses this value."
 
 
 (defcustom imp-timing-buffer
-  "ⓘ-imp-timing-ⓘ"
+  ;; "ⓘ-imp-timing-ⓘ"
+  "*imp*"
   "Buffer name to print to.
 
 If you want it to go to *Messages* with the usual minibuffer interaction, set
