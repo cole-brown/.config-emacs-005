@@ -673,6 +673,8 @@ next value for the STATE."
          (path-load (plist-get state :path-load))
          (feature-root (imp-feature-root feature)))
 
+    ;; We really should have a `path' of some sorts now.
+    ;; NOTE: We may not have a `path-load' if eg file does not exist.
     (unless (and (stringp path)
                  (file-name-absolute-p path))
       ;; TODO: some imp timing thing to say that this thing errored?
@@ -680,14 +682,6 @@ next value for the STATE."
                   `("Path is invalid or not absolute! "
                     "path:'%s'")
                   path))
-
-    (unless (and (stringp path-load)
-                 (file-name-absolute-p path-load))
-      ;; TODO: some imp timing thing to say that this thing errored?
-      (imp--error funcname
-                  `("Path is invalid or not absolute! "
-                    "path-load:'%s'")
-                  path-load))
 
     ;; Deal with non-existent file.
     (if (null path-load)
@@ -741,7 +735,7 @@ next value for the STATE."
               nil))
 
 
-  ;; TODO: MOVE TO path.el
+;; TODO: MOVE TO path.el
 (defun imp-path-load-file (path-absolute)
   "Return string path to existing file or nil."
   ;; Use the same function `load' uses to find its files: `locate-file'
@@ -1232,6 +1226,7 @@ See also `imp-parser-statistics'."
      (t nil))))
 ;; (imp-parser-normalize-path-symbol :user :path 'pwd)
 ;; (imp-parser-normalize-path-symbol :user :path 'user-emacs-directory)
+;; (imp-parser-normalize-path-symbol :user :path 'foo)
 
 (defun imp-parser-normalize-path-string (feature keyword arg)
   "Convert path prefixes ('./', ':/') in the path arg string."
@@ -1273,11 +1268,13 @@ See also `imp-parser-statistics'."
        (condition-case _
            (imp-parser-normalize-path-arg feature keyword (eval value))
          (error
-          (imp--error 'imp-parser-normalize-path-arg
-                      "`%s' couldn't evaluate %s: '%s'"
-                      keyword
-                      (type-of arg)
-                      arg)))))
+          (if (imp-parser-non-nil-symbolp arg)
+              (symbol-name)
+            (imp--error 'imp-parser-normalize-path-arg
+                        "`%s' couldn't evaluate %s: '%s'"
+                        keyword
+                        (type-of arg)
+                        arg))))))
 
     ((and (listp arg) (listp (cdr arg)))
      (mapcar #'(lambda (x)
@@ -1292,13 +1289,14 @@ See also `imp-parser-statistics'."
                  keyword
                  (type-of arg)
                  arg))))
-;; (imp-parser-normalize-path-arg :user :path "/foo/bar")
-;; (imp-parser-normalize-path-arg :user :path "/foo/bar/")
-;; (imp-parser-normalize-path-arg :user :path "foo/bar")
-;; (imp-parser-normalize-path-arg :user :path '("/foo/bar" "baz/qux/"))
-;; (imp-parser-normalize-path-arg :user :path 'pwd)
-;; (imp-parser-normalize-path-arg :user :path 'user-emacs-directory)
-;; (imp-parser-normalize-path-arg :user :path 'foo)
+;; (imp-parser-normalize-path-arg 'user :path "/foo/bar")
+;; (imp-parser-normalize-path-arg 'user :path "/foo/bar/")
+;; (imp-parser-normalize-path-arg 'user :path "foo/bar")
+;; (imp-parser-normalize-path-arg 'user :path '("/foo/bar" "baz/qux/"))
+;; (imp-parser-normalize-path-arg 'user :path 'pwd)
+;; (imp-parser-normalize-path-arg 'user :path 'user-emacs-directory)
+;; (imp-parser-normalize-path-arg 'user :path 'foo)
+;; (imp-parser-normalize-path-arg 'user :path '(foo))
 
 (defun imp-parser-normalize-path (feature keyword arg)
   "Normalize a (list of?) filesystem paths to absolute, canonical paths."
@@ -1342,7 +1340,7 @@ If the path is relative, root it in one of:
   (let ((funcname 'imp-parser-normalize/:path)
         ;; Normalize to canonical, absolute path(s).
         (path (imp-parser-normalize-path feature keyword arg))
-        (feature-root (imp-feature-root feature)))
+        (feature-path (imp-feature-split feature)))
 
     ;; Normalize to one path.
     ;; `imp-parser-normalize-path' allows lists of paths.
@@ -1352,8 +1350,10 @@ If the path is relative, root it in one of:
 
     ;; If no path supplied and feature is rooted, use feature root's path.
     (when (and (not path)
-               feature-root)
-      (setq path (imp-path-root-get feature-root)))
+               (imp-feature-root feature))
+      (setq path (imp-path-root-get (imp-feature-root feature)))
+      ;; Take FEATURE out of PATH since we used it just now.
+      (setq feature-path (imp-feature-unrooted feature)))
 
     ;; Double Check: We got an absolute path, right?
     (unless (and (stringp path)
@@ -1366,16 +1366,15 @@ If the path is relative, root it in one of:
     ;; Add rest of NAME to path; is a relative path.
     (setq path (apply #'imp-path-join
                       path
-                      ;; FEATURE, sans root. eg `imp:/parser' -> `parser'
-                      (imp-feature-unrooted feature)))
-
+                      ;; FEATURE, with or without root.
+                      feature-path))
     path))
-;; (imp-parser-normalize/:path :user :path "/foo/bar")
-;; (imp-parser-normalize/:path :user :path "foo/bar")
-;; (imp-parser-normalize/:path :user :path '("/foo/bar" "baz/qux"))
-;; (imp-parser-normalize/:path :user :path 'pwd)
-;; (imp-parser-normalize/:path :user :path 'user-emacs-directory)
-;; (imp-parser-normalize/:path :user :path 'foo)
+;; (imp-parser-normalize/:path 'user :path '("/foo/bar"))
+;; (imp-parser-normalize/:path 'user :path '("foo/bar"))
+;; (imp-parser-normalize/:path 'user :path '("/foo/bar" "baz/qux"))
+;; (imp-parser-normalize/:path 'user :path '(pwd))
+;; (imp-parser-normalize/:path 'user :path '(user-emacs-directory))
+;; (imp-parser-normalize/:path 'user :path '(foo))
 
 (defun imp-parser-handler/:path (name keyword arg rest state)
   "Put `:path' and `:path-load' into state."
