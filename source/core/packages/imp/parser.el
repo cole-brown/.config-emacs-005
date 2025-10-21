@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-10-20
+;; Timestamp:  2025-10-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -65,6 +65,8 @@
 
 (defcustom imp-parser-keywords
   '(:disabled
+    ;; TODO(stats): uncomment
+    ;; :stats :statistics
     :path
     :root
     :error
@@ -148,12 +150,13 @@ then the expanded macros do their job silently."
 
 (defcustom imp-parser-defaults
   '(;; (KEYWORD DEFAULT-VALUE USAGE-PREDICATE)
+    ;; TODO(stats): uncomment
+    ;; (:stats t t)
     (:path
      (lambda (feature args) (imp-parser-normalize/:path feature :path nil))
      (lambda (feature args) (not (plist-member args :path))))
     (:error    t   t)
-    (:optional nil t)
-    )
+    (:optional nil t))
   "Default values for specified `imp-parser' keywords.
 Each entry in the alist is a list of three elements:
 The first element is the `imp-parser' keyword.
@@ -534,6 +537,7 @@ extending any keys already present."
 
 (defun imp-parser-unalias-keywords (_name args)
   "Convert `:when' and `:unless' in ARGS to `:if'."
+  (setq args (cl-nsubstitute :stats :statistics args))
   (setq args (cl-nsubstitute :if :when args))
   (let (temp)
     (while (setq temp (plist-get args :unless))
@@ -695,7 +699,7 @@ next value for the STATE."
                 ;; Return `nil' for load result.
                 nil))
           ;; Else requried, so error?
-          ;; TODO: Make some imp timing thing to say that this thing errored?
+          ;; TODO(stats): Make some imp timing thing to say that this thing errored?
           (imp--error funcname
                       "Cannot find a file to load. path:'%s' -> load-path:'%s'"
                       path
@@ -1380,6 +1384,7 @@ If the path is relative, root it in one of:
   "Put `:path' and `:path-load' into state."
   (setq state (imp-parser-plist-maybe-put state keyword arg))
   (setq state (imp-parser-plist-maybe-put state :path-load (imp-path-load-file arg)))
+  ;; TODO(stats): Add path & load-path to stats?
   (imp-parser-process-keywords name rest state))
 
 ;;------------------------------
@@ -1394,6 +1399,7 @@ If the path is relative, root it in one of:
     (imp-feature-first (if (eq t root) name root))))
 
 (defun imp-parser-handler/:root (name keyword arg rest state)
+  ;; TODO(stats): Add root to stats?
   (imp-parser-concat
    ;; Add root before load happens so that subfeatures can use their root.
    ;; Example: Loading `imp/init.el' will load all of imp's files, some of which
@@ -1401,6 +1407,44 @@ If the path is relative, root it in one of:
    `((imp-path-root-set ',arg
                         ,(imp-path-parent (plist-get state :path-load))))
    (imp-parser-process-keywords name rest state)))
+
+;; TODO(stats): uncomment
+;; ;;------------------------------
+;; ;;;; `:stats'
+;; ;;------------------------------
+;;
+;; (defun imp-parser-normalize/:stats (name keyword args)
+;;   (imp-parser-normalize-symbols name
+;;                                 (imp-parser-normalize-flag name args)))
+;; ;; (imp-parser-normalize/:stats 'testing :stats nil)
+;; ;; (imp-parser-normalize/:stats 'testing :stats '(t))
+;; ;; (imp-parser-normalize/:stats 'testing :stats '(autoshow))
+;; ;; (imp-parser-normalize/:stats 'testing :stats '(timing autoshow))
+;; ;; (imp-parser-normalize/:stats 'testing :stats '("hello"))
+;;
+;; (defun imp-parser-handler/:stats (name keyword arg rest state)
+;;   ;; ARG is a list of symbols.
+;;   (let (denormalized)
+;;     ;; Denormalize stats into stat flags.
+;;     (when (or (memq t         arg)
+;;               (memq 'default  arg)
+;;               (memq 'defaults arg))
+;;       ;; Expand t into default stat flags.
+;;       ;; TODO(stats): Put default flags in a const/var/custom.
+;;       (setq denormalized (append denormalized '(timing))))
+;;
+;;     ;; Add known stat flags.
+;;     ;; TODO(stats): Put valid flags in a const/var/custom.
+;;     (when-let ((valid (cl-intersection arg '(timing autoshow debug))))
+;;       (setq denormalized (append denormalized valid)))
+;;
+;;     ;; TODO(stats): error for unknown flags?
+;;
+;;     ;; Deduplicate flags.
+;;     (setq denormalized (seq-uniq denormalize))
+;;
+;;     ;; Add stat flags into state & continue to next handler.
+;;     (imp-parser-handle-state name keyword denormalized rest state)))
 
 ;;------------------------------
 ;;;; `:catch'
