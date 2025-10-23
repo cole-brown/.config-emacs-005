@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-20
+;; Timestamp:  2025-10-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -1112,6 +1112,30 @@ Returns normalized path."
 ;; Ok:
 ;;   (imp--path-canonical "/path/to/imp/test/loading" "dont-load" :file:load)
 ;;   (imp--path-canonical "/path/to/imp/test/loading" "dont-load.el" :file:load)
+
+
+;;------------------------------------------------------------------------------
+;; Load Paths
+;;------------------------------------------------------------------------------
+
+(defun imp-path-has-load-extension (path)
+  "Return non-nil if PATH ends with a known load extension.
+
+See func `get-load-suffixes' for known load extenstions."
+  (seq-reduce (lambda (result ext)
+                (or result
+                    (string-suffix-p ext path)))
+              (get-load-suffixes)
+              nil))
+
+
+(defun imp-path-load-file (path-absolute)
+  "Return string path to existing file or nil."
+  ;; Use the same function `load' uses to find its files: `locate-file'
+  (locate-file path-absolute
+               '("/") ; Don't use `load-paths'; we have an absolute path.
+               (unless (imp-path-has-load-extension path-absolute)
+                 (get-load-suffixes))))
 
 
 ;;------------------------------------------------------------------------------

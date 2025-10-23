@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-10-21
+;; Timestamp:  2025-10-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -727,26 +727,6 @@ next value for the STATE."
                       'noerror)
                   'nomessage))))))
 
-
-;; TODO: MOVE TO path.el
-(defun imp-path-has-load-extension (path)
-  (seq-reduce (lambda (result ext)
-                (or result
-                    (string-suffix-p ext path)))
-              (get-load-suffixes)
-              nil))
-
-
-;; TODO: MOVE TO path.el
-(defun imp-path-load-file (path-absolute)
-  "Return string path to existing file or nil."
-  ;; Use the same function `load' uses to find its files: `locate-file'
-  (locate-file path-absolute
-               '("/") ; Don't use `load-paths'; we have an absolute path.
-               (unless (imp-path-has-load-extension path-absolute)
-                 (get-load-suffixes))))
-
-
 ;; (defun imp-parser-list-insert (elem xs &optional anchor after test)
 ;;   "Insert ELEM into the list XS.
 ;; If ANCHOR is also a keyword, place the new KEYWORD before that
@@ -775,6 +755,16 @@ next value for the STATE."
 ;;
 ;;; Argument Processing
 ;;
+
+(defun imp-parser-args-only-one (keyword args)
+  "Call F on the first member of ARGS if it has exactly one element."
+  (cond
+   ((and (listp args) (listp (cdr args))
+         (= (length args) 1))
+    (car args))
+   (t
+    (imp-parser-error
+     (concat label " wants exactly one argument")))))
 
 (defun imp-parser-only-one (label args f)
   "Call F on the first member of ARGS if it has exactly one element."
@@ -1270,7 +1260,7 @@ See also `imp-parser-statistics'."
            (imp-parser-normalize-path-arg feature keyword (eval value))
          (error
           (if (imp-parser-non-nil-symbolp arg)
-              (symbol-name)
+              (symbol-name arg)
             (imp--error 'imp-parser-normalize-path-arg
                         "`%s' couldn't evaluate %s: '%s'"
                         keyword
@@ -1307,19 +1297,20 @@ See also `imp-parser-statistics'."
     (cond ((stringp path)
            (imp-path-canonical path))
 
-        ((and (listp path) (listp (cdr path)))
-         (mapcar #'(lambda (x)
-                     (imp-parser-normalize-path feature keyword x))
-                 path))
+          ;; Recurse
+          ((and (listp path) (listp (cdr path)))
+           (mapcar #'(lambda (x)
+                       (imp-parser-normalize-path feature keyword x))
+                   path))
 
-        ;; Error: No idea what PATH is.
-        (t
-         (imp--error 'imp-parser-normalize-path
-                     "`%s' wants a path (or list of paths). "
-                     "Don't know what to do with %s: '%s'"
-                     keyword
-                     (type-of path)
-                     path)))))
+          ;; Error: No idea what PATH is.
+          (t
+           (imp--error 'imp-parser-normalize-path
+                       "`%s' wants a path (or list of paths). "
+                       "Don't know what to do with %s: '%s'"
+                       keyword
+                       (type-of path)
+                       path)))))
 ;; (imp-parser-normalize-path :user :path "/foo/bar")
 ;; (imp-parser-normalize-path :user :path "foo/bar")
 ;; (imp-parser-normalize-path :user :path '("/foo/bar" "baz/qux/"))
@@ -1338,10 +1329,11 @@ Else ARG will be used as-is for the path.
 If the path is relative, root it in one of:
   1) FEATURE's root path
   2) `user-emacs-directory'"
-  (let ((funcname 'imp-parser-normalize/:path)
-        ;; Normalize to canonical, absolute path(s).
-        (path (imp-parser-normalize-path feature keyword arg))
-        (feature-path (imp-feature-split feature)))
+  (let* ((funcname 'imp-parser-normalize/:path)
+         (arg (imp-parser-args-only-one feature arg))
+         ;; Normalize to canonical, absolute path(s).
+         (path (imp-parser-normalize-path feature keyword arg))
+         (feature-path (imp-feature-split feature)))
 
     ;; Normalize to one path.
     ;; `imp-parser-normalize-path' allows lists of paths.
