@@ -1128,18 +1128,31 @@ move config to ~source/user/config/ai.el~
 update from 4o to 5
   - [[file:source/user/config/ai.el::gptel-model 'gpt-5][here]]
 
-* -- U R HERE --
-<<here>>
-
-* org-babel no confirm
-
-write a func that ~org-confirm-babel-evaluate~ can use to decide
-whether to prompt with ~y-or-n-p~
-
-by source type (major-mode)?
-
-* ├CURRENT┤ IMP-FIX: imp-load
+* ├DONE───┤ macrostep-expand broken?
+CLOSED: [2025-10-24 Fri 00:04]
 :LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-24 Fri 00:04]
+:END:
+
+#+begin_src elisp
+(defmacro m-test ()
+  (message "Hello there!")
+  (range-map (apply-partially #'format "%S")
+             '((0 . 100000)))
+  (message "General Kenobi!"))
+;; m-x macrostep-expand this:
+(m-test)
+#+end_src
+
+IDFK. It hasn't been updated in 2 years.
+Delete it?
+
+deleted it.
+
+* ├DONE───┤ IMP-FIX: imp-load
+CLOSED: [2025-10-24 Fri 00:06]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-24 Fri 00:06]
 - State "├CURRENT┤"  from              [2025-09-25 Thu 15:44]
 :END:
 
@@ -2873,29 +2886,77 @@ So I need one of each:
   - [X] ditto
 
 
-** imp-parser: clean up commented out code
+** ├DONE───┤ imp-parser: clean up commented out code
+CLOSED: [2025-10-23 Thu 23:55]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-23 Thu 23:55]
+:END:
 
 Make sure there are no refs to each func/var first.
 
-** Do some TODOs
+
+* -- U R HERE --
+<<here>>
+
+* org-babel no confirm
+
+write a func that ~org-confirm-babel-evaluate~ can use to decide
+whether to prompt with ~y-or-n-p~
+
+by source type (major-mode)?
+
+* imp-parser MVP
+
+After restarting emacs & returning to this branch:
+#+begin_src elisp
+;; reload imp to get new code.
+(load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
+(imp-path-root-set 'imp "~/.config/emacs/source/core/packages/imp/")
+#+end_src
+
+
+** Check TODOs
+
+Any that will prevent me from starting to use imp-parser?
+
+** imp-parser: fix param names
+
+eg NAME -> FEATURE
+  - ...or should it be FEATURE -> NAME???
+
+LABEL is... what? KEYWORD?
+
+ARG vs ARGS
+  - things that only work on lists should not say ARG.
+
+F -> FUNC?
+
+Either commit to the underscores or delete 'em.
+eg:
+#+begin_src elisp
+(defsubst imp-parser-normalize-symbol-or-string (_label arg)
+  ...)
+
+(defun imp-parser-normalize-symlist (_name keyword args)
+  ...)
+
+#+end_src
+
+
 ** imp-parser: rename?
 
 Rename imp-parser to imp-load? imp-load-parser?
 
-* macrostep-expand broken?
+Hm... steps to do this?...
 
-#+begin_src elisp
-(defmacro m-test ()
-  (message "Hello there!")
-  (range-map (apply-partially #'format "%S")
-             '((0 . 100000)))
-  (message "General Kenobi!"))
-;; m-x macrostep-expand this:
-(m-test)
-#+end_src
+Test that it works for some examples from init.
 
-IDFK. It hasn't been updated in 2 years.
-Delete it?
+Delete/move old imp-load func(s).
+  - delete the `imp-load` funcs themselves.
+  - Move any load.el funcs we wanna keep into parser.el
+
+Might need to rework `imp-provide` and `imp-require` for new imp feature names?
+
 
 * TRAMP into Win10 VM
 
@@ -3024,6 +3085,12 @@ most wanted:
   3. buffer
   4. unit
 
+* imp output
+
+Make ~imp--error~ and ~imp--debug~ not generate such a huge block of the stacktrace.
+
+Use ~defsubst~ instead of ~defun~ for all the underlying funcs?
+
 * imp statistics
 
 Uncomment ~:stats~ stuff in imp-parser.
@@ -3137,11 +3204,6 @@ actual:/todo/penis
                              TODO TODO
 
 * treesitter
-* elisp
-
-Get settings and stuff.
-Need my timestamp working.
-
 * org
 
 imp works* now.
