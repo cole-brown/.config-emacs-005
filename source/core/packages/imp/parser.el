@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-10-23
+;; Timestamp:  2025-10-24
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,44 +24,18 @@
 
 ;;; Code:
 
-;;(require 'bytecomp)
 (require 'cl-lib)
-;;(require 'tabulated-list)
 
-;; (eval-and-compile
-;;   ;; Declare a synthetic theme for :custom variables.
-;;   ;; Necessary in order to avoid having those variables saved by custom.el.
-;;   (deftheme imp-parser))
+;; TODO: move, merge with imp's existing defgroup
+(defgroup imp-parser nil
+  "A `imp-parser' declaration for simplifying your `.emacs'."
+  :group 'initialization
+  ;; :link '(custom-manual "(imp-parser) Top")
+  :version "30.2")
 
-;; (enable-theme 'imp-parser)
-;; ;; Remove the synthetic imp-parser theme from the enabled themes, so
-;; ;; iterating over them to "disable all themes" won't disable it.
-;; (setq custom-enabled-themes (remq 'imp-parser custom-enabled-themes))
-
-;; (eval-when-compile
-;;   (if (and (eq emacs-major-version 24) (eq emacs-minor-version 3))
-;;       (progn
-;;         (defsubst hash-table-keys (hash-table)
-;;           "Return a list of keys in HASH-TABLE."
-;;           (cl-loop for k being the hash-keys of hash-table collect k))
-;;         (defsubst string-suffix-p (suffix string  &optional ignore-case)
-;;           (let ((start-pos (- (length string) (length suffix))))
-;;             (and (>= start-pos 0)
-;;                  (eq t (compare-strings suffix nil nil
-;;                                         string start-pos nil ignore-case))))))
-;;     (require 'subr-x)))
-
-;; (eval-when-compile
-;;   (require 'regexp-opt))
-
-;; (defgroup imp-parser nil
-;;   "A `imp-parser' declaration for simplifying your `.emacs'."
-;;   :group 'initialization
-;;   :link '(custom-manual "(imp-parser) Top")
-;;   :version "29.1")
-
-;; (defconst imp-parser-version "2.4.4"
-;;   "This version of `imp-parser'.")
+;; TODO: move, use for all of imp
+(defconst imp-parser-version "1.0.0"
+  "This version of `imp-parser'.")
 
 (defcustom imp-parser-keywords
   '(:disabled
@@ -74,7 +48,7 @@
     :if :when :unless
     :after
     :requires
-    ;; NOTE: file load is parsed/handled here.
+    ;; NOTE: file load is currently parsed/handled after all keywords.
     )
   "The set of valid keywords, in the order they are processed in.
 The order of this list is *very important*, so it is only
@@ -90,20 +64,6 @@ declaration is incorrect."
   :type '(repeat symbol)
   :group 'imp-parser)
 
-;; (defcustom imp-parser-deferring-keywords
-;;   '(:bind-keymap
-;;     :bind-keymap*
-;;     :commands
-;;     :autoload)
-;;   "Unless `:demand' is used, keywords in this list imply deferred loading.
-;; The reason keywords like `:hook' are not in this list is that
-;; they only imply deferred loading if they reference actual
-;; function symbols that can be autoloaded from the module; whereas
-;; the default keywords provided here always defer loading unless
-;; otherwise requested."
-;;   :type '(repeat symbol)
-;;   :group 'imp-parser)
-
 (defcustom imp-parser-ignore-unknown-keywords nil
   "If non-nil, warn instead of signaling error for unknown keywords.
 The unknown keyword and its associated arguments will be ignored
@@ -111,13 +71,7 @@ in the `imp-parser' expansion."
   :type 'boolean
   :group 'imp-parser)
 
-;; (defcustom imp-parser-use-theme t
-;;   "If non-nil, use a custom theme to avoid saving :custom
-;; variables twice (once in the Custom file, once in the imp-parser
-;; call)."
-;;   :type 'boolean
-;;   :group 'imp-parser)
-
+;; TODO: use imp's debugging flag? merge with it?
 (defcustom imp-parser-verbose nil
   "Whether to report about loading and configuration details.
 If you customize this, then you should require the `imp-parser'
@@ -129,24 +83,6 @@ then the expanded macros do their job silently."
                  (const :tag "Verbose" t)
                  (const :tag "Debug" debug))
   :group 'imp-parser)
-
-;; (defcustom imp-parser-check-before-init nil
-;;   "If non-nil, check that package exists before executing its `:init' block.
-;; This check is performed by calling `locate-library'."
-;;   :type 'boolean
-;;   :group 'imp-parser)
-
-;; (defcustom imp-parser-always-defer nil
-;;   "If non-nil, assume `:defer t' unless `:demand' is used.
-;; See also `imp-parser-defaults', which uses this value."
-;;   :type 'boolean
-;;   :group 'imp-parser)
-
-;; (defcustom imp-parser-always-demand nil
-;;   "If non-nil, assume `:demand t' unless `:defer' is used.
-;; See also `imp-parser-defaults', which uses this value."
-;;   :type 'boolean
-;;   :group 'imp-parser)
 
 (defcustom imp-parser-defaults
   '(;; (KEYWORD DEFAULT-VALUE USAGE-PREDICATE)
@@ -207,13 +143,7 @@ handler is called only once."
                 function))
   :group 'imp-parser)
 
-;; (defcustom imp-parser-hook-name-suffix "-hook"
-;;   "Text append to the name of hooks mentioned by :hook.
-;; Set to nil if you don't want this to happen; it's only a
-;; convenience."
-;;   :type '(choice string (const :tag "No suffix" nil))
-;;   :group 'imp-parser)
-
+;; TODO(stats): use any of predecessor's stats?
 ;; (defcustom imp-parser-minimum-reported-time 0.1
 ;;   "Minimal load time that will be reported.
 ;; Note that `imp-parser-verbose' has to be set to a non-nil value
@@ -221,32 +151,7 @@ handler is called only once."
 ;;   :type 'number
 ;;   :group 'imp-parser)
 
-;; (defcustom imp-parser-inject-hooks nil
-;;   "If non-nil, add hooks to the `:init' and `:config' sections.
-;; In particular, for a given package `foo', the following hooks
-;; become available:
-
-;;   `imp-parser--foo--pre-init-hook'
-;;   `imp-parser--foo--post-init-hook'
-;;   `imp-parser--foo--pre-config-hook'
-;;   `imp-parser--foo--post-config-hook'
-
-;; This way, you can add to these hooks before evaluation of a
-;; `imp-parser` declaration, and exercise some control over what
-;; happens.
-
-;; NOTE: These hooks are run even if the user does not specify an
-;; `:init' or `:config' block, and they will happen at the regular
-;; time when initialization and configuration would have been
-;; performed.
-
-;; NOTE: If the `pre-init' hook return a nil value, that block's
-;; user-supplied configuration is not evaluated, so be certain to
-;; return t if you only wish to add behavior to what the user had
-;; specified."
-;;   :type 'boolean
-;;   :group 'imp-parser)
-
+;; TODO(stats): delete if we don't end up using this.
 (defcustom imp-parser-expand-minimally nil
   "If non-nil, make the expanded code as minimal as possible.
 This disables:
@@ -262,54 +167,25 @@ definitions, to understand the main intent of what's happening."
   :type 'boolean
   :group 'imp-parser)
 
-;; (defcustom imp-parser-form-regexp-eval
-;;   `(concat ,(eval-when-compile
-;;               (concat "^\\s-*("
-;;                       (regexp-opt '("imp-parser" "require") t)
-;;                       "\\s-+\\("))
-;;            (or (bound-and-true-p lisp-mode-symbol-regexp)
-;;                "\\(?:\\sw\\|\\s_\\|\\\\.\\)+") "\\)")
-;;   "Sexp providing regexp for finding `imp-parser' forms in user files.
-;; This is used by `imp-parser-jump-to-package-form' and
-;; `imp-parser-enable-imenu-support'."
-;;   :type 'sexp
-;;   :group 'imp-parser)
-
-;; (defcustom imp-parser-enable-imenu-support nil
-;;   "If non-nil, cause imenu to see `imp-parser' declarations.
-;; This is done by adjusting `lisp-imenu-generic-expression' to
-;; include support for finding `imp-parser' and `require' forms.
-
-;; Must be set before loading `imp-parser'."
-;;   :type 'boolean
-;;   :set
-;;   #'(lambda (sym value)
-;;       (eval-after-load 'lisp-mode
-;;         (if value
-;;             `(add-to-list 'lisp-imenu-generic-expression
-;;                           (list "Packages" ,imp-parser-form-regexp-eval 2))
-;;           `(setq lisp-imenu-generic-expression
-;;                  (remove (list "Packages" ,imp-parser-form-regexp-eval 2)
-;;                          lisp-imenu-generic-expression))))
-;;       (set-default sym value))
-;;   :group 'imp-parser)
-
+;; TODO: figure out wtf this regex soup is doing & adapt to imp.
 ;; (defconst imp-parser-font-lock-keywords
 ;;   '(("(\\(imp-parser\\)\\_>[ \t']*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
 ;;      (1 font-lock-keyword-face)
 ;;      (2 font-lock-constant-face nil t))))
-
+;;
 ;; (font-lock-add-keywords 'emacs-lisp-mode imp-parser-font-lock-keywords)
 
-(defcustom imp-parser-compute-statistics nil
-  "If non-nil, compute statistics concerned `imp-parser' declarations.
-View the statistical report using `imp-parser-report'.  Note that
-if this option is enabled, you must require `imp-parser' in your
-user init file at loadup time, or you will see errors concerning
-undefined variables."
-  :type 'boolean
-  :group 'imp-parser)
+;; TODO(stats): use any of predecessor's stats?
+;; (defcustom imp-parser-compute-statistics nil
+;;   "If non-nil, compute statistics concerned `imp-parser' declarations.
+;; View the statistical report using `imp-parser-report'.  Note that
+;; if this option is enabled, you must require `imp-parser' in your
+;; user init file at loadup time, or you will see errors concerning
+;; undefined variables."
+;;   :type 'boolean
+;;   :group 'imp-parser)
 
+;; TODO(stats): use any of predecessor's stats?
 (defvar imp-parser-statistics (make-hash-table))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -317,6 +193,7 @@ undefined variables."
 ;;; Utility functions
 ;;
 
+;; TODO: Switch to imp--error
 (defsubst imp-parser-error (msg)
   "Report MSG as an error, so the user knows it came from this package."
   (error "imp-parser: %s" msg))
@@ -332,26 +209,16 @@ undefined variables."
 (defsubst imp-parser-as-symbol (string-or-symbol)
   "If STRING-OR-SYMBOL is already a symbol, return it.
 Otherwise convert it to a symbol and return that."
-  (if (symbolp string-or-symbol) string-or-symbol
+  (if (symbolp string-or-symbol)
+      string-or-symbol
     (intern string-or-symbol)))
 
 (defsubst imp-parser-as-string (string-or-symbol)
   "If STRING-OR-SYMBOL is already a string, return it.
 Otherwise convert it to a string and return that."
-  (if (stringp string-or-symbol) string-or-symbol
+  (if (stringp string-or-symbol)
+      string-or-symbol
     (symbol-name string-or-symbol)))
-
-;; (defsubst imp-parser-regex-p (re)
-;;   "Return t if RE is some regexp-like thing."
-;;   (or (and (listp re) (eq (car re) 'rx))
-;;       (stringp re)))
-
-;; (defun imp-parser-normalize-regex (re)
-;;   "Given some regexp-like thing in RE, resolve to a regular expression."
-;;   (cond
-;;    ((and (listp re) (eq (car re) 'rx)) (eval re))
-;;    ((stringp re) re)
-;;    (t (error "Not recognized as regular expression: %s" re))))
 
 ;; (defsubst imp-parser-is-pair (x car-pred cdr-pred)
 ;;   "Return non-nil if X is a cons satisfying the given predicates.
@@ -361,87 +228,20 @@ Otherwise convert it to a string and return that."
 ;;        (funcall car-pred (car x))
 ;;        (funcall cdr-pred (cdr x))))
 
-;; (defun imp-parser-as-mode (string-or-symbol)
-;;   "If STRING-OR-SYMBOL ends in `-mode' (or its name does), return
-;; it as a symbol.  Otherwise, return it as a symbol with `-mode'
-;; appended."
-;;   (let ((string (imp-parser-as-string string-or-symbol)))
-;;     (intern (if (string-match "-mode\\'" string)
-;;                 string
-;;               (concat string "-mode")))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Property Lists
+;;
 
-;; (defsubst imp-parser-load-name (name &optional noerror)
-;;   "Return a form which will load or require NAME.
-;; It does the right thing no matter if NAME is a string or symbol.
-;; Argument NOERROR means to indicate load failures as a warning."
-;;   (if (stringp name)
-;;       `(load ,name ,noerror)
-;;     `(require ',name nil ,noerror)))
-
-;; (defun imp-parser-hook-injector (name-string keyword body)
-;;   "Wrap pre/post hook injections around the given BODY for KEYWORD.
-;; The BODY is a list of forms, so `((foo))' if only `foo' is being called."
-;;   (if (not imp-parser-inject-hooks)
-;;       body
-;;     (let ((keyword-name (substring (format "%s" keyword) 1)))
-;;       `((when (run-hook-with-args-until-failure
-;;                ',(intern (concat "imp-parser--" name-string
-;;                                  "--pre-" keyword-name "-hook")))
-;;           ,@body
-;;           (run-hooks
-;;            ',(intern (concat "imp-parser--" name-string
-;;                              "--post-" keyword-name "-hook"))))))))
-
-;; (defun imp-parser-with-elapsed-timer (text body)
-;;   "BODY is a list of forms, so `((foo))' if only `foo' is being called."
-;;   (declare (indent 1))
-;;   (if imp-parser-expand-minimally
-;;       body
-;;     (let ((nowvar (make-symbol "now")))
-;;       (if (bound-and-true-p imp-parser-verbose)
-;;           `((let ((,nowvar (current-time)))
-;;               (message "%s..." ,text)
-;;               (prog1
-;;                   ,(macroexp-progn body)
-;;                 (let ((elapsed
-;;                        (float-time (time-subtract (current-time) ,nowvar))))
-;;                   (if (> elapsed ,imp-parser-minimum-reported-time)
-;;                       (message "%s...done (%.3fs)" ,text elapsed)
-;;                     (message "%s...done" ,text))))))
-;;         body))))
-
-;; (put 'imp-parser-with-elapsed-timer 'lisp-indent-function 1)
-
-;; (defun imp-parser-require (name &optional no-require body)
-;;   (if imp-parser-expand-minimally
-;;       (imp-parser-concat
-;;        (unless no-require
-;;          (list (imp-parser-load-name name)))
-;;        body)
-;;     (if no-require
-;;         body
-;;       (imp-parser-with-elapsed-timer
-;;           (format "Loading package %s" name)
-;;         `((if (not ,(imp-parser-load-name name t))
-;;               (display-warning 'imp-parser
-;;                                (format "Cannot load %s" ',name)
-;;                                :error)
-;;             ,@body))))))
-
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;;
-;; ;;; Property lists
-;; ;;
-
-;; (defun imp-parser-plist-delete (plist property)
-;;   "Delete PROPERTY from PLIST.
-;; This is in contrast to merely setting it to 0."
-;;   (let (p)
-;;     (while plist
-;;       (if (not (eq property (car plist)))
-;;           (setq p (plist-put p (car plist) (nth 1 plist))))
-;;       (setq plist (cddr plist)))
-;;     p))
+(defun imp-parser-plist-delete (plist property)
+  "Delete PROPERTY from PLIST.
+This is in contrast to merely setting it to 0."
+  (let (p)
+    (while plist
+      (if (not (eq property (car plist)))
+          (setq p (plist-put p (car plist) (nth 1 plist))))
+      (setq plist (cddr plist)))
+    p))
 
 (defun imp-parser-plist-delete-first (plist property)
   "Delete PROPERTY from PLIST.
@@ -461,14 +261,6 @@ This is in contrast to merely setting it to 0."
       plist
     (plist-put plist property value)))
 
-;; (defsubst imp-parser-plist-cons (plist property value)
-;;   "Cons VALUE onto the head of the list at PROPERTY in PLIST."
-;;   (plist-put plist property (cons value (plist-get plist property))))
-
-;; (defsubst imp-parser-plist-append (plist property value)
-;;   "Append VALUE onto the front of the list at PROPERTY in PLIST."
-;;   (plist-put plist property (append value (plist-get plist property))))
-
 (defun imp-parser-split-list (pred xs)
   (let ((ys (list nil))
         (zs (list nil))
@@ -482,11 +274,6 @@ This is in contrast to merely setting it to 0."
               (nconc zs (list x)))
           (nconc ys (list x)))))
     (cons (cdr ys) (cdr zs))))
-
-;; (defun imp-parser-split-list-at-keys (key lst)
-;;   (and lst
-;;        (let ((xs (imp-parser-split-list (apply-partially #'eq key) lst)))
-;;          (cons (car xs) (imp-parser-split-list-at-keys key (cddr xs))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -561,7 +348,7 @@ extending any keys already present."
            (nreverse
             (sort plist-grouped
                   #'(lambda (l r) (< (imp-parser-keyword-index (car l))
-                                (imp-parser-keyword-index (car r)))))))
+                                     (imp-parser-keyword-index (car r)))))))
         (setq result (cons (car x) (cons (cdr x) result))))
       result)))
 
@@ -645,7 +432,6 @@ Unless the KEYWORD being processed intends to ignore remaining
 keywords, it must call this function recursively, passing in the
 plist with its keyword and argument removed, and passing in the
 next value for the STATE."
-  (declare (indent 1))
   (if (null plist)
       ;; No more keywords to process; do the thing!
       (imp-parser-load name state)
@@ -662,10 +448,6 @@ next value for the STATE."
             (funcall handler-sym name keyword arg rest state)
           (imp-parser-error
            (format "Keyword handler not defined: %s" handler)))))))
-
-;; TODO: WTF does this do? Why `(declare (indent 1))` in the func
-;; and then immediately back to indent of `defun`?!
-(put 'imp-parser-process-keywords 'lisp-indent-function 'defun)
 
 (defun imp-parser-load (feature state)
   "Actually load the file, maybe."
@@ -727,36 +509,15 @@ next value for the STATE."
                       'noerror)
                   'nomessage))))))
 
-;; (defun imp-parser-list-insert (elem xs &optional anchor after test)
-;;   "Insert ELEM into the list XS.
-;; If ANCHOR is also a keyword, place the new KEYWORD before that
-;; one.
-;; If AFTER is non-nil, insert KEYWORD either at the end of the
-;; keywords list, or after the ANCHOR if one has been provided.
-;; If TEST is non-nil, it is the test used to compare ELEM to list
-;; elements.  The default is `eq'.
-;; The modified list is returned.  The original list is not modified."
-;;   (let (result)
-;;     (dolist (k xs)
-;;       (if (funcall (or test #'eq) k anchor)
-;;           (if after
-;;               (setq result (cons k result)
-;;                     result (cons elem result))
-;;             (setq result (cons elem result)
-;;                   result (cons k result)))
-;;         (setq result (cons k result))))
-;;     (if anchor
-;;         (nreverse result)
-;;       (if after
-;;           (nreverse (cons elem result))
-;;         (cons elem (nreverse result))))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Argument Processing
 ;;
 
-(defun imp-parser-args-only-one (keyword args)
+;; TODO: make 'em all start with `imp-parser-args-'
+;; TODO: and try to standardize the naming of the 2 or 3 different kinds of arg processing funcs.
+
+(defun imp-parser-args-only-one (label args)
   "Call F on the first member of ARGS if it has exactly one element."
   (cond
    ((and (listp args) (listp (cdr args))
@@ -768,7 +529,6 @@ next value for the STATE."
 
 (defun imp-parser-only-one (label args f)
   "Call F on the first member of ARGS if it has exactly one element."
-  (declare (indent 1))
   (cond
    ((and (listp args) (listp (cdr args))
          (= (length args) 1))
@@ -777,12 +537,9 @@ next value for the STATE."
     (imp-parser-error
      (concat label " wants exactly one argument")))))
 
-(put 'imp-parser-only-one 'lisp-indent-function 'defun)
-
 (defun imp-parser-as-one (label args f &optional allow-empty)
   "Call F on the first element of ARGS if it has one element, or all of ARGS.
 If ALLOW-EMPTY is non-nil, it's OK for ARGS to be an empty list."
-  (declare (indent 1))
   (if (if args
           (and (listp args) (listp (cdr args)))
         allow-empty)
@@ -791,8 +548,6 @@ If ALLOW-EMPTY is non-nil, it's OK for ARGS to be an empty list."
         (funcall f label args))
     (imp-parser-error
      (concat label " wants a non-empty list"))))
-
-(put 'imp-parser-as-one 'lisp-indent-function 'defun)
 
 (defun imp-parser-memoize (f arg)
   "Ensure the macro-expansion of F applied to ARG evaluates ARG
@@ -803,7 +558,7 @@ no more than once."
     `((defvar ,loaded nil)
       (defvar ,result nil)
       (defvar ,next #'(lambda () (if ,loaded ,result
-                              (setq ,loaded t ,result ,arg))))
+                                   (setq ,loaded t ,result ,arg))))
       ,@(funcall f `((funcall ,next))))))
 
 (defsubst imp-parser-normalize-value (_label arg)
@@ -899,20 +654,21 @@ The argument LABEL is ignored."
     (imp-parser-only-one (symbol-name keyword) args
       #'imp-parser-normalize-value)))
 
-;; (defun imp-parser-normalize-form (label args)
-;;   "Given a list of forms, return it wrapped in `progn'."
-;;   (unless (listp (car args))
-;;     (imp-parser-error (concat label " wants a sexp or list of sexps")))
-;;   (mapcar #'(lambda (form)
-;;               (if (and (consp form)
-;;                        (memq (car form)
-;;                              '(imp-parser bind-key bind-key*
-;;                                 unbind-key bind-keys bind-keys*)))
-;;                   (macroexpand form)
-;;                 form)) args))
+(defun imp-parser-normalize-form (label args)
+  "Given a list of forms, return it wrapped in `progn'."
+  (unless (listp (car args))
+    (imp-parser-error (concat label " wants a sexp or list of sexps")))
+  (mapcar #'(lambda (form)
+              (if (and (consp form)
+                       (memq (car form)
+                             '(imp-parser bind-key bind-key*
+                                unbind-key bind-keys bind-keys*)))
+                  (macroexpand form)
+                form)) args))
 
-;; (defun imp-parser-normalize-forms (_name keyword args)
-;;   (imp-parser-normalize-form (symbol-name keyword) args))
+(defun imp-parser-normalize-forms (_name keyword args)
+  "Given a list of forms, return it wrapped in `progn'."
+  (imp-parser-normalize-form (symbol-name keyword) args))
 
 ;; (defun imp-parser-normalize-pairs
 ;;     (key-pred val-pred name label arg &optional recursed)
@@ -939,6 +695,7 @@ The argument LABEL is ignored."
 ;;              (setq last-item x))) arg)))
 ;;    (t arg)))
 
+;; TODO: use this in path normalizer for the `eval' case?
 ;; (defun imp-parser-recognize-function (v &optional binding additional-pred)
 ;;   "A predicate that recognizes functional constructions:
 ;;   nil
@@ -998,12 +755,13 @@ The argument LABEL is ignored."
 ;;
 ;;; Statistics
 ;;
+;; TODO(stats): use any of predecessor's stats?
 
-(defun imp-parser-reset-statistics ()
-  "Reset statistics for `imp-parser'.
-See also `imp-parser-statistics'."
-  (interactive)
-  (setq imp-parser-statistics (make-hash-table)))
+;; (defun imp-parser-reset-statistics ()
+;;   "Reset statistics for `imp-parser'.
+;; See also `imp-parser-statistics'."
+;;   (interactive)
+;;   (setq imp-parser-statistics (make-hash-table)))
 
 ;; (defun imp-parser-statistics-status (package)
 ;;   "Return loading configuration status of PACKAGE statistics."
@@ -1099,15 +857,15 @@ See also `imp-parser-statistics'."
 ;;   (setq tabulated-list-sort-key '("Time" . t))
 ;;   (tabulated-list-init-header))
 
-(defun imp-parser-statistics-gather (keyword name after)
-  (let* ((hash (gethash name imp-parser-statistics
-                        (make-hash-table)))
-         (before (and after (gethash keyword hash (current-time)))))
-    (puthash keyword (current-time) hash)
-    (when after
-      (puthash (intern (concat (symbol-name keyword) "-secs"))
-               (time-subtract (current-time) before) hash))
-    (puthash name hash imp-parser-statistics)))
+;; (defun imp-parser-statistics-gather (keyword name after)
+;;   (let* ((hash (gethash name imp-parser-statistics
+;;                         (make-hash-table)))
+;;          (before (and after (gethash keyword hash (current-time)))))
+;;     (puthash keyword (current-time) hash)
+;;     (when after
+;;       (puthash (intern (concat (symbol-name keyword) "-secs"))
+;;                (time-subtract (current-time) before) hash))
+;;     (puthash name hash imp-parser-statistics)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1116,7 +874,7 @@ See also `imp-parser-statistics'."
 ;;
 
 ;;------------------------------
-;;;; NAME
+;;;; `NAME' arg
 ;;------------------------------
 
 (defun imp-parser-normalize-name (name)
@@ -1127,22 +885,12 @@ See also `imp-parser-statistics'."
 ;;------------------------------
 ;; No handlers; handled by `imp-parser' personally.
 
-;; ;; Don't alias this to `ignore', as that will cause the resulting
-;; ;; function to be interactive.
-;; (defun imp-parser-normalize/:disabled (_name _keyword _arg)
-;;   "Do nothing, return nil.")
-
-;; (defun imp-parser-handler/:disabled (name _keyword _arg rest state)
-;;   (imp-parser-process-keywords name rest state))
-
 ;;------------------------------
 ;;;; `:error'
 ;;------------------------------
 
 (defalias 'imp-parser-normalize/:error 'imp-parser-normalize-only-one-value-or-flag)
 (defalias 'imp-parser-handler/:error   'imp-parser-handle-state)
-
-;; (imp-parser foo :optional t :error t)
 
 ;;------------------------------
 ;;;; `:optional'
@@ -1613,6 +1361,23 @@ no keyword implies `:all'."
 ;;             (list arg)
 ;;           arg))))
 
+;; (eval-and-compile
+;;   ;; Declare a synthetic theme for :custom variables.
+;;   ;; Necessary in order to avoid having those variables saved by custom.el.
+;;   (deftheme imp-parser))
+
+;; (enable-theme 'imp-parser)
+;; ;; Remove the synthetic imp-parser theme from the enabled themes, so
+;; ;; iterating over them to "disable all themes" won't disable it.
+;; (setq custom-enabled-themes (remq 'imp-parser custom-enabled-themes))
+
+;; (defcustom imp-parser-use-theme t
+;;   "If non-nil, use a custom theme to avoid saving :custom
+;; variables twice (once in the Custom file, once in the imp-parser
+;; call)."
+;;   :type 'boolean
+;;   :group 'imp-parser)
+
 ;; (defun imp-parser-handler/:custom (name _keyword args rest state)
 ;;   "Generate imp-parser custom keyword code."
 ;;   (imp-parser-concat
@@ -1674,8 +1439,7 @@ no keyword implies `:all'."
        (message (make-string 40 ?━))
        (message "%s" imp-parser--form))
 
-     (imp-parser-process-keywords name* args*)
-     ))
+     (imp-parser-process-keywords name* args*)))
 
 
 ;;;###autoload
@@ -1766,9 +1530,7 @@ Usage:
 
       ;; (when imp-parser-compute-statistics
       ;;   `((imp-parser-statistics-gather :imp-parser ',name t)))
-      ))
-    ))
-;; (imp-parser foo)
+      ))))
 
 
 ;;------------------------------------------------------------------------------
