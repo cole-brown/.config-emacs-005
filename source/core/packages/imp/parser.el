@@ -517,7 +517,7 @@ next value for the STATE."
 ;; TODO: make 'em all start with `imp-parser-args-'
 ;; TODO: and try to standardize the naming of the 2 or 3 different kinds of arg processing funcs.
 
-(defun imp-parser-args-only-one (label args)
+(defun imp-parser-args-only-one (keyword args)
   "Call F on the first member of ARGS if it has exactly one element."
   (cond
    ((and (listp args) (listp (cdr args))
@@ -525,29 +525,29 @@ next value for the STATE."
     (car args))
    (t
     (imp-parser-error
-     (concat label " wants exactly one argument")))))
+     (concat (imp-parser-as-string keyword) " wants exactly one argument")))))
 
-(defun imp-parser-only-one (label args f)
+(defun imp-parser-only-one (keyword args f)
   "Call F on the first member of ARGS if it has exactly one element."
   (cond
    ((and (listp args) (listp (cdr args))
          (= (length args) 1))
-    (funcall f label (car args)))
+    (funcall f keyword (car args)))
    (t
     (imp-parser-error
-     (concat label " wants exactly one argument")))))
+     (concat (imp-parser-as-string keyword) " wants exactly one argument")))))
 
-(defun imp-parser-as-one (label args f &optional allow-empty)
+(defun imp-parser-as-one (keyword args f &optional allow-empty)
   "Call F on the first element of ARGS if it has one element, or all of ARGS.
 If ALLOW-EMPTY is non-nil, it's OK for ARGS to be an empty list."
   (if (if args
           (and (listp args) (listp (cdr args)))
         allow-empty)
       (if (= (length args) 1)
-          (funcall f label (car args))
-        (funcall f label args))
+          (funcall f keyword (car args))
+        (funcall f keyword args))
     (imp-parser-error
-     (concat label " wants a non-empty list"))))
+     (concat (imp-parser-as-string keyword) " wants a non-empty list"))))
 
 (defun imp-parser-memoize (f arg)
   "Ensure the macro-expansion of F applied to ARG evaluates ARG
@@ -561,9 +561,9 @@ no more than once."
                                    (setq ,loaded t ,result ,arg))))
       ,@(funcall f `((funcall ,next))))))
 
-(defsubst imp-parser-normalize-value (_label arg)
+(defsubst imp-parser-normalize-value (_keyword arg)
   "Normalize the Lisp value given by ARG.
-The argument LABEL is ignored."
+The argument KEYWORD is ignored."
   (cond ((null arg) nil)
         ((eq t arg) t)
         ((imp-parser-non-nil-symbolp arg)
@@ -581,9 +581,9 @@ The argument LABEL is ignored."
         (t
          (eval arg))))
 
-(defsubst imp-parser-normalize-symbol-or-string (_label arg)
+(defsubst imp-parser-normalize-symbol-or-string (_keyword arg)
   "Normalize the Lisp value given by ARG.
-The argument LABEL is ignored."
+The argument KEYWORD is ignored."
   (cond ((null arg) nil)
         ((eq t arg) t)
         ((stringp arg) arg)
@@ -591,19 +591,19 @@ The argument LABEL is ignored."
          `(funcall #',arg))
         (t arg)))
 
-(defun imp-parser-normalize-symbols (label arg &optional recursed)
+(defun imp-parser-normalize-symbols (keyword arg &optional recursed)
   "Normalize a list of symbols."
   (cond
    ((imp-parser-non-nil-symbolp arg)
     (list arg))
    ((and (not recursed) (listp arg) (listp (cdr arg)))
-    (mapcar #'(lambda (x) (car (imp-parser-normalize-symbols label x t))) arg))
+    (mapcar #'(lambda (x) (car (imp-parser-normalize-symbols keyword x t))) arg))
    (t
     (imp-parser-error
-     (concat label " wants a symbol, or list of symbols")))))
+     (concat (imp-parser-as-string keyword) " wants a symbol, or list of symbols")))))
 
 (defun imp-parser-normalize-symlist (_feature keyword args)
-  (imp-parser-as-one (symbol-name keyword) args
+  (imp-parser-as-one keyword args
     #'imp-parser-normalize-symbols))
 
 (defun imp-parser-normalize-flag (feature arg)
@@ -613,51 +613,51 @@ The argument LABEL is ignored."
     arg))
 
 (defun imp-parser-normalize-only-one-symbol (feature keyword args)
-  (imp-parser-only-one (symbol-name keyword) args
+  (imp-parser-only-one keyword args
     #'imp-parser-normalize-symbols))
 
 (defun imp-parser-normalize-only-one-value-or-flag (feature keyword args)
   (if (null args)
       ;; keyword used as a flag (by itself; no value), so normalize to true.
       '(t)
-    (imp-parser-only-one (symbol-name keyword) args
+    (imp-parser-only-one keyword args
       #'imp-parser-normalize-value)))
 
 (defun imp-parser-normalize-only-one-symbol-or-string (_feature keyword args)
-  (imp-parser-only-one (symbol-name keyword)
+  (imp-parser-only-one keyword
     args
     #'imp-parser-normalize-value))
 
 (defun imp-parser-normalize-only-one-value (_feature keyword args)
-  (imp-parser-only-one (symbol-name keyword) args
+  (imp-parser-only-one keyword args
     #'imp-parser-normalize-value))
 
-(defun imp-parser-normalize-recursive-symbols (label arg)
+(defun imp-parser-normalize-recursive-symbols (keyword arg)
   "Normalize a list of symbols."
   (cond
    ((imp-parser-non-nil-symbolp arg)
     arg)
    ((and (listp arg) (listp (cdr arg)))
-    (mapcar #'(lambda (x) (imp-parser-normalize-recursive-symbols label x))
+    (mapcar #'(lambda (x) (imp-parser-normalize-recursive-symbols keyword x))
             arg))
    (t
     (imp-parser-error
-     (concat label " wants a symbol, or nested list of symbols")))))
+     (concat (imp-parser-as-string keyword) " wants a symbol, or nested list of symbols")))))
 
 (defun imp-parser-normalize-recursive-symlist (_feature keyword args)
-  (imp-parser-as-one (symbol-name keyword) args
+  (imp-parser-as-one keyword args
     #'imp-parser-normalize-recursive-symbols))
 
 (defun imp-parser-normalize-predicate (_feature keyword args)
   (if (null args)
       t
-    (imp-parser-only-one (symbol-name keyword) args
+    (imp-parser-only-one keyword args
       #'imp-parser-normalize-value)))
 
-(defun imp-parser-normalize-form (label args)
+(defun imp-parser-normalize-form (keyword args)
   "Given a list of forms, return it wrapped in `progn'."
   (unless (listp (car args))
-    (imp-parser-error (concat label " wants a sexp or list of sexps")))
+    (imp-parser-error (concat (imp-parser-as-string keyword) " wants a sexp or list of sexps")))
   (mapcar #'(lambda (form)
               (if (and (consp form)
                        (memq (car form)
@@ -668,10 +668,10 @@ The argument LABEL is ignored."
 
 (defun imp-parser-normalize-forms (_feature keyword args)
   "Given a list of forms, return it wrapped in `progn'."
-  (imp-parser-normalize-form (symbol-name keyword) args))
+  (imp-parser-normalize-form keyword args))
 
 ;; (defun imp-parser-normalize-pairs
-;;     (key-pred val-pred feature label arg &optional recursed)
+;;     (key-pred val-pred feature keyword arg &optional recursed)
 ;;   "Normalize a list of pairs.
 ;; KEY-PRED and VAL-PRED are predicates recognizing valid keys and
 ;; values, respectively.
@@ -687,7 +687,7 @@ The argument LABEL is ignored."
 ;;        #'(lambda (x)
 ;;            (prog1
 ;;                (let ((ret (imp-parser-normalize-pairs
-;;                            key-pred val-pred feature label x t)))
+;;                            key-pred val-pred feature keyword x t)))
 ;;                  (if (and (listp ret)
 ;;                           (not (keywordp last-item)))
 ;;                      (car ret)
@@ -936,7 +936,7 @@ The argument LABEL is ignored."
 ;;;; `:path'
 ;;------------------------------
 
-(defun imp-parser-normalize-path-symbol (feature label arg)
+(defun imp-parser-normalize-path-symbol (feature keyword arg)
   "Convert a path symbol (eg `relative') into a path string."
   (when (symbolp arg)
     (cond
@@ -955,7 +955,7 @@ The argument LABEL is ignored."
         (imp--error funcname
                     '("`%s' wants to be feature root of `%s'. "
                       "Cannot find feature root for: '%s'")
-                    label
+                    keyword
                     feature
                     arg)))
 
@@ -1229,7 +1229,7 @@ If the path is relative, root it in one of:
 ;; (defun imp-parser-normalize/:catch (_feature keyword args)
 ;;   (if (null args)
 ;;       t
-;;     (imp-parser-only-one (symbol-name keyword) args
+;;     (imp-parser-only-one keyword args
 ;;       imp-parser--hush-function)))
 
 ;; (defun imp-parser-handler/:catch (feature keyword arg rest state)
@@ -1354,11 +1354,11 @@ no keyword implies `:all'."
 
 ;; (defun imp-parser-normalize/:custom (_feature keyword args)
 ;;   "Normalize imp-parser custom keyword."
-;;   (imp-parser-as-one (symbol-name keyword) args
-;;     #'(lambda (label arg)
+;;   (imp-parser-as-one keyword args
+;;     #'(lambda (keyword arg)
 ;;         (unless (listp arg)
 ;;           (imp-parser-error
-;;            (concat label " a (<symbol> <value> [comment])"
+;;            (concat (imp-parser-as-string keyword) " a (<symbol> <value> [comment])"
 ;;                    " or list of these")))
 ;;         (if (imp-parser-non-nil-symbolp (car arg))
 ;;             (list arg)
