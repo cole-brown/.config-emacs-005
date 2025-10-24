@@ -301,7 +301,7 @@ extending any keys already present."
            (normalizer
             (intern-soft (concat "imp-parser-normalize/"
                                  (symbol-name keyword))))
-           (arg (and (functionp normalizer)
+           (args-norm (and (functionp normalizer)
                      (funcall normalizer feature keyword args)))
            (error-string (format "Unrecognized keyword: %s" keyword)))
       (if (memq keyword imp-parser-keywords)
@@ -310,9 +310,9 @@ extending any keys already present."
                          feature tail plist merge-function))
             (plist-put plist keyword
                        (if (plist-member plist keyword)
-                           (funcall merge-function keyword arg
+                           (funcall merge-function keyword args-norm
                                     (plist-get plist keyword))
-                         arg)))
+                         args-norm)))
         (if imp-parser-ignore-unknown-keywords
             (progn
               (display-warning 'imp-parser error-string)
@@ -593,13 +593,13 @@ The argument KEYWORD is ignored."
          `(funcall #',arg))
         (t arg)))
 
-(defun imp-parser-normalize-symbols (keyword arg &optional recursed)
+(defun imp-parser-normalize-symbols (keyword args &optional recursed)
   "Normalize a list of symbols."
   (cond
-   ((imp-parser-non-nil-symbolp arg)
-    (list arg))
-   ((and (not recursed) (listp arg) (listp (cdr arg)))
-    (mapcar #'(lambda (x) (car (imp-parser-normalize-symbols keyword x t))) arg))
+   ((imp-parser-non-nil-symbolp args)
+    (list args))
+   ((and (not recursed) (listp args) (listp (cdr args)))
+    (mapcar #'(lambda (x) (car (imp-parser-normalize-symbols keyword x t))) args))
    (t
     (imp-parser-error
      (concat (imp-parser-as-string keyword) " wants a symbol, or list of symbols")))))
@@ -634,14 +634,14 @@ The argument KEYWORD is ignored."
   (imp-parser-only-one keyword args
     #'imp-parser-normalize-value))
 
-(defun imp-parser-normalize-recursive-symbols (keyword arg)
+(defun imp-parser-normalize-recursive-symbols (keyword args)
   "Normalize a list of symbols."
   (cond
-   ((imp-parser-non-nil-symbolp arg)
-    arg)
-   ((and (listp arg) (listp (cdr arg)))
+   ((imp-parser-non-nil-symbolp args)
+    args)
+   ((and (listp args) (listp (cdr args)))
     (mapcar #'(lambda (x) (imp-parser-normalize-recursive-symbols keyword x))
-            arg))
+            args))
    (t
     (imp-parser-error
      (concat (imp-parser-as-string keyword) " wants a symbol, or nested list of symbols")))))
@@ -1051,16 +1051,16 @@ The argument KEYWORD is ignored."
 ;; symbol-value: (imp-parser-normalize-path-one-arg 'user :path 'user-emacs-directory)
 ;; unknown: (imp-parser-normalize-path-one-arg 'test :path 'invalid)
 
-(defun imp-parser-normalize-path-args-list (feature keyword arglist)
-  "Determine what each arg in ARGLIST lits is, exactly.
+(defun imp-parser-normalize-path-args-list (feature keyword args)
+  "Determine what each arg in ARGS lits is, exactly.
 
-ARGLIST should be the raw args list from func `imp-parser-normalize-keywords'."
-  (if (sequencep arglist)
+ARGS should be the raw args list from func `imp-parser-normalize-keywords'."
+  (if (sequencep args)
       (seq-map (apply-partially #'imp-parser-normalize-path-one-arg feature keyword)
-               arglist)
+               args)
     (imp--error 'imp-parser-normalize-path-args-list
                 "`%S': `%S' expected a list of args. Got %S: %S"
-                feature keyword (type-of arglist) arglist)))
+                feature keyword (type-of args) args)))
 ;; symbol: (imp-parser-normalize-path-args-list 'test :path '(emacs))
 ;; string: (imp-parser-normalize-path-args-list 'test :path '("/path/to/foo"))
 ;; form:   (imp-parser-normalize-path-args-list 'test :path '((imp-path-join user-emacs-directory "path/to/imp")))
@@ -1075,7 +1075,7 @@ ARGLIST should be the raw args list from func `imp-parser-normalize-keywords'."
 ;; (imp-parser-normalize-path-args-list 'user :path '(foo))
 
 (defun imp-parser-normalize-paths (feature keyword args)
-  "Normalize ARGS (list of args) to absolute, canonical paths."
+  "Normalize ARGS (list) to absolute, canonical paths."
   ;; Normalize args list into list of paths.
   (let ((paths (imp-parser-normalize-path-args-list feature keyword args)))
 
