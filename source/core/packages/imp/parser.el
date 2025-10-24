@@ -320,7 +320,7 @@ extending any keys already present."
                feature tail plist merge-function))
           (imp-parser-error error-string))))))
 
-(defun imp-parser-unalias-keywords (_feature args)
+(defun imp-parser-unalias-keywords (feature args)
   "Convert `:when' and `:unless' in ARGS to `:if'."
   (setq args (cl-nsubstitute :stats :statistics args))
   (setq args (cl-nsubstitute :if :when args))
@@ -563,9 +563,8 @@ no more than once."
                                    (setq ,loaded t ,result ,arg))))
       ,@(funcall func `((funcall ,next))))))
 
-(defsubst imp-parser-normalize-value (_keyword arg)
-  "Normalize the Lisp value given by ARG.
-The argument KEYWORD is ignored."
+(defsubst imp-parser-normalize-value (keyword arg)
+  "Normalize the Lisp value given by ARG."
   (cond ((null arg) nil)
         ((eq t arg) t)
         ((imp-parser-non-nil-symbolp arg)
@@ -583,9 +582,8 @@ The argument KEYWORD is ignored."
         (t
          (eval arg))))
 
-(defsubst imp-parser-normalize-symbol-or-string (_keyword arg)
-  "Normalize the Lisp value given by ARG.
-The argument KEYWORD is ignored."
+(defsubst imp-parser-normalize-symbol-or-string (keyword arg)
+  "Normalize the Lisp value given by ARG."
   (cond ((null arg) nil)
         ((eq t arg) t)
         ((stringp arg) arg)
@@ -604,7 +602,7 @@ The argument KEYWORD is ignored."
     (imp-parser-error
      (concat (imp-parser-as-string keyword) " wants a symbol, or list of symbols")))))
 
-(defun imp-parser-normalize-symlist (_feature keyword args)
+(defun imp-parser-normalize-symlist (feature keyword args)
   (imp-parser-as-one keyword args
     #'imp-parser-normalize-symbols))
 
@@ -625,12 +623,12 @@ The argument KEYWORD is ignored."
     (imp-parser-only-one keyword args
       #'imp-parser-normalize-value)))
 
-(defun imp-parser-normalize-only-one-symbol-or-string (_feature keyword args)
+(defun imp-parser-normalize-only-one-symbol-or-string (feature keyword args)
   (imp-parser-only-one keyword
     args
     #'imp-parser-normalize-value))
 
-(defun imp-parser-normalize-only-one-value (_feature keyword args)
+(defun imp-parser-normalize-only-one-value (feature keyword args)
   (imp-parser-only-one keyword args
     #'imp-parser-normalize-value))
 
@@ -646,11 +644,11 @@ The argument KEYWORD is ignored."
     (imp-parser-error
      (concat (imp-parser-as-string keyword) " wants a symbol, or nested list of symbols")))))
 
-(defun imp-parser-normalize-recursive-symlist (_feature keyword args)
+(defun imp-parser-normalize-recursive-symlist (feature keyword args)
   (imp-parser-as-one keyword args
     #'imp-parser-normalize-recursive-symbols))
 
-(defun imp-parser-normalize-predicate (_feature keyword args)
+(defun imp-parser-normalize-predicate (feature keyword args)
   (if (null args)
       t
     (imp-parser-only-one keyword args
@@ -668,7 +666,7 @@ The argument KEYWORD is ignored."
                   (macroexpand form)
                 form)) args))
 
-(defun imp-parser-normalize-forms (_feature keyword args)
+(defun imp-parser-normalize-forms (feature keyword args)
   "Given a list of forms, return it wrapped in `progn'."
   (imp-parser-normalize-form keyword args))
 
@@ -909,13 +907,13 @@ The argument KEYWORD is ignored."
 (defalias 'imp-parser-normalize/:when   'imp-parser-normalize-only-one-value)
 (defalias 'imp-parser-normalize/:unless 'imp-parser-normalize-only-one-value)
 
-(defun imp-parser-handler/:if (feature _keyword pred rest state)
+(defun imp-parser-handler/:if (feature keyword pred rest state)
   (let ((body (imp-parser-process-keywords feature rest state)))
     `((when ,pred ,@body))))
 
 (defalias 'imp-parser-handler/:when 'imp-parser-handler/:if)
 
-(defun imp-parser-handler/:unless (feature _keyword pred rest state)
+(defun imp-parser-handler/:unless (feature keyword pred rest state)
   (let ((body (imp-parser-process-keywords feature rest state)))
     `((unless ,pred ,@body))))
 
@@ -925,7 +923,7 @@ The argument KEYWORD is ignored."
 
 (defalias 'imp-parser-normalize/:requires 'imp-parser-normalize-symlist)
 
-(defun imp-parser-handler/:requires (feature _keyword requires rest state)
+(defun imp-parser-handler/:requires (feature keyword requires rest state)
   (let ((body (imp-parser-process-keywords feature rest state)))
     (if (null requires)
         body
@@ -1221,14 +1219,14 @@ If the path is relative, root it in one of:
 ;; TODO: is this better than `imp-parser-verbose' == `debug'?
 
 ;; (defvar imp-parser--form)
-;; (defvar imp-parser--hush-function #'(lambda (_keyword body) body))
+;; (defvar imp-parser--hush-function #'(lambda (keyword body) body))
 
 ;; (defsubst imp-parser-hush (context keyword body)
 ;;   `((condition-case-unless-debug err
 ;;         ,(macroexp-progn body)
 ;;       (error (funcall ,context ,keyword err)))))
 
-;; (defun imp-parser-normalize/:catch (_feature keyword args)
+;; (defun imp-parser-normalize/:catch (feature keyword args)
 ;;   (if (null args)
 ;;       t
 ;;     (imp-parser-only-one keyword args
@@ -1277,7 +1275,7 @@ If the path is relative, root it in one of:
 
 ;; (defalias 'imp-parser-normalize/:defer 'imp-parser-normalize-predicate)
 
-;; (defun imp-parser-handler/:defer (feature _keyword arg rest state)
+;; (defun imp-parser-handler/:defer (feature keyword arg rest state)
 ;;   (let ((body (imp-parser-process-keywords feature rest state)))
 ;;     (imp-parser-concat
 ;;      ;; Load the package after a set amount of idle time, if the argument to
@@ -1336,7 +1334,7 @@ no keyword implies `:all'."
    ((listp features*)
     (imp-parser-require-after-load (cons :all features*) body))))
 
-(defun imp-parser-handler/:after (feature _keyword arg rest state)
+(defun imp-parser-handler/:after (feature keyword arg rest state)
   (let ((body (imp-parser-process-keywords feature rest state))
         (uses (imp-parser-after-count-uses arg)))
     (if (or (null uses) (null body))
@@ -1354,7 +1352,7 @@ no keyword implies `:all'."
 ;; TODO: Add this keyword back in?
 ;; TODO: Add something similar for `let' vars?
 
-;; (defun imp-parser-normalize/:custom (_feature keyword args)
+;; (defun imp-parser-normalize/:custom (feature keyword args)
 ;;   "Normalize imp-parser custom keyword."
 ;;   (imp-parser-as-one keyword args
 ;;     #'(lambda (keyword arg)
@@ -1383,7 +1381,7 @@ no keyword implies `:all'."
 ;;   :type 'boolean
 ;;   :group 'imp-parser)
 
-;; (defun imp-parser-handler/:custom (feature _keyword args rest state)
+;; (defun imp-parser-handler/:custom (feature keyword args rest state)
 ;;   "Generate imp-parser custom keyword code."
 ;;   (imp-parser-concat
 ;;    (if (bound-and-true-p imp-parser-use-theme)
