@@ -1242,17 +1242,22 @@ See also `imp-parser-statistics'."
 
      ;; path == rooted @ FEATURE
      ((string-prefix-p ":/" arg)
-      (imp-path-join (imp--path-root-dir feature :no-error)
-                     (string-remove-prefix ":/" arg)))
+      (if-let ((root (imp--path-root-dir feature :no-error)))
+          (imp-path-join root (string-remove-prefix ":/" arg))
+        (imp--error 'imp-parser-normalize-path-string
+                    "`%S' has no root; `%S' doesn't know what to do with %S in %S"
+                    feature
+                    keyword
+                    ":/"
+                    arg)))
 
      ;; TODO?: look for "FEATURE-ROOT:/..."
      ;; TODO?: get root of FEATURE
 
-     ;; path as-is
+     ;; otherwise, leave path string as-is
      (t arg))))
 ;; (imp-parser-normalize-path-string :user :path "/foo/bar")
 ;; (imp-parser-normalize-path-string :user :path "./foo/bar")
-;; (imp-parser-normalize-path-string :user :path ":/foo/bar")
 
 (defun imp-parser-normalize-path-arg (feature keyword arg)
   "Normalize a (list of?) filesystem paths to abs and/or rel paths."
