@@ -1192,6 +1192,9 @@ See also `imp-parser-statistics'."
   "Convert a path symbol (eg `relative') into a path string."
   (when (symbolp arg)
     (cond
+     ;; Symbol Itself (Placeholder Symbols)
+     ;;------------------------------------
+
      ;; path == working directory
      ;; NOTE: Careful with `pwd'; it's already a function.
      ((memq arg '(pwd cwd current-dir current-directory working-dir working-directory))
@@ -1212,7 +1215,16 @@ See also `imp-parser-statistics'."
      ((memq arg '(emacs .emacs .emacs.d))
       user-emacs-directory)
 
-     ;; path is not a placeholder symbol.
+     ;; Symbol Value (ya know... a variable)
+     ;;-------------------------------------
+     ;; Don't use `bound-and-true-p'.
+     ((when-let ((value (and (boundp arg) arg)))
+        (when (stringp value)
+          value)))
+
+     ;; Unknown; Do Not Error
+     ;;----------------------
+     ;; path is not anything we know about.
      ;; Let someone else deal with whatever it is.
      (t nil))))
 ;; (imp-parser-normalize-path-symbol :user :path 'pwd)
