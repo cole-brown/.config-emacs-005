@@ -1258,105 +1258,113 @@ See also `imp-parser-statistics'."
      (t arg))))
 ;; (imp-parser-normalize-path-string :user :path "/foo/bar")
 ;; (imp-parser-normalize-path-string :user :path "./foo/bar")
+;; (imp-parser-normalize-path-string 'foo/bar/init :path ":/bar/")
 
-(defun imp-parser-normalize-path-arg (feature keyword arg)
-  "Normalize a (list of?) filesystem paths to abs and/or rel paths."
-   (cond
-    ;; Simple/base Cases:
-    ;;-------------------
-    ((imp-parser-normalize-path-symbol feature keyword arg))
+(defun imp-parser-normalize-path-one-arg (feature keyword arg &optional no-recurse)
+  ;; Don't handle lists of things. That is handled above us.
+  (cond
+   ;; Simple/Base Cases:
+   ;;-------------------
+   ;; A known shortcut symbol. example: `.emacs', `pwd', etc
+   ((imp-parser-normalize-path-symbol feature keyword arg))
 
-    ((imp-parser-normalize-path-string feature keyword arg))
+   ;; A string with optional prefix. example: "./", ":/"
+   ((imp-parser-normalize-path-string feature keyword arg))
 
-    ;; Recursive Cases:
-    ;; ARG is a function or something.
-    ;;----------------------------
-    ((and arg (or (imp-parser-non-nil-symbolp arg) (functionp arg)))
-     (let ((value (imp-parser-normalize-value keyword arg)))
-       (condition-case _
-           (imp-parser-normalize-path-arg feature keyword (eval value))
-         (error
-          (if (imp-parser-non-nil-symbolp arg)
-              (symbol-name arg)
-            (imp--error 'imp-parser-normalize-path-arg
-                        "`%s' couldn't evaluate %s: '%s'"
-                        keyword
-                        (type-of arg)
-                        arg))))))
+   ;; Recursive Cases:
+   ;;----------------------------
+   (no-recurse
+    (imp--error 'imp-parser-normalize-path-one-arg
+                "`%S': `%S' doesn't know what to do %S: %S"
+                feature keyword (type-of arg) arg))
 
-    ((and (listp arg) (listp (cdr arg)))
-     (mapcar #'(lambda (x)
-                 (imp-parser-normalize-path-arg feature keyword x))
-             arg))
+   ;; A func or form? example: (imp-path-join user-emacs-directory "path/to/imp")
+   ((condition-case _
+        (let ((arg-eval (eval arg)))
+          ;; Require that the eval'd whatever returns a string.
+          (when (stringp arg-eval)
+            (imp-parser-normalize-path-one-arg feature
+                                               keyword
+                                               arg-eval
+                                               :no-recurse)))
+      (error nil)))
 
-    ;; Error: No idea what ARG is.
-    (t
-     (imp--error 'imp-parser-normalize-path-arg
-                 "`%s' wants a path (or list of paths). "
-                 "Don't know what to do with %s: '%s'"
-                 keyword
-                 (type-of arg)
-                 arg))))
-;; (imp-parser-normalize-path-arg 'user :path "/foo/bar")
-;; (imp-parser-normalize-path-arg 'user :path "/foo/bar/")
-;; (imp-parser-normalize-path-arg 'user :path "foo/bar")
-;; (imp-parser-normalize-path-arg 'user :path '("/foo/bar" "baz/qux/"))
-;; (imp-parser-normalize-path-arg 'user :path 'pwd)
-;; (imp-parser-normalize-path-arg 'user :path 'user-emacs-directory)
-;; (imp-parser-normalize-path-arg 'user :path 'foo)
-;; (imp-parser-normalize-path-arg 'user :path '(foo))
+   ;; Unknown/Error Case:
+   ;;----------------------------
+   (t
+    (imp--error 'imp-parser-normalize-path-one-arg
+                "`%S': `%S' cannot parse %S: %S"
+                feature keyword (type-of arg) arg))))
+;; symbol: (imp-parser-normalize-path-one-arg 'test :path 'emacs)
+;; string: (imp-parser-normalize-path-one-arg 'test :path "/path/to/foo")
+;; form:   (imp-parser-normalize-path-one-arg 'test :path '(imp-path-join user-emacs-directory "path/to/imp"))
+;; symbol-value: (imp-parser-normalize-path-one-arg 'user :path 'user-emacs-directory)
+;; unknown: (imp-parser-normalize-path-one-arg 'test :path 'invalid)
 
-(defun imp-parser-normalize-path (feature keyword arg)
-  "Normalize a (list of?) filesystem paths to absolute, canonical paths."
-  ;; Normalize
-  (let ((path (imp-parser-normalize-path-arg feature keyword arg)))
-    ;; Canonicalize
-    (cond ((stringp path)
-           (imp-path-canonical path))
+(defun imp-parser-normalize-path-args-list (feature keyword arglist)
+  "Determine what each arg in ARGLIST lits is, exactly.
 
-          ;; Recurse
-          ((and (listp path) (listp (cdr path)))
-           (mapcar #'(lambda (x)
-                       (imp-parser-normalize-path feature keyword x))
-                   path))
+ARGLIST should be the raw args list from func `imp-parser-normalize-keywords'."
+  (if (sequencep arglist)
+      (seq-map (apply-partially #'imp-parser-normalize-path-one-arg feature keyword)
+               arglist)
+    (imp--error 'imp-parser-normalize-path-args-list
+                "`%S': `%S' expected a list of args. Got %S: %S"
+                feature keyword (type-of arglist) arglist)))
+;; symbol: (imp-parser-normalize-path-args-list 'test :path '(emacs))
+;; string: (imp-parser-normalize-path-args-list 'test :path '("/path/to/foo"))
+;; form:   (imp-parser-normalize-path-args-list 'test :path '((imp-path-join user-emacs-directory "path/to/imp")))
+;; symbol-value: (imp-parser-normalize-path-args-list 'user :path '(user-emacs-directory))
+;; unknown: (imp-parser-normalize-path-args-list 'test :path '(invalid))
+;; not a list: (imp-parser-normalize-path-args-list 'test :path 'emacs)
+;; (imp-parser-normalize-path-args-list 'user :path '("/foo/bar"))
+;; (imp-parser-normalize-path-args-list 'user :path '("/foo/bar/"))
+;; (imp-parser-normalize-path-args-list 'user :path '("foo/bar"))
+;; (imp-parser-normalize-path-args-list 'user :path '("/foo/bar" "baz/qux/" pwd user-emacs-directory))
+;; (imp-parser-normalize-path-args-list 'user :path '(pwd))
+;; (imp-parser-normalize-path-args-list 'user :path '(foo))
 
-          ;; Error: No idea what PATH is.
-          (t
-           (imp--error 'imp-parser-normalize-path
-                       "`%s' wants a path (or list of paths). "
-                       "Don't know what to do with %s: '%s'"
-                       keyword
-                       (type-of path)
-                       path)))))
-;; (imp-parser-normalize-path :user :path "/foo/bar")
-;; (imp-parser-normalize-path :user :path "foo/bar")
-;; (imp-parser-normalize-path :user :path '("/foo/bar" "baz/qux/"))
-;; (imp-parser-normalize-path :user :path 'pwd)
-;; (imp-parser-normalize-path :user :path 'user-emacs-directory)
-;; (imp-parser-normalize-path :user :path 'foo)
+(defun imp-parser-normalize-paths (feature keyword args)
+  "Normalize ARGS (list of args) to absolute, canonical paths."
+  ;; Normalize args list into list of paths.
+  (let ((paths (imp-parser-normalize-path-args-list feature keyword args)))
 
-(defun imp-parser-normalize/:path (feature keyword arg)
-  "Normalize `:path' ARG to absolute & canonical path string.
+    ;; Validate normalization.
+    (when (seq-find (lambda (p) (not (stringp p))) paths)
+      (imp--error 'imp-parser-normalize-paths
+                  "`%S': `%S' couldn't normalize path(s). Got a non-string: %S -> S%"
+                  feature
+                  keyword
+                  args
+                  paths))
 
-If ARG is `guess', make a guess at where the path to FEATURE probably is:
+    ;; Canonicalize the list of paths.
+    (seq-map #'imp-path-canonical paths)))
+;; (imp-parser-normalize-paths :user :path '("/foo/bar"))
+;; (imp-parser-normalize-paths :user :path '("foo/bar"))
+;; (imp-parser-normalize-paths :user :path '("/foo/bar" "baz/qux/"))
+;; (imp-parser-normalize-paths :user :path '(pwd))
+;; (imp-parser-normalize-paths :user :path '(user-emacs-directory))
+;; (imp-parser-normalize-paths :user :path '(foo))
+
+(defun imp-parser-normalize/:path (feature keyword args)
+  "Normalize `:path' ARGS to absolute & canonical path string.
+
+If ARGS is `guess', make a guess at where the path to FEATURE probably is:
   1) Using FEATURE's root path.
   2) Using Emacs's current working directory.
-Else ARG will be used as-is for the path.
+Else ARGS will be used as-is for the path.
 
 If the path is relative, root it in one of:
   1) FEATURE's root path
   2) `user-emacs-directory'"
   (let* ((funcname 'imp-parser-normalize/:path)
-         (arg (imp-parser-args-only-one feature arg))
          ;; Normalize to canonical, absolute path(s).
-         (path (imp-parser-normalize-path feature keyword arg))
-         (feature-path (imp-feature-split feature)))
-
-    ;; Normalize to one path.
-    ;; `imp-parser-normalize-path' allows lists of paths.
-    ;; We want just one; take the first.
-    (when (proper-list-p path)
-      (setq path (car path)))
+         (paths (imp-parser-normalize-paths feature keyword args))
+         (feature-path (imp-feature-split feature))
+         ;; Normalize path list to one path.
+         ;; `imp-parser-normalize-paths' works on and returns lists.
+         (path (car paths)))
 
     ;; If no path supplied and feature is rooted, use feature root's path.
     (when (and (not path)
@@ -1369,10 +1377,11 @@ If the path is relative, root it in one of:
     (unless (and (stringp path)
                  (file-name-absolute-p path))
       (imp--error funcname
-                  "%S: `%S' should end up as absolute: got: %S -> %S"
+                  "%S: `%S' should end up with an absolute path: got: %S -> %S -> %S"
                   feature
                   keyword
-                  arg
+                  args
+                  paths
                   path))
 
     ;; Add rest of NAME to path; is a relative path.
