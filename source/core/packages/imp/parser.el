@@ -98,7 +98,7 @@ Each entry in the alist is a list of three elements:
 The first element is the `imp-parser' keyword.
 
 The second is a form that can be evaluated to get the default
-value.  It can also be a function that will receive the name of
+value.  It can also be a function that will receive the FEATURE from
 the `imp-parser' declaration and the keyword plist given to
 `imp-parser', in normalized form.  The value it returns should
 also be in normalized form (which is sometimes *not* what one
@@ -109,7 +109,7 @@ The third element is a form that can be evaluated to determine
 whether or not to assign a default value; if it evaluates to nil,
 then the default value is not assigned even if the keyword is not
 present in the `imp-parser' form.  This third element may also be
-a function, in which case it receives the name of the package (as
+a function, in which case it receives the FEATURE from `imp-parser' (as
 a symbol) and a list of keywords (in normalized form).  It should
 return nil or non-nil depending on whether defaulting should be
 attempted."
@@ -167,7 +167,7 @@ definitions, to understand the main intent of what's happening."
   :type 'boolean
   :group 'imp-parser)
 
-;; TODO: figure out wtf this regex soup is doing & adapt to imp.
+;; TODO: figure out wtf this regex soup is doing & adapt to imp?
 ;; (defconst imp-parser-font-lock-keywords
 ;;   '(("(\\(imp-parser\\)\\_>[ \t']*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
 ;;      (1 font-lock-keyword-face)
@@ -288,7 +288,7 @@ This is in contrast to merely setting it to 0."
                (cl-return-from outer index))
            (cl-incf index)))
 
-(defun imp-parser-normalize-plist (name input &optional plist merge-function)
+(defun imp-parser-normalize-plist (feature input &optional plist merge-function)
   "Given a pseudo-plist, normalize it to a regular plist.
 The normalized key/value pairs from input are added to PLIST,
 extending any keys already present."
@@ -302,12 +302,12 @@ extending any keys already present."
             (intern-soft (concat "imp-parser-normalize/"
                                  (symbol-name keyword))))
            (arg (and (functionp normalizer)
-                     (funcall normalizer name keyword args)))
+                     (funcall normalizer feature keyword args)))
            (error-string (format "Unrecognized keyword: %s" keyword)))
       (if (memq keyword imp-parser-keywords)
           (progn
             (setq plist (imp-parser-normalize-plist
-                         name tail plist merge-function))
+                         feature tail plist merge-function))
             (plist-put plist keyword
                        (if (plist-member plist keyword)
                            (funcall merge-function keyword arg
@@ -317,10 +317,10 @@ extending any keys already present."
             (progn
               (display-warning 'imp-parser error-string)
               (imp-parser-normalize-plist
-               name tail plist merge-function))
+               feature tail plist merge-function))
           (imp-parser-error error-string))))))
 
-(defun imp-parser-unalias-keywords (_name args)
+(defun imp-parser-unalias-keywords (_feature args)
   "Convert `:when' and `:unless' in ARGS to `:if'."
   (setq args (cl-nsubstitute :stats :statistics args))
   (setq args (cl-nsubstitute :if :when args))
@@ -352,9 +352,9 @@ extending any keys already present."
         (setq result (cons (car x) (cons (cdr x) result))))
       result)))
 
-(defun imp-parser-normalize-keywords (name args)
-  (let* ((name-symbol (if (stringp name) (intern name) name))
-         (name-string (symbol-name name-symbol)))
+(defun imp-parser-normalize-keywords (feature args)
+  (let* ((feature-symbol (if (stringp feature) (intern feature) feature))
+         (feature-string (symbol-name feature-symbol)))
 
     ;;------------------------------
     ;; Input Prep & Validation
@@ -370,14 +370,14 @@ extending any keys already present."
     (setq args (delq 'elisp--witness--lisp args))
 
     ;; Reduce the set of keywords down to its most fundamental expression.
-    (setq args (imp-parser-unalias-keywords name-symbol args))
+    (setq args (imp-parser-unalias-keywords feature-symbol args))
 
     ;;------------------------------
     ;; Per-Keyword Normalization
     ;;------------------------------
 
     ;; Normalize keyword values, coalescing multiple occurrences.
-    (setq args (imp-parser-normalize-plist name-symbol args nil
+    (setq args (imp-parser-normalize-plist feature-symbol args nil
                                            #'imp-parser-merge-keys))
 
     ;;------------------------------
@@ -389,13 +389,13 @@ extending any keys already present."
     (cl-dolist (spec imp-parser-defaults)
       (when (let ((func (nth 2 spec)))
               (if (and func (functionp func))
-                  (funcall func name args)
+                  (funcall func feature args)
                 (eval func)))
         (setq args (imp-parser-plist-maybe-put
                     args (nth 0 spec)
                     (let ((func (nth 1 spec)))
                       (if (and func (functionp func))
-                          (funcall func name args)
+                          (funcall func feature args)
                         (eval func)))))))
 
     ;; TODO: Add validation (eg keyword conflict resolution) here.
@@ -414,12 +414,12 @@ extending any keys already present."
     ;; (when (and (not (plist-member args :load))
     ;;            (not (plist-member args :defer))
     ;;            (not (plist-member args :no-require)))
-    ;;   (setq args (append args `(:load (,name)))))
+    ;;   (setq args (append args `(:load (,feature)))))
 
     ;; Sort the list of keywords based on the order of `imp-parser-keywords'.
     (imp-parser-sort-keywords args)))
 
-(defun imp-parser-process-keywords (name plist &optional state)
+(defun imp-parser-process-keywords (feature plist &optional state)
   "Process the next keyword in the free-form property list PLIST.
 The values in the PLIST have each been normalized by the function
 imp-parser-normalize/KEYWORD.
@@ -434,7 +434,7 @@ plist with its keyword and argument removed, and passing in the
 next value for the STATE."
   (if (null plist)
       ;; No more keywords to process; do the thing!
-      (imp-parser-load name state)
+      (imp-parser-load feature state)
 
     ;; Process the next keyword.
     (let* ((keyword (car plist))
@@ -445,7 +445,7 @@ next value for the STATE."
       (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword)))
              (handler-sym (intern handler)))
         (if (functionp handler-sym)
-            (funcall handler-sym name keyword arg rest state)
+            (funcall handler-sym feature keyword arg rest state)
           (imp-parser-error
            (format "Keyword handler not defined: %s" handler)))))))
 
@@ -461,7 +461,7 @@ next value for the STATE."
     ;; NOTE: We may not have a `path-load' if eg file does not exist.
     (unless (and (stringp path)
                  (file-name-absolute-p path))
-      ;; TODO: some imp timing thing to say that this thing errored?
+      ;; TODO(stats): some imp timing thing to say that this thing errored?
       (imp--error funcname
                   `("Path is invalid or not absolute! "
                     "path:'%s'")
@@ -602,33 +602,33 @@ The argument LABEL is ignored."
     (imp-parser-error
      (concat label " wants a symbol, or list of symbols")))))
 
-(defun imp-parser-normalize-symlist (_name keyword args)
+(defun imp-parser-normalize-symlist (_feature keyword args)
   (imp-parser-as-one (symbol-name keyword) args
     #'imp-parser-normalize-symbols))
 
-(defun imp-parser-normalize-flag (name arg)
+(defun imp-parser-normalize-flag (feature arg)
   "Converts ARGS to '(t) if there are no args."
   (if (null arg)
       '(t)
     arg))
 
-(defun imp-parser-normalize-only-one-symbol (name keyword args)
+(defun imp-parser-normalize-only-one-symbol (feature keyword args)
   (imp-parser-only-one (symbol-name keyword) args
     #'imp-parser-normalize-symbols))
 
-(defun imp-parser-normalize-only-one-value-or-flag (name keyword args)
+(defun imp-parser-normalize-only-one-value-or-flag (feature keyword args)
   (if (null args)
       ;; keyword used as a flag (by itself; no value), so normalize to true.
       '(t)
     (imp-parser-only-one (symbol-name keyword) args
       #'imp-parser-normalize-value)))
 
-(defun imp-parser-normalize-only-one-symbol-or-string (_name keyword args)
+(defun imp-parser-normalize-only-one-symbol-or-string (_feature keyword args)
   (imp-parser-only-one (symbol-name keyword)
     args
     #'imp-parser-normalize-value))
 
-(defun imp-parser-normalize-only-one-value (_name keyword args)
+(defun imp-parser-normalize-only-one-value (_feature keyword args)
   (imp-parser-only-one (symbol-name keyword) args
     #'imp-parser-normalize-value))
 
@@ -644,11 +644,11 @@ The argument LABEL is ignored."
     (imp-parser-error
      (concat label " wants a symbol, or nested list of symbols")))))
 
-(defun imp-parser-normalize-recursive-symlist (_name keyword args)
+(defun imp-parser-normalize-recursive-symlist (_feature keyword args)
   (imp-parser-as-one (symbol-name keyword) args
     #'imp-parser-normalize-recursive-symbols))
 
-(defun imp-parser-normalize-predicate (_name keyword args)
+(defun imp-parser-normalize-predicate (_feature keyword args)
   (if (null args)
       t
     (imp-parser-only-one (symbol-name keyword) args
@@ -666,19 +666,19 @@ The argument LABEL is ignored."
                   (macroexpand form)
                 form)) args))
 
-(defun imp-parser-normalize-forms (_name keyword args)
+(defun imp-parser-normalize-forms (_feature keyword args)
   "Given a list of forms, return it wrapped in `progn'."
   (imp-parser-normalize-form (symbol-name keyword) args))
 
 ;; (defun imp-parser-normalize-pairs
-;;     (key-pred val-pred name label arg &optional recursed)
+;;     (key-pred val-pred feature label arg &optional recursed)
 ;;   "Normalize a list of pairs.
 ;; KEY-PRED and VAL-PRED are predicates recognizing valid keys and
 ;; values, respectively.
 ;; If RECURSED is non-nil, recurse into sublists."
 ;;   (cond
 ;;    ((funcall key-pred arg)
-;;     (list (cons arg (imp-parser-as-symbol name))))
+;;     (list (cons arg (imp-parser-as-symbol feature))))
 ;;    ((imp-parser-is-pair arg key-pred val-pred)
 ;;     (list arg))
 ;;    ((and (not recursed) (listp arg) (listp (cdr arg)))
@@ -687,7 +687,7 @@ The argument LABEL is ignored."
 ;;        #'(lambda (x)
 ;;            (prog1
 ;;                (let ((ret (imp-parser-normalize-pairs
-;;                            key-pred val-pred name label x t)))
+;;                            key-pred val-pred feature label x t)))
 ;;                  (if (and (listp ret)
 ;;                           (not (keywordp last-item)))
 ;;                      (car ret)
@@ -745,10 +745,10 @@ The argument LABEL is ignored."
 ;;                 x))
 ;;           args))
 
-(defun imp-parser-handle-state (name keyword arg rest state)
+(defun imp-parser-handle-state (feature keyword arg rest state)
   "Save KEYWORD & ARG into STATE plist for later use."
   (setq state (imp-parser-plist-maybe-put state keyword arg))
-  (imp-parser-process-keywords name rest state))
+  (imp-parser-process-keywords feature rest state))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -857,15 +857,15 @@ The argument LABEL is ignored."
 ;;   (setq tabulated-list-sort-key '("Time" . t))
 ;;   (tabulated-list-init-header))
 
-;; (defun imp-parser-statistics-gather (keyword name after)
-;;   (let* ((hash (gethash name imp-parser-statistics
+;; (defun imp-parser-statistics-gather (keyword feature after)
+;;   (let* ((hash (gethash feature imp-parser-statistics
 ;;                         (make-hash-table)))
 ;;          (before (and after (gethash keyword hash (current-time)))))
 ;;     (puthash keyword (current-time) hash)
 ;;     (when after
 ;;       (puthash (intern (concat (symbol-name keyword) "-secs"))
 ;;                (time-subtract (current-time) before) hash))
-;;     (puthash name hash imp-parser-statistics)))
+;;     (puthash feature hash imp-parser-statistics)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -874,11 +874,11 @@ The argument LABEL is ignored."
 ;;
 
 ;;------------------------------
-;;;; `NAME' arg
+;;;; `FEATURE' arg
 ;;------------------------------
 
-(defun imp-parser-normalize-name (name)
-  (imp-feature-normalize name))
+(defun imp-parser-normalize-feature (feature)
+  (imp-feature-normalize feature))
 
 ;;------------------------------
 ;;;; `:disabled'
@@ -907,14 +907,14 @@ The argument LABEL is ignored."
 (defalias 'imp-parser-normalize/:when   'imp-parser-normalize-only-one-value)
 (defalias 'imp-parser-normalize/:unless 'imp-parser-normalize-only-one-value)
 
-(defun imp-parser-handler/:if (name _keyword pred rest state)
-  (let ((body (imp-parser-process-keywords name rest state)))
+(defun imp-parser-handler/:if (feature _keyword pred rest state)
+  (let ((body (imp-parser-process-keywords feature rest state)))
     `((when ,pred ,@body))))
 
 (defalias 'imp-parser-handler/:when 'imp-parser-handler/:if)
 
-(defun imp-parser-handler/:unless (name _keyword pred rest state)
-  (let ((body (imp-parser-process-keywords name rest state)))
+(defun imp-parser-handler/:unless (feature _keyword pred rest state)
+  (let ((body (imp-parser-process-keywords feature rest state)))
     `((unless ,pred ,@body))))
 
 ;;------------------------------
@@ -923,8 +923,8 @@ The argument LABEL is ignored."
 
 (defalias 'imp-parser-normalize/:requires 'imp-parser-normalize-symlist)
 
-(defun imp-parser-handler/:requires (name _keyword requires rest state)
-  (let ((body (imp-parser-process-keywords name rest state)))
+(defun imp-parser-handler/:requires (feature _keyword requires rest state)
+  (let ((body (imp-parser-process-keywords feature rest state)))
     (if (null requires)
         body
       `((when ,(if (> (length requires) 1)
@@ -1132,7 +1132,7 @@ If the path is relative, root it in one of:
                   paths
                   path))
 
-    ;; Add rest of NAME to path; is a relative path.
+    ;; Add rest of FEATURE to path; is a relative path.
     (setq path (apply #'imp-path-join
                       path
                       ;; FEATURE, with or without root.
@@ -1145,25 +1145,25 @@ If the path is relative, root it in one of:
 ;; (imp-parser-normalize/:path 'user :path '(user-emacs-directory))
 ;; (imp-parser-normalize/:path 'user :path '(foo))
 
-(defun imp-parser-handler/:path (name keyword arg rest state)
+(defun imp-parser-handler/:path (feature keyword arg rest state)
   "Put `:path' and `:path-load' into state."
   (setq state (imp-parser-plist-maybe-put state keyword arg))
   (setq state (imp-parser-plist-maybe-put state :path-load (imp-path-load-file arg)))
   ;; TODO(stats): Add path & load-path to stats?
-  (imp-parser-process-keywords name rest state))
+  (imp-parser-process-keywords feature rest state))
 
 ;;------------------------------
 ;;;; `:root'
 ;;------------------------------
 
-(defun imp-parser-normalize/:root (name keyword args)
+(defun imp-parser-normalize/:root (feature keyword args)
   (let ((root (imp-parser-only-one
-                name
-                (imp-parser-normalize-flag name args)
+                feature
+                (imp-parser-normalize-flag feature args)
                 #'imp-parser-normalize-symbol-or-string)))
-    (imp-feature-first (if (eq t root) name root))))
+    (imp-feature-first (if (eq t root) feature root))))
 
-(defun imp-parser-handler/:root (name keyword arg rest state)
+(defun imp-parser-handler/:root (feature keyword arg rest state)
   ;; TODO(stats): Add root to stats?
   (imp-parser-concat
    ;; Add root before load happens so that subfeatures can use their root.
@@ -1171,23 +1171,23 @@ If the path is relative, root it in one of:
    ;; expect imp's root path to exist.
    `((imp-path-root-set ',arg
                         ,(imp-path-parent (plist-get state :path-load))))
-   (imp-parser-process-keywords name rest state)))
+   (imp-parser-process-keywords feature rest state)))
 
 ;; TODO(stats): uncomment
 ;; ;;------------------------------
 ;; ;;;; `:stats'
 ;; ;;------------------------------
 ;;
-;; (defun imp-parser-normalize/:stats (name keyword args)
-;;   (imp-parser-normalize-symbols name
-;;                                 (imp-parser-normalize-flag name args)))
+;; (defun imp-parser-normalize/:stats (feature keyword args)
+;;   (imp-parser-normalize-symbols feature
+;;                                 (imp-parser-normalize-flag feature args)))
 ;; ;; (imp-parser-normalize/:stats 'testing :stats nil)
 ;; ;; (imp-parser-normalize/:stats 'testing :stats '(t))
 ;; ;; (imp-parser-normalize/:stats 'testing :stats '(autoshow))
 ;; ;; (imp-parser-normalize/:stats 'testing :stats '(timing autoshow))
 ;; ;; (imp-parser-normalize/:stats 'testing :stats '("hello"))
 ;;
-;; (defun imp-parser-handler/:stats (name keyword arg rest state)
+;; (defun imp-parser-handler/:stats (feature keyword arg rest state)
 ;;   ;; ARG is a list of symbols.
 ;;   (let (denormalized)
 ;;     ;; Denormalize stats into stat flags.
@@ -1209,7 +1209,7 @@ If the path is relative, root it in one of:
 ;;     (setq denormalized (seq-uniq denormalize))
 ;;
 ;;     ;; Add stat flags into state & continue to next handler.
-;;     (imp-parser-handle-state name keyword denormalized rest state)))
+;;     (imp-parser-handle-state feature keyword denormalized rest state)))
 
 ;;------------------------------
 ;;;; `:catch'
@@ -1226,21 +1226,21 @@ If the path is relative, root it in one of:
 ;;         ,(macroexp-progn body)
 ;;       (error (funcall ,context ,keyword err)))))
 
-;; (defun imp-parser-normalize/:catch (_name keyword args)
+;; (defun imp-parser-normalize/:catch (_feature keyword args)
 ;;   (if (null args)
 ;;       t
 ;;     (imp-parser-only-one (symbol-name keyword) args
 ;;       imp-parser--hush-function)))
 
-;; (defun imp-parser-handler/:catch (name keyword arg rest state)
+;; (defun imp-parser-handler/:catch (feature keyword arg rest state)
 ;;   (let* ((context (cl-gentemp "imp-parser--warning")))
 ;;     (cond
 ;;      ((not arg)
-;;       (imp-parser-process-keywords name rest state))
+;;       (imp-parser-process-keywords feature rest state))
 ;;      ((eq arg t)
 ;;       `((defvar ,context
 ;;           #'(lambda (keyword err)
-;;               (let ((msg (format "%s/%s: %s" ',name keyword
+;;               (let ((msg (format "%s/%s: %s" ',feature keyword
 ;;                                  (error-message-string err))))
 ;;                 ,@(when (eq imp-parser-verbose 'debug)
 ;;                     `((with-current-buffer
@@ -1255,13 +1255,13 @@ If the path is relative, root it in one of:
 ;;         ,@(let ((imp-parser--hush-function
 ;;                  (apply-partially #'imp-parser-hush context)))
 ;;             (funcall imp-parser--hush-function keyword
-;;                      (imp-parser-process-keywords name rest state)))))
+;;                      (imp-parser-process-keywords feature rest state)))))
 ;;      ((functionp arg)
 ;;       `((defvar ,context ,arg)
 ;;         ,@(let ((imp-parser--hush-function
 ;;                  (apply-partially #'imp-parser-hush context)))
 ;;             (funcall imp-parser--hush-function keyword
-;;                      (imp-parser-process-keywords name rest state)))))
+;;                      (imp-parser-process-keywords feature rest state)))))
 ;;      (t
 ;;       (imp-parser-error "The :catch keyword expects 't' or a function")))))
 
@@ -1270,28 +1270,30 @@ If the path is relative, root it in one of:
 ;;;; `:defer'
 ;;------------------------------
 ;; TODO: Add this keyword back in?
+;; TODO: Make it able to defer for N seconds after emacs init.
+;; TODO: make it able to defer until N seconds of emacs being idle?
 
 ;; (defalias 'imp-parser-normalize/:defer 'imp-parser-normalize-predicate)
 
-;; (defun imp-parser-handler/:defer (name _keyword arg rest state)
-;;   (let ((body (imp-parser-process-keywords name rest state)))
+;; (defun imp-parser-handler/:defer (feature _keyword arg rest state)
+;;   (let ((body (imp-parser-process-keywords feature rest state)))
 ;;     (imp-parser-concat
 ;;      ;; Load the package after a set amount of idle time, if the argument to
 ;;      ;; `:defer' was a number.
 ;;      (when (numberp arg)
 ;;        `((run-with-idle-timer ,arg nil #'require
-;;                               ',(imp-parser-as-symbol name) nil t)))
+;;                               ',(imp-parser-as-symbol feature) nil t)))
 ;;      (if (or (not arg) (null body))
 ;;          body
-;;        `((eval-after-load ',name ',(macroexp-progn body)))))))
+;;        `((eval-after-load ',feature ',(macroexp-progn body)))))))
 
 
 ;;------------------------------
 ;;;; `:after'
 ;;------------------------------
 
-(defun imp-parser-normalize/:after (name keyword args)
-  (setq args (imp-parser-normalize-recursive-symlist name keyword args))
+(defun imp-parser-normalize/:after (feature keyword args)
+  (setq args (imp-parser-normalize-recursive-symlist feature keyword args))
   (if (consp args)
       args
     (list args)))
@@ -1332,8 +1334,8 @@ no keyword implies `:all'."
    ((listp features*)
     (imp-parser-require-after-load (cons :all features*) body))))
 
-(defun imp-parser-handler/:after (name _keyword arg rest state)
-  (let ((body (imp-parser-process-keywords name rest state))
+(defun imp-parser-handler/:after (feature _keyword arg rest state)
+  (let ((body (imp-parser-process-keywords feature rest state))
         (uses (imp-parser-after-count-uses arg)))
     (if (or (null uses) (null body))
         body
@@ -1348,8 +1350,9 @@ no keyword implies `:all'."
 ;;;; `:custom'
 ;;------------------------------
 ;; TODO: Add this keyword back in?
+;; TODO: Add something similar for `let' vars?
 
-;; (defun imp-parser-normalize/:custom (_name keyword args)
+;; (defun imp-parser-normalize/:custom (_feature keyword args)
 ;;   "Normalize imp-parser custom keyword."
 ;;   (imp-parser-as-one (symbol-name keyword) args
 ;;     #'(lambda (label arg)
@@ -1378,7 +1381,7 @@ no keyword implies `:all'."
 ;;   :type 'boolean
 ;;   :group 'imp-parser)
 
-;; (defun imp-parser-handler/:custom (name _keyword args rest state)
+;; (defun imp-parser-handler/:custom (feature _keyword args rest state)
 ;;   "Generate imp-parser custom keyword code."
 ;;   (imp-parser-concat
 ;;    (if (bound-and-true-p imp-parser-use-theme)
@@ -1397,7 +1400,7 @@ no keyword implies `:all'."
 ;;                          (value (nth 1 def))
 ;;                          (comment (nth 2 def)))
 ;;                      (unless (and comment (stringp comment))
-;;                        (setq comment (format "Customized with imp-parser %s" name)))
+;;                        (setq comment (format "Customized with imp-parser %s" feature)))
 ;;                      `'(,variable ,value nil () ,comment)))
 ;;                args))))
 ;;      (mapcar
@@ -1406,10 +1409,10 @@ no keyword implies `:all'."
 ;;                 (value (nth 1 def))
 ;;                 (comment (nth 2 def)))
 ;;             (unless (and comment (stringp comment))
-;;               (setq comment (format "Customized with imp-parser %s" name)))
+;;               (setq comment (format "Customized with imp-parser %s" feature)))
 ;;             `(customize-set-variable (quote ,variable) ,value ,comment)))
 ;;       args))
-;;    (imp-parser-process-keywords name rest state)))
+;;    (imp-parser-process-keywords feature rest state)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1417,57 +1420,72 @@ no keyword implies `:all'."
 ;;; The main macro
 ;;
 
-(defmacro imp-parser-core (name args)
-  `(let* ((name* (imp-parser-normalize-name ,name))
-          (args* (imp-parser-normalize-keywords name* ,args))
+(defmacro imp-parser-core (feature args)
+  `(let* ((feature* (imp-parser-normalize-feature ,feature))
+          (args* (imp-parser-normalize-keywords feature* ,args))
           (imp-parser--form
            (if (eq imp-parser-verbose 'debug)
                (concat "\n\n"
-                       (pp-to-string `(imp-parser name* ,@,args))
+                       (pp-to-string `(imp-parser feature* ,@,args))
                        "\n  -->\n\n"
-                       (pp-to-string `(imp-parser name* ,@args*))
+                       (pp-to-string `(imp-parser feature* ,@args*))
                        "\n  ==>\n\n"
                        (pp-to-string
                         (macroexp-progn
                          (let ((imp-parser-verbose 'errors)
                                (imp-parser-expand-minimally t))
-                           (imp-parser-process-keywords name* args*)))))
+                           (imp-parser-process-keywords feature* args*)))))
              "")))
      (when (eq imp-parser-verbose 'debug)
        (message (make-string 40 ?━))
-       (message "%s" name*)
+       (message "%s" feature*)
        (message (make-string 40 ?━))
        (message "%s" imp-parser--form))
 
-     (imp-parser-process-keywords name* args*)))
+     (imp-parser-process-keywords feature* args*)))
 
 
 ;;;###autoload
-(defmacro imp-parser (name &rest args)
-  "Load NAME.
+(defmacro imp-parser (feature &rest args)
+  "Load FEATURE.
 
 Usage:
 
-  (imp-parser name
+  (imp-parser feature
      [:keyword [option]]...)
 
-:disabled      Flag. Nothing happens; NAME is ignored completely if this keyword
+:disabled      Flag. Nothing happens; FEATURE is ignored completely if this keyword
                is present.
 
 :path PATH     Absolute, relative, or rooted path to file.
                PATH can be:
                  - A path string.
-                 - A list of strings to join into a path.
-                 - A form that should evaluate to one of the above.
+                   - absolute or relative
+                   - prefixes:
+                     - \"./\" - relative to `imp-path-current-dir'
+                     - \":/\" - relative to FEATURE's root
+                 - A symbol whose value is a path string.
+                   - example: `user-emacs-directory'
+                 - A symbol whose name is known.
+                   - examples:
+                     - `pwd' - `imp-path-current-dir'
+                     - `.emacs' - `user-emacs-directory'
+                     - `root' - `imp-feature-root'
+                   - See func `imp-parser-normalize-path-symbol'
+                 - A form/function that evaluates to a path string.
+                   - (imp-path-join user-emacs-directory \"path/to/imp\")
+TODO(path): Do we want this to be the solution for lists?
+                 - A list of the above to join into a path.
+TODO(path): Alternative is a list of paths to try for locating the file.
 
-:root ROOT     Create an imp path root for ROOT at PATH given in `:path'.
+:root ROOT     Create an imp feature root for ROOT at PATH given in `:path'.
                See var `imp-path-roots' and func `imp-path-root-set'.
-               If ROOT is t, use first part of NAME.
+               If ROOT is t or a flag (arg-less), use first part of FEATURE.
                Example:
                  (imp-parser imp/init
                              :path (imp-path-join user-emacs-directory
                                                   \"path/to/imp\")
-                             :root t)
+                             :root)
                  => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)
 
 :error ERR     Value (aka ERROR) can be:
@@ -1476,12 +1494,12 @@ Usage:
                  - A form that should evaluate to one of the above.
                If ERROR is nil, the function will not raise an error if:
                  - The file doesn't exist.
-                 - NAME isn't provided after loading the file.
+                 - FEATURE isn't provided after loading the file.
                It will still raise an error if:
                  - It cannot parse the inputs.
                  - It cannot determine where to /look/ for the file.
 
-:optional OPT  Load NAME if it exists; do nothing if it does not.
+:optional OPT  Load FEATURE if it exists; do nothing if it does not.
                OPT can be:
                  - nil (default)
                  - non-nil
@@ -1499,37 +1517,36 @@ Usage:
 :unless EXPR   Opposite of `:if'.
                Initialize and load only if EXPR evaluates to a nil value.
 
-:after AFTER   Delay the effect of the imp-parser declaration
-               until after the named libraries have loaded.
-               Before they have been loaded, no other keyword
-               has any effect at all, and once they have been
+:after AFTER   Delay the effect of the imp-parser declaration until after the
+               named features have loaded. Before they have been loaded, no
+               other keyword has any effect at all, and once they have been
                loaded it is as if `:after' was not specified."
   (declare (indent defun))
   (unless (memq :disabled args)
     (macroexp-progn
      (imp-parser-concat
       ;; (when imp-parser-compute-statistics
-      ;;   `((imp-parser-statistics-gather :imp-parser ',name nil)))
+      ;;   `((imp-parser-statistics-gather :imp-parser ',feature nil)))
 
       ;; Let errors bubble up for now. They're more useful for debugging
       ;; and I don't have `imp-parser' integrated with imp's preexisting
       ;; debug/error stuff.
-      (imp-parser-core name args)
+      (imp-parser-core feature args)
 
       ;; (if (memq imp-parser-verbose '(errors debug))
-      ;;     (imp-parser-core name args)
+      ;;     (imp-parser-core feature args)
       ;;   (condition-case-unless-debug err
-      ;;       (imp-parser-core name args)
+      ;;       (imp-parser-core feature args)
       ;;     (error
       ;;      (ignore
       ;;       (display-warning
       ;;        'imp-parser
       ;;        (format "Failed to parse package %s: %s"
-      ;;                name (error-message-string err))
+      ;;                feature (error-message-string err))
       ;;        :error)))))
 
       ;; (when imp-parser-compute-statistics
-      ;;   `((imp-parser-statistics-gather :imp-parser ',name t)))
+      ;;   `((imp-parser-statistics-gather :imp-parser ',feature t)))
       ))))
 
 
