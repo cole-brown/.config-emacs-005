@@ -518,7 +518,8 @@ next value for the STATE."
 ;; TODO: and try to standardize the naming of the 2 or 3 different kinds of arg processing funcs.
 
 (defun imp-parser-args-only-one (keyword args)
-  "Call F on the first member of ARGS if it has exactly one element."
+  "Return the first member of ARGS if it has exactly one element.
+Else error."
   (cond
    ((and (listp args) (listp (cdr args))
          (= (length args) 1))
@@ -527,30 +528,31 @@ next value for the STATE."
     (imp-parser-error
      (concat (imp-parser-as-string keyword) " wants exactly one argument")))))
 
-(defun imp-parser-only-one (keyword args f)
-  "Call F on the first member of ARGS if it has exactly one element."
+(defun imp-parser-only-one (keyword args func)
+  "Call FUNC on the first member of ARGS if it has exactly one element.
+Else error."
   (cond
    ((and (listp args) (listp (cdr args))
          (= (length args) 1))
-    (funcall f keyword (car args)))
+    (funcall func keyword (car args)))
    (t
     (imp-parser-error
      (concat (imp-parser-as-string keyword) " wants exactly one argument")))))
 
-(defun imp-parser-as-one (keyword args f &optional allow-empty)
-  "Call F on the first element of ARGS if it has one element, or all of ARGS.
+(defun imp-parser-as-one (keyword args func &optional allow-empty)
+  "Call FUNC on the first element of ARGS if it has one element, or all of ARGS.
 If ALLOW-EMPTY is non-nil, it's OK for ARGS to be an empty list."
   (if (if args
           (and (listp args) (listp (cdr args)))
         allow-empty)
       (if (= (length args) 1)
-          (funcall f keyword (car args))
-        (funcall f keyword args))
+          (funcall func keyword (car args))
+        (funcall func keyword args))
     (imp-parser-error
      (concat (imp-parser-as-string keyword) " wants a non-empty list"))))
 
-(defun imp-parser-memoize (f arg)
-  "Ensure the macro-expansion of F applied to ARG evaluates ARG
+(defun imp-parser-memoize (func arg)
+  "Ensure the macro-expansion of FUNC applied to ARG evaluates ARG
 no more than once."
   (let ((loaded (cl-gentemp "imp-parser--loaded"))
         (result (cl-gentemp "imp-parser--result"))
@@ -559,7 +561,7 @@ no more than once."
       (defvar ,result nil)
       (defvar ,next #'(lambda () (if ,loaded ,result
                                    (setq ,loaded t ,result ,arg))))
-      ,@(funcall f `((funcall ,next))))))
+      ,@(funcall func `((funcall ,next))))))
 
 (defsubst imp-parser-normalize-value (_keyword arg)
   "Normalize the Lisp value given by ARG.
@@ -738,7 +740,7 @@ The argument KEYWORD is ignored."
 ;;         (t v)))
 
 ;; (defun imp-parser-normalize-commands (args)
-;;   "Map over ARGS of the form ((_ . F) ...), normalizing functional F's."
+;;   "Map over ARGS of the form ((_ . FUNC) ...), normalizing FUNCs."
 ;;   (mapcar #'(lambda (x)
 ;;               (if (consp x)
 ;;                   (cons (car x) (imp-parser-normalize-function (cdr x)))
