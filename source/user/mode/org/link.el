@@ -19,7 +19,7 @@
 ;;; Code:
 
 
-(imp-require :buffer 'region)
+(imp-require buffer region)
 
 
 ;;------------------------------------------------------------------------------

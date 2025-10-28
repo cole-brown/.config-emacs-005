@@ -22,7 +22,7 @@
 
 (require 'cl-lib)
 
-(imp-require :datetime 'datetime)
+(imp-require datetime datetime)
 
 
 ;;------------------------------------------------------------------------------

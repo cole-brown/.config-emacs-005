@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    TODO:(datetime:timestamp:insert :rfc-3339:date)
-;; Timestamp:  2025-10-27
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,7 +17,7 @@
 ;;; Code:
 
 ;; TODO-INCLUDES
-;; (imp-require :unit)
+;; (imp-require unit)
 ;; (require 'cl-lib)
 
 

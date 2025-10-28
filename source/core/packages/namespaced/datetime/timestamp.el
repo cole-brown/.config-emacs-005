@@ -16,7 +16,7 @@
 ;;
 ;;; Code:
 
-(imp-require :datetime 'format)
+(imp-require datetime format)
 
 
 ;;------------------------------------------------------------------------------

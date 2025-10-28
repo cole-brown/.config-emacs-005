@@ -45,7 +45,7 @@
 
 ;; Oh, hey; you're alive. Good job.
 
-(imp-require-assert :theme 'face)
+(imp-require-assert 'theme 'face)
 
 
 ;;------------------------------------------------------------------------------

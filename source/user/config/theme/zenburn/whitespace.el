@@ -16,7 +16,7 @@
 ;;
 ;;; Code:
 
-(imp-require :theme 'face)
+(imp-require theme face)
 
 ;;------------------------------------------------------------------------------
 ;; Zenburn Theme Tweaks for Whitespace-Mode

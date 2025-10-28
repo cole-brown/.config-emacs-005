@@ -19,7 +19,7 @@
 ;;; Code:
 
 
-(imp-require :buffer 'delete)
+(imp-require buffer delete)
 
 
 ;;------------------------------------------------------------------------------
