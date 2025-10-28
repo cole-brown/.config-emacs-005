@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-27
+;; Timestamp:  2025-10-28
 ;; Version:    1.1.20220413
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -121,5 +121,5 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :imp)
+(imp-provide imp)
 ;;; imp/init.el ends here

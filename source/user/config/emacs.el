@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-24
-;; Timestamp:  2025-10-13
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -402,4 +402,4 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :user 'config 'emacs)
+(imp-provide user config emacs)

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-20
-;; Timestamp:  2025-10-27
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -304,4 +304,4 @@ This is a wrapper around `eval-after-load' that:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :imp 'package)
+(imp-provide imp package)

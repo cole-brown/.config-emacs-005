@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-10-14
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -956,7 +956,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
 ;;------------------------------------------------------------------------------
 ;; The End of File.
 ;;------------------------------------------------------------------------------
-;; (imp-provide :emacs.d 'init)
+;; (imp-provide emacs.d init)
 
 ;;------------------------------------------------------------------------------
 ;; TODO: Not in here.

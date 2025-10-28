@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2023-02-24
-;; Timestamp:  2025-09-22
+;; Timestamp:  2025-10-28
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -296,4 +296,4 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :unit 'units)
+(imp-provide unit units)

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2025-09-22
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -182,4 +182,4 @@ Return string from `format-time-string'."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :datetime 'format)
+(imp-provide datetime format)

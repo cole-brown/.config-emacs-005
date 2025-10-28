@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    TODO:(datetime:timestamp:insert :rfc-3339:date)
-;; Timestamp:  2025-10-10
+;; Timestamp:  2025-10-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -36,4 +36,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :user 'config 'TODO-FILENAME)
+(imp-provide user config (imp-file-current :no-ext))

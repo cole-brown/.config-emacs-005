@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-22
-;; Timestamp:  2023-08-18
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -72,4 +72,4 @@ ARGS should be a list of args for formatting the STRING."
 ;; The End.
 ;;------------------------------------------------------------------------------
 ;; Don't provide - entirely internal to imp.
-;; (imp-provide :imp 'error)
+;; (imp-provide imp error)

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-27
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -34,7 +34,7 @@
   "Ensure file(s) for FEATURE are provided.
 
 Return non-nil on success."
-  (let ((feature-normal (imp--feature-normalize-chain feature)))
+  (let ((feature-normal (imp-feature-normalize feature)))
     ;; Already provided?
     (cond ((imp-feature? feature-normal)
            t)
@@ -75,4 +75,4 @@ Return non-nil on success."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :imp 'require)
+(imp-provide imp require)

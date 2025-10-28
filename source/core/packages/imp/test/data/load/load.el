@@ -65,5 +65,4 @@ That is: delete the variable from existance."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :test 'imp-load (imp-file-current))
-
+(imp-provide test imp-load (imp-file-current))

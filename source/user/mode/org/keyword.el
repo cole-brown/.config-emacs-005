@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-29
-;; Timestamp:  2023-06-29
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -404,4 +404,4 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :user 'mode 'org 'keyword)
+(imp-provide user mode org keyword)

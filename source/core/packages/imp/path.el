@@ -1237,8 +1237,8 @@ Must be called after 'provide.el' is loaded."
 ;; Set `imp' root idempotently.
 ;;   - Might as well automatically fill ourself in.
 ;;     - dogfood, etc.
-(unless (imp-path-root-get :imp 'no-error)
-  (imp-path-root-set :imp
+(unless (imp-path-root-get 'imp 'no-error)
+  (imp-path-root-set 'imp
                      (imp-path-current-dir)
                      "init.el"))
 
