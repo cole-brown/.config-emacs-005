@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-22
-;; Timestamp:  2025-10-13
+;; Timestamp:  2025-10-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -395,12 +395,12 @@ If VALUE is nil, just adds chain - does not add a nil child."
   ;; Don't allow a null chain.
   (when (or (null chain)
             (not (imp--tree-chain? chain)))
-    (imp--error "imp--tree-contains" "CHAIN is not a chain: %S" chain))
+    (imp--error "imp--tree-contains?" "CHAIN is not a chain: %S" chain))
 
   ;; Valid tree?
   (when (or (null tree)
             (not (imp--tree-tree? tree)))
-    (imp--error "imp--tree-contains" "TREE is not a tree: %S" tree))
+    (imp--error "imp--tree-contains?" "TREE is not a tree: %S" tree))
 
   (imp--tree-debug "imp--tree-contains?" "CHAIN and TREE verified as valid.\n  chain: %S\n  tree:\n    %S"
                    chain tree)

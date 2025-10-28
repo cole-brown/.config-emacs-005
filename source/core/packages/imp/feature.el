@@ -364,20 +364,28 @@ string or symbol name."
 ;; (imp-feature-join :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
 
 
-(defun imp-feature-split (&rest feature)
-  "`:foo/bar/baz' -> '(\":foo\" \"bar\" \"baz\")"
-  (let ((split (apply #'imp--feature-normalize-chain feature)))
-    (cons (string-remove-suffix imp--feature-separator-root
-                                (car split))
-          (cdr split))))
+(defun imp-feature-split (feature &optional symbols?)
+  "`foo:/bar/baz' -> '(\"foo\" \"bar\" \"baz\")
+
+Return list of strings.
+If SYMBOLS? is non-nil, return list of symbols."
+  (let ((split (apply #'imp--feature-normalize-chain
+                      (if (proper-list-p feature)
+                          feature
+                        (list feature)))))
+    (seq-map (if symbols? #'imp--feature-symbol #'identity)
+             (cons (string-remove-suffix imp--feature-separator-root
+                                         (car split))
+                   (cdr split)))))
 ;; (imp-feature-split nil)
 ;; (imp-feature-split '+layout/spydez)
+;; (imp-feature-split '+layout/spydez t)
 ;; (imp-feature-split 'foo:/bar/baz)
 ;; (imp-feature-split 'dne)
 ;; (imp-feature-split 'dne:/thing)
 ;; (imp-feature-split :imp 'foo 'bar "baz")
 ;; (imp-feature-split (imp-feature-join :imp 'foo 'bar "baz"))
-;; (imp-feature-split (imp-feature-join "+spydez" "foo" "bar"))
+;; (imp-feature-split (imp-feature-join "+spydez" "foo" "bar") t)
 
 
 (defun imp-feature-normalize (&rest feature)
@@ -413,8 +421,7 @@ NORMALIZED must already be a normalized (by `imp-feature-normalize') symbol."
   ;; (imp--debug "imp--feature-add" "imp-features before:\n%s"
   ;;                 (pp-to-string imp-features))
 
-  (let ((symbols (seq-map #'imp--feature-symbol
-                          (apply #'imp--feature-normalize-chain feature))))
+  (let ((symbols (imp-feature-split feature :symbols)))
     ;; Add normalized features to `imp-features' tree & set updated tree back
     ;; to `imp-features'.
     (imp--tree-update symbols nil imp-features)
