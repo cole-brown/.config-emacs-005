@@ -36,9 +36,7 @@
     (imp-file-current)
     (imp-path-current-dir)
 
-  (imp-load :feature  '(:unit units)
-            :filename "units")
-  )
+  (imp-parser unit:/units))
 
 
 ;;------------------------------------------------------------------------------

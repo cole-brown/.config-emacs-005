@@ -38,18 +38,13 @@
     (imp-file-current)
     (imp-path-current-dir)
 
-  (imp-load :feature  '(:elisp types)
-            :filename "types")
-  (imp-load :feature  '(:elisp functions)
-            :filename "functions")
+  (imp-parser types     :path pwd)
+  (imp-parser functions :path pwd)
 
   ;; TODO: refactor the rest of 'em.
-  ;; (imp-load :feature  '(:elisp predicates)
-  ;;           :filename "predicates")
-  ;; (imp-load :feature  '(:elisp utest)
-  ;;           :filename "test")
-  ;; (imp-load :feature  '(:elisp units)
-  ;;           :filename "units")
+  ;; (imp-parser predicates :path pwd)
+  ;; (imp-parser test       :path pwd)
+  ;; (imp-parser units      :path pwd)
   )
 
 

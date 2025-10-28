@@ -37,12 +37,9 @@
     (imp-file-current)
     (imp-path-current-dir)
 
-  (imp-load :feature  '(:datetime datetime)
-            :filename "datetime")
-  (imp-load :feature  '(:datetime format)
-            :filename "format")
-  (imp-load :feature  '(:datetime timestamp)
-            :filename "timestamp"))
+  (imp-parser datetime  :path pwd)
+  (imp-parser format    :path pwd)
+  (imp-parser timestamp :path pwd))
 
 ;;------------------------------------------------------------------------------
 ;; The End.

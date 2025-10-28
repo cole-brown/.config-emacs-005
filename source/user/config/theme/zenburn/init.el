@@ -83,13 +83,15 @@
 ;; Load Other Zenburn Files
 ;;------------------------------------------------------------------------------
 
-;; (imp:load :feature  '(:mantle theme zenburn org-mode)
-;;           :path     (imp:path:current:dir)
-;;           :filename "org-mode")
+;; (imp-parser org-mode
+;;   :path pwd
+;;   :after org
+;;   :after zenburn)
 
-(imp-load :feature  '(:user config theme zenburn whitespace)
-          :path     "config/theme/zenburn"
-          :filename "whitespace")
+(imp-parser whitespace
+  :path pwd
+  :after org
+  :after zenburn)
 
 
 ;;------------------------------------------------------------------------------

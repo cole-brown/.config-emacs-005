@@ -22,17 +22,12 @@
 ;;------------------------------------------------------------------------------
 
 (imp-timing
- '(:user mode org)
+ '(user mode org)
  (imp-file-current)
  (imp-path-current-dir)
 
-
- (imp-load :feature  '(:user mode org keyword)
-           :path     "mode/org" ;; (imp-path-current-dir)
-           :filename "keyword")
- (imp-load :feature  '(:user mode org link)
-           :path     "mode/org" ;; (imp-path-current-dir)
-           :filename "link"))
+ (imp-parser keyword :path pwd)
+ (imp-parser link :path pwd))
 
 
 ;;------------------------------------------------------------------------------

@@ -38,8 +38,7 @@
     (imp-file-current)
     (imp-path-current-dir)
 
-  (imp-load :feature  '(:theme face)
-            :filename "face"))
+  (imp-parser theme:/face))
 
 
 ;;------------------------------------------------------------------------------

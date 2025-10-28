@@ -49,34 +49,20 @@
     (imp-file-current)
     (imp-path-current-dir)
 
-  (imp-load :feature  '(:str normalize)
-  ;; :filename "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/str/normalize")
-            :filename "normalize")
+  (imp-parser str:/normalize)
   ;; TODO: refactor the rest of 'em.
-  ;; (imp-load :feature  '(:str regex)
-  ;;           :filename "regex")
-  ;; (imp-load :feature  '(:str buffer)
-  ;;           :filename "buffer")
-  ;; (imp-load :feature  '(:str string)
-  ;;           :filename "string")
-  ;; (imp-load :feature  '(:str propertize)
-  ;;           :filename "propertize")
-  ;; (imp-load :feature  '(:str hash)
-  ;;           :filename "hash")
+  ;; (imp-parser str:/regex)
+  ;; (imp-parser str:/buffer)
+  ;; (imp-parser str:/string)
+  ;; (imp-parser str:/propertize)
+  ;; (imp-parser str:/hash)
 
   ;; ;; Requires 'normalize', 'regex', and 'string'.
-  ;; (unless (imp-flag? :str -case)
-  ;;   (imp-load :feature  '(:str +case)
-  ;;             :filename "+case")
-
-  ;;   (unless (imp-flag? :str -hydra)
-  ;;     (imp-load :feature  '(:str +hydra +case)
-  ;;               :filename "+case-hydra")))
+  ;; (imp-parser str:/+case)
+  ;; (imp-parser str:/+case-hydra)
 
   ;; ;; Requires 'string'.
-  ;; (unless (imp-flag? :str -random)
-  ;;   (imp-load :feature  '(:str +random)
-  ;;             :filename "+random"))
+  ;; (imp-parser str:/+random)
 
   ;; End load timing.
   )

@@ -21,70 +21,53 @@
 ;; Org Helpers
 ;;------------------------------------------------------------------------------
 
-(imp-load :feature  '(:user mode org)
-          :path     "mode/org" ;; (imp-path-current-dir-relative :user)
-          :filename "init")
+(imp-parser user:/mode/org/init)
 
 
 ;;------------------------------------------------------------------------------
 ;; Org-Mode Itself
 ;;------------------------------------------------------------------------------
 
-(imp-load :feature  '(:user config org mode)
-          :path     "config/org" ;; (imp-path-current-dir-relative :user)
-          :filename "mode")
+(imp-parser mode :path pwd)
 
 ;; ...And now theme org mode itself...
-(imp-eval-after (:and zenburn-theme org)
-  (imp-load :feature  '(:user config org theme zenburn)
-            :path     "config/org" ;; (imp-path-current-dir-relative :user)
-            :filename "theme/zenburn"))
-;; TODO: another one for `hc-zenburn-theme'
+(imp-parser theme/zenburn
+  :path pwd
+  :after zenburn-theme
+  :after org)
 
 ;; Skip agenda for now... It doesn't jive well with hundreds of org files...
-;; (imp-load :feature  '(:user config org agenda)
-;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
-;;           :filename "agenda")
+;; (imp-parser agenda :path pwd)
 
 
 ;; ;;------------------------------------------------------------------------------
 ;; ;; Org-Journal
 ;; ;;------------------------------------------------------------------------------
 
-;; (imp-load :feature  '(:user config org journal)
-;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
-;;           :filename "journal")
+;; (imp-parser journal :path pwd)
 
 
 ;; ;;------------------------------------------------------------------------------
 ;; ;; Etc.
 ;; ;;------------------------------------------------------------------------------
 
-;; (imp-load :feature  '(:user config org contacts)
-;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
-;;           :filename "contacts")
+;; (imp-parser contacts :path pwd)
 
-;; (imp-load :feature  '(:user config org pretty)
-;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
-;;           :filename "pretty")
+;; (imp-parser pretty :path pwd)
 
 
 ;; ;;------------------------------------------------------------------------------
 ;; ;; Integration with Other Parts of Emacs
 ;; ;;------------------------------------------------------------------------------
 
-;; (imp-load :feature  '(:user config org version-control)
-;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
-;;           :filename "version-control")
+;; (imp-parser version-control :path pwd)
 
 
 ;; ;;--------------------------------------------------------------------------------
 ;; ;; Integration with Apps / Services
 ;; ;;--------------------------------------------------------------------------------
 
-;; (imp-load :feature  '(:user config org toggl)
-;;           :path     "source/user/org" ;; (imp-path-current-dir-relative :user)
-;;           :filename "toggl")
+;; (imp-parser toggl :path pwd)
 
 
 ;;------------------------------------------------------------------------------

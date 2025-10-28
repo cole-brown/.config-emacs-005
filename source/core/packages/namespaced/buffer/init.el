@@ -51,45 +51,28 @@
   ;; Required
   ;;------------------------------
 
-  (imp-load :feature  '(:buffer delete)
-            :filename "delete")
-  (imp-load :feature  '(:buffer region)
-            :filename "region")
+  (imp-parser buffer:/delete)
+  (imp-parser buffer:/region)
 
   ;; TODO: the rest
 
-  ;; (imp-load :feature  '(:buffer narrow)
-  ;;           :filename "narrow")
-  ;; (imp-load :feature  '(:buffer type)
-  ;;           :filename "type")
-  ;; (imp-load :feature  '(:buffer eval)
-  ;;           :filename "eval")
-  ;; (imp-load :feature  '(:buffer manage)
-  ;;           :filename "manage")
-  ;; (imp-load :feature  '(:buffer name)
-  ;;           :filename "name")
-  ;; (imp-load :feature  '(:buffer point)
-  ;;           :filename "point")
-
-  ;; (imp-load :feature  '(:buffer line)
-  ;;           :filename "line")
-  ;; (imp-load :feature  '(:buffer search)
-  ;;           :filename "search")
-  ;; (imp-load :feature  '(:buffer yank)
-  ;;           :filename "yank")
+  ;; (imp-parser buffer:/narrow)
+  ;; (imp-parser buffer:/type)
+  ;; (imp-parser buffer:/eval)
+  ;; (imp-parser buffer:/manage)
+  ;; (imp-parser buffer:/name)
+  ;; (imp-parser buffer:/point)
+  ;; (imp-parser buffer:/line)
+  ;; (imp-parser buffer:/search)
+  ;; (imp-parser buffer:/yank)
 
 
   ;;------------------------------
   ;; Optional
   ;;------------------------------
 
-  ;; (unless (imp-flag? :buffer '-commands)
-  ;;   (imp-load :feature  '(:buffer +commands)
-  ;;             :filename "+commands"))
-
-  ;; (unless (imp-flag? :buffer '-hydra)
-  ;;   (imp-load :feature  '(:buffer +hydra +line)
-  ;;             :filename "+line-hydra"))
+  ;; (imp-parser buffer:/+commands)
+  ;; (imp-parser buffer:/+line-hydra)
 
   )
 
