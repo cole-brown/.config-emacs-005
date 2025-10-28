@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-23
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -746,9 +746,12 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\")
 ;; (imp-path-current-file-relative :test)
 
 
-(defun imp-file-current ()
+(defun imp-file-current (&optional no-ext)
   "Return the filename (no path, just filename) this is called from."
-  (file-name-nondirectory (imp-path-current-file)))
+  (funcall (if no-ext #'imp--path-sans-extension #'identity)
+           (file-name-nondirectory (imp-path-current-file))))
+;; (imp-file-current)
+;; (imp-file-current t)
 
 
 (defun imp-path-current-dir ()
@@ -1199,36 +1202,6 @@ Return path string from `imp-path-roots' or nil."
   (imp--alist-delete feature-base imp-path-roots))
 ;; imp-path-roots
 ;; (imp-path-root-delete 'imp)
-
-
-;;------------------------------------------------------------------------------
-;; Internal API: Initialization
-;;------------------------------------------------------------------------------
-;; We are loaded before 'provide.el', but we have public functions that people
-;; may want, so we want to call:
-;;   (imp-provide-with-emacs :imp 'path)
-;;
-;; Instead of calling directly when this file is loaded/eval'd, we'll depend on
-;; 'init.el' to call this function.
-
-(defun imp--path-init ()
-  "Initialize imp's path functions/variables.
-
-This will:
-  - Call `imp-path-root' for setting imp's root dir & file.
-  - Provide 'path.el' feature to imp & emacs.
-
-Must be called after 'provide.el' is loaded."
-  ;; Set `imp' root.
-  ;;   - Might as well automatically fill ourself in.
-  (unless (imp-path-root-get :imp 'no-error)
-    (imp-path-root-set :imp
-                       ;; root dir
-                       (file-name-directory (if load-in-progress
-                                                load-file-name
-                                              (buffer-file-name)))
-                       ;; root file - just provide relative to dir/imp
-                       "init.el")))
 
 
 ;;------------------------------------------------------------------------------
