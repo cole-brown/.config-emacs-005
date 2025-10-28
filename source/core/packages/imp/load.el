@@ -117,10 +117,6 @@ Let `feature-base' be FEATURE (if just a keyword) or `(car FEATURE)' if a list.
 For Example:
   When:
     (imp-path-root-set :imp \"/path/to/imp-root\")
-    (imp-feature-at :imp
-                    '((:imp           \"init.el\")
-                      ((:imp provide) \"provide.el\")
-                      ...))
   Then this:
     (imp--load-feature :imp 'provide)
   Will try to load:
@@ -133,31 +129,17 @@ Does nothing if:
 
 Returns non-nil if loaded."
   (let* ((func-name "imp--load-feature")
-         (feature-normal (imp--feature-normalize-chain feature))
-         (feature-base (car feature-normal))
-         (feature-rest (cdr feature-normal))
-         (feature-emacs (imp-feature-normalize--for-emacs feature-normal))
-         (feature-emacs-base (imp-feature-normalize feature-base))
-         (feature-emacs-rest (if feature-rest
-                                 (imp-feature-normalize feature-rest)
-                               nil)))
+         (feature-normal (imp-feature-normalize feature))
+         (feature-base (imp-feature-first feature)))
     (imp--debug func-name
                 '("Inputs:\n"
                   "  - feature: %S\n"
                   "Normalized:\n"
                   "  - feature: %S\n"
-                  "  - base:    %S\n"
-                  "  - rest:    %S\n"
-                  "  - emacs:   %S\n"
-                  "    - feature:    %S\n"
-                  "    - subfeature: %S")
+                  "  - base:    %S")
                 feature
                 feature-normal
-                feature-base
-                feature-rest
-                feature-emacs
-                feature-emacs-base
-                feature-emacs-rest)
+                feature-base)
 
     ;;------------------------------
     ;; No path root?
