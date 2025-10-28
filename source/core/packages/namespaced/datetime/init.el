@@ -34,8 +34,7 @@
 
 (imp-timing
     '(:datetime)
-    (imp-file-current)
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   (imp-parser datetime  :path pwd)
   (imp-parser format    :path pwd)

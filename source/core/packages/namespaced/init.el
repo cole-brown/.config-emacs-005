@@ -26,8 +26,7 @@
 
 (imp-timing
     :namespaced
-    "init.el"
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   ;; Load all namespaced packages in proper order.
   ;; They use each other.

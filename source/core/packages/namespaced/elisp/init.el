@@ -35,8 +35,7 @@
 
 (imp-timing
     :elisp
-    (imp-file-current)
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   (imp-parser types     :path pwd)
   (imp-parser functions :path pwd)

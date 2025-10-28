@@ -46,8 +46,7 @@
 
 (imp-timing
     :str
-    (imp-file-current)
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   (imp-parser str:/normalize)
   ;; TODO: refactor the rest of 'em.

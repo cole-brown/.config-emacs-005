@@ -159,21 +159,13 @@ STATE is a plist of shit from other handlers that you can add to for other handl
 
 NAME and ARGS should be exactly as `use-package' requires.
 
-Does not load `use-package'; call should load it prior to using this.
-
-Available macro variables:
-  - `macro<imp>:path/file'
-  - `macro<imp>:path/dir'
-  - `macro<imp>:name/file'"
+Does not load `use-package'; call should load it prior to using this."
   (declare (indent 1))
   (let ((macro<imp>:feature (list :use-package name)))
-    `(let ((macro<imp>:path/file ,(imp-path-abbreviate (imp-path-current-file)))
-           (macro<imp>:path/dir  ,(imp-path-abbreviate (imp-path-current-dir)))
-           (macro<imp>:name/file ,(imp-file-current)))
+    `(let ((macro<imp>:path ,(imp-path-abbreviate (imp-path-current-file))))
        (imp-timing
            (quote ,macro<imp>:feature)
-           macro<imp>:path/file
-           macro<imp>:path/dir
+           macro<imp>:path
          (use-package ,name
            ,@args)))))
 ;; (imp-use-package test-foo)

@@ -44,8 +44,7 @@
 
 (imp-timing
     '(:buffer)
-    (imp-file-current)
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   ;;------------------------------
   ;; Required

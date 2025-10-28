@@ -21,10 +21,8 @@
 ;; Org-Mode Stuff
 ;;------------------------------------------------------------------------------
 
-(imp-timing
- '(user mode org)
- (imp-file-current)
- (imp-path-current-dir)
+(imp-timing '(user mode org)
+ (imp-path-current-file)
 
  (imp-parser keyword :path pwd)
  (imp-parser link :path pwd))

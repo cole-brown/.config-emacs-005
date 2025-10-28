@@ -33,8 +33,7 @@
 
 (imp-timing
     :unit
-    (imp-file-current)
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   (imp-parser unit:/units))
 

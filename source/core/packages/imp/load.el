@@ -98,8 +98,7 @@ FEATURE is only for `imp-timing' use."
                                ;; Time this load if timing is enabled.
                                (imp-timing
                                    feature
-                                   (imp--path-filename path-absolute)
-                                   (imp-path-parent    path-absolute)
+                                   path-absolute
                                  (imp--load-file path-absolute))))))))
 
 

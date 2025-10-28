@@ -267,7 +267,6 @@
 ;; Put the rest of user Emacs init under the `:emacs.d' namespace.
 (imp-timing :emacs.d
     (imp-path-current-file)
-    (imp-path-current-dir)
 
   ;;------------------------------------------------------------------------------
   ;; BASICALLY REQUIRED: `namespaced'

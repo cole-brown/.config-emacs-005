@@ -35,8 +35,7 @@
 
 (imp-timing
     :theme
-    (imp-file-current)
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   (imp-parser theme:/face))
 

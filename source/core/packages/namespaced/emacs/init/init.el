@@ -33,8 +33,7 @@
 
 (imp-timing
     :init
-    (imp-file-current)
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   ;; (imp-parser init:/vars)
   ;; (imp-parser init:/error)
