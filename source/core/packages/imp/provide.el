@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-27
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -31,10 +31,27 @@
 (defalias 'imp-provided? 'imp-feature?)
 (defalias 'imp-provided-p 'imp-feature?)
 
+(defun imp--provide-parse (args)
+  "Normalize the Lisp value given by ARGS."
+  (seq-map (lambda (arg)
+             (cond ((null arg) nil)
+                   ((eq t arg) t)
+                   ((and arg (symbolp arg))
+                    (if (bound-and-true-p arg)
+                        (symbol-value arg)
+                      arg))
+                   ((functionp arg)
+                    (funcall arg))
+                   (t
+                    (eval arg))))
+           args))
+;; (imp--provide-parse '(foo))
+;; (imp--provide-parse '(foo bar (imp-file-current :no-ext)))
+
 
 (defmacro imp-provide (&rest feature)
   `(let ((funcname 'imp-provide)
-         (feature-norm (imp-feature-normalize ',feature)))
+         (feature-norm (imp-feature-normalize (imp--provide-parse ',feature))))
      (unless feature-norm
        (imp--error "imp-provide"
                    '("No features to provide? "
@@ -49,7 +66,8 @@
      (provide feature-norm)
 
      feature-norm))
-;; (imp-provide 'foo 'bar)
+;; (imp-provide foo)
+;; (imp-provide foo bar (imp-file-current :no-ext))
 
 
 ;;------------------------------------------------------------------------------
