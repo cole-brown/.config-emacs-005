@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-10-27
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -80,15 +80,16 @@ For example:
 ;; Feature Helpers
 ;;------------------------------------------------------------------------------
 
-(defun imp-feature-exists? (features)
+(defun imp-feature-exists? (&rest feature)
   "Check for list of FEATURES in the `imp-features' tree."
   ;; When not `imp-features', always return `nil'.
   (when imp-features
-    (not (null (imp--tree-contains? (imp--feature-normalize-chain features)
+    (not (null (imp--tree-contains? (imp-feature-split feature :symbols)
                                     imp-features)))))
-;; (imp-feature-exists? '(:imp))
-;; (imp-feature-exists? '(:imp provide))
-;; (imp-feature-exists? '(:imp (provide)))
+;; (pp imp-features)
+;; (imp-feature-exists? 'imp)
+;; (imp-feature-exists? '(imp provide))
+;; (imp-feature-exists? '(imp (provide)))
 
 
 (defun imp-feature? (&rest feature)
