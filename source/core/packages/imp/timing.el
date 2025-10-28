@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-07
-;; Timestamp:  2025-10-16
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -43,18 +43,12 @@
 ;; Timings Toggle
 ;;------------------------------------------------------------------------------
 
-;; NOTE: Doom Emacs can add the feature flag `+timing' to "doom/init.el".
-(defconst imp-timing-feature? (imp-flag? :imp +timing)
-  "Cache of our feature flag.")
-
-
 (defun imp-timing-enabled? ()
   "Return non-nil if timing is enabled.
 
 Specifically, if `imp-timing-enabled?' is non-nil or imp's `+timing'
 feature flag is set."
-  (or imp-timing-enabled?
-      imp-timing-feature?))
+  imp-timing-enabled?)
 ;; (imp-timing-enabled?)
 
 
