@@ -2895,17 +2895,30 @@ CLOSED: [2025-10-23 Thu 23:55]
 Make sure there are no refs to each func/var first.
 
 
+* ├DONE───┤ gptel: modify org mode layout?
+CLOSED: [2025-10-24 Fri 00:08]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-24 Fri 00:08]
+:END:
+
+Can I get, like...
+
+#+begin_quote
+human> blah blah blah
+
+InternGPT>
+lorem ipsum dolor sit amet...
+#+end_quote
+
+Look in [[file:~/.config/emacs/elpa/gptel-20250818.648/gptel-org.el::;;; gptel-org.el --- Org functions for gptel -*- lexical-binding: t; -*-][here]] somewhere.
+
 * -- U R HERE --
 <<here>>
 
-* org-babel no confirm
-
-write a func that ~org-confirm-babel-evaluate~ can use to decide
-whether to prompt with ~y-or-n-p~
-
-by source type (major-mode)?
-
-* imp-parser MVP
+* ├CURRENT┤ imp-parser MVP
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-10-24 Fri 13:38]
+:END:
 
 After restarting emacs & returning to this branch:
 #+begin_src elisp
@@ -2915,21 +2928,37 @@ After restarting emacs & returning to this branch:
 #+end_src
 
 
-** Check TODOs
+** ├DONE───┤ Check TODOs
+CLOSED: [2025-10-24 Fri 13:22]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-24 Fri 13:22]
+:END:
 
 Any that will prevent me from starting to use imp-parser?
 
-** imp-parser: fix param names
+Don't see any.
+
+** ├DONE───┤ imp-parser: fix param names
+CLOSED: [2025-10-24 Fri 14:14]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-10-24 Fri 14:14]
+:END:
 
 eg NAME -> FEATURE
   - ...or should it be FEATURE -> NAME???
+  - [X] k
 
 LABEL is... what? KEYWORD?
+  - it is ~(symbol-name keyword)~
+  - [X] k
+
+F -> FUNC?
+  - [X] k
 
 ARG vs ARGS
   - things that only work on lists should not say ARG.
+  - [X] k
 
-F -> FUNC?
 
 Either commit to the underscores or delete 'em.
 eg:
@@ -2941,7 +2970,61 @@ eg:
   ...)
 
 #+end_src
+  - [X] k
 
+
+** ├CURRENT┤ provide.el
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-10-27 Mon 13:35]
+:END:
+
+Might need to rework `imp-provide` and `imp-require` for new imp feature names?
+
+Do want them to be macros
+
+Do need to rework all callers.
+#+begin_src elisp
+(imp-provide :imp 'parser)
+#+end_src
+
+should be:
+#+begin_src elisp
+;; macro so no quotes required
+(imp-provide imp parser)
+;; But still allowed.
+(imp-provide 'imp 'parser)
+#+end_src
+
+imp-unprovide [[file:source/core/packages/imp/provide.el::defun imp-unprovide (&rest feature][here]]
+  - k
+
+** require.el
+
+same deal as [[*provide.el][provide.el]]
+
+Might need to rework `imp-provide` and `imp-require` for new imp feature names?
+
+Do want them to be macros
+
+Do need to rework all callers.
+#+begin_src elisp
+(imp-provide :imp 'parser)
+#+end_src
+
+should be:
+#+begin_src elisp
+;; macro so no quotes required
+(imp-provide imp parser)
+;; But still allowed.
+(imp-provide 'imp 'parser)
+#+end_src
+
+
+
+** Testing
+
+Make sure this is a functional, working MVP.
+Convert init.el (or something) over to imp-parse and see if it can handle it
 
 ** imp-parser: rename?
 
@@ -2955,12 +3038,69 @@ Delete/move old imp-load func(s).
   - delete the `imp-load` funcs themselves.
   - Move any load.el funcs we wanna keep into parser.el
 
-Might need to rework `imp-provide` and `imp-require` for new imp feature names?
+Delete load.el
 
+Rename parser.el to load.el
+
+Maybe?
+~load.el~ is 1500 lines long. Split it up?
+Split ~load.el~ up into tree:
+  - load/
+    - parse.el
+    - normalize.el (helper funcs for normalizing)
+    - statistics.el?
+    - keywords.el (keyword normalizers & handlers)
+    - etc...
+
+** imp-provide: no colons?
+
+Should we not include ":" in name given to ~features~?
+or does it work fine as-is?
+
+* auth-source / 1pass
+
+what dis? ~gptel~ uses it by default to find API key.
+
+Can I hook in 1pass?
+
+
+* namespace
+
+want my ~window:kill-or-quit~
+  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
+  - and ~deadgrep~ maybe?
+
+most wanted:
+  1. path
+  2. datetime
+  3. buffer
+  4. unit
+
+* my public IP(s)
+
+is there a package that will figure out my IP for me?
+
+else just make a call to the one that I used for the bash prompt
+
+* org-babel no confirm
+
+write a func that ~org-confirm-babel-evaluate~ can use to decide
+whether to prompt with ~y-or-n-p~
+
+by source type (major-mode)?
 
 * TRAMP into Win10 VM
 
 I probably need an ssh server running or something.
+
+I think Windows comes with OpenSSH now?
+  - Does it come with server?
+  - Else what should I use for the server?
+    - Putty?
+
+* imp unit tests?
+
+What all does ~use-package~ do for its tests?
 
 * use-package-editor
 
@@ -2979,19 +3119,6 @@ I wanna be able to put the cusor after ~(gptel-model 'gpt-4o)~ and ~eval-last-se
 Instead of having to add ~setq~ (or ideally ~customize-set-variable~) to the front.
 
 
-* my public IP(s)
-
-is there a package that will figure out my IP for me?
-
-else just make a call to the one that I used for the bash prompt
-
-* auth-source / 1pass
-
-what dis? ~gptel~ uses it by default to find API key.
-
-Can I hook in 1pass?
-
-
 * gptel: PrivateGPT
 
 gptel can support PrivateGPT
@@ -3000,25 +3127,6 @@ gptel can support PrivateGPT
 https://github.com/zylon-ai/private-gpt
 
 Get that running on my work org notes?
-* gptel: modify org mode layout?
-
-Can I get, like...
-
-#+begin_quote
-human> blah blah blah
-
-InternGPT>
-lorem ipsum dolor sit amet...
-#+end_quote
-
-Look in [[file:~/.config/emacs/elpa/gptel-20250818.648/gptel-org.el::;;; gptel-org.el --- Org functions for gptel -*- lexical-binding: t; -*-][here]] somewhere.
-
-* namespaced window
-
-want my ~window:kill-or-quit~
-  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
-  - and ~deadgrep~ maybe?
-
 * ├CURRENT┤ csharp & treesit?
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2025-10-08 Wed 23:01]
@@ -3076,14 +3184,6 @@ file:source/user/config/languages/
   (push '("json"                    . json-ts)    org-src-lang-modes)
 #+end_src
 
-
-* namespace
-
-most wanted:
-  1. path
-  2. datetime
-  3. buffer
-  4. unit
 
 * imp output
 
@@ -3159,9 +3259,6 @@ Or just like a generic ~:vars~ or ~:custom~?
 
 Add to ~imp-parser~ docstr
   - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
-
-** Make provide and require macros
-  - find an example of what is wanted from this?
 
 * snippet: notes directive
 
