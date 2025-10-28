@@ -1,10 +1,10 @@
-;;; core/modules/emacs/imp/package.el --- `imp' + `use-package' = `imp-use-package' -*- lexical-binding: t; -*-
+;;; imp/package.el --- `imp' + `use-package' = `imp-use-package' -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-20
-;; Timestamp:  2025-10-13
+;; Timestamp:  2025-10-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

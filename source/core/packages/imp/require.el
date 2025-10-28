@@ -1,10 +1,10 @@
-;;; core/modules/emacs/imp/provide.el --- Require a feature from imp. -*- lexical-binding: t; -*-
+;;; imp/provide.el --- Require a feature from imp. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-13
+;; Timestamp:  2025-10-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

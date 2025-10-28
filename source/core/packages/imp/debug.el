@@ -1,10 +1,10 @@
-;;; core/modules/emacs/imp/debug.el --- Delouse the Imps. -*- lexical-binding: t; -*-
+;;; imp/debug.el --- Delouse the Imps. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-03-09
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-10-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

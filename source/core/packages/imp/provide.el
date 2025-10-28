@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/provide.el --- Provide a feature. -*- lexical-binding: t; -*-
+;;; imp/provide.el --- Provide a feature. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>

@@ -1,10 +1,10 @@
-;;; imp/init.el --- Structured IMPort/export of elisp features  -*- lexical-binding: t; -*-
+;;; imp/init.el --- Structured IMPort of elisp features  -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2024-10-02
+;; Timestamp:  2025-10-27
 ;; Version:    1.1.20220413
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
