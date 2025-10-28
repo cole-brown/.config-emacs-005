@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-10-21
+;; Timestamp:  2025-10-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -432,22 +432,25 @@ NORMALIZED must already be a normalized (by `imp-feature-normalize') symbol."
     ;; Not sure what to return, but the updated features seems decent enough.
     imp-features))
 ;; (setq imp-features nil)
-;; (imp--feature-add '(:test foo))
+;; (imp--feature-add '(foo bar))
 ;; imp-features
-;; (imp--feature-add '(:imp or something here))
-;; (imp--alist-get-value :imp imp-features)
-;; (imp--tree-contains? '(:imp) imp-features)
-;; (imp--tree-contains? '(:imp or something) imp-features)
+;; (imp--feature-add '(imp or something here))
+;; (imp--alist-get-value 'imp imp-features)
+;; (imp--tree-contains? '(imp) imp-features)
+;; (imp--tree-contains? '(imp or something) imp-features)
 
 
-(defun imp--feature-get-tree (normalized)
-  "Get tree of NORMALIZED features from `imp-features'."
-  (imp--tree-contains? normalized imp-features))
+(defun imp--feature-get-tree (&rest feature)
+  "Get full tree of features that contains FEATURE from `imp-features'."
+  (imp--tree-key-exists? (apply #'imp-feature-first feature) imp-features))
+;; (imp--feature-get-tree 'imp)
 
 
-(defun imp--feature-delete (normalized)
+(defun imp--feature-delete (&rest feature)
   "Remove the NORMALIZED feature, and all subfeatures, from `imp-features'."
-  (imp--tree-delete normalized imp-features))
+  (imp--tree-delete (imp-feature-split feature :symbols) imp-features))
+;; (pp imp-features)
+;; (imp--feature-delete 'foo/bar)
 
 
 ;;------------------------------------------------------------------------------
