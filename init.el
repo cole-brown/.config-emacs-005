@@ -289,7 +289,7 @@
 
   (imp-parser namespaced
     :root
-    :path (imp-path-join :emacs.d 'source 'core 'packages 'namespaced 'init.el))
+    :path (imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
 
 
   ;;------------------------------------------------------------------------------

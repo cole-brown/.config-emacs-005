@@ -1132,11 +1132,14 @@ If the path is relative, root it in one of:
                   paths
                   path))
 
-    ;; Add rest of FEATURE to path; is a relative path.
-    (setq path (apply #'imp-path-join
-                      path
-                      ;; FEATURE, with or without root.
-                      feature-path))
+    ;; We're done if path itself is a full, loadable path.
+    (unless (imp-path-load-file path)
+      ;; Add rest of FEATURE to path; is a relative path.
+      (setq path (apply #'imp-path-join
+                        path
+                        ;; FEATURE, with or without root.
+                        feature-path)))
+
     path))
 ;; (imp-parser-normalize/:path 'user :path '("/foo/bar"))
 ;; (imp-parser-normalize/:path 'user :path '("foo/bar"))
@@ -1148,7 +1151,15 @@ If the path is relative, root it in one of:
 (defun imp-parser-handler/:path (feature keyword arg rest state)
   "Put `:path' and `:path-load' into state."
   (setq state (imp-parser-plist-maybe-put state keyword arg))
-  (setq state (imp-parser-plist-maybe-put state :path-load (imp-path-load-file arg)))
+
+  (if-let ((path-load (imp-path-load-file arg)))
+      (setq state (imp-parser-plist-maybe-put state :path-load path-load))
+    (imp--error 'imp-parser-handler/:path
+                '("Cannot find a load path from path. "
+                  "Is path pointing to a file (with or without ext)? "
+                  "path: %S")
+                arg))
+
   ;; TODO(stats): Add path & load-path to stats?
   (imp-parser-process-keywords feature rest state))
 
