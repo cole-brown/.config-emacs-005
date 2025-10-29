@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -66,53 +66,6 @@ respectively."
   (and (consp x)
        (funcall car-pred (car x))
        (funcall cdr-pred (cdr x))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;;; Property Lists
-;;
-
-(defun imp-parser-plist-delete (plist property)
-  "Delete PROPERTY from PLIST.
-This is in contrast to merely setting it to 0."
-  (let (p)
-    (while plist
-      (if (not (eq property (car plist)))
-          (setq p (plist-put p (car plist) (nth 1 plist))))
-      (setq plist (cddr plist)))
-    p))
-
-(defun imp-parser-plist-delete-first (plist property)
-  "Delete PROPERTY from PLIST.
-This is in contrast to merely setting it to 0."
-  (let (p)
-    (while plist
-      (if (eq property (car plist))
-          (setq p (nconc p (cddr plist))
-                plist nil)
-        (setq p (nconc p (list (car plist) (cadr plist)))
-              plist (cddr plist))))
-    p))
-
-(defsubst imp-parser-plist-maybe-put (plist property value)
-  "Add a VALUE for PROPERTY to PLIST, if it does not already exist."
-  (if (plist-member plist property)
-      plist
-    (plist-put plist property value)))
-
-(defun imp-parser-split-list (pred xs)
-  (let ((ys (list nil))
-        (zs (list nil))
-        flip)
-    (cl-dolist (x xs)
-      (if flip
-          (nconc zs (list x))
-        (if (funcall pred x)
-            (progn
-              (setq flip t)
-              (nconc zs (list x)))
-          (nconc ys (list x)))))
-    (cons (cdr ys) (cdr zs))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
