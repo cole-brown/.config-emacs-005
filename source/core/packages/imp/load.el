@@ -339,6 +339,7 @@ next value for the STATE."
 ;;;; `:path'
 ;;------------------------------
 
+;; TODO(path): move to path.el & rename
 (defun imp-parser-normalize-path-symbol (feature keyword arg)
   "Convert a path symbol (eg `relative') into a path string."
   (when (symbolp arg)
@@ -388,6 +389,7 @@ next value for the STATE."
 ;; (imp-parser-normalize-path-symbol :user :path 'user-emacs-directory)
 ;; (imp-parser-normalize-path-symbol :user :path 'foo)
 
+;; TODO(path): move to path.el & rename
 (defun imp-parser-normalize-path-string (feature keyword arg)
   "Convert path prefixes ('./', ':/') in the path arg string."
   (when (stringp arg)
@@ -417,6 +419,7 @@ next value for the STATE."
 ;; (imp-parser-normalize-path-string :user :path "./foo/bar")
 ;; (imp-parser-normalize-path-string 'foo/bar/init :path ":/bar/")
 
+;; TODO(path): move to path.el & rename
 (defun imp-parser-normalize-path-one-arg (feature keyword arg &optional no-recurse)
   ;; Don't handle lists of things. That is handled above us.
   (cond
@@ -458,6 +461,7 @@ next value for the STATE."
 ;; symbol-value: (imp-parser-normalize-path-one-arg 'user :path 'user-emacs-directory)
 ;; unknown: (imp-parser-normalize-path-one-arg 'test :path 'invalid)
 
+;; TODO(path): move to path.el & rename
 (defun imp-parser-normalize-path-args-list (feature keyword args)
   "Determine what each arg in ARGS lits is, exactly.
 
@@ -481,6 +485,7 @@ ARGS should be the raw args list from func `imp-parser-normalize-keywords'."
 ;; (imp-parser-normalize-path-args-list 'user :path '(pwd))
 ;; (imp-parser-normalize-path-args-list 'user :path '(foo))
 
+;; TODO(path): move to path.el & rename
 (defun imp-parser-normalize-paths (feature keyword args)
   "Normalize ARGS (list) to absolute, canonical paths."
   ;; Normalize args list into list of paths.
@@ -504,6 +509,53 @@ ARGS should be the raw args list from func `imp-parser-normalize-keywords'."
 ;; (imp-parser-normalize-paths :user :path '(user-emacs-directory))
 ;; (imp-parser-normalize-paths :user :path '(foo))
 
+;; TODO(path): move to path.el & rename to `imp-path-apply-feature' w/ params (path feature)
+(defun imp-parser-normalize-path-feature (feature keyword path)
+  "Add the relevant parts of FEATURE to PATH.
+
+PATH can be nil.
+
+Return nil if errored. Caller is expected to have a better understanding of
+what to say to end user."
+  ;; We're done if path itself is a full, loadable path.
+  (unless (imp-path-load-file path)
+    (let* ((funcname 'imp-parser-normalize-path-feature)
+           (append-to-path (imp-feature-split feature)))
+      (unless path
+        ;; No path. We need to get an absolute path from FEATURE.
+        ;; If we can't get one, we'll have to error.
+        (cond
+         ;; Do we know about this feature's root path?
+         ((imp-feature-root feature)
+          (setq path (imp-path-root-get (imp-feature-root feature)))
+          (setq append-to-path (imp-feature-unrooted feature)))
+
+         ;; Does it start with a "./"?
+         ((string-prefix-p "./" (symbol-name feature))
+          ;; Absolute path is "here".
+          (setq path (imp-path-current-dir))
+          ;; `(imp-feature-split './foo) == '(. foo)
+          ;; Delete the "." from that.
+          (setq append-to-path (cdr append-to-path)))
+
+         ;; Error: An absolute path does not exist.
+         ;; But we want our caller to error as they'll have more info for
+         ;; a better error message.
+         ;; So... just leave path as nil.
+         (t
+          nil)))
+
+      ;; Did we end up with an absolute path?
+      (when (and (stringp path)
+                 (file-name-absolute-p path))
+        ;; Add (the rest of) FEATURE to the end of path.
+        (apply #'imp-path-join
+               path
+               append-to-path)))))
+;; (imp-parser-normalize-path-feature './foo :path nil)
+;; (imp-parser-normalize-path-feature 'imp/foo :path nil)
+;; (imp-parser-normalize-path-feature 'imp/foo :path "/jeff")
+
 (defun imp-parser-normalize/:path (feature keyword args)
   "Normalize `:path' ARGS to absolute & canonical path string.
 
@@ -523,14 +575,12 @@ If the path is relative, root it in one of:
          ;; `imp-parser-normalize-paths' works on and returns lists.
          (path (car paths)))
 
-    ;; If no path supplied and feature is rooted, use feature root's path.
-    (when (and (not path)
-               (imp-feature-root feature))
-      (setq path (imp-path-root-get (imp-feature-root feature)))
-      ;; Take FEATURE out of PATH since we used it just now.
-      (setq feature-path (imp-feature-unrooted feature)))
+    ;; Apply any relevant parts of FEATURE to PATH.
+    ;; FEATURE can be part of or even all of the path.
+    ;; Does nothing if PATH is already a valid load path.
+    (setq path (imp-parser-normalize-path-feature feature keyword path))
 
-    ;; Double Check: We got an absolute path, right?
+    ;; Verify: We got an absolute path, right?
     (unless (and (stringp path)
                  (file-name-absolute-p path))
       (imp--error funcname
@@ -540,14 +590,6 @@ If the path is relative, root it in one of:
                   args
                   paths
                   path))
-
-    ;; We're done if path itself is a full, loadable path.
-    (unless (imp-path-load-file path)
-      ;; Add rest of FEATURE to path; is a relative path.
-      (setq path (apply #'imp-path-join
-                        path
-                        ;; FEATURE, with or without root.
-                        feature-path)))
 
     path))
 ;; (imp-parser-normalize/:path 'user :path '("/foo/bar"))
