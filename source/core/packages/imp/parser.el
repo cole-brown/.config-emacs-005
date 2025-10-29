@@ -27,9 +27,6 @@
 (require 'cl-lib)
 
 
-;; TODO(stats): use any of predecessor's stats?
-(defvar imp-parser-statistics (make-hash-table))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Utility functions
@@ -591,123 +588,6 @@ no more than once."
   "Save KEYWORD & ARG into STATE plist for later use."
   (setq state (imp-parser-plist-maybe-put state keyword arg))
   (imp-parser-process-keywords feature rest state))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;;; Statistics
-;;
-;; TODO(stats): use any of predecessor's stats?
-
-;; (defun imp-parser-reset-statistics ()
-;;   "Reset statistics for `imp-parser'.
-;; See also `imp-parser-statistics'."
-;;   (interactive)
-;;   (setq imp-parser-statistics (make-hash-table)))
-
-;; (defun imp-parser-statistics-status (package)
-;;   "Return loading configuration status of PACKAGE statistics."
-;;   (cond ((gethash :config package)      "Configured")
-;;         ((gethash :init package)        "Initialized")
-;;         ((gethash :preface package)     "Prefaced")
-;;         ((gethash :imp-parser package) "Declared")))
-
-;; (defun imp-parser-statistics-last-event (package)
-;;   "Return the date when PACKAGE's status last changed.
-;; The date is returned as a string."
-;;   (or (gethash :config package)
-;;       (gethash :init package)
-;;       (gethash :preface package)
-;;       (gethash :imp-parser package)))
-
-;; (defun imp-parser-statistics-time (package)
-;;   "Return the time is took for PACKAGE to load."
-;;   (+ (float-time (gethash :config-secs package '(0 0 0 0)))
-;;      (float-time (gethash :init-secs package '(0 0 0 0)))
-;;      (float-time (gethash :preface-secs package '(0 0 0 0)))
-;;      (float-time (gethash :imp-parser-secs package '(0 0 0 0)))))
-
-;; (defun imp-parser-statistics-convert (package)
-;;   "Return information about PACKAGE.
-
-;; The information is formatted in a way suitable for
-;; `imp-parser-statistics-mode'."
-;;   (let ((statistics (gethash package imp-parser-statistics)))
-;;     (list
-;;      package
-;;      (vector
-;;       (symbol-name package)
-;;       (imp-parser-statistics-status statistics)
-;;       (format-time-string
-;;        "%H:%M:%S.%6N"
-;;        (imp-parser-statistics-last-event statistics))
-;;       (format "%.2f" (imp-parser-statistics-time statistics))))))
-
-;; (defun imp-parser-report ()
-;;   "Show current statistics gathered about `imp-parser' declarations.
-;; In the table that's generated, the status field has the following
-;; meaning:
-;;   Configured        :config has been processed (the package is loaded!)
-;;   Initialized       :init has been processed (load status unknown)
-;;   Prefaced          :preface has been processed
-;;   Declared          the imp-parser declaration was seen"
-;;   (interactive)
-;;   (with-current-buffer (get-buffer-create "*imp-parser statistics*")
-;;     (setq tabulated-list-entries
-;;           (mapcar #'imp-parser-statistics-convert
-;;                   (hash-table-keys imp-parser-statistics)))
-;;     (imp-parser-statistics-mode)
-;;     (tabulated-list-print)
-;;     (display-buffer (current-buffer))))
-
-;; (defvar imp-parser-statistics-status-order
-;;   '(("Declared"    . 0)
-;;     ("Prefaced"    . 1)
-;;     ("Initialized" . 2)
-;;     ("Configured"  . 3)))
-
-;; (define-derived-mode imp-parser-statistics-mode tabulated-list-mode
-;;   "imp-parser statistics"
-;;   "Show current statistics gathered about `imp-parser' declarations."
-;;   (setq tabulated-list-format
-;;         ;; The sum of column width is 80 characters:
-;;         [("Package" 25 t)
-;;          ("Status" 13
-;;           (lambda (a b)
-;;             (< (assoc-default
-;;                 (imp-parser-statistics-status
-;;                  (gethash (car a) imp-parser-statistics))
-;;                 imp-parser-statistics-status-order)
-;;                (assoc-default
-;;                 (imp-parser-statistics-status
-;;                  (gethash (car b) imp-parser-statistics))
-;;                 imp-parser-statistics-status-order))))
-;;          ("Last Event" 23
-;;           (lambda (a b)
-;;             (< (float-time
-;;                 (imp-parser-statistics-last-event
-;;                  (gethash (car a) imp-parser-statistics)))
-;;                (float-time
-;;                 (imp-parser-statistics-last-event
-;;                  (gethash (car b) imp-parser-statistics))))))
-;;          ("Time" 10
-;;           (lambda (a b)
-;;             (< (imp-parser-statistics-time
-;;                 (gethash (car a) imp-parser-statistics))
-;;                (imp-parser-statistics-time
-;;                 (gethash (car b) imp-parser-statistics)))))])
-;;   (setq tabulated-list-sort-key '("Time" . t))
-;;   (tabulated-list-init-header))
-
-;; (defun imp-parser-statistics-gather (keyword feature after)
-;;   (let* ((hash (gethash feature imp-parser-statistics
-;;                         (make-hash-table)))
-;;          (before (and after (gethash keyword hash (current-time)))))
-;;     (puthash keyword (current-time) hash)
-;;     (when after
-;;       (puthash (intern (concat (symbol-name keyword) "-secs"))
-;;                (time-subtract (current-time) before) hash))
-;;     (puthash feature hash imp-parser-statistics)))
 
 
 ;;------------------------------------------------------------------------------
