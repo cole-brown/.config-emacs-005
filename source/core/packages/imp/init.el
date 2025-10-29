@@ -50,8 +50,14 @@
 ;;
 ;;; Code:
 
+;; Require everything that any imp file uses here to keep track of
+;; external dependencies?
 (require 'cl-macs)
+(require 'cl-lib)
 
+
+(defconst imp-version "0.3.0"
+  "This version of `imp'.")
 
 ;;------------------------------------------------------------------------------
 ;; Function for to Load our own Files...

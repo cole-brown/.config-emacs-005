@@ -26,17 +26,6 @@
 
 (require 'cl-lib)
 
-;; TODO: move, merge with imp's existing defgroup
-(defgroup imp-parser nil
-  "A `imp-parser' declaration for simplifying your `.emacs'."
-  :group 'initialization
-  ;; :link '(custom-manual "(imp-parser) Top")
-  :version "30.2")
-
-;; TODO: move, use for all of imp
-(defconst imp-parser-version "1.0.0"
-  "This version of `imp-parser'.")
-
 (defcustom imp-parser-keywords
   '(:disabled
     ;; TODO(stats): uncomment

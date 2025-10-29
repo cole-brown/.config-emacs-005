@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-04-16
-;; Timestamp:  2025-10-20
+;; Timestamp:  2025-10-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,9 +24,10 @@
 
 
 (defgroup imp nil
-  "Automatically-ish commit/push git repos for note, docs, etc."
-  :prefix "imp-"
-  :group 'initialization)
+  "A `imp-parser' declaration for simplifying your `.emacs'."
+  :group 'initialization
+  ;; :link '(custom-manual "(imp-parser) Top")
+  :version "30.2")
 
 
 ;;------------------------------------------------------------------------------
