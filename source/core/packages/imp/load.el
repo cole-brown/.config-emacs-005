@@ -518,7 +518,9 @@ PATH can be nil.
 Return nil if errored. Caller is expected to have a better understanding of
 what to say to end user."
   ;; We're done if path itself is a full, loadable path.
-  (unless (imp-path-load-file path)
+  (if (imp-path-load-file path)
+      path
+
     (let* ((funcname 'imp-parser-normalize-path-feature)
            (append-to-path (imp-feature-split feature)))
       (unless path
