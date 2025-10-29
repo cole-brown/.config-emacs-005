@@ -54,6 +54,7 @@
 ;; external dependencies?
 (require 'cl-macs)
 (require 'cl-lib)
+(require 'seq)
 
 
 (defconst imp-version "0.3.0"
@@ -70,12 +71,12 @@
                      path-relative
                      (directory-file-name
                       (file-name-directory
-                       ;; this is just `imp-path-current-file'
+                       ;; This is just `imp-path-current-file' as of 2025-10-29
                        (cond ((bound-and-true-p byte-compile-current-file))
-                             (load-file-name)
+                             ((bound-and-true-p load-file-name))
                              ((stringp (car-safe current-load-list))
                               (car current-load-list))
-                             (buffer-file-name)
+                             ((buffer-file-name (buffer-base-buffer)))
                              ((error "Cannot find filepath for filename '%s'"))))))
                     nil
                     ;; NOTE: Commenting out this `nomessage' can help debug Emacs start-up.
