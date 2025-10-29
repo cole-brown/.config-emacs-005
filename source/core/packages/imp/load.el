@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -31,6 +31,243 @@
 ;;; Code:
 
 (require 'cl-lib)
+
+;;------------------------------------------------------------------------------
+;;; Keyword Processing
+;;------------------------------------------------------------------------------
+
+;;; Keywords
+;;
+
+(defun imp-parser-keyword-index (keyword)
+  (cl-loop named outer
+           with index = 0
+           for k in imp-parser-keywords do
+           (if (eq k keyword)
+               (cl-return-from outer index))
+           (cl-incf index)))
+
+(defun imp-parser-normalize-plist (feature input &optional plist merge-function)
+  "Given a pseudo-plist, normalize it to a regular plist.
+The normalized key/value pairs from input are added to PLIST,
+extending any keys already present."
+  (if (null input)
+      plist
+    (let* ((keyword (car input))
+           (xs (imp-parser-split-list #'keywordp (cdr input)))
+           (args (car xs))
+           (tail (cdr xs))
+           (normalizer
+            (intern-soft (concat "imp-parser-normalize/"
+                                 (symbol-name keyword))))
+           (args-norm (and (functionp normalizer)
+                     (funcall normalizer feature keyword args)))
+           (error-string (format "Unrecognized keyword: %s" keyword)))
+      (if (memq keyword imp-parser-keywords)
+          (progn
+            (setq plist (imp-parser-normalize-plist
+                         feature tail plist merge-function))
+            (plist-put plist keyword
+                       (if (plist-member plist keyword)
+                           (funcall merge-function keyword args-norm
+                                    (plist-get plist keyword))
+                         args-norm)))
+        (if imp-parser-ignore-unknown-keywords
+            (progn
+              (display-warning 'imp-parser error-string)
+              (imp-parser-normalize-plist
+               feature tail plist merge-function))
+          (imp-parser-error error-string))))))
+
+(defun imp-parser-unalias-keywords (feature args)
+  "Convert `:when' and `:unless' in ARGS to `:if'."
+  (setq args (cl-nsubstitute :stats :statistics args))
+  (setq args (cl-nsubstitute :if :when args))
+  (let (temp)
+    (while (setq temp (plist-get args :unless))
+      (setq args (imp-parser-plist-delete-first args :unless)
+            args (append args `(:if (not ,temp))))))
+  args)
+
+(defun imp-parser-merge-keys (key new old)
+  (let ((merger (assq key imp-parser-merge-key-alist)))
+    (if merger
+        (funcall (cdr merger) new old)
+      (append new old))))
+
+(defun imp-parser-sort-keywords (plist)
+  (let (plist-grouped)
+    (while plist
+      (push (cons (car plist) (cadr plist))
+            plist-grouped)
+      (setq plist (cddr plist)))
+    (let (result)
+      (cl-dolist
+          (x
+           (nreverse
+            (sort plist-grouped
+                  #'(lambda (l r) (< (imp-parser-keyword-index (car l))
+                                     (imp-parser-keyword-index (car r)))))))
+        (setq result (cons (car x) (cons (cdr x) result))))
+      result)))
+
+(defun imp-parser-normalize-keywords (feature args)
+  (let* ((feature-symbol (if (stringp feature) (intern feature) feature))
+         (feature-string (symbol-name feature-symbol)))
+
+    ;;------------------------------
+    ;; Input Prep & Validation
+    ;;------------------------------
+
+    ;; The function `elisp--local-variables' inserts this unbound variable into
+    ;; macro forms to determine the locally bound variables for
+    ;; `elisp-completion-at-point'. It ends up throwing a lot of errors since it
+    ;; can occupy the position of a keyword (or look like a second argument to a
+    ;; keyword that takes one). Deleting it when it's at the top level should be
+    ;; harmless since there should be no locally bound variables to discover
+    ;; here anyway.
+    (setq args (delq 'elisp--witness--lisp args))
+
+    ;; Reduce the set of keywords down to its most fundamental expression.
+    (setq args (imp-parser-unalias-keywords feature-symbol args))
+
+    ;;------------------------------
+    ;; Per-Keyword Normalization
+    ;;------------------------------
+
+    ;; Normalize keyword values, coalescing multiple occurrences.
+    (setq args (imp-parser-normalize-plist feature-symbol args nil
+                                           #'imp-parser-merge-keys))
+
+    ;;------------------------------
+    ;; Clean & Tidy
+    ;;------------------------------
+    ;; defaults, restrictions/exclusive keywords, implicit keywords...
+
+    ;; Add default values for keywords not specified, when applicable.
+    (cl-dolist (spec imp-parser-defaults)
+      (when (let ((func (nth 2 spec)))
+              (if (and func (functionp func))
+                  (funcall func feature args)
+                (eval func)))
+        (setq args (imp-parser-plist-maybe-put
+                    args (nth 0 spec)
+                    (let ((func (nth 1 spec)))
+                      (if (and func (functionp func))
+                          (funcall func feature args)
+                        (eval func)))))))
+
+    ;; TODO: Add validation (eg keyword conflict resolution) here.
+    ;;
+    ;; example:
+    ;; ;; The :load keyword overrides :no-require
+    ;; (when (and (plist-member args :load)
+    ;;            (plist-member args :no-require))
+    ;;   (setq args (imp-parser-plist-delete args :no-require)))
+
+    ;; TODO: Add implicit keywords here?
+    ;;
+    ;; example:
+    ;; ;; If at this point no :load, :defer or :no-require has been seen, then
+    ;; ;; :load the package itself.
+    ;; (when (and (not (plist-member args :load))
+    ;;            (not (plist-member args :defer))
+    ;;            (not (plist-member args :no-require)))
+    ;;   (setq args (append args `(:load (,feature)))))
+
+    ;; Sort the list of keywords based on the order of `imp-parser-keywords'.
+    (imp-parser-sort-keywords args)))
+
+(defun imp-parser-process-keywords (feature plist &optional state)
+  "Process the next keyword in the free-form property list PLIST.
+The values in the PLIST have each been normalized by the function
+imp-parser-normalize/KEYWORD.
+
+STATE is a property list that the function may modify and/or
+query.  This is useful if a package defines multiple keywords and
+wishes them to have some kind of stateful interaction.
+
+Unless the KEYWORD being processed intends to ignore remaining
+keywords, it must call this function recursively, passing in the
+plist with its keyword and argument removed, and passing in the
+next value for the STATE."
+  (if (null plist)
+      ;; No more keywords to process; do the thing!
+      (imp-parser-load feature state)
+
+    ;; Process the next keyword.
+    (let* ((keyword (car plist))
+           (arg (cadr plist))
+           (rest (cddr plist)))
+      (unless (keywordp keyword)
+        (imp-parser-error (format "%s is not a keyword" keyword)))
+      (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword)))
+             (handler-sym (intern handler)))
+        (if (functionp handler-sym)
+            (funcall handler-sym feature keyword arg rest state)
+          (imp-parser-error
+           (format "Keyword handler not defined: %s" handler)))))))
+
+(defun imp-parser-load (feature state)
+  "Actually load the file, maybe."
+  (let* ((funcname 'imp-parser-load)
+         ;; Handle STATE: `:path'
+         (path (plist-get state :path))
+         (path-load (plist-get state :path-load))
+         (feature-root (imp-feature-root feature)))
+
+    ;; We really should have a `path' of some sorts now.
+    ;; NOTE: We may not have a `path-load' if eg file does not exist.
+    (unless (and (stringp path)
+                 (file-name-absolute-p path))
+      ;; TODO(stats): some imp timing thing to say that this thing errored?
+      (imp--error funcname
+                  `("Path is invalid or not absolute! "
+                    "path:'%s'")
+                  path))
+
+    ;; Deal with non-existent file.
+    (if (null path-load)
+        ;; Handle STATE: `:optional'
+        (if (plist-get state :optional)
+            ;; Optional load and file does not exist.
+            ;; Return sexprs that will skip the file
+            `((progn
+                ;; Skip w/ optional timing message.
+                (imp-timing-skip-optional-dne ',feature ,path)
+                ;; Return `nil' for load result.
+                nil))
+          ;; Else requried, so error?
+          ;; TODO(stats): Make some imp timing thing to say that this thing errored?
+          (imp--error funcname
+                      "Cannot find a file to load. path:'%s' -> load-path:'%s'"
+                      path
+                      path-load))
+
+      ;; Have a valid load path. Try loading it.
+
+      (when imp--debugging?
+        ;; `load' outputs:
+        ;; > "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
+        (imp--debug funcname
+                    "load '%s' => '%s'"
+                    path
+                    path-load))
+
+      ;; Return sexprs that will time & load the file.
+      `((imp-timing
+            ',feature
+            ,path-load
+
+            ;; Actually do the load.
+            ;; Skip erroring out if STATE says so.
+            ;; Return the results of `load'.
+            (load ,path
+                  ;; Handle STATE: `:error'
+                  ',(when (not (plist-get state :error))
+                      'noerror)
+                  'nomessage))))))
+
 
 ;;------------------------------------------------------------------------------
 ;;; Keyword Handlers
