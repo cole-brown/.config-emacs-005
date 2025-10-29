@@ -366,6 +366,12 @@ next value for the STATE."
      ((memq arg '(emacs .emacs .emacs.d))
       user-emacs-directory)
 
+     ;; path starts with ":/" or "./"
+     ((or (string-prefix-p ":/" (symbol-name arg))
+          (string-prefix-p "./" (symbol-name arg)))
+      ;; redirect to the func that already knows how to deal with it.
+      (imp-parser-normalize-path-string feature keyword (symbol-name arg)))
+
      ;; Symbol Value (ya know... a variable)
      ;;-------------------------------------
      ;; Don't use `bound-and-true-p'.
