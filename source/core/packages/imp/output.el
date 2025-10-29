@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-04-16
-;; Timestamp:  2025-10-09
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -150,7 +150,7 @@ ARGS should be a list of args for formatting the STRING, or nil."
           (caller (imp--output-callers caller)))
 
       (unless (listp sinks)
-        (setq lists (list sinks)))
+        (setq sinks (list sinks)))
 
       ;; Send to each sink.
       (dolist (sink sinks)
@@ -166,8 +166,7 @@ ARGS should be a list of args for formatting the STRING, or nil."
                              ((listp string)
                               (apply #'concat string))))
                args)))))
-;; (imp--output :error "me" "General Kenobi." nil)
-;; (imp--output "Hello there.")
+;; (imp--output :error "me" "Hello there." nil)
 
 
 ;;------------------------------------------------------------------------------
