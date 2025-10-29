@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -287,7 +287,7 @@
   ;;   C-h f path<TAB>
   ;;   C-h f str<TAB>
 
-  (imp-parser namespaced
+  (imp namespaced
     :root
     :path (imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
 
@@ -384,8 +384,7 @@
   ;; https://github.com/bbatsov/zenburn-emacs
   ;;---
   ;; It's just...... good.
-  (imp-parser '(:user config theme zenburn)
-    :path  "config/theme/zenburn/init.el") ; (imp-path-join 'config 'theme 'zenburn 'init.el))
+  (imp user:/config/theme/zenburn)
 
 
   ;;------------------------------------------------------------------------------
@@ -516,13 +515,13 @@
     ('gnu/linux
      ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
      ;; to figure out path from system-name/host.
-     (imp-parser secret.d
+     (imp secret.d
        :root
        :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))
     ('windows-nt
      ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
      ;; to figure out path from system-name/host.
-     (imp-parser secret.d
+     (imp secret.d
        :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
 
 
@@ -542,33 +541,28 @@
   ;;   - `cape':    https://github.com/minad/cape
   ;;   - `dabbrev': https://www.gnu.org/software/emacs/manual/html_node/emacs/Dynamic-Abbrevs.html
 
-  (imp-parser '(:user config completion)
-            :path    "config/completion.el")
+  (imp user:/config/completion)
 
   ;;------------------------------
   ;; Completion: `yasnippets'
   ;;------------------------------
-  (imp-parser '(:user config snippets)
-            :path    "config/snippets.el")
+  (imp user:/config/snippets)
 
 
   ;;------------------------------------------------------------------------------
   ;; Emacs
   ;;------------------------------------------------------------------------------
 
-  (imp-parser '(:user config emacs)
-            :path  "config/emacs.el")
+  (imp user:/config/emacs)
 
-  (imp-parser '(:user config help)
-            :path  "config/help.el")
+  (imp user:/config/help)
 
 
   ;;------------------------------------------------------------------------------
   ;; Whitespace
   ;;------------------------------------------------------------------------------
 
-  (imp-parser '(:user config whitespace)
-            :path    "config/whitespace.el")
+  (imp user:/config/whitespace)
 
 
   ;;--------------------------------------------------------------------------------
@@ -726,18 +720,14 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   ;; Files
   ;;------------------------------------------------------------------------------
 
-  (imp-parser '(:user config files)
-            :path  "config/files.el"  ;;(imp-path-join 'config 'files.el)
-            )
+  (imp user:/config/files)
 
 
   ;;------------------------------------------------------------------------------
   ;; Org-Mode
   ;;------------------------------------------------------------------------------
 
-  (imp-parser '(:user config org)
-            :path  "config/org/init.el"  ;;(imp-path-join 'config 'org 'init.el)
-            )
+  (imp user:/config org)
 
 
   ;;------------------------------------------------------------------------------
@@ -745,19 +735,11 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   ;;------------------------------------------------------------------------------
   ;; TODO: make/load "config/languages/init.el", which will load all
 
-  (imp-parser '(:user config languages common)
-            :path  "config/languages/common.el"  ;; (imp-path-join 'config 'org 'init.el)
-            )
+  (imp user:/config languages common)
 
-  (imp-parser '(:user config languages elisp)
-            ;; TODO: make/load "config/languages/init.el", which will load all
-            :path  "config/languages/elisp.el"  ;; (imp-path-join 'config 'org 'init.el)
-            )
+  (imp user:/config languages elisp)
 
-  (imp-parser '(:user config languages elisp)
-            ;; TODO: make/load "config/languages/init.el", which will load all
-            :path  "config/languages/json.el"  ;; (imp-path-join 'config 'org 'init.el)
-            )
+  (imp user:/config languages elisp)
 
 
   ;;------------------------------------------------------------------------------
@@ -835,8 +817,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   ;; AI: ChatGPT & Friends!
   ;;------------------------------------------------------------------------------
 
-  (imp-parser '(:user config ai)
-            :path    "config/ai.el")
+  (imp user:/config/ai)
 
   ;;------------------------------------------------------------------------------
   ;; dev-env: Language: YAML

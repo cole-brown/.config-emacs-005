@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-02-16
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -47,20 +47,20 @@
     :str
     (imp-path-current-file)
 
-  (imp-parser str:/normalize)
+  (imp str:/normalize)
   ;; TODO: refactor the rest of 'em.
-  ;; (imp-parser str:/regex)
-  ;; (imp-parser str:/buffer)
-  ;; (imp-parser str:/string)
-  ;; (imp-parser str:/propertize)
-  ;; (imp-parser str:/hash)
+  ;; (imp str:/regex)
+  ;; (imp str:/buffer)
+  ;; (imp str:/string)
+  ;; (imp str:/propertize)
+  ;; (imp str:/hash)
 
   ;; ;; Requires 'normalize', 'regex', and 'string'.
-  ;; (imp-parser str:/+case)
-  ;; (imp-parser str:/+case-hydra)
+  ;; (imp str:/+case)
+  ;; (imp str:/+case-hydra)
 
   ;; ;; Requires 'string'.
-  ;; (imp-parser str:/+random)
+  ;; (imp str:/+random)
 
   ;; End load timing.
   )

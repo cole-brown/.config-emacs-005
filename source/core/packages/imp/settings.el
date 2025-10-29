@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-04-16
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,9 +28,9 @@
 ;;------------------------------------------------------------------------------
 
 (defgroup imp nil
-  "A `imp-parser' declaration for simplifying your `.emacs'."
+  "A `imp' declaration for simplifying your `.emacs'."
   :group 'initialization
-  ;; :link '(custom-manual "(imp-parser) Top")
+  ;; :link '(custom-manual "(imp) Top")
   :version "30.2")
 
 ;; Below here: the groupies.
@@ -58,11 +58,11 @@ The order of this list is *very important*, so it is only
 advisable to insert new keywords, never to delete or reorder
 them.  Further, attention should be paid to the NEWS.md if the
 default order ever changes, as they may have subtle effects on
-the semantics of `imp-parser' declarations and may necessitate
+the semantics of `imp' declarations and may necessitate
 changing where you had inserted a new keyword earlier.
 
 NOTE: `:disabled' is special in this list, as it causes
-nothing at all to happen, even if the rest of the `imp-parser'
+nothing at all to happen, even if the rest of the `imp'
 declaration is incorrect."
   :type '(repeat symbol)
   :group 'imp)
@@ -70,15 +70,15 @@ declaration is incorrect."
 (defcustom imp-parser-ignore-unknown-keywords nil
   "If non-nil, warn instead of signaling error for unknown keywords.
 The unknown keyword and its associated arguments will be ignored
-in the `imp-parser' expansion."
+in the `imp' expansion."
   :type 'boolean
   :group 'imp)
 
 ;; TODO: use imp's debugging flag? merge with it?
 (defcustom imp-parser-verbose nil
   "Whether to report about loading and configuration details.
-If you customize this, then you should require the `imp-parser'
-feature in files that use `imp-parser', even if these files only
+If you customize this, then you should require the `imp'
+feature in files that use `imp', even if these files only
 contain compiled expansions of the macros.  If you don't do so,
 then the expanded macros do their job silently."
   :type '(choice (const :tag "Quiet, without catching errors" errors)
@@ -96,23 +96,23 @@ then the expanded macros do their job silently."
      (lambda (feature args) (not (plist-member args :path))))
     (:error    t   t)
     (:optional nil t))
-  "Default values for specified `imp-parser' keywords.
+  "Default values for specified `imp' keywords.
 Each entry in the alist is a list of three elements:
-The first element is the `imp-parser' keyword.
+The first element is the `imp' keyword.
 
 The second is a form that can be evaluated to get the default
 value.  It can also be a function that will receive the FEATURE from
-the `imp-parser' declaration and the keyword plist given to
-`imp-parser', in normalized form.  The value it returns should
+the `imp' declaration and the keyword plist given to
+`imp', in normalized form.  The value it returns should
 also be in normalized form (which is sometimes *not* what one
-would normally write in a `imp-parser' declaration, so use
+would normally write in a `imp' declaration, so use
 caution).
 
 The third element is a form that can be evaluated to determine
 whether or not to assign a default value; if it evaluates to nil,
 then the default value is not assigned even if the keyword is not
-present in the `imp-parser' form.  This third element may also be
-a function, in which case it receives the FEATURE from `imp-parser' (as
+present in the `imp' form.  This third element may also be
+a function, in which case it receives the FEATURE from `imp' (as
 a symbol) and a list of keywords (in normalized form).  It should
 return nil or non-nil depending on whether defaulting should be
 attempted."
@@ -130,11 +130,11 @@ attempted."
   "Alist of keys and the functions used to merge multiple values.
 For example, if the following form is provided:
 
-  (imp-parser foo :if pred1 :if pred2)
+  (imp foo :if pred1 :if pred2)
 
 Then based on the above defaults, the merged result will be:
 
-  (imp-parser foo :if (and pred1 pred2))
+  (imp foo :if (and pred1 pred2))
 
 This is done so that, at the stage of invoking handlers, each
 handler is called only once."
@@ -172,7 +172,7 @@ definitions, to understand the main intent of what's happening."
 
 ;; TODO: figure out wtf this regex soup is doing & adapt to imp?
 ;; (defconst imp-parser-font-lock-keywords
-;;   '(("(\\(imp-parser\\)\\_>[ \t']*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
+;;   '(("(\\(imp\\)\\_>[ \t']*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
 ;;      (1 font-lock-keyword-face)
 ;;      (2 font-lock-constant-face nil t))))
 ;;
@@ -238,7 +238,7 @@ See also `use-package-defaults', which uses this value."
 ;; (defcustom imp-parser-compute-statistics nil
 ;;   "If non-nil, compute statistics concerned `imp-parser' declarations.
 ;; View the statistical report using `imp-parser-report'.  Note that
-;; if this option is enabled, you must require `imp-parser' in your
+;; if this option is enabled, you must require `imp' in your
 ;; user init file at loadup time, or you will see errors concerning
 ;; undefined variables."
 ;;   :type 'boolean

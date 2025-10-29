@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-12
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -83,12 +83,12 @@
 ;; Load Other Zenburn Files
 ;;------------------------------------------------------------------------------
 
-;; (imp-parser org-mode
+;; (imp org-mode
 ;;   :path pwd
 ;;   :after org
 ;;   :after zenburn)
 
-(imp-parser whitespace
+(imp whitespace
   :path pwd
   :after org
   :after zenburn)

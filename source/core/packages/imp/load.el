@@ -840,9 +840,9 @@ no keyword implies `:all'."
           (imp-parser--form
            (if (eq imp-parser-verbose 'debug)
                (concat "\n\n"
-                       (pp-to-string `(imp-parser feature* ,@,args))
+                       (pp-to-string `(imp feature* ,@,args))
                        "\n  -->\n\n"
-                       (pp-to-string `(imp-parser feature* ,@args*))
+                       (pp-to-string `(imp feature* ,@args*))
                        "\n  ==>\n\n"
                        (pp-to-string
                         (macroexp-progn
@@ -865,7 +865,7 @@ no keyword implies `:all'."
 
 Usage:
 
-  (imp-parser feature
+  (imp feature
      [:keyword [option]]...)
 
 :disabled      Flag. Nothing happens; FEATURE is ignored completely if this keyword
@@ -896,10 +896,10 @@ TODO(path): Alternative is a list of paths to try for locating the file.
                See var `imp-path-roots' and func `imp-path-root-set'.
                If ROOT is t or a flag (arg-less), use first part of FEATURE.
                Example:
-                 (imp-parser imp/init
-                             :path (imp-path-join user-emacs-directory
-                                                  \"path/to/imp\")
-                             :root)
+                 (imp imp/init
+                   :path (imp-path-join user-emacs-directory
+                                        \"path/to/imp\")
+                   :root)
                  => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)
 
 :error ERR     Value (aka ERROR) can be:
@@ -931,7 +931,7 @@ TODO(path): Alternative is a list of paths to try for locating the file.
 :unless EXPR   Opposite of `:if'.
                Initialize and load only if EXPR evaluates to a nil value.
 
-:after AFTER   Delay the effect of the imp-parser declaration until after the
+:after AFTER   Delay the effect of the imp declaration until after the
                named features have loaded. Before they have been loaded, no
                other keyword has any effect at all, and once they have been
                loaded it is as if `:after' was not specified."
@@ -940,27 +940,27 @@ TODO(path): Alternative is a list of paths to try for locating the file.
     (macroexp-progn
      (imp-parser-concat
       ;; (when imp-parser-compute-statistics
-      ;;   `((imp-parser-statistics-gather :imp-parser ',feature nil)))
+      ;;   `((imp-parser-statistics-gather :imp ',feature nil)))
 
       ;; Let errors bubble up for now. They're more useful for debugging
       ;; and I don't have `imp-parser' integrated with imp's preexisting
       ;; debug/error stuff.
-      (imp-parser-core feature args)
+      (imp-core feature args)
 
       ;; (if (memq imp-parser-verbose '(errors debug))
-      ;;     (imp-parser-core feature args)
+      ;;     (imp-core feature args)
       ;;   (condition-case-unless-debug err
-      ;;       (imp-parser-core feature args)
+      ;;       (imp-core feature args)
       ;;     (error
       ;;      (ignore
       ;;       (display-warning
-      ;;        'imp-parser
+      ;;        'imp
       ;;        (format "Failed to parse package %s: %s"
       ;;                feature (error-message-string err))
       ;;        :error)))))
 
       ;; (when imp-parser-compute-statistics
-      ;;   `((imp-parser-statistics-gather :imp-parser ',feature t)))
+      ;;   `((imp-parser-statistics-gather :imp ',feature t)))
       ))))
 
 

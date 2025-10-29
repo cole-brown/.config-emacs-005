@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -36,13 +36,13 @@
     :elisp
     (imp-path-current-file)
 
-  (imp-parser types     :path pwd)
-  (imp-parser functions :path pwd)
+  (imp ./types)
+  (imp ./functions)
 
   ;; TODO: refactor the rest of 'em.
-  ;; (imp-parser predicates :path pwd)
-  ;; (imp-parser test       :path pwd)
-  ;; (imp-parser units      :path pwd)
+  ;; (imp ./predicates)
+  ;; (imp ./test)
+  ;; (imp ./units)
   )
 
 

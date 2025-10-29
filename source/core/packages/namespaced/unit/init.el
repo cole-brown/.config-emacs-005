@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -34,7 +34,7 @@
     :unit
     (imp-path-current-file)
 
-  (imp-parser unit:/units))
+  (imp unit:/units))
 
 
 ;;------------------------------------------------------------------------------

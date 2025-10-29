@@ -222,10 +222,11 @@ no more than once."
   (mapcar #'(lambda (form)
               (if (and (consp form)
                        (memq (car form)
-                             '(imp-parser bind-key bind-key*
+                             '(imp bind-key bind-key*
                                 unbind-key bind-keys bind-keys*)))
                   (macroexpand form)
-                form)) args))
+                form))
+          args))
 
 (defun imp-parser-normalize-forms (feature keyword args)
   "Given a list of forms, return it wrapped in `progn'."

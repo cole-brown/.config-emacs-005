@@ -6,5 +6,5 @@
 (message "Loading 'manual-test.el' for %s time..."
          imp--test-manual)
 
-;; (imp-parser :imp/test/data/load/manual-test)
-;; (imp-parser manual-test :path (imp-path-current-dir))
+;; (imp imp:/test/data/load/manual-test)
+;; (imp manual-test :path (imp-path-current-dir))

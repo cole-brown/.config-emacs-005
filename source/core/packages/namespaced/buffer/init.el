@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -49,28 +49,28 @@
   ;; Required
   ;;------------------------------
 
-  (imp-parser buffer:/delete)
-  (imp-parser buffer:/region)
+  (imp buffer:/delete)
+  (imp buffer:/region)
 
   ;; TODO: the rest
 
-  ;; (imp-parser buffer:/narrow)
-  ;; (imp-parser buffer:/type)
-  ;; (imp-parser buffer:/eval)
-  ;; (imp-parser buffer:/manage)
-  ;; (imp-parser buffer:/name)
-  ;; (imp-parser buffer:/point)
-  ;; (imp-parser buffer:/line)
-  ;; (imp-parser buffer:/search)
-  ;; (imp-parser buffer:/yank)
+  ;; (imp buffer:/narrow)
+  ;; (imp buffer:/type)
+  ;; (imp buffer:/eval)
+  ;; (imp buffer:/manage)
+  ;; (imp buffer:/name)
+  ;; (imp buffer:/point)
+  ;; (imp buffer:/line)
+  ;; (imp buffer:/search)
+  ;; (imp buffer:/yank)
 
 
   ;;------------------------------
   ;; Optional
   ;;------------------------------
 
-  ;; (imp-parser buffer:/+commands)
-  ;; (imp-parser buffer:/+line-hydra)
+  ;; (imp buffer:/+commands)
+  ;; (imp buffer:/+line-hydra)
 
   )
 

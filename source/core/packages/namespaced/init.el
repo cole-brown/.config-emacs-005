@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-05-15
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -40,24 +40,22 @@
   ;; Standalone Libraries
   ;;------------------------------
   ;; TODO: finish refactor
-  (imp-parser elisp/init    :path pwd) ; standalone
+  (imp "./elisp/init") ; standalone
 
   ;; TODO: finish refactor
-  (imp-parser buffer/init   :path pwd) ; standalone... so far
-
-  (imp-parser unit/init     :path pwd) ; standalone... so far
-
-  (imp-parser datetime/init :path pwd) ; standalone... so far
+  (imp "./buffer/init")   ; standalone... so far
+  (imp "./unit/init")     ; standalone... so far
+  (imp "./datetime/init") ; standalone... so far
 
   ;;------------------------------
   ;; Libraries
   ;;------------------------------
 
   ;; TODO: finish refactor
-  (imp-parser str/init :path pwd) ; requires `:elisp'
+  (imp "./str/init") ; requires `:elisp'
 
   ;; TODO: finish refactor
-  (imp-parser theme/init :path pwd) ; requires `:elisp', `:str'
+  (imp "./theme/init") ; requires `:elisp', `:str'
 
 
   ;; TODO: refactor the rest of 'em.

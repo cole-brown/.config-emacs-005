@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-13
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -34,21 +34,21 @@
     :init
     (imp-path-current-file)
 
-  ;; (imp-parser init:/vars)
-  ;; (imp-parser init:/error)
-  ;; (imp-parser init:/debug)
-  ;; (imp-parser init:/nub)
-  ;; (imp-parser init:/os)
-  ;; (imp-parser init:/time)
-  ;; (imp-parser init:/optimize)
-  ;; (imp-parser init:/server)
-  ;; (imp-parser init:/package)
-  ;; (imp-parser init:/package-upgrade-mode)
-  ;; (imp-parser init:/package-upgrade-command)
-  ;; (imp-parser init:/squelch)
-  ;; (imp-parser init:/hook)
-  ;; (imp-parser init:/advice)
-  ;; (imp-parser init:/theme)
+  ;; (imp init:/vars)
+  ;; (imp init:/error)
+  ;; (imp init:/debug)
+  ;; (imp init:/nub)
+  ;; (imp init:/os)
+  ;; (imp init:/time)
+  ;; (imp init:/optimize)
+  ;; (imp init:/server)
+  ;; (imp init:/package)
+  ;; (imp init:/package-upgrade-mode)
+  ;; (imp init:/package-upgrade-command)
+  ;; (imp init:/squelch)
+  ;; (imp init:/hook)
+  ;; (imp init:/advice)
+  ;; (imp init:/theme)
 
   ;; End load timing.
   )
