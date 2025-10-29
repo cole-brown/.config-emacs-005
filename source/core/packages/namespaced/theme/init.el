@@ -25,8 +25,7 @@
 
 
 (imp-path-root-set :theme
-                   (imp-path-current-dir)
-                   (imp-file-current))
+                   (imp-path-current-dir))
 
 
 ;;------------------------------------------------------------------------------

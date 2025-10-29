@@ -1087,7 +1087,7 @@ ARGS should be the raw args list from func `imp-parser-normalize-keywords'."
                   paths))
 
     ;; Canonicalize the list of paths.
-    (seq-map #'imp-path-canonical paths)))
+    (seq-map #'imp-path paths)))
 ;; (imp-parser-normalize-paths :user :path '("/foo/bar"))
 ;; (imp-parser-normalize-paths :user :path '("foo/bar"))
 ;; (imp-parser-normalize-paths :user :path '("/foo/bar" "baz/qux/"))

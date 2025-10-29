@@ -44,8 +44,7 @@
 ;; (Optional) Set-Up:
 ;; ------
 ;; (imp-path-root-set <symbol/keyword0>
-;;                    <path-to-root-dir-absolute>
-;;                    &optional <path-to-root-file-relative-or-absolute>)
+;;                    <path-to-root-dir-absolute>)
 ;;   - Setting a root for <symbol/keyword0> allows later `imp-require' calls to
 ;;     try to find the file if not already provided.
 ;;
@@ -109,7 +108,6 @@
   (imp--init-load "tree")
   (imp--init-load "feature")
   (imp--init-load "path")
-  (imp--init-load "flag")
   (imp--init-load "timing")
   (imp--init-load "provide")
   (imp--init-load "load")

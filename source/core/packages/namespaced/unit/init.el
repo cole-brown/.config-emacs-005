@@ -23,8 +23,7 @@
 
 
 (imp-path-root-set :unit
-                   (imp-path-current-dir)
-                   (imp-file-current))
+                   (imp-path-current-dir))
 
 
 ;;------------------------------------------------------------------------------
