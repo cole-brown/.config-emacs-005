@@ -77,7 +77,7 @@ extending any keys already present."
               (display-warning 'imp-parser error-string)
               (imp-parser-normalize-plist
                feature tail plist merge-function))
-          (imp-parser-error error-string))))))
+          (imp--error 'imp-parser-normalize-plist error-string))))))
 
 (defun imp-parser-unalias-keywords (feature args)
   "Convert `:when' and `:unless' in ARGS to `:if'."
@@ -200,13 +200,16 @@ next value for the STATE."
            (arg (cadr plist))
            (rest (cddr plist)))
       (unless (keywordp keyword)
-        (imp-parser-error (format "%s is not a keyword" keyword)))
+        (imp--error 'imp-parser-process-keywords
+                    "%s is not a keyword"
+                    keyword))
       (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword)))
              (handler-sym (intern handler)))
         (if (functionp handler-sym)
             (funcall handler-sym feature keyword arg rest state)
-          (imp-parser-error
-           (format "Keyword handler not defined: %s" handler)))))))
+          (imp--error 'imp-parser-process-keywords
+                      "Keyword handler not defined: %s"
+                      handler))))))
 
 (defun imp-parser-load (feature state)
   "Actually load the file, maybe."
@@ -674,7 +677,7 @@ If the path is relative, root it in one of:
 ;;             (funcall imp-parser--hush-function keyword
 ;;                      (imp-parser-process-keywords feature rest state)))))
 ;;      (t
-;;       (imp-parser-error "The :catch keyword expects 't' or a function")))))
+;;       (imp--error 'imp-parser-handler/:catch "The :catch keyword expects 't' or a function")))))
 
 
 ;;------------------------------
@@ -768,9 +771,10 @@ no keyword implies `:all'."
 ;;   (imp-parser-as-one keyword args
 ;;     #'(lambda (keyword arg)
 ;;         (unless (listp arg)
-;;           (imp-parser-error
-;;            (concat (imp-parser-as-string keyword) " a (<symbol> <value> [comment])"
-;;                    " or list of these")))
+;;           (imp--error 'imp-parser-normalize/:custom
+;;                       "%S expects a (<symbol> <value> [comment])"
+;;                       " or list of these"
+;;                       keyword))
 ;;         (if (imp-parser-non-nil-symbolp (car arg))
 ;;             (list arg)
 ;;           arg))))
