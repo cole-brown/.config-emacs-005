@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-22
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -63,9 +63,7 @@ and will be printed as the error message.
 
 ARGS should be a list of args for formatting the STRING."
   (when error?
-    (imp--error caller
-                string
-                args)))
+    (apply #'imp--error caller string args)))
 
 
 ;;------------------------------------------------------------------------------
