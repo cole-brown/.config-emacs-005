@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-10-30
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -354,8 +354,8 @@ next value for the STATE."
 
      ;; path == rooted @ FEATURE
      ((memq arg '(feature root feature-root from-feature relative-to-feature))
-      (if (imp--path-root-dir feature :no-error)
-          (imp--path-root-dir feature :no-error)
+      (if (imp-path-root-get feature :no-error)
+          (imp-path-root-get feature :no-error)
         (imp--error funcname
                     '("`%s' wants to be feature root of `%s'. "
                       "Cannot find feature root for: '%s'")
@@ -401,7 +401,7 @@ next value for the STATE."
 
      ;; path == rooted @ FEATURE
      ((string-prefix-p ":/" arg)
-      (if-let ((root (imp--path-root-dir feature :no-error)))
+      (if-let ((root (imp-path-root-get feature :no-error)))
           (imp-path-join root (string-remove-prefix ":/" arg))
         (imp--error 'imp-parser-normalize-path-string
                     "`%S' has no root; `%S' doesn't know what to do with %S in %S"

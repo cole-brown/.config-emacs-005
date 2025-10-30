@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-10-30
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -346,7 +346,7 @@ If SYMBOLS? is non-nil, return list of symbols."
 
 ;; TODO(feature): alias to `imp-feature'?
 ;; TODO(feature): have a "no error" version or param. `imp-feature-errorless'?
-;;   - path.el needs it for `imp--path-root-dir'
+;;   - path.el needs it for `imp-path-root-get'
 (defun imp-feature-normalize (&rest feature)
   "Translate the feature to a single symbol appropriate for Emacs' `provide'.
 

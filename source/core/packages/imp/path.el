@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-10-30
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -117,8 +117,8 @@ If PATH has no relation to the determined root path from ROOT:
            ;; It's either:
            ;;   - symbol or something that `imp-feature-first' can resolve
            ;;   - an error
-           ;; TODO(path): Relative to whle of feature, not just first bit?
-           (setq path-root (imp--path-root-dir (imp-feature-first root)))
+           ;; TODO(path): Relative to whole of feature, not just the root bit?
+           (setq path-root (imp-path-root-get (imp-feature-first root)))
            (unless (and path-root
                         (stringp path-root)
                         (file-name-absolute-p path-root))
@@ -219,27 +219,6 @@ Error ff PATH has no relation to the determined root path from ROOT."
 ;;------------------------------------------------------------------------------
 ;; `imp-roots' Getters
 ;;------------------------------------------------------------------------------
-
-(defun imp--path-root-dir (feature &optional no-error?)
-  "Get the root directory from `imp-roots' for FEATURE.
-
-If NO-ERROR? is nil and FEATURE-BASE is not in `imp-roots',
-signals an error."
-  ;; TODO(path): need to be able to tell `imp-feature-normalize' to error or not
-  (if-let* ((feature-norm (imp-feature-normalize feature))
-            (dir (nth 0 (imp--alist-get-value feature
-                                              imp-roots))))
-      (imp-path dir)
-    ;; this returns nil if we're not erroring.
-    (imp--error-if (not no-error?)
-                   'imp--path-root-dir
-                   "FEATURE is unknown: %S -> %S"
-                   feature
-                   feature-norm)))
-;; (imp--path-root-dir 'imp)
-;; (imp--path-root-dir 'dne)
-;; (imp--path-root-dir 'dne t)
-
 
 ;; TODO(path): Unused. Delete? Make it a public func? Needs better params.
 ;; (defun imp--path-file-exists? (root &rest paths)
@@ -501,7 +480,7 @@ KWARGS should be a plist. All default to t:
 ;;   ;; Make sure both paths are equivalent (directory paths) for the regex replace.
 ;;   (let* ((path-root (file-name-as-directory
 ;;                      (expand-file-name (if feature/base
-;;                                            (imp--path-root-dir feature/base)
+;;                                            (imp-path-root-get feature/base)
 ;;                                          user-emacs-directory))))
 ;;          (path/here (file-name-as-directory (imp-path-current-dir)))
 ;;          ;; Don't like `file-relative-name' as it can return weird things when it
@@ -726,12 +705,14 @@ See func `get-load-suffixes' for known load extenstions."
 ;; Public API: Feature Root Directories
 ;;------------------------------------------------------------------------------
 
-(defun imp-path-root-set (feature path-dir-root)
+(defun imp-path-root-set (feature dirpath)
   "Set the root path(s) of FEATURE for future `imp-require' calls.
 
-PATH-DIR-ROOT is the directory under which all of FEATURE exist."
+DIRPATH is the directory under which all of FEATURE exist."
   (let ((funcname 'imp-path-root-set)
-        (feature-base (imp-feature-first feature)))
+        ;; normalize inputs
+        (feature-base (imp-feature-first feature))
+        (path-root (imp-path dirpath)))
 
     (imp--error-if (not feature-base)
                    funcname
@@ -739,10 +720,10 @@ PATH-DIR-ROOT is the directory under which all of FEATURE exist."
                    feature
                    feature-base)
 
-    (cond ((imp-path-root-get feature-base)
+    (cond ((imp-path-root-get feature-base :no-error)
            ;; ignore exact duplicates.
-           (unless (string= (imp-path-root-get feature-base)
-                            path-dir-root)
+           (unless (string= (imp-path-root-get feature-base :no-error)
+                            dirpath)
              (imp--error funcname
                          '("Feature is already an imp root. "
                            "FEATURE: %S "
@@ -750,31 +731,44 @@ PATH-DIR-ROOT is the directory under which all of FEATURE exist."
                            "path: %s")
                          feature
                          feature-base
-                         (imp--path-root-dir feature-base :no-error))))
+                         (imp-path-root-get feature-base :no-error))))
 
           ;; `imp--path-root-valid?' will error with better reason, so the
           ;; error here isn't actually triggered... I think?
-          ((not (imp--path-root-valid? "imp-root" path-dir-root))
+          ((not (imp--path-root-valid? "imp-root" dirpath))
            (imp--error funcname
-                       "Path must be a valid directory: %s" path-dir-root))
+                       "Path must be a valid directory: %s" dirpath))
 
           ;; Ok; set keyword to path.
           (t
            (push (list feature-base
-                       path-dir-root)
+                       dirpath)
                  imp-roots)))))
 ;; (imp-path-root-set 'imp (imp-path-current-dir))
 
 
 (defun imp-path-root-get (feature &optional no-error?)
-  "Get the root directory from `imp-roots' for FEATURE-BASE.
+  "Get the root directory from `imp-roots' for FEATURE.
 
-If NO-ERROR? is nil and FEATURE-BASE is not in `imp-roots',
+If NO-ERROR? is nil and FEATURE is not in `imp-roots',
 signals an error.
 
 Return path string from `imp-roots' or nil."
-  (imp--path-root-dir feature no-error?))
+  ;; TODO(path): need to be able to tell `imp-feature-normalize' to error or not
+  (if-let* ((feature-norm (imp-feature-normalize feature))
+            (dir (nth 0 (imp--alist-get-value feature
+                                              imp-roots))))
+      (imp-path dir)
+    ;; this returns nil if we're not erroring.
+    (imp--error-if (not no-error?)
+                   'imp-path-root-get
+                   "FEATURE is unknown: %S -> %S"
+                   feature
+                   feature-norm)))
 ;; (imp-path-root-get 'imp)
+;; (imp-path-root-get 'imp 'no-error)
+;; (imp-path-root-get 'dne)
+;; (imp-path-root-get 'dne t)
 
 
 (defun imp-path-root-delete (feature &optional no-error?)
