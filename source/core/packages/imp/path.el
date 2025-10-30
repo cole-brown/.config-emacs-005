@@ -31,19 +31,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Constants & Variables
-;;------------------------------------------------------------------------------
-
-(defvar imp-path-roots nil
-  "Alist of require/provide root keywords to a cons of: (root-dir . root-file).
-
-Example:
-  `:imp' entry is: '(:imp \"/path/to/imp/\" \"/path/to/imp/init.el\")")
-;; imp-path-roots
-;; (setq imp-path-roots nil)
-
-
-;;------------------------------------------------------------------------------
 ;; Normalize Paths
 ;;------------------------------------------------------------------------------
 
@@ -213,22 +200,25 @@ Example (given `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
 
 
 ;;------------------------------------------------------------------------------
-;; `imp-path-roots' Getters
+;; `imp-roots' Getters
 ;;------------------------------------------------------------------------------
 
-(defun imp--path-root-dir (feature-base &optional no-error?)
-  "Get the root directory from `imp-path-roots' for FEATURE-BASE.
+(defun imp--path-root-dir (feature &optional no-error?)
+  "Get the root directory from `imp-roots' for FEATURE.
 
-If NO-ERROR? is nil and FEATURE-BASE is not in `imp-path-roots',
+If NO-ERROR? is nil and FEATURE-BASE is not in `imp-roots',
 signals an error."
-  (if-let ((dir (nth 0 (imp--alist-get-value feature-base
-                                             imp-path-roots))))
-      (imp-path-canonical "" dir)
-    (if no-error?
-        nil
-      (imp--error "imp--path-root-dir"
-                  "FEATURE-BASE '%S' unknown."
-                  feature-base))))
+  ;; TODO(path): need to be able to tell `imp-feature-normalize' to error or not
+  (if-let* ((feature-norm (imp-feature-normalize feature))
+            (dir (nth 0 (imp--alist-get-value feature
+                                              imp-roots))))
+      (imp-path "" dir)
+    ;; this returns nil if we're not erroring.
+    (imp--error-if (not no-error?)
+                   "imp--path-root-dir"
+                   "FEATURE is unknown: %S -> %S"
+                   feature
+                   feature-norm)))
 ;; (imp--path-root-dir :imp)
 ;; (imp--path-root-dir :dne)
 ;; (imp--path-root-dir :dne t)
@@ -260,8 +250,8 @@ Then checks that:
 
 
 (defun imp--path-root-contains? (feature-base)
-  "Return bool based on if `imp-path-roots' contains FEATURE-BASE."
-  (not (null (imp--alist-get-value feature-base imp-path-roots))))
+  "Return bool based on if `imp-roots' contains FEATURE-BASE."
+  (not (null (imp--alist-get-value feature-base imp-roots))))
 
 
 (defun imp--path-root-valid? (caller path &rest kwargs)
@@ -753,25 +743,25 @@ PATH-DIR-ROOT is the directory under which all of FEATURE-BASE's features exist.
         (t
          (push (list feature-base
                      path-dir-root)
-               imp-path-roots))))
+               imp-roots))))
 ;; (imp-path-root-set 'imp (imp-path-current-dir))
 
 
 (defun imp-path-root-get (feature-base &optional no-error?)
-  "Get the root directory from `imp-path-roots' for FEATURE-BASE.
+  "Get the root directory from `imp-roots' for FEATURE-BASE.
 
-If NO-ERROR? is nil and FEATURE-BASE is not in `imp-path-roots',
+If NO-ERROR? is nil and FEATURE-BASE is not in `imp-roots',
 signals an error.
 
-Return path string from `imp-path-roots' or nil."
+Return path string from `imp-roots' or nil."
   (imp--path-root-dir feature-base no-error?))
 ;; (imp-path-root-get 'imp)
 
 
 (defun imp-path-root-delete (feature-base &optional no-error?)
   "Delete the root path for FEATURE-BASE."
-  (imp--alist-delete feature-base imp-path-roots))
-;; imp-path-roots
+  (imp--alist-delete feature-base imp-roots))
+;; imp-roots
 ;; (imp-path-root-delete 'imp)
 
 

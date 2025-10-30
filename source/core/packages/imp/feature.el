@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -33,47 +33,6 @@
 ;; Loaded Features Tree
 ;;------------------------------------------------------------------------------
 
-(defvar imp-features nil
-  "Features that have been loaded by `imp-provide'.
-
-It is a tree; an alist of alists of ad nauseam. Provided features are the
-leaves, and their feature names should be built from the path traversed to get
-to them.
-  - I.e. directory structures w/ files as leaves.
-
-For example:
-  '((:imp
-     (provide)
-     (require))
-    (:metasyntactic
-     (foo (bar (baz (qux (quux (quuux (quuuux (quuuuux))))))
-               (thud (grunt))
-               (bletch)
-               (fum)
-               (bongo)
-               (zot)))
-     (bazola (ztesch))
-     (fred (jim (sheila (barney))))
-     (corge (grault (flarp)))
-     (zxc (spqr (wombat)))
-     (shme)
-     (spam (eggs))
-     (snork)
-     (blarg (wibble))
-     (toto (titi (tata (tutu))))
-     (pippo (pluto (paperino)))
-     (aap (noot (mies)))
-     (oogle (foogle (boogle (zork (gork (bork)))))))
-    (:pinky (narf (zort (poit (egad (troz (fiddely-posh))))))))
-    - is a tree with 3 'roots':
-      - :imp
-        - provide
-        - require
-      - :metasyntactic
-        - ...
-      - :pinky
-        - ...")
-;; (setq imp-features nil)
 
 
 ;;------------------------------------------------------------------------------
@@ -165,7 +124,7 @@ Return count of leaf nodes."
          "")
 
    ;; Features use colon to denote the feature root (a feature with an entry
-   ;; in `imp-path-roots'). eg `imp:/feature' is this file.
+   ;; in `imp-roots'). eg `imp:/feature' is this file.
    ;; Disallow it everywhere, then carefully insert it in the correct place?
    '(":" "")
 

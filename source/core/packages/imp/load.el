@@ -943,14 +943,14 @@ TODO(path): Do we want this to be the solution for lists?
 TODO(path): Alternative is a list of paths to try for locating the file.
 
 :root ROOT     Create an imp feature root for ROOT at PATH given in `:path'.
-               See var `imp-path-roots' and func `imp-path-root-set'.
+               See var `imp-roots' and func `imp-path-root-set'.
                If ROOT is t or a flag (arg-less), use first part of FEATURE.
                Example:
                  (imp imp/init
                    :path (imp-path-join user-emacs-directory
                                         \"path/to/imp\")
                    :root)
-                 => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)
+                 => imp-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)
 
 :error ERR     Value (aka ERROR) can be:
                  - nil

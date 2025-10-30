@@ -57,8 +57,65 @@
 (require 'seq)
 
 
+;;------------------------------------------------------------------------------
+;; Constants & Variables
+;;------------------------------------------------------------------------------
+
 (defconst imp-version "0.3.0"
   "This version of `imp'.")
+
+
+(defvar imp-roots nil
+  "Alist of require/provide root keywords to a cons of: (root-dir . root-file).
+
+Example:
+  `imp' entry is: '(imp \"/path/to/imp/\")")
+;; imp-roots
+;; (setq imp-roots nil)
+
+
+(defvar imp-features nil
+  "Features that have been loaded by `imp-provide'.
+
+It is a tree; an alist of alists of ad nauseam. Provided features are the
+leaves, and their feature names should be built from the path traversed to get
+to them.
+  - I.e. directory structures w/ files as leaves.
+
+For example:
+  '((:imp
+     (provide)
+     (require))
+    (:metasyntactic
+     (foo (bar (baz (qux (quux (quuux (quuuux (quuuuux))))))
+               (thud (grunt))
+               (bletch)
+               (fum)
+               (bongo)
+               (zot)))
+     (bazola (ztesch))
+     (fred (jim (sheila (barney))))
+     (corge (grault (flarp)))
+     (zxc (spqr (wombat)))
+     (shme)
+     (spam (eggs))
+     (snork)
+     (blarg (wibble))
+     (toto (titi (tata (tutu))))
+     (pippo (pluto (paperino)))
+     (aap (noot (mies)))
+     (oogle (foogle (boogle (zork (gork (bork)))))))
+    (:pinky (narf (zort (poit (egad (troz (fiddely-posh))))))))
+    - is a tree with 3 'roots':
+      - :imp
+        - provide
+        - require
+      - :metasyntactic
+        - ...
+      - :pinky
+        - ...")
+;; (setq imp-features nil)
+
 
 ;;------------------------------------------------------------------------------
 ;; Function for to Load our own Files...
@@ -83,16 +140,11 @@
                     'nomessage))))
 
   ;;------------------------------------------------------------------------------
-  ;; Customize
+  ;; Load our files...
   ;;------------------------------------------------------------------------------
 
   ;; Look here for all the defcustoms.
   (imp--init-load "settings")
-
-
-  ;;------------------------------------------------------------------------------
-  ;; Load our files...
-  ;;------------------------------------------------------------------------------
 
   ;;------------------------------
   ;; Required by debug.
@@ -101,12 +153,10 @@
   (imp--init-load "output")
   (imp--init-load "error")
 
-
   ;;------------------------------
   ;; Debug: Get it initialized ASAP, cuz I bug a lot.
   ;;------------------------------
   (imp--init-load "debug")
-
 
   ;;------------------------------
   ;; Order matters.
@@ -119,6 +169,8 @@
   (imp--init-load "timing")
   (imp--init-load "provide")
   (imp--init-load "load")
+
+  ;; TODO: Do we really need these?
   (imp--init-load "require")
   (imp--init-load "package")
   (imp--init-load "commands"))
