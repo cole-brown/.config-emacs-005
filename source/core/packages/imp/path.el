@@ -212,16 +212,16 @@ signals an error."
   (if-let* ((feature-norm (imp-feature-normalize feature))
             (dir (nth 0 (imp--alist-get-value feature
                                               imp-roots))))
-      (imp-path "" dir)
+      (imp-path dir)
     ;; this returns nil if we're not erroring.
     (imp--error-if (not no-error?)
-                   "imp--path-root-dir"
+                   'imp--path-root-dir
                    "FEATURE is unknown: %S -> %S"
                    feature
                    feature-norm)))
-;; (imp--path-root-dir :imp)
-;; (imp--path-root-dir :dne)
-;; (imp--path-root-dir :dne t)
+;; (imp--path-root-dir 'imp)
+;; (imp--path-root-dir 'dne)
+;; (imp--path-root-dir 'dne t)
 
 
 (defun imp--path-file-exists? (root &rest paths)
