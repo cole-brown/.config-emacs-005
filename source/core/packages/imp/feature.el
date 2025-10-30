@@ -30,12 +30,6 @@
 (require 'rx)
 
 ;;------------------------------------------------------------------------------
-;; Loaded Features Tree
-;;------------------------------------------------------------------------------
-
-
-
-;;------------------------------------------------------------------------------
 ;; Feature Helpers
 ;;------------------------------------------------------------------------------
 
@@ -258,15 +252,17 @@ string or symbol name."
 ;; (imp--feature-normalize-chain :imp)
 
 
+;; TODO(path,feature): Delete. Not allowed to use path.el here.
 (defun imp--feature-root? (normalized-chain)
   (let ((root-maybe (imp--feature-symbol (car-safe normalized-chain))))
-    (when (imp--path-root-dir root-maybe :no-error)
+    (when (imp--alist-get-value root-maybe imp-roots)
         root-maybe)))
 ;; (imp--feature-root? (imp--feature-normalize-chain :imp 'foo 'bar "baz"))
 ;; (imp--feature-root? '("imp"))
 ;; (imp--feature-root? '(":dne"))
 
 
+;; TODO(path,feature): Delete. Not allowed to use path.el here.
 (defun imp-feature-root (&rest feature)
   "Return root of FEATURE, if any. Else nil."
   (imp--feature-root? (apply #'imp--feature-normalize-chain feature)))
@@ -348,6 +344,8 @@ If SYMBOLS? is non-nil, return list of symbols."
 ;; (imp-feature-split (imp-feature-join "+spydez" "foo" "bar") t)
 
 
+;; TODO(feature): alias to `imp-feature'?
+;; TODO(feature): have a "no error" version? `imp-feature-errorless'?
 (defun imp-feature-normalize (&rest feature)
   "Translate the feature to a single symbol appropriate for Emacs' `provide'.
 

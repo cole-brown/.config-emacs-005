@@ -55,6 +55,8 @@
 (require 'cl-macs)
 (require 'cl-lib)
 (require 'seq)
+(require 'rx)
+(require 'range)
 
 
 ;;------------------------------------------------------------------------------
@@ -114,6 +116,7 @@ For example:
         - ...
       - :pinky
         - ...")
+;; imp-features
 ;; (setq imp-features nil)
 
 
