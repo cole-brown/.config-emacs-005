@@ -77,8 +77,8 @@ Return an absolute path."
   "Get PATH, relative to ROOT.
 
 ROOT should be:
-  - keyword - the `imp' feature's keyword
-    - Returned path will be relative to the root directory of the keyword.
+  - feature - Something that `imp-feature-normalize' can handle.
+    - Returned path will be relative to the entry in `imp-roots'.
     - Will raise an error if the feature does not have a path root.
   - string - an absolute path
     - Returned path will be relative to this absolute path.
@@ -89,23 +89,21 @@ PATH should be an absolute path string.
 
 If PATH has no relation to the determined root path from ROOT:
   - If ERROR? is nil, just return (canonicalized) PATH.
-  - If ERROR? is non-nil, signal an error.
+  - If ERROR? is non-nil, signal an error."
+  (let ((func-name "imp--path-relative")
+        path-root)
 
-Example (given `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
-  ~/.config/emacs/foo/bar.el:
-    (imp-path-relative :dot-emacs \"~/.config/emacs/foo/bar.el\")
-      -> \"foo/bar.el\"
-    (imp-path-relative :dot-emacs
-                       \"/home/<username>\" \".config\" \"emacs/foo/bar.el\")
-      -> \"foo/bar.el\""
-  (let ((func-name "imp--path-relative"))
     ;;------------------------------
-    ;; Error Checking
+    ;; Input Validation
     ;;------------------------------
-    (cond ((null root)     nil)
-          ((keywordp root) nil)
+    ;; Does ROOT make sense?
+    (cond ((null root) nil) ; nil is valid
 
-          ((and (stringp root)
+          ((and (stringp root) ; absolute path string is valid
+                (file-name-absolute-p root))
+           (setq path-root root))
+
+          ((and (stringp root) ; other strings are not valid
                 (not (file-name-absolute-p root)))
            (imp--error-if error?
                           func-name
@@ -113,15 +111,38 @@ Example (given `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
                           root)
            (setq root 'error))
 
+          ((condition-case _ ;; can this be understood as a feature name?
+               (imp-feature-normalize root)
+             (error nil))
+           ;; It's either:
+           ;;   - symbol or something that `imp-feature-first' can resolve
+           ;;   - an error
+           ;; TODO(path): Relative to whle of feature, not just first bit?
+           (setq path-root (imp--path-root-dir (imp-feature-first root)))
+           (unless (and path-root
+                        (stringp path-root)
+                        (file-name-absolute-p path-root))
+             (imp--error-if error?
+                            func-name
+                            '("Cannot get a path from ROOT. "
+                              "ROOT is not a feature in `imp-roots'. "
+                              "ROOT: %S")
+                            root)
+             (setq root 'error)))
+
           (t
            (imp--error-if error?
                           func-name
-                          "Don't know how to handle ROOT. Not a keyword, a string, or nil. Got a '%S': %S"
+                          '("Don't know how to handle ROOT. "
+                            "Not a feature, a string, or nil. "
+                            "Got a '%S': %S")
                           (type-of root)
                           root)
            (setq root 'error)))
 
-    (unless (stringp path)
+    ;; Does PATH make sense?
+    (if (stringp path)
+        (setq path (imp-path path)) ; normalize path
       (imp--error-if error?
                      func-name
                      "PATH must be a string! Got '%S': '%S'"
@@ -129,71 +150,67 @@ Example (given `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
                      path)
       (setq path 'error))
 
+    (setq path-root
+          (if (eq root 'error)
+              ;; Don't have a valid ROOT but don't want to error out.
+              ;; So do something that'll end up returning absolute PATH.
+              ""
+            ;; Add trailing slash so we don't have to deal with it
+            ;; in `replace-regexp-in-string'.
+            (file-name-as-directory
+             ;; normalize path
+             (imp-path (if (and path-root
+                               (stringp path-root))
+                          path-root
+                        user-emacs-directory))))) ; default/fallback
+
     ;;------------------------------
     ;; Get Relative Path
     ;;------------------------------
-    (let* ((path-root (if (eq root 'error)
-                          ;; Don't have a valid ROOT but don't want to error out.
-                          ;; So do something that'll end up returning absolute PATH.
-                          ""
-                        ;; canonical directory path
-                        (file-name-as-directory
-                         (expand-file-name (cond ((keywordp root)
-                                                  (imp--path-root-dir root))
-                                                 ((stringp root)
-                                                  root)
-                                                 (t
-                                                  user-emacs-directory))))))
-           ;; Don't like `file-relative-name' as it can return weird things when it
-           ;; goes off looking for actual directories and files...
-           (path-relative (replace-regexp-in-string
-                           ;; Make sure root dir has ending slash.
-                           path-root ;; Look for root directory path...
-                           ""        ;; Replace with nothing to get a relative path.
-                           path
-                           :fixedcase
-                           :literal)))
+    (let (;; Don't like `file-relative-name' as it can return weird things
+          ;; when it goes off looking for actual directories and files...
+          (path-relative (replace-regexp-in-string
+                          ;; Make sure root dir has ending slash.
+                          path-root ;; Look for root directory path...
+                          ""        ;; Replace with nothing to get a relative path.
+                          path
+                          :fixedcase
+                          :literal)))
 
       ;; End up with the same thing? Not a relative path - signal error?
       (when (and error?
                  (string= path-relative path))
         (imp--error func-name
-                    '("Current directory is not relative to ROOT!\n"
+                    '("PATH is not relative to ROOT!\n"
+                      "  PATH: %S\n"
                       "  ROOT: %S\n"
                       "  root path:    %s\n"
-                      "  emacs path:   %s\n"
                       "---> result:    %s")
+                    path
                     root
                     path-root
-                    user-emacs-directory
                     path-relative))
 
       ;; Return relative path.
       path-relative)))
+;; (imp--path-relative 'imp:/path (imp-path-join (imp-path-current-dir) "path/to/thing") t)
 
 
 (defun imp-path-relative (root &rest path)
   "Join & canonicalize PATH, then make relative to ROOT.
 
 ROOT should be:
-  - keyword - the `imp' feature's keyword
-    - Returned path will be relative to the root directory of the keyword.
+  - feature - Something that `imp-feature-normalize' can handle.
+    - Returned path will be relative to the entry in `imp-roots'.
     - Will raise an error if the feature does not have a path root.
-  - string  - an absolute path
+  - string - an absolute path
     - Returned path will be relative to this absolute path.
   - nil
     - Returned path will be relative to `user-emacs-directory'.
 
-Will raise an error if `imp-path-current-file' (i.e. the absolute path)
-has no relation to the determined root path.
+PATH should be an absolute path string.
 
-Example (given `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
-  ~/.config/emacs/foo/bar.el:
-    (imp-path-relative :dot-emacs \"~/.config/emacs/foo/bar.el\")
-      -> \"foo/bar.el\"
-    (imp-path-relative :dot-emacs
-                       \"/home/<username>\" \".config\" \"emacs/foo/bar.el\")
-      -> \"foo/bar.el\""
+Error ff PATH has no relation to the determined root path from ROOT."
   (imp--path-relative root
                       (imp-path-canonical (apply #'imp-path-join path))
                       :error))
