@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-07
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-10-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -537,7 +537,7 @@ Message depends on `imp--timing-format-optional'."
                            path))))
 
 
-;; TODO delete; use `imp--timing-core'
+;; TODO(use-package) delete?
 (defun imp--timing-macro-helper (feature &rest body)
   "imp timing for use in use-package handler.
 
@@ -571,45 +571,6 @@ TODO better docstr"
           (imp--timing-end ,(current-time)))))))
 
 
-(defmacro imp-timing-core (feature path &rest body)
-  "Return forms that measure & print the time it takes to evaluate BODY.
-
-FEATURE should be a list of keyword & symbol names.
-
-PATH should be a file path string.
-
-Output message depends on `imp--timing-format-time'.
-
-Prints timing to the `imp-timing-buffer' buffer.
-Return result of evaluating BODY."
-  (declare (indent 3))
-  (let ((feature-normalized (imp-feature-normalize feature)))
-    (if (or (not (imp-timing-enabled?))
-            ;; Don't do (another) timing block/level for a duplicated call.
-            (imp--timing-feature-duplicate? feature-normalized))
-        ;; Timing disabled: Just return BODY.
-        `(,@body)
-      ;; Timings enabled: Run BODY in between timing start/end messages.
-      `((let ((imp--macro-time (current-time)))
-          ;; Update current feature being timed.
-          (setq imp--timing-feature-current ',feature-normalized)
-          ;; Output load message.
-          (imp--timing-start ',feature-normalized
-                             ,path)
-          (prog1
-              ;; Increase indent level for body.
-              (let ((imp--timing-indent (1+ imp--timing-indent)))
-                ;; Run the body...
-                ,@body)
-
-            ;; Clear this feature from current.
-            (setq imp--timing-feature-current nil)
-
-            ;; Finish with the timing message.
-            (imp--timing-end imp--macro-time)))))))
-
-
-
 (defmacro imp-timing (feature path &rest body)
   "Measure & print the time it takes to evaluate BODY.
 
@@ -620,7 +581,7 @@ PATH should be a file path string.
 Output message depends on `imp--timing-format-time'.
 
 Return result of evaluating BODY."
-  (declare (indent 3))
+  (declare (indent 2))
 
   `(let ((imp--macro-feature (imp--feature-normalize-chain ,feature)))
      (if (and (imp-timing-enabled?)
