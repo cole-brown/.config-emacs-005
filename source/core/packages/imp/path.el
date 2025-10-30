@@ -241,34 +241,22 @@ signals an error."
 ;; (imp--path-root-dir 'dne t)
 
 
-(defun imp--path-file-exists? (root &rest paths)
-  "Return canonical path to file if it exists, else nil.
-
-Join ROOT and PATHS together into a filepath and canonicalize it.
-Then checks that:
-  1) It exists as a file.
-  2) The file is readable."
-  ;; Join PATHS, canonicalize at ROOT.
-  (let ((filepath (imp-path-canonical (imp-path-join paths) root)))
-    ;; Check that it exists.
-    (if (and (file-regular-p  filepath)
-             (file-readable-p filepath))
-        filepath
-      nil)))
-;; (imp--path-file-exists? default-directory "init.el")
-
-
-(defun imp--path-strings? (root &rest paths)
-  "Return canonical path to file if ROOT and PATHS are strings, else nil."
-  (if (and (stringp root)
-           (seq-every-p #'stringp paths))
-      (imp-path-canonical (imp-path-join paths) root)
-    nil))
-
-
-(defun imp--path-root-contains? (feature-base)
-  "Return bool based on if `imp-roots' contains FEATURE-BASE."
-  (not (null (imp--alist-get-value feature-base imp-roots))))
+;; TODO(path): Unused. Delete? Make it a public func? Needs better params.
+;; (defun imp--path-file-exists? (root &rest paths)
+;;   "Return canonical path to file if it exists, else nil.
+;;
+;; Join ROOT and PATHS together into a filepath and canonicalize it.
+;; Then checks that:
+;;   1) It exists as a file.
+;;   2) The file is readable."
+;;   ;; Join PATHS, canonicalize at ROOT.
+;;   (let ((filepath (imp-path-canonical (imp-path-join paths) root)))
+;;     ;; Check that it exists.
+;;     (if (and (file-regular-p  filepath)
+;;              (file-readable-p filepath))
+;;         filepath
+;;       nil)))
+;; ;; (imp--path-file-exists? default-directory "init.el")
 
 
 (defun imp--path-root-valid? (caller path &rest kwargs)
@@ -361,6 +349,7 @@ KWARGS should be a plist. All default to t:
 ;; Path Helpers
 ;;------------------------------------------------------------------------------
 
+;; TODO(path): Used once. Delete? The name is terrible.
 (defun imp--path-dir? (path)
   "Return non-nil if PATH is a directory path."
   ;; Directory path if the PATH is equal to its path-as-a-directory.
@@ -439,38 +428,39 @@ KWARGS should be a plist. All default to t:
 ;; (imp-path-current-file)
 
 
-(defun imp-path-current-file-relative (&optional root)
-  "Return the relative path of the file this function is called from.
+;; TODO(path): Unused. Delete?
+;; (defun imp-path-current-file-relative (&optional root)
+;;   "Return the relative path of the file this function is called from.
 
-ROOT should be:
-  - keyword - the `imp' feature's keyword
-    - Returned path will be relative to the root directory of the keyword.
-    - Will raise an error if the feature does not have a path root.
-  - string  - an absolute path
-    - Returned path will be relative to this absolute path.
-  - nil
-    - Returned path will be relative to `user-emacs-directory'.
+;; ROOT should be:
+;;   - keyword - the `imp' feature's keyword
+;;     - Returned path will be relative to the root directory of the keyword.
+;;     - Will raise an error if the feature does not have a path root.
+;;   - string  - an absolute path
+;;     - Returned path will be relative to this absolute path.
+;;   - nil
+;;     - Returned path will be relative to `user-emacs-directory'.
 
-Will raise an error if `imp-path-current-file' (i.e. the absolute path)
-has no relation to the determined root path.
+;; Will raise an error if `imp-path-current-file' (i.e. the absolute path)
+;; has no relation to the determined root path.
 
-Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
-  ~/.config/emacs/foo/bar.el:
-    (imp-path-current-file)
-      -> \"/home/<username>/.config/emacs/foo/bar.el\"
-    (imp-path-current-file-relative)
-      -> \"foo/bar.el\"
-    (imp-path-current-file-relative :dot-emacs)
-      -> \"foo/bar.el\"
-    (imp-path-current-file-relative \"/home/<username>/.config/emacs/foo\")
-      -> \"bar.el\""
-  (imp--path-relative root
-                      (imp-path-current-file)
-                      :error))
-;; (imp-path-current-file)
-;; (imp-path-current-file-relative)
-;; (imp-path-root-set :test (imp-path-current-dir))
-;; (imp-path-current-file-relative :test)
+;; Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
+;;   ~/.config/emacs/foo/bar.el:
+;;     (imp-path-current-file)
+;;       -> \"/home/<username>/.config/emacs/foo/bar.el\"
+;;     (imp-path-current-file-relative)
+;;       -> \"foo/bar.el\"
+;;     (imp-path-current-file-relative :dot-emacs)
+;;       -> \"foo/bar.el\"
+;;     (imp-path-current-file-relative \"/home/<username>/.config/emacs/foo\")
+;;       -> \"bar.el\""
+;;   (imp--path-relative root
+;;                       (imp-path-current-file)
+;;                       :error))
+;; ;; (imp-path-current-file)
+;; ;; (imp-path-current-file-relative)
+;; ;; (imp-path-root-set :test (imp-path-current-dir))
+;; ;; (imp-path-current-file-relative :test)
 
 
 (defun imp-file-current (&optional no-ext)
@@ -488,70 +478,72 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\")
 ;; (imp-path-current-dir)
 
 
-(defun imp-path-current-dir-relative (feature/base)
-  "Return the relative path from feature's path root to the dir this is called.
+;; TODO(path): Unused. Delete?
+;; (defun imp-path-current-dir-relative (feature/base)
+;;   "Return the relative path from feature's path root to the dir this is called.
 
-Path will be relative to FEATURE/BASE. If FEATURE/BASE is nil, use
-`user-emacs-directory' as the base path.
+;; Path will be relative to FEATURE/BASE. If FEATURE/BASE is nil, use
+;; `user-emacs-directory' as the base path.
 
-Will raise an error if non-nil FEATURE/BASE does not have a path root.
+;; Will raise an error if non-nil FEATURE/BASE does not have a path root.
 
-Will raise an error if `imp-path-current-dir' (i.e. the absolute path)
-has no relation to FEATURE/BASE's root path.
+;; Will raise an error if `imp-path-current-dir' (i.e. the absolute path)
+;; has no relation to FEATURE/BASE's root path.
 
-Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
-  ~/.config/emacs/foo/bar.el:
-    (imp-path-current-dir)
-      -> \"/home/<username>/.config/emacs/foo/\"
-    (imp-path-current-dir-relative :dot-emacs)
-      -> \"foo\"
-    (imp-path-current-dir-relative)
-      -> \"foo\""
-  ;; Make sure both paths are equivalent (directory paths) for the regex replace.
-  (let* ((path-root (file-name-as-directory
-                     (expand-file-name (if feature/base
-                                           (imp--path-root-dir feature/base)
-                                         user-emacs-directory))))
-         (path/here (file-name-as-directory (imp-path-current-dir)))
-         ;; Don't like `file-relative-name' as it can return weird things when it
-         ;; goes off looking for actual directories and files...
-         (path/relative (replace-regexp-in-string
-                         ;; Make sure root dir has ending slash.
-                         path-root ;; Look for root directory path...
-                         ""        ;; Replace with nothing to get a relative path.
-                         path/here
-                         :fixedcase
-                         :literal)))
-    ;; End up with the same thing? Not a relative path - signal error.
-    (when (string= path/relative path/here)
-      ;; Error message gets truncated to oblivion, so... hello again:
-      ;; (message (mapconcat #'identity
-      ;;                     '("Current directory is not relative to FEATURE/BASE!"
-      ;;                       "  FEATURE/BASE: %S"
-      ;;                       "  root path:    %s"
-      ;;                       "  curr path:    %s"
-      ;;                       "---> result:    %s")
-      ;;                     "\n")
-      ;;          feature/base
-      ;;          path-root
-      ;;          path/here
-      ;;          path/relative)
-      (imp--error "imp-path-current-dir-relative"
-                  '("Current directory is not relative to FEATURE/BASE!\n"
-                    "  FEATURE/BASE: %S\n"
-                    "  root path:    %s\n"
-                    "  curr path:    %s\n"
-                    "---> result:    %s")
-                  feature/base
-                  path-root
-                  path/here
-                  path/relative))
-    ;; Return relative path, sans final slash.
-    (directory-file-name path/relative)))
-;; Should be "" since we're at the root dir for imp:
-;;   (imp-path-current-dir-relative :imp)
+;; Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
+;;   ~/.config/emacs/foo/bar.el:
+;;     (imp-path-current-dir)
+;;       -> \"/home/<username>/.config/emacs/foo/\"
+;;     (imp-path-current-dir-relative :dot-emacs)
+;;       -> \"foo\"
+;;     (imp-path-current-dir-relative)
+;;       -> \"foo\""
+;;   ;; Make sure both paths are equivalent (directory paths) for the regex replace.
+;;   (let* ((path-root (file-name-as-directory
+;;                      (expand-file-name (if feature/base
+;;                                            (imp--path-root-dir feature/base)
+;;                                          user-emacs-directory))))
+;;          (path/here (file-name-as-directory (imp-path-current-dir)))
+;;          ;; Don't like `file-relative-name' as it can return weird things when it
+;;          ;; goes off looking for actual directories and files...
+;;          (path/relative (replace-regexp-in-string
+;;                          ;; Make sure root dir has ending slash.
+;;                          path-root ;; Look for root directory path...
+;;                          ""        ;; Replace with nothing to get a relative path.
+;;                          path/here
+;;                          :fixedcase
+;;                          :literal)))
+;;     ;; End up with the same thing? Not a relative path - signal error.
+;;     (when (string= path/relative path/here)
+;;       ;; Error message gets truncated to oblivion, so... hello again:
+;;       ;; (message (mapconcat #'identity
+;;       ;;                     '("Current directory is not relative to FEATURE/BASE!"
+;;       ;;                       "  FEATURE/BASE: %S"
+;;       ;;                       "  root path:    %s"
+;;       ;;                       "  curr path:    %s"
+;;       ;;                       "---> result:    %s")
+;;       ;;                     "\n")
+;;       ;;          feature/base
+;;       ;;          path-root
+;;       ;;          path/here
+;;       ;;          path/relative)
+;;       (imp--error "imp-path-current-dir-relative"
+;;                   '("Current directory is not relative to FEATURE/BASE!\n"
+;;                     "  FEATURE/BASE: %S\n"
+;;                     "  root path:    %s\n"
+;;                     "  curr path:    %s\n"
+;;                     "---> result:    %s")
+;;                   feature/base
+;;                   path-root
+;;                   path/here
+;;                   path/relative))
+;;     ;; Return relative path, sans final slash.
+;;     (directory-file-name path/relative)))
+;; ;; Should be "" since we're at the root dir for imp:
+;; ;;   (imp-path-current-dir-relative :imp)
 
 
+;; TODO(path): Unused. Delete? Wait til `imp` hits the Win10VM first.
 (defvar imp--path-path-platform-case-insensitive
   '(;; Windows
     cygwin windows-nt ms-dos
@@ -560,6 +552,7 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
   "These operating systems have case-insensitive paths.")
 
 
+;; TODO(path): Unused. Delete? Wait til `imp` hits the Win10VM first.
 (defun imp--path-platform-agnostic (path)
   "Convert PATH string into a standardized path for the platform.
 
@@ -583,7 +576,8 @@ Downcases path on case-insensitive OSes."
 ;; (imp--path-platform-agnostic "C:\\Foo\\Bar")
 
 
-;; TODO(path): use imp-parser func?
+;; TODO(path):
+;; TODO(path): Used in one func. Delete? Use imp-parser func or imp-feature func?
 (defun imp--path-to-str (input)
   "Ensure INPUT is a string.
 
@@ -619,6 +613,7 @@ Return a string."
 ;; (imp--path-to-str "/bar")
 
 
+;; TODO(path): Only used in `imp-path-join`. Roll this into that func then delete.
 (defun imp--path-append (parent next)
   "Append NEXT element to PARENT, adding dir separator if needed."
   (let ((parent (imp--path-to-str parent))
@@ -660,6 +655,7 @@ Return a string."
 ;; (imp-path-join '("/foo" ("bar.el")))
 ;; (imp-path-join "foo" "bar.el")
 ;; (imp-path-join "foo")
+
 
 ;; TODO(path): change to pass in EXT, check for EXT, remove if matching.
 (defun imp--path-sans-extension (&rest path)
@@ -730,54 +726,60 @@ See func `get-load-suffixes' for known load extenstions."
 ;; Public API: Feature Root Directories
 ;;------------------------------------------------------------------------------
 
-(defun imp-path-root-set (feature-base path-dir-root)
-  "Set the root path(s) of FEATURE-BASE for future `imp-require' calls.
+(defun imp-path-root-set (feature path-dir-root)
+  "Set the root path(s) of FEATURE for future `imp-require' calls.
 
-PATH-DIR-ROOT is the directory under which all of FEATURE-BASE's features exist."
-  (cond ((not (symbolp feature-base))
-         (imp--error "imp-path-root-set"
-                     "FEATURE-BASE must be a symbol"))
+PATH-DIR-ROOT is the directory under which all of FEATURE exist."
+  (let ((funcname 'imp-path-root-set)
+        (feature-base (imp-feature-first feature)))
 
-        ((imp--path-root-contains? feature-base)
-         ;; ignore exact duplicates.
-         (unless (string= (imp-path-root-get feature-base)
-                          path-dir-root)
-           (imp--error "imp-path-root-set"
-                       '("FEATURE-BASE '%S' is already an imp root.\n"
-                         "path: %s\n"
-                         "file: %s")
-                       feature-base
-                       (imp--path-root-dir feature-base :no-error)
-                       (imp--path-root-file-init feature-base :no-error))))
+    (imp--error-if (not feature-base)
+                   funcname
+                   "Could not normalize FEATURE. %S -> %S"
+                   feature
+                   feature-base)
 
-        ;; imp--path-root-valid? will error with better reason, so the error here
-        ;; isn't actually triggered... I think?
-        ((not (imp--path-root-valid? "imp-root" path-dir-root))
-         (imp--error "imp-path-root-set"
-                     "Path must be a valid directory: %s" path-dir-root))
+    (cond ((imp-path-root-get feature-base)
+           ;; ignore exact duplicates.
+           (unless (string= (imp-path-root-get feature-base)
+                            path-dir-root)
+             (imp--error funcname
+                         '("Feature is already an imp root. "
+                           "FEATURE: %S "
+                           "feature base: %S"
+                           "path: %s")
+                         feature
+                         feature-base
+                         (imp--path-root-dir feature-base :no-error))))
 
-        ;; Ok; set keyword to path.
-        (t
-         (push (list feature-base
-                     path-dir-root)
-               imp-roots))))
+          ;; `imp--path-root-valid?' will error with better reason, so the
+          ;; error here isn't actually triggered... I think?
+          ((not (imp--path-root-valid? "imp-root" path-dir-root))
+           (imp--error funcname
+                       "Path must be a valid directory: %s" path-dir-root))
+
+          ;; Ok; set keyword to path.
+          (t
+           (push (list feature-base
+                       path-dir-root)
+                 imp-roots)))))
 ;; (imp-path-root-set 'imp (imp-path-current-dir))
 
 
-(defun imp-path-root-get (feature-base &optional no-error?)
+(defun imp-path-root-get (feature &optional no-error?)
   "Get the root directory from `imp-roots' for FEATURE-BASE.
 
 If NO-ERROR? is nil and FEATURE-BASE is not in `imp-roots',
 signals an error.
 
 Return path string from `imp-roots' or nil."
-  (imp--path-root-dir feature-base no-error?))
+  (imp--path-root-dir feature no-error?))
 ;; (imp-path-root-get 'imp)
 
 
-(defun imp-path-root-delete (feature-base &optional no-error?)
-  "Delete the root path for FEATURE-BASE."
-  (imp--alist-delete feature-base imp-roots))
+(defun imp-path-root-delete (feature &optional no-error?)
+  "Delete the root path for FEATURE."
+  (imp--alist-delete (imp-feature-first feature) imp-roots))
 ;; imp-roots
 ;; (imp-path-root-delete 'imp)
 
@@ -791,6 +793,7 @@ Return path string from `imp-roots' or nil."
 (unless (imp-path-root-get 'imp 'no-error)
   (imp-path-root-set 'imp
                      (imp-path-current-dir)))
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.

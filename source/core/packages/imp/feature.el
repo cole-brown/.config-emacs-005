@@ -345,7 +345,8 @@ If SYMBOLS? is non-nil, return list of symbols."
 
 
 ;; TODO(feature): alias to `imp-feature'?
-;; TODO(feature): have a "no error" version? `imp-feature-errorless'?
+;; TODO(feature): have a "no error" version or param. `imp-feature-errorless'?
+;;   - path.el needs it for `imp--path-root-dir'
 (defun imp-feature-normalize (&rest feature)
   "Translate the feature to a single symbol appropriate for Emacs' `provide'.
 
