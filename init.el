@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-10-30
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -384,7 +384,7 @@
   ;; https://github.com/bbatsov/zenburn-emacs
   ;;---
   ;; It's just...... good.
-  (imp user:/config/theme/zenburn)
+  (imp user:/config/theme/zenburn/init.el)
 
 
   ;;------------------------------------------------------------------------------
@@ -727,7 +727,7 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   ;; Org-Mode
   ;;------------------------------------------------------------------------------
 
-  (imp user:/config org)
+  (imp user:/config/org/init)
 
 
   ;;------------------------------------------------------------------------------
@@ -735,11 +735,11 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
   ;;------------------------------------------------------------------------------
   ;; TODO: make/load "config/languages/init.el", which will load all
 
-  (imp user:/config languages common)
+  (imp user:/config/languages/common)
 
-  (imp user:/config languages elisp)
+  (imp user:/config/languages/elisp)
 
-  (imp user:/config languages elisp)
+  (imp user:/config/languages/elisp)
 
 
   ;;------------------------------------------------------------------------------
