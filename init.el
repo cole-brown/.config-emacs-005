@@ -258,8 +258,9 @@
 ;; (customize-set-variable 'imp-timing-enabled? t)
 
 ;; TODO: imp-load user w/ root flag?
-(imp-path-root-set :user
-                   (imp-path-join user-emacs-directory 'source 'user))
+;; imp-roots
+(imp-path-root-set 'user
+                   (imp-path user-emacs-directory 'source 'user))
 
 ;;------------------------------
 ;; Time the Rest
@@ -289,7 +290,7 @@
 
   (imp namespaced
     :root
-    :path (imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
+    :path (imp-path user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
 
 
   ;;------------------------------------------------------------------------------
@@ -511,18 +512,13 @@
            system-type
            system-name)
   ;; TODO: for now, this way.
-  (pcase system-type
-    ('gnu/linux
-     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
-     ;; to figure out path from system-name/host.
-     (imp secret.d
-       :root
-       :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))
-    ('windows-nt
-     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
-     ;; to figure out path from system-name/host.
-     (imp secret.d
-       :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
+  (imp secret.d
+    :root
+    :path (pcase system-type
+            ('gnu/linux
+             "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el")
+            ('windows-nt
+             "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
 
 
   ;;--------------------------------------------------------------------------------
