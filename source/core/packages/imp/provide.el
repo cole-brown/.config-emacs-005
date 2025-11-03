@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -37,7 +37,7 @@
              (cond ((null arg) nil)
                    ((eq t arg) t)
                    ((and arg (symbolp arg))
-                    (if (bound-and-true-p arg)
+                    (if (and (boundp arg) arg)
                         (symbol-value arg)
                       arg))
                    ((functionp arg)
@@ -50,13 +50,14 @@
 
 
 (defmacro imp-provide (&rest feature)
-  `(let ((funcname 'imp-provide)
-         (feature-norm (imp-feature-normalize (imp--provide-parse ',feature))))
+  `(let* ((funcname 'imp-provide)
+          (feature* ',feature)
+          (feature-norm (imp-feature-normalize (imp--provide-parse feature*))))
      (unless feature-norm
-       (imp--error "imp-provide"
+       (imp--error funcname
                    '("No features to provide? "
                      "input: %S, normalized: %S")
-                   feature
+                   feature*
                    feature-norm))
 
      ;; Provide to `imp-features' tree.
@@ -79,20 +80,20 @@
 
 Delete from:
   - imp: `imp-features'
-    - Given FEATURE of '(foo bar baz), delete from root of
-      feature tree (`foo`, see func `imp-feature-first').
+    - Given FEATURE of \\='(foo bar baz), delete from root of
+      feature tree (`foo', see func `imp-feature-first').
   - emacs: `features'
-    - Given FEATURE of '(foo bar baz), delete all that either:
+    - Given FEATURE of \\='(foo bar baz), delete all that either:
       1) start with \"foo:/\" or \"foo/\"
       2) equal the entire string \"foo\""
-  `(let* ((funcname 'imp-unprovide)
-          (feature-norm (apply #'imp-feature-normalize ',feature))
+  `(let* ((feature* ',feature)
+          (feature-norm (apply #'imp-feature-normalize feature*))
           (feature-first (imp-feature-first feature-norm)))
      (unless feature-norm
        (imp--error "imp-unprovide"
                    '("No features to unprovide? "
                      "input: %S, normalized: %S")
-                   feature
+                   feature*
                    feature-norm))
 
      (message "unproviding all of `%S' from `imp-features' & `features'."
