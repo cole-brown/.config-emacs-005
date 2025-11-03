@@ -723,27 +723,27 @@ DIRPATH is the directory under which all of FEATURE exist."
     (cond ((imp-path-root-get feature-base :no-error)
            ;; ignore exact duplicates.
            (unless (string= (imp-path-root-get feature-base :no-error)
-                            dirpath)
+                            path-root)
              (imp--error funcname
                          '("Feature is already an imp root. "
                            "FEATURE: %S "
-                           "feature base: %S"
-                           "path: %s")
+                           "feature base: %S "
+                           "existing path: %s "
+                           "requested path: %s")
                          feature
                          feature-base
-                         (imp-path-root-get feature-base :no-error))))
+                         (imp-path-root-get feature-base :no-error)
+                         path-root)))
 
           ;; `imp--path-root-valid?' will error with better reason, so the
           ;; error here isn't actually triggered... I think?
-          ((not (imp--path-root-valid? "imp-root" dirpath))
+          ((not (imp--path-root-valid? "imp-root" path-root))
            (imp--error funcname
-                       "Path must be a valid directory: %s" dirpath))
+                       "Path must be a valid directory: %s" path-root))
 
-          ;; Ok; set keyword to path.
+          ;; Ok; set the feature's root to the path.
           (t
-           (push (list feature-base
-                       dirpath)
-                 imp-roots)))))
+           (push (list feature-base path-root) imp-roots)))))
 ;; (imp-path-root-set 'imp (imp-path-current-dir))
 
 
