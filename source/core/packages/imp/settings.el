@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-04-16
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -183,7 +183,7 @@ definitions, to understand the main intent of what's happening."
 ;; Output (errors, warnings, messages...)
 ;;------------------------------------------------------------------------------
 
-(defcustom imp-output-buffer "ⓘ-imp-output-ⓘ"
+(defcustom imp-output-buffer "*imp-log*"
   "Name of the output buffer used by `imp--output-sink'."
   :group 'imp
   :type '(string))
@@ -253,7 +253,7 @@ See also `use-package-defaults', which uses this value."
 
 (defcustom imp-timing-buffer
   ;; "ⓘ-imp-timing-ⓘ"
-  "*imp*"
+  "*imp-statistics*"
   "Buffer name to print to.
 
 If you want it to go to *Messages* with the usual minibuffer interaction, set
