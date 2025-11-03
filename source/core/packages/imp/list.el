@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-16
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -40,7 +40,7 @@ NOTE: recursive"
   (apply #'append
          (seq-map (lambda (x)
                     (if (and (listp x) (listp (cdr x)))
-                        (test-ilf x)
+                        (imp--list-flatten x)
                       (list x)))
                   (if unquote?
                       (seq-map #'imp--unquote input)
