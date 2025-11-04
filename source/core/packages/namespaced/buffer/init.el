@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -23,7 +23,7 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp-path-root-set :buffer
+(imp-path-root-set 'buffer
                    (imp-path-current-dir))
 
 
@@ -32,7 +32,7 @@
 ;;------------------------------------------------------------------------------
 
 (defgroup buffer nil
-  "Group namespace for the `:buffer' defcustoms."
+  "Group namespace for `buffer' defcustoms."
   ;; Not really sure where to stick it..?
   :group 'files)
 
@@ -42,7 +42,7 @@
 ;;------------------------------------------------------------------------------
 
 (imp-timing
-    '(:buffer)
+    'buffer
     (imp-path-current-file)
 
   ;;------------------------------

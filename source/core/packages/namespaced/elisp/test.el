@@ -1,10 +1,10 @@
-;;; elisp/utils/test.el --- Test Utils -*- lexical-binding: t; -*-
+;;; namespaced/elisp/test.el --- Test Utils -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-07-14
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -29,4 +29,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :elisp 'utils 'test)
+(imp-provide elisp utils test)

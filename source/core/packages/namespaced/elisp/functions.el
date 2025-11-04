@@ -1,10 +1,10 @@
-;;; core/modules/elisp/utils/functions.el --- Functions for Functions -*- lexical-binding: t; -*-
+;;; namespaced/elisp/functions.el --- Functions for Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-12-17
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
