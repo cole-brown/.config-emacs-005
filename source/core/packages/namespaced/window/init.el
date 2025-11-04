@@ -1,10 +1,10 @@
-;;; core/modules/emacs/chrome/init.el --- Emacs Chrome (Windows, Frames...) -*- lexical-binding: t; -*-
+;;; namespaced/window/init.el --- Emacs Chrome (Windows, Frames...) -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-15
-;; Timestamp:  2023-09-26
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,25 +28,22 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root/set :chrome
-                   (imp:path:current:dir)
-                   "init.el")
+(imp-path-root-set 'window
+                   (imp-path-current-dir))
 
 
 ;;------------------------------------------------------------------------------
 ;; Load files.
 ;;------------------------------------------------------------------------------
 
-(imp:timing
-    '(:chrome)
-    (imp:file:current)
-    (imp:path:current:dir)
+(imp-timing
+    'window
+    (imp-path-current-dir)
 
-  (imp:load :feature  '(:chrome window)
-            :filename "window"))
+  (imp ./window))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :casement)
+(imp-provide window)

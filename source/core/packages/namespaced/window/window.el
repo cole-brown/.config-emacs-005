@@ -1,10 +1,10 @@
-;;; core/modules/emacs/chrome/window.el --- Emacs 'Window' Functions -*- lexical-binding: t; -*-
+;;; namespaced/window/window.el --- Emacs 'Window' Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-15
-;; Timestamp:  2023-09-26
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -25,8 +25,7 @@
 ;;------------------------------------------------------------------------------
 ;; Kill Functions
 ;;------------------------------------------------------------------------------
-;; See `:buffer:manage' for similar functions.
-;;   git-root://core/modules/emacs/buffer/manage.el
+;; See `buffer:/manage' for similar functions but for buffers.
 
 ;; Like `kill-buffer-ask' but no confirmation for unmodified buffers.
 (defun window:kill-or-quit (&optional quit window)
@@ -72,4 +71,4 @@ If WINDOW-LIST is nil, use function `window-list' instead."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :chrome 'window)
+(imp-provide window window)

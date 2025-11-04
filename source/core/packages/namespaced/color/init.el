@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-06
-;; Timestamp:  2025-05-15
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -23,8 +23,8 @@
 ;;
 ;;; Code:
 
-(require 'cl-macs) ; `cl-loop'
-(require 'color)   ; `color-clamp'
+(require 'cl-macs)         ; `cl-loop'
+(require 'color)           ; `color-clamp'
 (require 'term/tty-colors) ; `tty-color-standard-values'
 
 
@@ -272,4 +272,4 @@ Color values should be either:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :ns 'color)
+(imp-provide color)

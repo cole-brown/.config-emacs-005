@@ -31,31 +31,28 @@
   ;; Load all namespaced packages in proper order.
   ;; They use each other.
 
-  ;;------------------------------
-  ;; Standalone Libraries
-  ;;------------------------------
+  ;; Must be standalone:
+  (imp "./elisp/init") ; TODO: refactor "elisp/dlv/*"
 
-  (imp "./elisp/init")    ; standalone            ;; TODO: refactor "elisp/dlv/*"
-  (imp "./buffer/init")   ; standalone... so far  ;; TODO: refactor "+blah" ("optional") files
-  (imp "./unit/init")     ; standalone... so far
-  (imp "./datetime/init") ; standalone... so far
+  ;; Incidentally standalone:
+  (imp "./buffer/init") ; TODO: refactor "+blah" ("optional") files
+  (imp "./color/init")
+  (imp "./datetime/init")
+  (imp "./unit/init")
+  (imp "./window/init")
 
-  ;;------------------------------
-  ;; Libraries
-  ;;------------------------------
-
+  ;; Require other namespaced libs:
   (imp "./str/init")   ; requires `elisp'        ;; TODO: finish refactor
   (imp "./theme/init") ; requires `elisp', `str' ;; TODO: finish refactor
 
 
   ;; TODO: refactor the rest of 'em:
-  ;; (imp "./color/init")
+  ;;
   ;; (imp "./emacs/init")
   ;; (imp "./input/init")
   ;; (imp "./list/init")
   ;; (imp "./output/init")
   ;; (imp "./path/init")
-  ;; (imp "./window/init")
 
 
   ;; End load timing.
