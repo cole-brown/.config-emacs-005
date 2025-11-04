@@ -1,10 +1,10 @@
-;;; core/modules/emacs/buffer/line.el --- Welcome to... (line?) -*- lexical-binding: t; -*-
+;;; namespaced/buffer/line.el --- Welcome to... (line?) -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-08-30
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -23,9 +23,7 @@
 ;; Emacs
 ;; ------------------------------
 ;;
-;; (imp:use-package emacs
-;;   :unless (or (imp:flag? :keybinds +meow)
-;;               (imp:flag? :keybinds +evil))
+;; (use-package emacs
 ;;
 ;;   ;;------------------------------
 ;;   :bind ; emacs
@@ -46,8 +44,7 @@
 ;; Meow
 ;; ------------------------------
 ;;
-;; (imp:use-package package-name
-;;   :when  (imp:flag? :keybinds +meow)
+;; (use-package package-name
 ;;   :after meow
 ;;
 ;;   ;; TODO-meow: Do I need to make a meow version of the smart line functions?
@@ -72,8 +69,7 @@
 ;; Evil
 ;; ------------------------------
 ;;
-;; (imp:use-package package-name
-;;   :when  (imp:flag? :keybinds +evil)
+;; (use-package package-name
 ;;   :after (:and evil evil-collection)
 ;;
 ;;   ;;------------------------------
@@ -108,7 +104,7 @@
 ;;; Code:
 
 
-(imp:require :buffer 'region)
+(imp-require buffer:/region)
 
 
 ;;--------------------------------------------------------------------------------
@@ -368,4 +364,4 @@ beginning or end of the buffer, stop there."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'line)
+(imp-provide buffer line)

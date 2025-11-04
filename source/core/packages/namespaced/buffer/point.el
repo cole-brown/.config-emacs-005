@@ -1,10 +1,10 @@
-;;; core/modules/emacs/buffer/point.el --- Buffer Point Helpers -*- lexical-binding: t; -*-
+;;; namespaced/buffer/point.el --- Buffer Point Helpers -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -51,4 +51,4 @@ Result depends on syntax table's comment character."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'point)
+(imp-provide buffer point)

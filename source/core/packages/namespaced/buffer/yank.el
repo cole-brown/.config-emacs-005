@@ -1,10 +1,10 @@
-;;; core/modules/emacs/buffer/yank.el --- Cut, Copy, Paste, Yank, Kill -*- lexical-binding: t; -*-
+;;; namespaced/buffer/yank.el --- Cut, Copy, Paste, Yank, Kill -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-10-06
-;; Timestamp:  2023-10-10
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,7 +21,7 @@
 ;; Yank
 ;;------------------------------------------------------------------------------
 
-(defun int<yank>:region/delete (start end &optional require-active?)
+(defun _:yank:region/delete (start end &optional require-active?)
   "Delete region from START to END in preparation for yank.
 
 If REQUIRE-ACTIVE? is non-nil, region must be active in order to be deleted."
@@ -41,7 +41,7 @@ If REQUIRE-ACTIVE? is non-nil, region must be active in order to be deleted."
       (delete-region start end)))
 
 
-(defun int<yank>:replace (start end &optional trim/start? trim/end?)
+(defun _:yank:replace (start end &optional trim/start? trim/end?)
   "Replace any selected region with yanked text.
 
 START should be the start of the region (int or point) or nil.
@@ -62,7 +62,7 @@ inserting."
                                 (t
                                  killed))))
     ;; Only delete region if we in fact have one.
-    (int<yank>:region/delete start end :require-active)
+    (_:yank:region/delete start end :require-active)
 
     ;; ...and yank our (trimmed?) text.
     (insert replacement)))
@@ -83,11 +83,11 @@ END should be the end of the region (int or point) or nil."
   ;;       ;; `region-active-p'.
   ;;       (meow-replace)
   ;;
-  ;;   (int<yank>:replace start end))
+  ;;   (_:yank:replace start end))
 
   ;; Don't use `meow-replace' because that trims newlines and I don't know why
   ;; you would want to trim newlines..?
-  (int<yank>:replace start end))
+  (_:yank:replace start end))
 
 
 (defun yank/pop:replace (&optional start end prefix)
@@ -131,7 +131,7 @@ Will use `consult-yank-from-kill-ring' if `consult' is a feature."
          ;;---
          ;; First, delete the selected region?
          ;;---
-         (int<yank>:region/delete start end :require-active)
+         (_:yank:region/delete start end :require-active)
 
          ;;---
          ;; Fancy Yank
@@ -148,4 +148,4 @@ Will use `consult-yank-from-kill-ring' if `consult' is a feature."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'yank)
+(imp-provide buffer:/yank)

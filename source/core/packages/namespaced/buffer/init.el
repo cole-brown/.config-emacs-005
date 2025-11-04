@@ -51,19 +51,15 @@
 
   (imp buffer:/delete)
   (imp buffer:/region)
-
-  ;; TODO: the rest
-
-  ;; (imp buffer:/narrow)
-  ;; (imp buffer:/type)
-  ;; (imp buffer:/eval)
-  ;; (imp buffer:/manage)
-  ;; (imp buffer:/name)
-  ;; (imp buffer:/point)
-  ;; (imp buffer:/line)
-  ;; (imp buffer:/search)
-  ;; (imp buffer:/yank)
-
+  (imp buffer:/narrow)
+  (imp buffer:/type)
+  (imp buffer:/eval)
+  (imp buffer:/manage)
+  (imp buffer:/name)
+  (imp buffer:/point)
+  (imp buffer:/line)
+  (imp buffer:/search)
+  (imp buffer:/yank)
 
   ;;------------------------------
   ;; Optional
@@ -71,7 +67,6 @@
 
   ;; (imp buffer:/+commands)
   ;; (imp buffer:/+line-hydra)
-
   )
 
 

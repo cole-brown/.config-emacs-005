@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-12-04
-;; Timestamp:  2023-06-29
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -20,14 +20,14 @@
 (require 'cl-lib)
 
 
-(imp:require :buffer 'narrow)
+(imp-require buffer:/narrow)
 
 
 ;;------------------------------------------------------------------------------
 ;; Constants
 ;;------------------------------------------------------------------------------
 
-(defconst int<buffer>:search:header:max/default 1000
+(defconst _:buffer:search:header:max/default 1000
   "Buffer position boundry for `buffer:cmd:search.header'.")
 
 
@@ -38,7 +38,7 @@
 (cl-defun buffer:search:header (string &key max (case 'default))
   "Search for STRING in the first MAX chars of the buffer.
 
-If MAX chars is nil, default to `int<buffer>:search:header:max/default'.
+If MAX chars is nil, default to `_:buffer:search:header:max/default'.
 
 CASE should be:
   - `default'                : Use default/current `case-fold-search'.
@@ -97,4 +97,4 @@ CASE should be:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'search)
+(imp-provide buffer:/search)

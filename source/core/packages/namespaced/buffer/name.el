@@ -1,10 +1,10 @@
-;;; core/modules/emacs/buffer/name.el --- Buffer Name Functions -*- lexical-binding: t; -*-
+;;; namespaced/buffer/name.el --- Buffer Name Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-12-04
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-03
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -181,7 +181,7 @@ Special buffers are:
 ;;------------------------------------------------------------------------------
 ;; Copy Buffer File/Dir Name Functions
 ;;------------------------------------------------------------------------------
-;; See `:path' module functions:
+;; See namespaced `path' functions:
 ;;   - `path:buffer:copy'
 ;;   - `path:cmd:buffer:copy:absolute'
 ;;   - `path:cmd:buffer:copy:project'
@@ -190,4 +190,4 @@ Special buffers are:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'name)
+(imp-provide buffer name)

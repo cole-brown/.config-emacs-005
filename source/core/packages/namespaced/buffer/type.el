@@ -1,10 +1,10 @@
-;;; core/modules/emacs/buffer/type.el --- Buffer Types -*- lexical-binding: t; -*-
+;;; namespaced/buffer/type.el --- Buffer Types -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-12-01
-;; Timestamp:  2023-09-14
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -35,7 +35,7 @@
 
 (require 'cl-lib)
 
-(imp:require :elisp 'utils 'functions)
+(imp-require elisp:/functions)
 
 
 ;;------------------------------------------------------------------------------
@@ -457,4 +457,4 @@ Originally Doom's `doom-fallback-buffer' in \"core/autoload/buffers.el\"."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'type)
+(imp-provide buffer type)

@@ -1,10 +1,10 @@
-;;; core/modules/emacs/buffer/eval.el --- Function for Eval (in) Buffers -*- lexical-binding: t; -*-
+;;; namespaced/buffer/eval.el --- Function for Eval (in) Buffers -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-22
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -37,4 +37,4 @@ and `defcustom' forms reset to their default values."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'eval)
+(imp-provide buffer eval)

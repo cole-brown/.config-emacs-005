@@ -1,10 +1,10 @@
-;;; core/modules/emacs/buffer/manage.el --- Buffer Management -*- lexical-binding: t; -*-
+;;; namespaced/buffer/manage.el --- Buffer Management -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-02-24
-;; Timestamp:  2023-09-26
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -22,7 +22,7 @@
 (require 'cl-lib)
 
 
-(imp:require :elisp 'utils)
+(imp-require elisp:/functions)
 
 
 ;;------------------------------------------------------------------------------
@@ -376,4 +376,4 @@ evil's replace state backspace 'undo' functionality."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'manage)
+(imp-provide buffer manage)
