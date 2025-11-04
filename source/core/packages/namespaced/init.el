@@ -31,19 +31,12 @@
   ;; Load all namespaced packages in proper order.
   ;; They use each other.
 
-  ;; TODO: order?
-  ;;   - elisp
-  ;;   - string
-  ;;     - requires: elisp
-
   ;;------------------------------
   ;; Standalone Libraries
   ;;------------------------------
-  ;; TODO: refactor "elisp/dlv/*"
-  (imp "./elisp/init") ; standalone
 
-  ;; TODO: finish refactor
-  (imp "./buffer/init")   ; standalone... so far
+  (imp "./elisp/init")    ; standalone            ;; TODO: refactor "elisp/dlv/*"
+  (imp "./buffer/init")   ; standalone... so far  ;; TODO: refactor "+blah" ("optional") files
   (imp "./unit/init")     ; standalone... so far
   (imp "./datetime/init") ; standalone... so far
 
@@ -51,30 +44,18 @@
   ;; Libraries
   ;;------------------------------
 
-  ;; TODO: finish refactor
-  (imp "./str/init") ; requires `:elisp'
-
-  ;; TODO: finish refactor
-  (imp "./theme/init") ; requires `:elisp', `:str'
+  (imp "./str/init")   ; requires `elisp'        ;; TODO: finish refactor
+  (imp "./theme/init") ; requires `elisp', `str' ;; TODO: finish refactor
 
 
-  ;; TODO: refactor the rest of 'em.
-
-
-  ;; TODO: Add something like one of theses to early ones?
-  ;;
-  ;; ;;-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
-  ;; ;; Imports
-  ;; ;; -------
-  ;; ;; Don't rely on anything more than the core modules... or anything at all?
-  ;; ;; This should be low-level stuff for use by other code.
-  ;; ;;-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
-  ;;
-  ;; ;;-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
-  ;; ;; `ns' Imports Allowed:
-  ;; ;; ----------------
-  ;; ;;   - :elisp
-  ;; ;;-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
+  ;; TODO: refactor the rest of 'em:
+  ;; (imp "./color/init")
+  ;; (imp "./emacs/init")
+  ;; (imp "./input/init")
+  ;; (imp "./list/init")
+  ;; (imp "./output/init")
+  ;; (imp "./path/init")
+  ;; (imp "./window/init")
 
 
   ;; End load timing.

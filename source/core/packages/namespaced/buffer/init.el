@@ -52,13 +52,13 @@
   (imp buffer:/delete)
   (imp buffer:/region)
   (imp buffer:/narrow)
-  (imp buffer:/type)
+  (imp buffer:/type)   ; required `elisp:/functions' (listify)
   (imp buffer:/eval)
-  (imp buffer:/manage)
+  (imp buffer:/manage) ; required `elisp:/functions' (flatten)
   (imp buffer:/name)
   (imp buffer:/point)
-  (imp buffer:/line)
-  (imp buffer:/search)
+  (imp buffer:/line)   ; requires `buffer:/region'
+  (imp buffer:/search) ; requires `buffer:/narrow'
   (imp buffer:/yank)
 
   ;;------------------------------
