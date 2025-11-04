@@ -2912,11 +2912,11 @@ lorem ipsum dolor sit amet...
 
 Look in [[file:~/.config/emacs/elpa/gptel-20250818.648/gptel-org.el::;;; gptel-org.el --- Org functions for gptel -*- lexical-binding: t; -*-][here]] somewhere.
 
-* -- U R HERE --
-<<here>>
-
-* ├CURRENT┤ imp-parser MVP
+* ├SUCCESS┤ imp-parser MVP
+CLOSED: [2025-11-03 Mon 21:46]
 :LOGBOOK:
+- State "├SUCCESS┤"  from "├DONE───┤"  [2025-11-03 Mon 21:46]
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-03 Mon 21:46]
 - State "├CURRENT┤"  from              [2025-10-24 Fri 13:38]
 :END:
 
@@ -3166,14 +3166,11 @@ CLOSED: [2025-10-29 Wed 16:20]
 
 
 
-** ├WAITING┤ test
+** ├DONE───┤ small test
+CLOSED: [2025-10-30 Thu 13:51]
 :LOGBOOK:
-- State "├WAITING┤"  from "├CURRENT┤"  [2025-10-28 Tue 22:26]
-- State "├CURRENT┤"  from              [2025-10-28 Tue 16:16]
-:END:
-
-*** ├WAITING┤ small test
-:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-30 Thu 13:51]
+- State "├CURRENT┤"  from "├WAITING┤"  [2025-10-29 Wed 16:26]
 - State "├WAITING┤"  from "├CURRENT┤"  [2025-10-28 Tue 22:26]
 - State "├CURRENT┤"  from              [2025-10-28 Tue 16:16]
 :END:
@@ -3340,27 +3337,824 @@ Go through [[file:source/core/packages/imp/path.el][path.el]] and clean up.
 hm...
 Actually let's split up parser.el first
 
-╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-╠══TODO══╣            ║                                                                                                          ║
-╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
-╠══TODO══╣            ║                                                                                                          ║
-╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 Wait on [[*imp-parser: rename?][imp-parser: rename?]]
-  - [ ] k
+  - [X] k
+  - [X] also some other stuff
+
+#+begin_src elisp
+(imp-parser namespaced
+  :root
+  :path (imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
+#+end_src
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (error "[ERROR--]: imp-parser-normalize/:path: namespaced: ‘:path’ should end up with an absolute path: got: ((imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el)) -> (\"~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el\") -> nil")
+  signal(error ("[ERROR--]: imp-parser-normalize/:path: namespaced: ‘:path’ should end up with an absolute path: got: ((imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el)) -> (\"~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el\") -> nil"))
+  error("[ERROR--]: imp-parser-normalize/:path: %S: `%S' should end up with an absolute path: got: %S -> %S -> %S" namespaced :path ((imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el)) ("~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") nil)
+  apply(error "[ERROR--]: imp-parser-normalize/:path: %S: `%S' should end up with an absolute path: got: %S -> %S -> %S" (namespaced :path ((imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el)) ("~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") nil))
+  (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail)))
+  (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail))))
+  (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply ... string)))) args) (setq tail (cdr tail)))))
+  (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond (... string) (... nil) (... ...))) args) (setq tail (cdr tail))))))
+  (progn (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ... ... ...)) args) (setq tail (cdr tail)))))))
+  (if (imp--output-level-get level :sink) (progn (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink ...)) (apply sink (concat prefix caller ... ...) args) (setq tail (cdr tail))))))))
+  imp--output(:error imp-parser-normalize/:path "%S: `%S' should end up with an absolute path: got: %S -> %S -> %S" (namespaced :path ((imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el)) ("~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") nil))
+  imp--error(imp-parser-normalize/:path "%S: `%S' should end up with an absolute path: got: %S -> %S -> %S" namespaced :path ((imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el)) ("~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") nil)
+  (if (and (stringp path) (file-name-absolute-p path)) nil (imp--error funcname "%S: `%S' should end up with an absolute path: got: %S -> %S -> %S" feature keyword args paths path))
+  (let* ((funcname 'imp-parser-normalize/:path) (paths (imp-parser-normalize-paths feature keyword args)) (feature-path (imp-feature-split feature)) (path (car paths))) (setq path (imp-parser-normalize-path-feature feature keyword path)) (if (and (stringp path) (file-name-absolute-p path)) nil (imp--error funcname "%S: `%S' should end up with an absolute path: got: %S -> %S -> %S" feature keyword args paths path)) path)
+  imp-parser-normalize/:path(namespaced :path ((imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el)))
+...
+#+end_src
+  - [X] oops. fixed.
+
+#+begin_src elisp
+(imp-parser namespaced
+  :root
+  :path (imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
+#+end_src
+
+errored before it could load anything:
+#+begin_src backtrace
+Debugger entered--Lisp error: (error "Eager macro-expansion failure: (wrong-type-argument stringp nil)")
+  signal(error ("Eager macro-expansion failure: (wrong-type-argument stringp nil)"))
+  error("Eager macro-expansion failure: %S" (wrong-type-argument stringp nil))
+  internal-macroexpand-for-load((let ((imp--macro-feature (imp--feature-normalize-chain :namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path (imp-path-current-file)) (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent ...)) (imp "./elisp/init") (imp "./buffer/init") (imp "./unit/init") (imp "./datetime/init") (imp "./str/init") (imp "./theme/init")) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (imp "./elisp/init") (imp "./buffer/init") (imp "./unit/init") (imp "./datetime/init") (imp "./str/init") (imp "./theme/init"))) t)
+  eval-buffer(#<buffer  *load*> nil "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" nil t)  ; Reading at buffer position 2038
+  load-with-code-conversion("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" nil t)
+  load("~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" nil nomessage)
+  (let ((imp--timing-indent (1+ imp--timing-indent))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage))
+  (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))
+  (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))
+  (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage))
+  (let ((imp--macro-feature (imp--feature-normalize-chain 'namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)))
+  (progn (imp-path-root-set 'namespaced "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced") (let ((imp--macro-feature (imp--feature-normalize-chain 'namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent ...)) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage))))
+  (progn (progn (imp-path-root-set 'namespaced "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced") (let ((imp--macro-feature (imp--feature-normalize-chain 'namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let (...) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" ... ...)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)))))
+  eval((progn (progn (imp-path-root-set 'namespaced "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced") (let ((imp--macro-feature (imp--feature-normalize-chain 'namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage))))) t)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0xa2a0a50c829a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0xa2a0a50c829a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+well this looks fine.
+#+begin_quote
+load("~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" nil nomessage)
+#+end_quote
+
+oh there's something helpful...
+#+begin_quote
+eval-buffer(#<buffer  *load*> nil "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" nil t)  ; Reading at buffer position 2038
+#+end_quote
+
+#+begin_quote
+Reading at buffer position 2038
+#+end_quote
+
+That's the end qoute from the ~imp-timing~ macro.
+
+So that ~imp-timing~ macro expanded to:
+#+begin_src elisp
+(let ((imp--macro-feature (imp--feature-normalize-chain :namespaced)))
+  (if (and (imp-timing-enabled?)
+           (not (imp--timing-feature-duplicate? imp--macro-feature)))
+      (let ((imp--macro-path (imp-path-current-file))
+            (imp--macro-time (current-time)))
+        (setq imp--timing-feature-current imp--macro-feature)
+        (imp--timing-start imp--macro-feature imp--macro-path)
+        (prog1
+            (let ((imp--timing-indent ...))
+              (imp "./elisp/init")
+              (imp "./buffer/init")
+              (imp "./unit/init")
+              (imp "./datetime/init")
+              (imp "./str/init")
+              (imp "./theme/init"))
+          (setq imp--timing-feature-current nil)
+          (imp--timing-end imp--macro-time)))
+    (imp "./elisp/init")
+    (imp "./buffer/init")
+    (imp "./unit/init")
+    (imp "./datetime/init")
+    (imp "./str/init")
+    (imp "./theme/init")))
+#+end_src
+
+Which got the stringp nil error.
+#+begin_quote
+error("Eager macro-expansion failure: %S" (wrong-type-argument stringp nil))
+#+end_quote
+
+But what goes in the ellipsis?
+#+begin_src elisp
+(let ((imp--macro-feature (imp--feature-normalize-chain :namespaced)))
+  (if (and (imp-timing-enabled?)
+           (not (imp--timing-feature-duplicate? imp--macro-feature)))
+      (let ((imp--macro-path (imp-path-current-file))
+            (imp--macro-time (current-time)))
+        (setq imp--timing-feature-current imp--macro-feature)
+        (imp--timing-start imp--macro-feature imp--macro-path)
+        (prog1
+            (let ((imp--timing-indent ...))
+              ;; (imp "./elisp/init")
+              ;; (imp "./buffer/init")
+              ;; (imp "./unit/init")
+              ;; (imp "./datetime/init")
+              ;; (imp "./str/init")
+              ;; (imp "./theme/init")
+              "with timing")
+          (setq imp--timing-feature-current nil)
+          (imp--timing-end imp--macro-time)))
+    ;; (imp "./elisp/init")
+    ;; (imp "./buffer/init")
+    ;; (imp "./unit/init")
+    ;; (imp "./datetime/init")
+    ;; (imp "./str/init")
+    ;; (imp "./theme/init")
+    "no timing"))
+#+end_src
+
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp-timing
+       :namespaced
+       (imp-path-current-file)
+     "hello there")))
+#+end_src
+
+#+RESULTS:
+#+begin_example elisp
+(let ((imp--macro-feature (imp--feature-normalize-chain :namespaced)))
+  (if
+      (and (imp-timing-enabled?)
+           (not (imp--timing-feature-duplicate? imp--macro-feature)))
+      (let
+          ((imp--macro-path (imp-path-current-file))
+           (imp--macro-time (current-time)))
+        (setq imp--timing-feature-current imp--macro-feature)
+        (imp--timing-start imp--macro-feature imp--macro-path)
+        (prog1
+            (let ((imp--timing-indent (1+ imp--timing-indent))) "hello there")
+          (setq imp--timing-feature-current nil)
+          (imp--timing-end imp--macro-time)))
+    "hello there"))
+#+end_example
+
+Mmh. So not imp-timing's fault.
+
+Must be this guy:
+#+begin_src elisp
+(imp "./elisp/init")
+#+end_src
+
+How to bubble these errors up better?
+With like a stack trace of where the error actually came from?
+Cuz it would've been nice to see this instead:
+#+begin_src backtrace
+Debugger entered--Lisp error: (wrong-type-argument stringp nil)
+  locate-file-internal(nil ("/") (".so" ".so.gz" ".elc" ".elc.gz" ".el" ".el.gz") nil)
+  locate-file(nil ("/") (".so" ".so.gz" ".elc" ".elc.gz" ".el" ".el.gz"))
+  imp-path-load-file(nil)
+  (if (imp-path-load-file path) path (let* ((funcname 'imp-parser-normalize-path-feature) (append-to-path (imp-feature-split feature))) (if path nil (cond ((imp-feature-root feature) (setq path (imp-path-root-get (imp-feature-root feature))) (setq append-to-path (imp-feature-unrooted feature))) ((string-prefix-p "./" (symbol-name feature)) (setq path (imp-path-current-dir)) (setq append-to-path (cdr append-to-path))) (t nil))) (if (and (stringp path) (file-name-absolute-p path)) (progn (apply #'imp-path-join path append-to-path)))))
+  imp-parser-normalize-path-feature(\./elisp/init :path nil)
+  (setq path (imp-parser-normalize-path-feature feature keyword path))
+  (let* ((funcname 'imp-parser-normalize/:path) (paths (imp-parser-normalize-paths feature keyword args)) (feature-path (imp-feature-split feature)) (path (car paths))) (setq path (imp-parser-normalize-path-feature feature keyword path)) (if (and (stringp path) (file-name-absolute-p path)) nil (imp--error funcname "%S: `%S' should end up with an absolute path: got: %S -> %S -> %S" feature keyword args paths path)) path)
+  imp-parser-normalize/:path(\./elisp/init :path nil)
+  (lambda (feature args) (imp-parser-normalize/:path feature :path nil))(\./elisp/init nil)
+  funcall((lambda (feature args) (imp-parser-normalize/:path feature :path nil)) \./elisp/init nil)
+  (if (and func (functionp func)) (funcall func feature args) (eval func))
+  (let ((func (nth 1 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func)))
+  (imp-parser-plist-maybe-put args (nth 0 spec) (let ((func (nth 1 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func))))
+  (setq args (imp-parser-plist-maybe-put args (nth 0 spec) (let ((func (nth 1 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func)))))
+  (progn (setq args (imp-parser-plist-maybe-put args (nth 0 spec) (let ((func (nth 1 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func))))))
+  (if (let ((func (nth 2 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func))) (progn (setq args (imp-parser-plist-maybe-put args (nth 0 spec) (let ((func (nth 1 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func)))))))
+  (let ((spec (car tail))) (if (let ((func (nth 2 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func))) (progn (setq args (imp-parser-plist-maybe-put args (nth 0 spec) (let ((func ...)) (if (and func ...) (funcall func feature args) (eval func))))))) (setq tail (cdr tail)))
+  (while tail (let ((spec (car tail))) (if (let ((func (nth 2 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func))) (progn (setq args (imp-parser-plist-maybe-put args (nth 0 spec) (let (...) (if ... ... ...)))))) (setq tail (cdr tail))))
+  (let ((tail imp-parser-defaults)) (while tail (let ((spec (car tail))) (if (let ((func (nth 2 spec))) (if (and func (functionp func)) (funcall func feature args) (eval func))) (progn (setq args (imp-parser-plist-maybe-put args (nth 0 spec) (let ... ...))))) (setq tail (cdr tail)))))
+  (let* ((feature-symbol (if (stringp feature) (intern feature) feature)) (feature-string (symbol-name feature-symbol))) (setq args (delq 'elisp--witness--lisp args)) (setq args (imp-parser-unalias-keywords feature-symbol args)) (setq args (imp-parser-normalize-plist feature-symbol args nil #'imp-parser-merge-keys)) (let ((tail imp-parser-defaults)) (while tail (let ((spec (car tail))) (if (let ((func ...)) (if (and func ...) (funcall func feature args) (eval func))) (progn (setq args (imp-parser-plist-maybe-put args ... ...)))) (setq tail (cdr tail))))) (imp-parser-sort-keywords args))
+  imp-parser-normalize-keywords(\./elisp/init nil)
+  (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp (cons ... args))) "\n  -->\n\n" (pp-to-string (cons 'imp (cons ... args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ... ...)))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))
+  (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons ... ...)) "\n  -->\n\n" (pp-to-string (cons ... ...)) "\n  ==>\n\n" (pp-to-string (macroexp-progn ...))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*)))
+  (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string ...) "\n  -->\n\n" (pp-to-string ...) "\n  ==>\n\n" (pp-to-string ...)) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))))
+  (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose ...) (concat "\n\n" ... "\n  -->\n\n" ... "\n  ==>\n\n" ...) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*)))))
+  #f(lambda (feature &rest args) [t] "Load FEATURE.\n\nUsage:\n\n  (imp feature\n     [:keyword [option]]...)\n\n:disabled      Flag. Nothing happens; FEATURE is ignored completely if this keyword\n               is present.\n\n:path PATH     Absolute, relative, or rooted path to file.\n               PATH can be:\n                 - A path string.\n                   - absolute or relative\n                   - prefixes:\n                     - \"./\" - relative to `imp-path-current-dir'\n                     - \":/\" - relative to FEATURE's root\n                 - A symbol whose value is a path string.\n                   - example: `user-emacs-directory'\n                 - A symbol whose name is known.\n                   - examples:\n                     - `pwd' - `imp-path-current-dir'\n                     - `.emacs' - `user-emacs-directory'\n                     - `root' - `imp-feature-root'\n                   - See func `imp-parser-normalize-path-symbol'\n                 - A form/function that evaluates to a path string.\n                   - (imp-path-join user-emacs-directory \"path/to/imp\")\nTODO(path): Do we want this to be the solution for lists?\n                 - A list of the above to join into a path.\nTODO(path): Alternative is a list of paths to try for locating the file.\n\n:root ROOT     Create an imp feature root for ROOT at PATH given in `:path'.\n               See var `imp-path-roots' and func `imp-path-root-set'.\n               If ROOT is t or a flag (arg-less), use first part of FEATURE.\n               Example:\n                 (imp imp/init\n                   :path (imp-path-join user-emacs-directory\n                                        \"path/to/imp\")\n                   :root)\n                 => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)\n\n:error ERR     Value (aka ERROR) can be:\n                 - nil\n                 - non-nil (default)\n                 - A form that should evaluate to one of the above.\n               If ERROR is nil, the function will not raise an error if:\n                 - The file doesn't exist.\n                 - FEATURE isn't provided after loading the file.\n               It will still raise an error if:\n                 - It cannot parse the inputs.\n                 - It cannot determine where to /look/ for the file.\n\n:optional OPT  Load FEATURE if it exists; do nothing if it does not.\n               OPT can be:\n                 - nil (default)\n                 - non-nil\n                 - A form that should evaluate to one of the above.\n\n:requires REQ  Assert that a feature already exists in `features'.\n               If assert fails, handle according to ERROR/OPTIONAL.\n               REQ can be:\n                 - nil\n                 - symbol\n                 - A form that should evaluate to one of the above.\n\n:if EXPR       Initialize and load only if EXPR evaluates to a non-nil value.\n:when EXPR     See `:if'.\n:unless EXPR   Opposite of `:if'.\n               Initialize and load only if EXPR evaluates to a nil value.\n\n:after AFTER   Delay the effect of the imp declaration until after the\n               named features have loaded. Before they have been loaded, no\n               other keyword has any effect at all, and once they have been\n               loaded it is as if `:after' was not specified." (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp (cons 'feature* args))) "\n  -->\n\n" (pp-to-string (cons 'imp (cons 'feature* args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ((imp-parser-verbose 'errors) (imp-parser-expand-minimally t)) (imp-parser-process-keywords feature* args*))))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))))))("./elisp/init")
+  macroexpand((imp "./elisp/init"))
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0xa2a0a50c829a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0xa2a0a50c829a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+Fix ~imp-path-load-file~
+#+begin_src elisp
+(imp-path-load-file nil)
+#+end_src
+  - [X] k
+
+#+begin_src elisp
+(imp "./elisp/init")
+#+end_src
+
+better
+#+begin_src backtrace
+Debugger entered--Lisp error: (error "[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: \"/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init\"")
+  signal(error ("[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: \"/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init\""))
+  error("[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: %S" "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init")
+  apply(error "[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: %S" "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init")
+  (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail)))
+  (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail))))
+  (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply ... string)))) args) (setq tail (cdr tail)))))
+  (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond (... string) (... nil) (... ...))) args) (setq tail (cdr tail))))))
+  (progn (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ... ... ...)) args) (setq tail (cdr tail)))))))
+  (if (imp--output-level-get level :sink) (progn (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink ...)) (apply sink (concat prefix caller ... ...) args) (setq tail (cdr tail))))))))
+  imp--output(:error imp-parser-handler/:path ("Cannot find a load path from path. " "Is path pointing to a file (with or without ext)? " "path: %S") ("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init"))
+  imp--error(imp-parser-handler/:path ("Cannot find a load path from path. " "Is path pointing to a file (with or without ext)? " "path: %S") "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init")
+  (if path-load (setq state (imp-parser-plist-maybe-put state :path-load path-load)) (imp--error 'imp-parser-handler/:path '("Cannot find a load path from path. " "Is path pointing to a file (with or without ext)? " "path: %S") arg))
+  (let* ((path-load (and t (imp-path-load-file arg)))) (if path-load (setq state (imp-parser-plist-maybe-put state :path-load path-load)) (imp--error 'imp-parser-handler/:path '("Cannot find a load path from path. " "Is path pointing to a file (with or without ext)? " "path: %S") arg)))
+  imp-parser-handler/:path(\./elisp/init :path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init" (:error t :optional nil) nil)
+  funcall(imp-parser-handler/:path \./elisp/init :path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init" (:error t :optional nil) nil)
+  (if (functionp handler-sym) (funcall handler-sym feature keyword arg rest state) (imp--error 'imp-parser-process-keywords "Keyword handler not defined: %s" handler))
+  (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym feature keyword arg rest state) (imp--error 'imp-parser-process-keywords "Keyword handler not defined: %s" handler)))
+  (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp--error 'imp-parser-process-keywords "%s is not a keyword" keyword)) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym feature keyword arg rest state) (imp--error 'imp-parser-process-keywords "Keyword handler not defined: %s" handler))))
+  (if (null plist) (imp-parser-load feature state) (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp--error 'imp-parser-process-keywords "%s is not a keyword" keyword)) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym feature keyword arg rest state) (imp--error 'imp-parser-process-keywords "Keyword handler not defined: %s" handler)))))
+  imp-parser-process-keywords(\./elisp/init (:path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/elisp/init" :error t :optional nil))
+  (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp (cons ... args))) "\n  -->\n\n" (pp-to-string (cons 'imp (cons ... args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ... ...)))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))
+  (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons ... ...)) "\n  -->\n\n" (pp-to-string (cons ... ...)) "\n  ==>\n\n" (pp-to-string (macroexp-progn ...))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*)))
+  (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string ...) "\n  -->\n\n" (pp-to-string ...) "\n  ==>\n\n" (pp-to-string ...)) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))))
+  (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose ...) (concat "\n\n" ... "\n  -->\n\n" ... "\n  ==>\n\n" ...) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*)))))
+  #f(lambda (feature &rest args) [t] "Load FEATURE.\n\nUsage:\n\n  (imp feature\n     [:keyword [option]]...)\n\n:disabled      Flag. Nothing happens; FEATURE is ignored completely if this keyword\n               is present.\n\n:path PATH     Absolute, relative, or rooted path to file.\n               PATH can be:\n                 - A path string.\n                   - absolute or relative\n                   - prefixes:\n                     - \"./\" - relative to `imp-path-current-dir'\n                     - \":/\" - relative to FEATURE's root\n                 - A symbol whose value is a path string.\n                   - example: `user-emacs-directory'\n                 - A symbol whose name is known.\n                   - examples:\n                     - `pwd' - `imp-path-current-dir'\n                     - `.emacs' - `user-emacs-directory'\n                     - `root' - `imp-feature-root'\n                   - See func `imp-parser-normalize-path-symbol'\n                 - A form/function that evaluates to a path string.\n                   - (imp-path-join user-emacs-directory \"path/to/imp\")\nTODO(path): Do we want this to be the solution for lists?\n                 - A list of the above to join into a path.\nTODO(path): Alternative is a list of paths to try for locating the file.\n\n:root ROOT     Create an imp feature root for ROOT at PATH given in `:path'.\n               See var `imp-path-roots' and func `imp-path-root-set'.\n               If ROOT is t or a flag (arg-less), use first part of FEATURE.\n               Example:\n                 (imp imp/init\n                   :path (imp-path-join user-emacs-directory\n                                        \"path/to/imp\")\n                   :root)\n                 => imp-path-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)\n\n:error ERR     Value (aka ERROR) can be:\n                 - nil\n                 - non-nil (default)\n                 - A form that should evaluate to one of the above.\n               If ERROR is nil, the function will not raise an error if:\n                 - The file doesn't exist.\n                 - FEATURE isn't provided after loading the file.\n               It will still raise an error if:\n                 - It cannot parse the inputs.\n                 - It cannot determine where to /look/ for the file.\n\n:optional OPT  Load FEATURE if it exists; do nothing if it does not.\n               OPT can be:\n                 - nil (default)\n                 - non-nil\n                 - A form that should evaluate to one of the above.\n\n:requires REQ  Assert that a feature already exists in `features'.\n               If assert fails, handle according to ERROR/OPTIONAL.\n               REQ can be:\n                 - nil\n                 - symbol\n                 - A form that should evaluate to one of the above.\n\n:if EXPR       Initialize and load only if EXPR evaluates to a non-nil value.\n:when EXPR     See `:if'.\n:unless EXPR   Opposite of `:if'.\n               Initialize and load only if EXPR evaluates to a nil value.\n\n:after AFTER   Delay the effect of the imp declaration until after the\n               named features have loaded. Before they have been loaded, no\n               other keyword has any effect at all, and once they have been\n               loaded it is as if `:after' was not specified." (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp (cons 'feature* args))) "\n  -->\n\n" (pp-to-string (cons 'imp (cons 'feature* args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ((imp-parser-verbose 'errors) (imp-parser-expand-minimally t)) (imp-parser-process-keywords feature* args*))))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))))))("./elisp/init")
+  macroexpand((imp "./elisp/init"))
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0xa2a0a50c829a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0xa2a0a50c829a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+hmm....
+Oh. I can't eval that here; needs to be in namespaced dir.
+
+eval this there:
+#+begin_src elisp
+(imp-parser-normalize-path-feature
+ (imp-feature-normalize "./elisp/init")
+ :path
+ nil)
+#+end_src
+
+got:
+"/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp/init"
+file:/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp/init.el
+good.
+
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  '(imp "./elisp/init")))
+#+end_src
+
+#+begin_src elisp
+(imp-parser namespaced
+  :root
+  :path (imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
+#+end_src
+
+yay. got up to ~units~ this time:
+#+begin_quote
+loading \./elisp/init...
+├─loading elisp...
+│ ├─loading \./types...
+│ │ └─00.0054 seconds
+│ ├─loading \./functions...
+│ │ └─00.0035 seconds
+│ └─00.0092 seconds
+└─00.0133 seconds
+loading \./buffer/init...
+├─loading buffer...
+│ ├─loading buffer:/delete...
+│ │ └─00.0046 seconds
+│ ├─loading buffer:/region...
+│ │ └─00.0037 seconds
+│ └─00.0088 seconds
+└─00.0171 seconds
+loading \./unit/init...
+#+end_quote
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (error "Eager macro-expansion failure: (error \"[ERROR--]: imp-parser-normalize/:path: unit/units: ‘:path’ should end up with an absolute path: got: nil -> nil -> nil\")")
+  signal(error ("Eager macro-expansion failure: (error \"[ERROR--]: imp-parser-normalize/:path: unit/units: ‘:path’ should end up with an absolute path: got: nil -> nil -> nil\")"))
+  error("Eager macro-expansion failure: %S" (error "[ERROR--]: imp-parser-normalize/:path: unit/units: ‘:path’ should end up with an absolute path: got: nil -> nil -> nil"))
+  internal-macroexpand-for-load((let ((imp--macro-feature (imp--feature-normalize-chain :unit))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path (imp-path-current-file)) (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent ...)) (imp unit:/units)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (imp unit:/units))) t)
+  eval-buffer(#<buffer  *load*-876134> nil "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el" nil t)  ; Reading at buffer position 1017
+  load-with-code-conversion("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el" "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el" nil t)
+  load("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" nil nomessage)
+  (let ((imp--timing-indent (1+ imp--timing-indent))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage))
+  (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))
+  (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time)))
+  (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage))
+  (let ((imp--macro-feature (imp--feature-normalize-chain '\./unit/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage)))
+  (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path (imp-path-current-file)) (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...))) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./elisp/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./buffer/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/buffer/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/buffer/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./unit/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./datetime/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/datetime/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/datetime/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./str/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/str/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/str/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./theme/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/theme/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/theme/init" 'nil 'nomessage))))
+  (let ((imp--macro-feature (imp--feature-normalize-chain :namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path (imp-path-current-file)) (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...)) (let (...) (if ... ... ...))) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./elisp/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./buffer/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/buffer/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/buffer/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./unit/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./datetime/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/datetime/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/datetime/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./str/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/str/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/str/init" 'nil 'nomessage))) (let ((imp--macro-feature (imp--feature-normalize-chain '\./theme/init))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/theme/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/theme/init" 'nil 'nomessage)))))
+  eval-buffer(#<buffer  *load*> nil "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" nil t)  ; Reading at buffer position 2038
+  load-with-code-conversion("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" nil t)
+  load("~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" nil nomessage)
+  (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage))
+  (let ((imp--macro-feature (imp--feature-normalize-chain 'namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent (1+ imp--timing-indent))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)))
+  (progn (imp-path-root-set 'namespaced "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced") (let ((imp--macro-feature (imp--feature-normalize-chain 'namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ((imp--timing-indent ...)) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage))))
+  (progn (progn (imp-path-root-set 'namespaced "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced") (let ((imp--macro-feature (imp--feature-normalize-chain 'namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time (current-time))) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let (...) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" ... ...)) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage)))))
+  eval((progn (progn (imp-path-root-set 'namespaced "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced") (let ((imp--macro-feature (imp--feature-normalize-chain 'namespaced))) (if (and (imp-timing-enabled?) (not (imp--timing-feature-duplicate? imp--macro-feature))) (let ((imp--macro-path "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el") (imp--macro-time ...)) (setq imp--timing-feature-current imp--macro-feature) (imp--timing-start imp--macro-feature imp--macro-path) (prog1 (let ... ...) (setq imp--timing-feature-current nil) (imp--timing-end imp--macro-time))) (load "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/init.el" 'nil 'nomessage))))) t)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0xa2a0a50c829a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0xa2a0a50c829a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+#+begin_quote
+eval-buffer(#<buffer  *load*-876134> nil
+ "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit/init.el" nil t)
+Reading at buffer position 1017
+#+end_quote
+
+end of an ~imp-timing~ macro again.
+
+Oh right. Need to fix path.el wrt feature.
+#+begin_src
+(imp-path-root-set :unit
+                   (imp-path-current-dir))
+imp-path-roots
+#+end_src
+  - there's a ~:unit~ in there but it's looking for ~unit~ sans colon.
+
+oops. Where's the infinite loop?
+#+begin_src elisp
+(imp--path-root-dir :imp)
+#+end_src
+
+#+begin_quote
+cl-prin1: (excessive-lisp-nesting 1622)
+cl-prin1: (error "Lisp nesting exceeds ‘max-lisp-eval-depth’") [23 times]
+#+end_quote
+
+imp-feature-normalize
+  - imp-feature-join
+    - imp-feature-root
+      - imp--feature-root
+        - imp--path-root-dir
+          - imp-feature-normalize
+            - infinite oops
+
+Remove refs to path.el funcs from feature.el.
+Here:
+  - imp--feature-root
+    - imp--path-root-dir
+
+:thinking:
+Rename ~imp-path-roots~ to ~imp-roots~ and put it in an earlier file?
+Put it and ~imp-features~ in ~init.el~?
+  - [X] k
+get rid of path func calls in ~feature.el~
+  - [X] k
 
 Go through [[file:source/core/packages/imp/path.el][path.el]] and check for feature-related args.
 Fix them to be as lenient as possible, and to use eg imp-feature-normalize.
+  - [X] k?
+  - [X] commit
+
+Normalize paths before putting into ~imp-roots~.
+
+eval-buffer imp/init.el
+#+begin_quote
+apply: [ERROR--]: imp--path-root-dir: FEATURE is unknown: imp -> imp
+#+end_quote
+  - add a `:no-error` to `imp-path-root-set` calls to `imp-path-root-get`.
+
+#+begin_src elisp
+(imp-parser namespaced
+  :root
+  :path (imp-path-join user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
+#+end_src
+
+yay
+#+begin_quote
+loading namespaced...
+├─loading \./elisp/init...
+│ ├─loading elisp...
+│ │ ├─loading \./types...
+│ │ │ └─00.0062 seconds
+│ │ ├─loading \./functions...
+│ │ │ └─00.0046 seconds
+│ │ └─00.0112 seconds
+│ └─00.0165 seconds
+├─loading \./buffer/init...
+│ ├─loading buffer...
+│ │ ├─loading buffer:/delete...
+│ │ │ └─00.0035 seconds
+│ │ ├─loading buffer:/region...
+│ │ │ └─00.0033 seconds
+│ │ └─00.0071 seconds
+│ └─00.0129 seconds
+├─loading \./unit/init...
+│ ├─loading unit...
+│ │ ├─loading unit:/units...
+│ │ │ └─00.0051 seconds
+│ │ └─00.0054 seconds
+│ └─00.0116 seconds
+├─loading \./datetime/init...
+│ ├─loading datetime...
+│ │ ├─loading \./datetime...
+│ │ │ └─00.0039 seconds
+│ │ ├─loading \./format...
+│ │ │ └─00.0036 seconds
+│ │ ├─loading \./timestamp...
+│ │ │ └─00.0048 seconds
+│ │ └─00.0127 seconds
+│ └─00.0201 seconds
+├─loading \./str/init...
+│ ├─loading str...
+│ │ ├─loading str:/normalize...
+│ │ │ └─00.0050 seconds
+│ │ └─00.0053 seconds
+│ └─00.0110 seconds
+├─loading \./theme/init...
+│ ├─loading theme...
+│ │ ├─loading theme:/face...
+│ │ │ └─00.0040 seconds
+│ │ └─00.0042 seconds
+│ └─00.0091 seconds
+└─00.0904 seconds
+#+end_quote
 
 
-*** full test:
-1. restart emacs
-2. fix errors
-3. goto 1
+** ├SUCCESS┤ full test
+CLOSED: [2025-10-30 Thu 17:10]
+:LOGBOOK:
+- State "├SUCCESS┤"  from "├DONE───┤"  [2025-10-30 Thu 17:10]
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-10-30 Thu 17:10]
+- State "├CURRENT┤"  from "├TODO───┤"  [2025-10-30 Thu 16:41]
+:END:
 
-** imp-provide: no colons?
+...goto ~.emacs.d/init.el~ and ~M-X eval-buffer~?
+#+begin_src messages
+internal-macroexpand-for-load: Eager macro-expansion failure: (error "[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: \"~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/theme/zenburn\"")
+#+end_src
 
-Should we not include ":" in name given to ~features~?
-or does it work fine as-is?
+#+begin_quote
+Cannot find a load path from path.
+Is path pointing to a file (with or without ext)?
+path: "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/theme/zenburn"
+#+end_quote
+
+oh. Missing "init.el" part of the path.
+Should we check for init.el?
+  - taht's a question for after MVP
+
+#+begin_src messages
+apply: [ERROR--]: imp-path-root-set:
+Feature is already an imp root.
+FEATURE: :user
+feature base: user
+path: ~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user
+#+end_src
+
+hm. Disable imp timing so I can see the backtraces?
+#+begin_src elisp
+(setq imp-timing-enabled? nil)
+#+end_src
+
+still didn't get a backtrace. :(
+#+begin_src messages
+internal-macroexpand-for-load: Eager macro-expansion failure: (error "[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: \"~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d\""
+)
+#+end_src
+
+#+begin_quote
+Cannot find a load path from path.
+Is path pointing to a file (with or without ext)?
+path: "~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d"
+#+end_quote
+...
+
+it should not be executing that?!
+#+begin_src elisp
+  ;; TODO: for now, this way.
+  (pcase system-type
+    ('gnu/linux
+     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
+     ;; to figure out path from system-name/host.
+     (imp secret.d
+       :root
+       :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))
+    ('windows-nt
+     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
+     ;; to figure out path from system-name/host.
+     (imp secret.d
+       :root
+       :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
+#+end_src
+  - [[file:init.el::(pcase system-type][init.el]]
+
+also.... my "just use path if path is load path" code broke again.
+probably in new func ~imp-parser-normalize-path-feature~?
+  - [[file:source/core/packages/imp/load.el::defun imp-parser-normalize-path-feature (feature keyword path][here]]
+
+or not.
+#+begin_src elisp
+  ;; We're done if path itself is a full, loadable path.
+  (if (imp-path-load-file path)
+      path
+#+end_src
+
+#+begin_src elisp
+(pp-to-string imp-roots)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+((user "~/.config/emacs/source/user")
+ (theme
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/theme")
+ (str
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/str")
+ (datetime
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/datetime")
+ (unit
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/unit")
+ (buffer
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/buffer")
+ (elisp
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced/elisp")
+ (namespaced
+  "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/namespaced")
+ (imp
+   "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/core/packages/imp"))
+#+end_example
+
+#+begin_src elisp
+(pp-to-string imp-features)
+#+end_src
+
+#+RESULTS:
+: ((namespaced) (theme nil (face)) (str nil (normalize))
+:  (datetime nil (timestamp) (format) (datetime)) (unit nil (units))
+:  (buffer nil (region) (delete)) (elisp nil (functions) (types))
+:  (imp nil nil nil nil nil (package) (require) (load) (provide) (parser)))
+
+#+begin_src elisp
+  (pcase system-type
+    ('gnu/linux
+     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
+     ;; to figure out path from system-name/host.
+     (imp secret.d
+       :root
+       :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))
+    ('windows-nt
+     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
+     ;; to figure out path from system-name/host.
+     (imp secret.d
+       :root
+       :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
+#+end_src
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (error "[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: \"~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d\"")
+  signal(error ("[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: \"~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d\""))
+  error("[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: %S" "~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d")
+  apply(error "[ERROR--]: imp-parser-handler/:path: Cannot find a load path from path. Is path pointing to a file (with or without ext)? path: %S" "~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d")
+  (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail)))
+  (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply #'concat string)))) args) (setq tail (cdr tail))))
+  (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ((stringp string) string) ((null string) nil) ((listp string) (apply ... string)))) args) (setq tail (cdr tail)))))
+  (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond (... string) (... nil) (... ...))) args) (setq tail (cdr tail))))))
+  (progn (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink (car tail))) (apply sink (concat prefix caller (if caller ": " "") (cond ... ... ...)) args) (setq tail (cdr tail)))))))
+  (if (imp--output-level-get level :sink) (progn (let ((sinks (imp--output-level-get level :sink)) (prefix (imp--output-prefix level)) (caller (imp--output-callers caller))) (if (listp sinks) nil (setq sinks (list sinks))) (let ((tail sinks)) (while tail (let ((sink ...)) (apply sink (concat prefix caller ... ...) args) (setq tail (cdr tail))))))))
+  imp--output(:error imp-parser-handler/:path ("Cannot find a load path from path. " "Is path pointing to a file (with or without ext)? " "path: %S") ("~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d"))
+  imp--error(imp-parser-handler/:path ("Cannot find a load path from path. " "Is path pointing to a file (with or without ext)? " "path: %S") "~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d")
+  (if path-load (setq state (imp-parser-plist-maybe-put state :path-load path-load)) (imp--error 'imp-parser-handler/:path '("Cannot find a load path from path. " "Is path pointing to a file (with or without ext)? " "path: %S") arg))
+  (let* ((path-load (and t (imp-path-load-file arg)))) (if path-load (setq state (imp-parser-plist-maybe-put state :path-load path-load)) (imp--error 'imp-parser-handler/:path '("Cannot find a load path from path. " "Is path pointing to a file (with or without ext)? " "path: %S") arg)))
+  imp-parser-handler/:path(secret.d :path "~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d" (:root secret.d :error t :optional nil) nil)
+  funcall(imp-parser-handler/:path secret.d :path "~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d" (:root secret.d :error t :optional nil) nil)
+  (if (functionp handler-sym) (funcall handler-sym feature keyword arg rest state) (imp--error 'imp-parser-process-keywords "Keyword handler not defined: %s" handler))
+  (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym feature keyword arg rest state) (imp--error 'imp-parser-process-keywords "Keyword handler not defined: %s" handler)))
+  (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp--error 'imp-parser-process-keywords "%s is not a keyword" keyword)) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym feature keyword arg rest state) (imp--error 'imp-parser-process-keywords "Keyword handler not defined: %s" handler))))
+  (if (null plist) (imp-parser-load feature state) (let* ((keyword (car plist)) (arg (car (cdr plist))) (rest (cdr (cdr plist)))) (if (keywordp keyword) nil (imp--error 'imp-parser-process-keywords "%s is not a keyword" keyword)) (let* ((handler (concat "imp-parser-handler/" (symbol-name keyword))) (handler-sym (intern handler))) (if (functionp handler-sym) (funcall handler-sym feature keyword arg rest state) (imp--error 'imp-parser-process-keywords "Keyword handler not defined: %s" handler)))))
+  imp-parser-process-keywords(secret.d (:path "~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d" :root secret.d :error t :optional nil))
+  (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp (cons ... args))) "\n  -->\n\n" (pp-to-string (cons 'imp (cons ... args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ... ...)))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))
+  (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons ... ...)) "\n  -->\n\n" (pp-to-string (cons ... ...)) "\n  ==>\n\n" (pp-to-string (macroexp-progn ...))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*)))
+  (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string ...) "\n  -->\n\n" (pp-to-string ...) "\n  ==>\n\n" (pp-to-string ...)) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))))
+  (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose ...) (concat "\n\n" ... "\n  -->\n\n" ... "\n  ==>\n\n" ...) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*)))))
+  #f(lambda (feature &rest args) [t] "Load FEATURE.\n\nUsage:\n\n  (imp feature\n     [:keyword [option]]...)\n\n:disabled      Flag. Nothing happens; FEATURE is ignored completely if this keyword\n               is present.\n\n:path PATH     Absolute, relative, or rooted path to file.\n               PATH can be:\n                 - A path string.\n                   - absolute or relative\n                   - prefixes:\n                     - \"./\" - relative to `imp-path-current-dir'\n                     - \":/\" - relative to FEATURE's root\n                 - A symbol whose value is a path string.\n                   - example: `user-emacs-directory'\n                 - A symbol whose name is known.\n                   - examples:\n                     - `pwd' - `imp-path-current-dir'\n                     - `.emacs' - `user-emacs-directory'\n                     - `root' - `imp-feature-root'\n                   - See func `imp-parser-normalize-path-symbol'\n                 - A form/function that evaluates to a path string.\n                   - (imp-path-join user-emacs-directory \"path/to/imp\")\nTODO(path): Do we want this to be the solution for lists?\n                 - A list of the above to join into a path.\nTODO(path): Alternative is a list of paths to try for locating the file.\n\n:root ROOT     Create an imp feature root for ROOT at PATH given in `:path'.\n               See var `imp-roots' and func `imp-path-root-set'.\n               If ROOT is t or a flag (arg-less), use first part of FEATURE.\n               Example:\n                 (imp imp/init\n                   :path (imp-path-join user-emacs-directory\n                                        \"path/to/imp\")\n                   :root)\n                 => imp-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)\n\n:error ERR     Value (aka ERROR) can be:\n                 - nil\n                 - non-nil (default)\n                 - A form that should evaluate to one of the above.\n               If ERROR is nil, the function will not raise an error if:\n                 - The file doesn't exist.\n                 - FEATURE isn't provided after loading the file.\n               It will still raise an error if:\n                 - It cannot parse the inputs.\n                 - It cannot determine where to /look/ for the file.\n\n:optional OPT  Load FEATURE if it exists; do nothing if it does not.\n               OPT can be:\n                 - nil (default)\n                 - non-nil\n                 - A form that should evaluate to one of the above.\n\n:requires REQ  Assert that a feature already exists in `features'.\n               If assert fails, handle according to ERROR/OPTIONAL.\n               REQ can be:\n                 - nil\n                 - symbol\n                 - A form that should evaluate to one of the above.\n\n:if EXPR       Initialize and load only if EXPR evaluates to a non-nil value.\n:when EXPR     See `:if'.\n:unless EXPR   Opposite of `:if'.\n               Initialize and load only if EXPR evaluates to a nil value.\n\n:after AFTER   Delay the effect of the imp declaration until after the\n               named features have loaded. Before they have been loaded, no\n               other keyword has any effect at all, and once they have been\n               loaded it is as if `:after' was not specified." (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((feature* (imp-parser-normalize-feature feature)) (args* (imp-parser-normalize-keywords feature* args)) (imp-parser--form (if (eq imp-parser-verbose 'debug) (concat "\n\n" (pp-to-string (cons 'imp (cons 'feature* args))) "\n  -->\n\n" (pp-to-string (cons 'imp (cons 'feature* args*))) "\n  ==>\n\n" (pp-to-string (macroexp-progn (let ((imp-parser-verbose 'errors) (imp-parser-expand-minimally t)) (imp-parser-process-keywords feature* args*))))) ""))) (if (eq imp-parser-verbose 'debug) (progn (message (make-string 40 9473)) (message "%s" feature*) (message (make-string 40 9473)) (message "%s" imp-parser--form))) (imp-parser-process-keywords feature* args*))))))(secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")
+  apply(#f(lambda (feature &rest args) [t] "Load FEATURE.\n\nUsage:\n\n  (imp feature\n     [:keyword [option]]...)\n\n:disabled      Flag. Nothing happens; FEATURE is ignored completely if this keyword\n               is present.\n\n:path PATH     Absolute, relative, or rooted path to file.\n               PATH can be:\n                 - A path string.\n                   - absolute or relative\n                   - prefixes:\n                     - \"./\" - relative to `imp-path-current-dir'\n                     - \":/\" - relative to FEATURE's root\n                 - A symbol whose value is a path string.\n                   - example: `user-emacs-directory'\n                 - A symbol whose name is known.\n                   - examples:\n                     - `pwd' - `imp-path-current-dir'\n                     - `.emacs' - `user-emacs-directory'\n                     - `root' - `imp-feature-root'\n                   - See func `imp-parser-normalize-path-symbol'\n                 - A form/function that evaluates to a path string.\n                   - (imp-path-join user-emacs-directory \"path/to/imp\")\nTODO(path): Do we want this to be the solution for lists?\n                 - A list of the above to join into a path.\nTODO(path): Alternative is a list of paths to try for locating the file.\n\n:root ROOT     Create an imp feature root for ROOT at PATH given in `:path'.\n               See var `imp-roots' and func `imp-path-root-set'.\n               If ROOT is t or a flag (arg-less), use first part of FEATURE.\n               Example:\n                 (imp imp/init\n                   :path (imp-path-join user-emacs-directory\n                                        \"path/to/imp\")\n                   :root)\n                 => imp-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)\n\n:error ERR     Value (aka ERROR) can be:\n                 - nil\n                 - non-nil (default)\n                 - A form that should evaluate to one of the above.\n               If ERROR is nil, the function will not raise an error if:\n                 - The file doesn't exist.\n                 - FEATURE isn't provided after loading the file.\n               It will still raise an error if:\n                 - It cannot parse the inputs.\n                 - It cannot determine where to /look/ for the file.\n\n:optional OPT  Load FEATURE if it exists; do nothing if it does not.\n               OPT can be:\n                 - nil (default)\n                 - non-nil\n                 - A form that should evaluate to one of the above.\n\n:requires REQ  Assert that a feature already exists in `features'.\n               If assert fails, handle according to ERROR/OPTIONAL.\n               REQ can be:\n                 - nil\n                 - symbol\n                 - A form that should evaluate to one of the above.\n\n:if EXPR       Initialize and load only if EXPR evaluates to a non-nil value.\n:when EXPR     See `:if'.\n:unless EXPR   Opposite of `:if'.\n               Initialize and load only if EXPR evaluates to a nil value.\n\n:after AFTER   Delay the effect of the imp declaration until after the\n               named features have loaded. Before they have been loaded, no\n               other keyword has any effect at all, and once they have been\n               loaded it is as if `:after' was not specified." (if (memq :disabled args) nil (macroexp-progn (imp-parser-concat (let* ((feature* ...) (args* ...) (imp-parser--form ...)) (if (eq imp-parser-verbose ...) (progn ... ... ... ...)) (imp-parser-process-keywords feature* args*)))))) (secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el"))
+  macroexpand-1((imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el") nil)
+  macroexp-macroexpand((imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el") nil)
+  macroexp--expand-all((imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el"))
+  macroexp--all-forms(((imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
+  macroexp--expand-all((let nil (imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
+  macroexp--all-forms(((eq system-type 'windows-nt) (let nil (imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el"))) nil)
+  macroexp--all-clauses((((eq system-type 'gnu/linux) (let nil (imp secret.d :root :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))) ((eq system-type 'windows-nt) (let nil (imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))))
+  macroexp--expand-all((cond ((eq system-type 'gnu/linux) (let nil (imp secret.d :root :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))) ((eq system-type 'windows-nt) (let nil (imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))))
+  macroexp--all-forms((progn (cond ((eq system-type 'gnu/linux) (let nil (imp secret.d :root :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))) ((eq system-type 'windows-nt) (let nil (imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el"))))) 1)
+  #f(compiled-function (form func) #<bytecode 0x4a4133a35169d59>)(((progn (cond ((eq system-type 'gnu/linux) (let nil (imp secret.d :root :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))) ((eq system-type 'windows-nt) (let nil (imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")))))) progn)
+  macroexp--expand-all((progn (cond ((eq system-type 'gnu/linux) (let nil (imp secret.d :root :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))) ((eq system-type 'windows-nt) (let nil (imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el"))))))
+  macroexpand-all((progn (cond ((eq system-type 'gnu/linux) (let nil (imp secret.d :root :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el"))) ((eq system-type 'windows-nt) (let nil (imp secret.d :root :path "~/.secret.d/emacs/2025-03-13_sn005/init.el"))))))
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0xa2a0a50c829a>)()
+  handler-bind-1(#f(compiled-function () #<bytecode 0xa2a0a50c829a>) (error) eval-expression--debug)
+  eval-last-sexp(nil)
+  funcall-interactively(eval-last-sexp nil)
+  call-interactively(eval-last-sexp nil nil)
+  command-execute(eval-last-sexp)
+#+end_src
+
+#+begin_quote
+imp-parser-handler/:path:
+Cannot find a load path from path.
+Is path pointing to a file (with or without ext)?
+path: "~/.secret.d/emacs/2025-03-13_sn005/init.el/secret.d"
+#+end_quote
+
+wtf mate
+that's a valid error
+But I'm not on WINDOWS!!!!!!!!!!!
+>:(
+Why you run the windows case in pcase?
+
+#+begin_src elisp
+  (pcase system-type
+    ('gnu/linux
+     ;; ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
+     ;; ;; to figure out path from system-name/host.
+     ;; (imp secret.d
+     ;;   :root
+     ;;   :path "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el")
+     (message "sane & normal"))
+    ('windows-nt
+     ;; TODO: macro should allow funcs & symbols for values in plist. e.g. call
+     ;; to figure out path from system-name/host.
+     ;; (imp secret.d
+     ;;   :root
+     ;;   :path "~/.secret.d/emacs/2025-03-13_sn005/init.el")
+     (message "hello there")))
+#+end_src
+
+#+RESULTS:
+: sane & normal
+
+Maybe that's just how macros work.
+In which case, meh.
+Fixing that is not for MVP, probably.
+
+try this:
+#+begin_src elisp
+  (imp secret.d
+    :root
+    :path (pcase system-type
+            ('gnu/linux
+             "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el")
+            ('windows-nt
+             "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
+#+end_src
+
+#+RESULTS:
+: t
+Successful load.
+
+oh, yay.
+~M-X eval-buffer~ in [[file:init.el][init.el]] was successful!
+
+My whitespace tweaks got erased.
+  - but that's a different thing.
+
+
+** ├DONE───┤ fullest test
+CLOSED: [2025-11-03 Mon 13:44]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-03 Mon 13:44]
+- State "├CURRENT┤"  from "├TODO───┤"  [2025-11-03 Mon 13:20]
+:END:
+
+Now do the whole shebang:
+  1. restart emacs
+     - debug-on-init?
+  2. fix errors
+  3. goto 1
+
+Can I just run one from command line while I keep this one for notes & coding?
+yeah
+~emacs --debug-init~
+
+...fix some imp bugs...
+
+yay; it got past init!
+
+*Warnings* buffer:
+#+begin_quote
+⛔ Warning (native-compiler): provide.el: Warning: the function ‘imp--feature-add’ is not known to be defined.
+⛔ Warning (native-compiler): provide.el: Warning: the function ‘imp--error’ is not known to be defined.
+⛔ Warning (native-compiler): provide.el: Warning: the function ‘imp-feature-normalize’ is not known to be defined.
+#+end_quote
+Hm... But they are known to be defined?
+It's from an earlier file.
+
+*Async-native-compile-log* buffer:
+#+begin_quote
+Compiling /home/main/.config/emacs/source/core/packages/imp/provide.el...
+
+In imp--provide-parse:
+provide.el:40:43: Warning: global/dynamic var ‘arg’ lacks a prefix
+provide.el:40:43: Warning: global/dynamic var ‘arg’ lacks a prefix
+
+In imp-unprovide:
+provide.el:77:2: Warning: docstring has wrong usage of unescaped single quotes (use \=' or different quoting such as `...')
+provide.el:135:2: Warning: Unused lexical variable ‘funcname’
+provide.el:135:2: Warning: reference to free variable ‘feature’
+
+In end of data:
+provide.el: Warning: the function ‘imp--feature-add’ is not known to be defined.
+provide.el: Warning: the function ‘imp--error’ is not known to be defined.
+provide.el: Warning: the function ‘imp-feature-normalize’ is not known to be defined.
+Compilation finished.
+#+end_quote
+
+Fixed some....
+Fixed more.
+
+Just this remaining in *Async-native-compile-log* buffer:
+#+begin_quote
+Compiling /home/main/.config/emacs/source/core/packages/imp/provide.el...
+
+In end of data:
+provide.el: Warning: the function ‘imp--feature-add’ is not known to be defined.
+provide.el: Warning: the function ‘imp--error’ is not known to be defined.
+provide.el: Warning: the function ‘imp-feature-normalize’ is not known to be defined.
+Compilation finished.
+#+end_quote
+
+Let's say good enough for now?
+
+** ├DONE───┤ Rename imp-output buffer with asterisks
+CLOSED: [2025-11-03 Mon 13:50]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-11-03 Mon 13:50]
+:END:
+
+
+* -- U R HERE --
+<<here>>
+
+* imp-provide & native compilation
+
+This is in *Async-native-compile-log* buffer after emacs init:
+#+begin_quote
+Compiling /home/main/.config/emacs/source/core/packages/imp/provide.el...
+
+In end of data:
+provide.el: Warning: the function ‘imp--feature-add’ is not known to be defined.
+provide.el: Warning: the function ‘imp--error’ is not known to be defined.
+provide.el: Warning: the function ‘imp-feature-normalize’ is not known to be defined.
+Compilation finished.
+#+end_quote
+
+How to fix?
+  - Do I need to ~require~ all the predecessor files?
+
+Go look at ~use-package~ core's compile stuff?
+Maybe some of those things are relevant?
+
+* imp-features weirdness
+
+wtf is imp doing?
+#+begin_src elisp
+(pp-to-string imp-features)
+#+end_src
+
+#+RESULTS:
+: ((namespaced) (theme nil (face)) (str nil (normalize))
+:  (datetime nil (timestamp) (format) (datetime)) (unit nil (units))
+:  (buffer nil (region) (delete)) (elisp nil (functions) (types))
+:  (imp nil nil nil nil nil (package) (require) (load) (provide) (parser)))
+
+#+begin_quote
+(imp nil nil nil nil nil (package) (require) (load) (provide) (parser))
+#+end_quote
+
+
+* imp/timing: let exceptions bubble up
+
+Do whatever `imp` does for that.
+
+* imp/path: move imp :path normalizers to path.el
+
+Integrate them into eg `imp-path` function.
 
 * auth-source / 1pass
 
