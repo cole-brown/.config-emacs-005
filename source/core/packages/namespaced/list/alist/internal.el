@@ -1,10 +1,10 @@
-;;; core/modules/emacs/alist/internal.el --- Erroring and Private Stuff; Go Away -*- lexical-binding: t; -*-
+;;; namespaced/list/alist/internal.el --- Erroring and Private Stuff; Go Away -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-12-07
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -31,7 +31,7 @@
 ;; Formatting
 ;;------------------------------------------------------------------------------
 
-(defun int<alist>:string:format (&rest msg)
+(defun _:alist:string:format (&rest msg)
   "Format MSG into a message formatting string.
 
 MSG should be:
@@ -74,15 +74,15 @@ The acceptable keywords are:
         ;; Error: invalid MSG.
         ;;---
         (t
-         (error "int<alist>:string:format: Don't know how to format: %S"
+         (error "_:alist:string:format: Don't know how to format: %S"
                 msg))))
-;; (int<alist>:string:format nil)
-;; (int<alist>:string:format "hello there")
-;; (int<alist>:string:format "hello, " "there")
-;; (int<alist>:string:format :line:each "Hi." "  -> Line 2")
+;; (_:alist:string:format nil)
+;; (_:alist:string:format "hello there")
+;; (_:alist:string:format "hello, " "there")
+;; (_:alist:string:format :line:each "Hi." "  -> Line 2")
 
 
-(defun int<alist>:callers:format (this callers)
+(defun _:alist:callers:format (this callers)
   "Build a 'caller' string.
 
 Builds from THIS (string) and CALLERS (string or nil).
@@ -93,13 +93,13 @@ Returns a string."
   ;;------------------------------
   ;; THIS must be a string.
   (cond ((not (stringp this))
-         (int<alist>:error "int<alist>:callers:format"
+         (_:alist:error "_:alist:callers:format"
                          "Invalid THIS param. Expected a string; got: this: %S, callers: %S"
                          this callers))
         ;; CALLERS must be a string if not nil.
         ((and callers
               (not (stringp callers)))
-         (int<alist>:error "int<alist>:callers:format"
+         (_:alist:error "_:alist:callers:format"
                          "Invalid CALLER param. Expected a string; got: callers: %S, this: %S"
                          callers this))
 
@@ -110,10 +110,10 @@ Returns a string."
          (if callers
              (concat this " <-via- " callers)
            this))))
-;; (int<alist>:callers:format "bob" nil)
-;; (int<alist>:callers:format "bob" "alice")
-;; (int<alist>:callers:format "C" (int<alist>:callers:format "B" "A"))
-;; (int<alist>:callers:format nil nil)
+;; (_:alist:callers:format "bob" nil)
+;; (_:alist:callers:format "bob" "alice")
+;; (_:alist:callers:format "C" (_:alist:callers:format "B" "A"))
+;; (_:alist:callers:format nil nil)
 
 
 ;;------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ Returns a string."
 ;;
 ;; So here's an error function for our error library.
 
-(defun int<alist>:error (caller msg &rest args)
+(defun _:alist:error (caller msg &rest args)
   "Format an error message for CALLER and signal an error.
 
 CALLER should be a string.
@@ -142,15 +142,15 @@ ARGS will be passed to `format' with the finalized message string."
                          ;; Formatted message based on what we got passed in.
                          ;; Use `flatten-list' to make MSG a list if it's just a string.
                          ;; It also converts cons to lists, but that's ok here.
-                         (apply #'int<alist>:string:format (flatten-list msg)))
+                         (apply #'_:alist:string:format (flatten-list msg)))
          ;; Just pass ARGS directly to error - it will do final format.
          args))
-;; (int<alist>:error "test-function-name" "hello there")
-;; (int<alist>:error "test-function-name" '("hello, " "there"))
-;; (int<alist>:error "test-function-name" '(:line:each . ("Hi." "  -> Line 2")))
+;; (_:alist:error "test-function-name" "hello there")
+;; (_:alist:error "test-function-name" '("hello, " "there"))
+;; (_:alist:error "test-function-name" '(:line:each . ("Hi." "  -> Line 2")))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :alist 'internal)
+(imp-provide alist internal)

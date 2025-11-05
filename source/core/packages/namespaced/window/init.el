@@ -28,8 +28,7 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp-path-root-set 'window
-                   (imp-path-current-dir))
+(imp-path-root-set 'window (imp-path-current-dir))
 
 
 ;;------------------------------------------------------------------------------
@@ -38,7 +37,7 @@
 
 (imp-timing
     'window
-    (imp-path-current-dir)
+    (imp-path-current-file)
 
   (imp ./window))
 

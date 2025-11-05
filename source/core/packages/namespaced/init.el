@@ -38,6 +38,7 @@
   (imp "./buffer/init") ; TODO: refactor "+blah" ("optional") files
   (imp "./color/init")
   (imp "./datetime/init")
+  (imp "./list/init") ; contains `list', `alist', `plist'
   (imp "./unit/init")
   (imp "./window/init")
 
@@ -50,7 +51,6 @@
   ;;
   ;; (imp "./emacs/init")
   ;; (imp "./input/init")
-  ;; (imp "./list/init")
   ;; (imp "./output/init")
   ;; (imp "./path/init")
 

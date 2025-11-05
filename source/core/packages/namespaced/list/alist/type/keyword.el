@@ -1,10 +1,10 @@
-;;; core/modules/emacs/alist/type/keyword.el --- Alist Type: Keyword -*- lexical-binding: t; -*-
+;;; namespaced/list/alist/type/keyword.el --- Alist Type: Keyword -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-12-17
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,8 +28,8 @@
 
 
 (require 'seq)
-(imp:require :alist 'internal)
-(imp:require :alist 'generic)
+(imp-require 'alist:/internal)
+(imp-require 'alist:/generic)
 
 
 ;;------------------------------------------------------------------------------
@@ -101,4 +101,4 @@ Returns ALIST."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :alist 'type 'keyword)
+(imp-provide alist type keyword)

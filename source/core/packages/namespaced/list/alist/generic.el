@@ -1,10 +1,10 @@
-;;; core/modules/emacs/alist/generic.el --- Better Alist Functions -*- lexical-binding: t; -*-
+;;; namespaced/list/alist/generic.el --- Better Alist Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-12-15
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -30,8 +30,8 @@
 
 
 (require 'seq)
-(imp:require :alist 'internal)
-(imp:require :alist 'type 'types)
+(imp-require alist:/internal)
+(imp-require alist:/type/types)
 
 
 ;;------------------------------------------------------------------------------
@@ -48,29 +48,29 @@
   "Get cdr of KEY's entry in ALIST.
 
 If TYPE is non-nil, get & use the proper equality function for TYPE."
-  (int<alist>:type:valid? type key)
+  (_:alist:type:valid? type key)
   (alist-get key
              alist
              default
              nil
-             (int<alist>:type:func/equal? type)))
+             (_:alist:type:func/equal? type)))
 
 
 (defun alist:generic:get/pair (key alist &optional type)
   "Get full assoc/entry of KEY in ALIST.
 
 If TYPE is non-nil, get & use the proper equality function for TYPE."
-  (int<alist>:type:valid? type key)
+  (_:alist:type:valid? type key)
   (assoc key
          alist
-         (int<alist>:type:func/equal? type)))
+         (_:alist:type:func/equal? type)))
 
 
 ;;------------------------------------------------------------------------------
 ;; Setters
 ;;------------------------------------------------------------------------------
 
-(defun int<alist>:generic:update/helper (key value alist &optional type)
+(defun _:alist:generic:update/helper (key value alist &optional type)
   "Set/overwrite an entry in the ALIST. Return the new alist.
 
 If VALUE is nil, it will be set as KEY's value. Use
@@ -80,7 +80,7 @@ If TYPE is non-nil, get & use the proper equality function for TYPE.
 
 Returns either a new alist, which isn't ALIST, or the updated alist which may
 or may not be ALIST."
-  (int<alist>:type:valid? type key)
+  (_:alist:type:valid? type key)
   (if (null alist)
       ;; Create a new alist and return it.
       (list (cons key value))
@@ -90,13 +90,13 @@ or may not be ALIST."
                      alist
                      nil
                      nil
-                     (int<alist>:type:func/equal? type))
+                     (_:alist:type:func/equal? type))
           value)
     alist))
 ;; (setq test-alist nil)
-;; (setq test-alist (int<alist>:generic:update/helper :k :v test-alist))
-;; (int<alist>:generic:update/helper :k2 :v2 test-alist)
-;; (int<alist>:generic:update/helper :k2 :v2.0 test-alist)
+;; (setq test-alist (_:alist:generic:update/helper :k :v test-alist))
+;; (_:alist:generic:update/helper :k2 :v2 test-alist)
+;; (_:alist:generic:update/helper :k2 :v2.0 test-alist)
 ;; test-alist
 
 
@@ -112,31 +112,31 @@ If VALUE is nil, it will be set as KEY's value. Use
 
 Returns ALIST."
   ;; Evaluate inputs only once.*
-  `(let ((int<alist>:macro:key   ,key)
-         (int<alist>:macro:value ,value)
-         (int<alist>:macro:alist ,alist)
-         (int<alist>:macro:type  ,type))
-     (int<alist>:type:valid? int<alist>:macro:type int<alist>:macro:key)
-     (cond ((listp int<alist>:macro:alist)
-            ;; Overwrite the input symbol value with the updated alist value that `int<alist>:macro:alist' holds.
+  `(let ((_:alist:macro:key   ,key)
+         (_:alist:macro:value ,value)
+         (_:alist:macro:alist ,alist)
+         (_:alist:macro:type  ,type))
+     (_:alist:type:valid? _:alist:macro:type _:alist:macro:key)
+     (cond ((listp _:alist:macro:alist)
+            ;; Overwrite the input symbol value with the updated alist value that `_:alist:macro:alist' holds.
             (setq ,alist ;; *Have to re-eval ALIST here to actually set it for the caller.
-                  (int<alist>:generic:update/helper int<alist>:macro:key
-                                                    int<alist>:macro:value
-                                                    int<alist>:macro:alist
-                                                    int<alist>:macro:type)))
+                  (_:alist:generic:update/helper _:alist:macro:key
+                                                    _:alist:macro:value
+                                                    _:alist:macro:alist
+                                                    _:alist:macro:type)))
 
-           ((symbolp int<alist>:macro:alist)
-            ;; Set our updated alist to the symbol that `int<alist>:macro:alist' holds.
-            (set int<alist>:macro:alist
-                 (int<alist>:generic:update/helper int<alist>:macro:key
-                                                   int<alist>:macro:value
+           ((symbolp _:alist:macro:alist)
+            ;; Set our updated alist to the symbol that `_:alist:macro:alist' holds.
+            (set _:alist:macro:alist
+                 (_:alist:generic:update/helper _:alist:macro:key
+                                                   _:alist:macro:value
                                                    ;;
-                                                   (eval int<alist>:macro:alist))))
+                                                   (eval _:alist:macro:alist))))
 
            (t
-            (int<alist>:error "alist:generic:update"
+            (_:alist:error "alist:generic:update"
                               "Unable to update alist with type %S: %S"
-                              (type-of int<alist>:macro:alist) int<alist>:macro:alist)))))
+                              (type-of _:alist:macro:alist) _:alist:macro:alist)))))
 ;; A global variable:
 ;;   (setq test-alist nil)
 ;;   (alist:generic:update :k :v test-alist)
@@ -162,20 +162,20 @@ Returns ALIST."
 ;; test<alist/alist>:alist/nil
 
 
-(defun int<alist>:generic:delete/helper (key alist type)
+(defun _:alist:generic:delete/helper (key alist type)
   "Removes KEY from ALIST.
 
 If TYPE is non-nil, get & use the proper equality function for TYPE.
 
 Returns alist without the key."
-  (int<alist>:type:valid? type key)
+  (_:alist:type:valid? type key)
   ;; If it's null, no need to do anything.
   (unless (null alist)
     (setf (alist-get key
                      alist
                      nil
                      'remove
-                     (int<alist>:type:func/equal? type))
+                     (_:alist:type:func/equal? type))
           nil))
 
   ;; Return the alist.
@@ -189,30 +189,30 @@ If TYPE is non-nil, get & use the proper equality function for TYPE.
 
 Returns ALIST."
   ;; Evaluate inputs only once.*
-  `(let ((int<alist>:macro:alist ,alist)
-         (int<alist>:macro:key   ,key)
-         (int<alist>:macro:type  ,type))
-     (int<alist>:type:valid? int<alist>:macro:type int<alist>:macro:key)
-     (cond ((listp int<alist>:macro:alist)
+  `(let ((_:alist:macro:alist ,alist)
+         (_:alist:macro:key   ,key)
+         (_:alist:macro:type  ,type))
+     (_:alist:type:valid? _:alist:macro:type _:alist:macro:key)
+     (cond ((listp _:alist:macro:alist)
             (setq ,alist ;; *Have to re-eval ALIST here to actually set it for the caller.
-                  (int<alist>:generic:delete/helper int<alist>:macro:key
-                                                    int<alist>:macro:alist
-                                                    int<alist>:macro:type)))
+                  (_:alist:generic:delete/helper _:alist:macro:key
+                                                    _:alist:macro:alist
+                                                    _:alist:macro:type)))
 
-           ((symbolp int<alist>:macro:alist)
-            (set int<alist>:macro:alist
-                 (int<alist>:generic:delete/helper int<alist>:macro:key
-                                                   (eval int<alist>:macro:alist)
-                                                   int<alist>:macro:type)))
+           ((symbolp _:alist:macro:alist)
+            (set _:alist:macro:alist
+                 (_:alist:generic:delete/helper _:alist:macro:key
+                                                   (eval _:alist:macro:alist)
+                                                   _:alist:macro:type)))
 
            (t
-            (int<alist>:error "alist:generic:delete"
+            (_:alist:error "alist:generic:delete"
                               "Unable to delete key from alist (type-of %S)%s: %S"
-                              (type-of int<alist>:macro:alist)
-                              (if int<alist>:macro:type
-                                  (format " with TYPE %S" int<alist>:macro:type)
+                              (type-of _:alist:macro:alist)
+                              (if _:alist:macro:type
+                                  (format " with TYPE %S" _:alist:macro:type)
                                 "")
-                              int<alist>:macro:alist)))))
+                              _:alist:macro:alist)))))
 ;; (setq test-alist '((:k . :value) (:k2 . :value2) (:jeff . :jeff)))
 ;; (alist:generic:delete :k test-alist)
 ;; test-alist
@@ -265,4 +265,4 @@ the input. Does not copy the keys/values (not a deep copy)."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :alist 'generic)
+(imp-provide alist generic)
