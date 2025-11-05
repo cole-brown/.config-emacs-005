@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/regex.el --- Regexes & Globs -*- lexical-binding: t; -*-
+;;; namespaced/path/regex.el --- Regexes & Globs -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-22
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-11-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -18,7 +18,7 @@
 ;;; Code:
 
 
-(imp:require :alist 'type 'string)
+(imp-require alist:/type/string)
 
 
 ;;------------------------------------------------------------------------------
@@ -27,13 +27,13 @@
 
 ;; TODO: filesystem ignore case?
 ;;   - Is that defined elsewhere in path?
-(defconst int<path>:rx:case-sensitive?
+(defconst _:path:rx:case-sensitive?
   (pcase system-type
     ('windows-nt nil)
     ('gnu/linux t)
     ;; Other systems as needed:
     ;;   gnu, gnu/kfreebsd, darwin, ms-dos, cygwin
-  )
+    )
   "Any valid directory/path separator for the operating system type.
 
 NOTE: This is an `rx' forms.")
@@ -79,7 +79,7 @@ paths will be absolute. Else returned paths will be relative to ROOT."
 ;; Globs -> Regex: Constants & Variables
 ;;------------------------------------------------------------------------------
 
-(defconst int<path>:rx:glob/chars
+(defconst _:path:rx:glob/chars
   (rx-to-string '(or "*" "?" "[") :no-group)
   "Regex string for characters that start a glob pattern.
 
@@ -87,31 +87,31 @@ There are other characters that belong to globs, like \"!\" and \"]\", but they
 never begin a pattern.")
 
 
-(defconst int<path>:rx:separator:dirs
+(defconst _:path:rx:separator:dirs
   (pcase system-type
     ('windows-nt '(or "/" "\\"))
     ('gnu/linux "/")
     ;; Other systems as needed:
     ;;   gnu, gnu/kfreebsd, darwin, ms-dos, cygwin
-  )
+    )
   "Any valid directory/path separator for the operating system type.
 
 NOTE: This is an `rx' forms.")
 
 
-(defconst int<path>:rx:separator:paths
+(defconst _:path:rx:separator:paths
   (pcase system-type
     ('windows-nt ";")
     ('gnu/linux  ":")
     ;; Other systems as needed:
     ;;   gnu, gnu/kfreebsd, darwin, ms-dos, cygwin
-  )
+    )
   "Any valid directory/path separator for the operating system type.
 
 NOTE: This is an `rx' forms.")
 
 
-(defconst int<path>:rx:glob:any/name
+(defconst _:path:rx:glob:any/name
   '(or alphanumeric " ")
   "Any valid directory or file name character.
 AKA not a directory or path separator.
@@ -119,17 +119,17 @@ AKA not a directory or path separator.
 NOTE: This is an `rx' forms.")
 
 
-(defconst int<path>:rx:glob:any/path
+(defconst _:path:rx:glob:any/path
   (list 'or
-        int<path>:rx:glob:any/name
-        int<path>:rx:separator:dirs)
+        _:path:rx:glob:any/name
+        _:path:rx:separator:dirs)
   "Any valid path character, including directory separators.
 
 NOTE: This is an `rx' forms.")
-;; (rx-to-string (list 'one-or-more int<path>:rx:glob:any/path) :no-group)
+;; (rx-to-string (list 'one-or-more _:path:rx:glob:any/path) :no-group)
 
 
-(defconst int<path>:rx:glob:range
+(defconst _:path:rx:glob:range
   '(group (not "-") "-" (not "-"))
   "A glob range (from inside a glob character class).
 
@@ -139,18 +139,18 @@ Example:
 NOTE: This is an `rx' forms.")
 
 
-(defconst int<path>:glob->rx:alist
+(defconst _:path:glob->rx:alist
   ;; "**" - Recursive Match: matches zero or more directories (and any file if used at end of regex).
-  (list (cons "**" (rx-to-string (list 'zero-or-more int<path>:rx:glob:any/path)
+  (list (cons "**" (rx-to-string (list 'zero-or-more _:path:rx:glob:any/path)
                                  :no-group))
         ;; "*" - Name Match: matches zero or one directory/file name characters.
-        (cons "*" (rx-to-string (list 'zero-or-one int<path>:rx:glob:any/name)
+        (cons "*" (rx-to-string (list 'zero-or-one _:path:rx:glob:any/name)
                                 :no-group))
         ;; "?" - Name Match: matches exactly one directory/file name character.
-        (cons "?" (rx-to-string int<path>:rx:glob:any/name
+        (cons "?" (rx-to-string _:path:rx:glob:any/name
                                 :no-group))
         ;; "[" & "[!" - Character Class: matches whatever's before the closing "]" (must match at least one char).
-        (cons "[" (rx-to-string int<path>:rx:glob:range
+        (cons "[" (rx-to-string _:path:rx:glob:range
                                 :no-group)))
   "Glob string to replacement regex string.")
 
@@ -159,19 +159,19 @@ NOTE: This is an `rx' forms.")
 ;; Globs -> Regex: Helper Functions
 ;;------------------------------------------------------------------------------
 
-(defun int<path>:rx:match (regex string)
+(defun _:path:rx:match (regex string)
   "Runs a `string-match' on STRING with case sensitivity set correctly.
 
 NOTE: Does not wrap in `save-match-data' macro - caller must do that.
 
 Returns `string-match' results."
   ;; Set case sensitivity flag.
-  (let* ((case-fold-search (not int<path>:rx:case-sensitive?)))
+  (let* ((case-fold-search (not _:path:rx:case-sensitive?)))
     ;; Run search, return nil/integer result.
     (string-match regex string)))
 
 
-(defun int<path>:glob->rx:find (string:glob string:rx)
+(defun _:path:glob->rx:find (string:glob string:rx)
   "Find the start of the next glob in STRING:GLOB.
 
 Move characters before that start to the end of STRING:RX. If no glob-start
@@ -181,7 +181,7 @@ Returns a plist of the updated STRING:GLOB and STRING:RX with keys:
   - `:glob'
   - `:rx'"
   (save-match-data
-    (let ((matched:at (int<path>:rx:match int<path>:rx:glob/chars string:glob)))
+    (let ((matched:at (_:path:rx:match _:path:rx:glob/chars string:glob)))
       ;; Are there any glob characters?
       (if (not matched:at)
           ;;---
@@ -206,7 +206,7 @@ Returns a plist of the updated STRING:GLOB and STRING:RX with keys:
           :rx   string:rx)))
 
 
-(defun int<path>:glob->rx:build:character-class (string:glob &optional compliment?)
+(defun _:path:glob->rx:build:character-class (string:glob &optional compliment?)
   "Convert STRING:GLOB to a regex string.
 
 STRING:GLOB (normal) should be \"[\"STRING:GLOB\"]\".
@@ -218,8 +218,8 @@ Deals correctly with ranges."
       ;;------------------------------
       ;; Find & extract ranges ("a-z").
       ;;------------------------------
-      (while (int<path>:rx:match (alist:string:get/value "[" int<path>:glob->rx:alist)
-                                 string:glob)
+      (while (_:path:rx:match (alist:string:get/value "[" _:path:glob->rx:alist)
+                              string:glob)
         (let ((string:match (match-string 1 string:glob))
               (match:start  (nth 2 (match-data :integers)))
               (match:end    (nth 3 (match-data :integers)))
@@ -248,11 +248,11 @@ Deals correctly with ranges."
 
       ;; Compile regex.
       (rx-to-string regexes :no-group))))
-;; (int<path>:glob->rx:build:character-class "A-Za-z-")
-;; (int<path>:glob->rx:build:character-class "A-Za-z-" t)
+;; (_:path:glob->rx:build:character-class "A-Za-z-")
+;; (_:path:glob->rx:build:character-class "A-Za-z-" t)
 
 
-(defun int<path>:glob->rx:convert (string:glob string:rx)
+(defun _:path:glob->rx:convert (string:glob string:rx)
   "Convert the glob at the start of STRING:GLOB into a regex.
 
 Takes glob pattern out of STRING:GLOB, converts to a regex string, and adds to
@@ -270,35 +270,35 @@ Returns a plist of the updated STRING:GLOB and STRING:RX with keys:
 
     ;; "[!"<something>"]" - Compliment Character Class/Range: Any name character that is not these characters.
     ;;    NOTE: <something> follows regex character class rules.
-    (cond ((int<path>:rx:match (rx string-start "[!" (group (one-or-more printing)) "]") string:glob)
+    (cond ((_:path:rx:match (rx string-start "[!" (group (one-or-more printing)) "]") string:glob)
            (setq string:rx (concat string:rx
-                                   (int<path>:glob->rx:build:character-class (match-string 1 string:glob)
-                                                                             :compliment))
+                                   (_:path:glob->rx:build:character-class (match-string 1 string:glob)
+                                                                          :compliment))
                  string:glob (substring string:glob (nth 1 (match-data :integers)))))
 
           ;; "["<something>"]" - Character Class/Range: Any name character that is not these characters.
           ;;    NOTE: <something> follows regex character class rules, except that leading "^" is not a negation/compliment.
-          ((int<path>:rx:match (rx string-start "[" (group (one-or-more printing)) "]") string:glob)
+          ((_:path:rx:match (rx string-start "[" (group (one-or-more printing)) "]") string:glob)
            (setq string:rx (concat string:rx
-                                   (int<path>:glob->rx:build:character-class (match-string 1 string:glob)))
+                                   (_:path:glob->rx:build:character-class (match-string 1 string:glob)))
                  string:glob (substring string:glob (nth 1 (match-data :integers)))))
 
           ;; "**" - Recursive Match: matches zero or more directories (and any file if used at end of regex).
-          ((int<path>:rx:match (rx string-start "**") string:glob)
+          ((_:path:rx:match (rx string-start "**") string:glob)
            (setq string:rx (concat string:rx
-                                   (alist:string:get/value "**" int<path>:glob->rx:alist))
+                                   (alist:string:get/value "**" _:path:glob->rx:alist))
                  string:glob (substring string:glob (nth 1 (match-data :integers)))))
 
           ;; "*" - Name Match: matches zero or more directory/file name characters.
-          ((int<path>:rx:match (rx string-start "*") string:glob)
+          ((_:path:rx:match (rx string-start "*") string:glob)
            (setq string:rx (concat string:rx
-                                   (alist:string:get/value "*" int<path>:glob->rx:alist))
+                                   (alist:string:get/value "*" _:path:glob->rx:alist))
                  string:glob (substring string:glob (nth 1 (match-data :integers)))))
 
           ;; "?" - Name Match: matches exactly one directory/file name character.
-          ((int<path>:rx:match (rx string-start "?") string:glob)
+          ((_:path:rx:match (rx string-start "?") string:glob)
            (setq string:rx (concat string:rx
-                                   (alist:string:get/value "?" int<path>:glob->rx:alist))
+                                   (alist:string:get/value "?" _:path:glob->rx:alist))
                  string:glob (substring string:glob (nth 1 (match-data :integers))))))
 
     ;;------------------------------
@@ -306,12 +306,12 @@ Returns a plist of the updated STRING:GLOB and STRING:RX with keys:
     ;;------------------------------
     (list :glob string:glob
           :rx   string:rx)))
-;; (int<path>:glob->rx:convert "[!A-Za-z-]" "")
-;; (int<path>:glob->rx:convert "[A-Za-z-]" "")
-;; (int<path>:glob->rx:convert "**" "")
-;; (int<path>:glob->rx:convert "*" "")
-;; (int<path>:glob->rx:convert "?" "")
-;; (int<path>:glob->rx:convert "[a-z]*/**" "")
+;; (_:path:glob->rx:convert "[!A-Za-z-]" "")
+;; (_:path:glob->rx:convert "[A-Za-z-]" "")
+;; (_:path:glob->rx:convert "**" "")
+;; (_:path:glob->rx:convert "*" "")
+;; (_:path:glob->rx:convert "?" "")
+;; (_:path:glob->rx:convert "[a-z]*/**" "")
 
 
 ;;------------------------------------------------------------------------------
@@ -329,11 +329,11 @@ Raises an error signal if GLOB is not a string."
   ;; Errors?
   ;;------------------------------
   (cond ((not (stringp glob))
-         (error "int<path>:glob/rx:alist: GLOB needs to be a string: %S"
+         (error "_:path:glob/rx:alist: GLOB needs to be a string: %S"
                 glob))
 
         ((= 0 (length glob))
-         (error "int<path>:glob/rx:alist: GLOB needs to be a string of length > 0: %S"
+         (error "_:path:glob/rx:alist: GLOB needs to be a string of length > 0: %S"
                 glob))
 
         ;;------------------------------
@@ -347,12 +347,12 @@ Raises an error signal if GLOB is not a string."
            ;;---
            ;; Replace globs until done processing input string.
            ;;---
-           ;; `int<path>:glob->rx:find' will move any non-glob substrings from
+           ;; `_:path:glob->rx:find' will move any non-glob substrings from
            ;; `string:glob' to `string:rx', so when `string:glob' is empty we
            ;; are done processing.
            (while string:glob
              ;; Search for start of next glob pattern...
-             (setq plist (int<path>:glob->rx:find string:glob string:rx))
+             (setq plist (_:path:glob->rx:find string:glob string:rx))
 
              ;; Update our strings.
              (setq string:glob (plist-get plist :glob)
@@ -360,7 +360,7 @@ Raises an error signal if GLOB is not a string."
 
              ;; Process a glob pattern or loop.
              (when string:glob
-               (setq plist (int<path>:glob->rx:convert string:glob string:rx))
+               (setq plist (_:path:glob->rx:convert string:glob string:rx))
                ;; Update our strings and loop.
                (setq string:glob (plist-get plist :glob)
                      string:rx   (plist-get plist :rx))))
@@ -388,4 +388,4 @@ paths will be absolute. Else returned paths will be relative to ROOT."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :path 'regex)
+(imp-provide path regex)

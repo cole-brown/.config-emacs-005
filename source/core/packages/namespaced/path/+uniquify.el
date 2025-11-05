@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/+uniquify.el --- Project-Based Unique Buffer Names -*- lexical-binding: t; -*-
+;;; namespaced/path/+uniquify.el --- Project-Based Unique Buffer Names -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-08-29
+;; Timestamp:  2025-11-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -27,26 +27,9 @@
 
 (require 'cl-lib)
 
-(imp:require :path 'path)
-(imp:require :path 'git)
-(imp:require :path 'buffer)
-
-
-;;--------------------------------------------------------------------------------
-;; Nub - Errors & Debugging
-;;--------------------------------------------------------------------------------
-
-(defun int<path>:uniquify:nub:init ()
-  "Initialize nub user & settings for `path:uniquify'."
-  ;; Defaults for all the settings.
-  (nub:vars:init :path:uniquify))
-;; (int<path>:uniquify:nub:init)
-
-
-(defun path:uniquify:debug:toggle ()
-  "Toggle debugging for `path:uniquify'."
-  (interactive)
-  (nub:debug:toggle :path:uniquify))
+(imp-require path:/path)
+(imp-require path:/git)
+(imp-require path:/buffer)
 
 
 ;;--------------------------------------------------------------------------------
@@ -59,7 +42,7 @@
 
 (defcustom path:uniquify:directory/end-in-slash? t
   "If non-nil, add a path separator to end of names that are dirs (eg `Dired')."
-  :group 'path:group
+  :group 'path
   :type  'boolean)
 
 
@@ -117,7 +100,7 @@ Add on to this variable like so:
 
 Use function `path:uniquify:ignore/buffer:name/rx' to see if what you created
 compiles to a regex string or not."
-  :group 'path:group
+  :group 'path
   :type  'sexp)
 
 
@@ -131,7 +114,7 @@ compiles to a regex string or not."
 
 (defcustom path:uniquify:ignore/buffer:mode/major nil
   "List of major modes that we should not mess with."
-  :group 'path:group
+  :group 'path
   :type  '(repeat symbol))
 
 
@@ -141,7 +124,7 @@ compiles to a regex string or not."
 Some buffers have no variable `buffer-file-name', but do have a
 `list-buffers-directory'that describes the directory they represent (e.g.
 `Dired' buffers). Use `list-buffers-directory' instead for them."
-  :group 'path:group
+  :group 'path
   :type  '(repeat symbol))
 
 
@@ -155,13 +138,13 @@ Some buffers have no variable `buffer-file-name', but do have a
   "Valid `path:uniquify' styles for `doom-modeline-buffer-file-name-style'.")
 
 
-(defun int<path>:uniquify:doom-modeline/style? ()
+(defun _:path:uniquify:doom-modeline/style? ()
   "Are we in charge of styling name for `doom-modeline'?"
   (not (null ; cast to bool
         (and (bound-and-true-p doom-modeline-buffer-file-name-style)
              (memq doom-modeline-buffer-file-name-style
                    path:uniquify:doom-modeline-buffer-file-name-style/valid)))))
-;; (int<path>:uniquify:doom-modeline/style?)
+;; (_:path:uniquify:doom-modeline/style?)
 
 
 ;;------------------------------
@@ -185,7 +168,7 @@ Value should be an alist-tree of keywords:
 ;; (get 'path:uniquify:settings/local 'permanent-local)
 
 
-(defun int<path>:uniquify:settings/path/normalize (path &rest segments)
+(defun _:path:uniquify:settings/path/normalize (path &rest segments)
   "Normalize PATH and SEGMENTS strings into a path string."
   ;; Always use "abbreviations" in path (i.e. "~" for user's home), and default
   ;; to file path...
@@ -196,13 +179,13 @@ Value should be an alist-tree of keywords:
              (file-directory-p path))
         (path:directory path)
       path)))
-;; (int<path>:uniquify:settings/path/normalize (path:current:file))
-;; (int<path>:uniquify:settings/path/normalize (path:current:dir))
+;; (_:path:uniquify:settings/path/normalize (path:current:file))
+;; (_:path:uniquify:settings/path/normalize (path:current:dir))
 ;; (setq path:uniquify:directory/end-in-slash? nil)
 ;; (setq path:uniquify:directory/end-in-slash? t)
 
 
-(defun int<path>:uniquify:settings/build (path/absolute/directory
+(defun _:path:uniquify:settings/build (path/absolute/directory
                                            name/requested
                                            buffer)
   "Create and return settings alist from args.
@@ -213,19 +196,11 @@ NAME/REQUESTED should be a string of the buffer name that Emacs (via
 
 PATH/ABSOLUTE/DIRECTORY should be a string of the absolute path to the file's
 parent directory."
-  (let ((func/name "int<path>:uniquify:settings/create")
+  (let ((func/name "_:path:uniquify:settings/create")
         (func/tags '(:settings)))
     (with-current-buffer buffer
-      (nub:debug:func/start
-          :path:uniquify
-          func/name
-          func/tags
-        (cons 'path/absolute/directory path/absolute/directory)
-        (cons 'name/requested          name/requested)
-        (cons 'buffer                  buffer))
-
       ;; Figure out new buffer name.
-      (let* ((path/absolute/file (int<path>:uniquify:settings/path/normalize path/absolute/directory
+      (let* ((path/absolute/file (_:path:uniquify:settings/path/normalize path/absolute/directory
                                                                              name/requested))
              (project            (path:project:current/alist path/absolute/file))
              ;; Assuming we don't have enough info, the name will just be the path.
@@ -239,7 +214,7 @@ parent directory."
         (when project
           (setq name/buffer/naked
                 ;; Create the buffer name from the project settings.
-                (int<path>:uniquify:name:propertize
+                (_:path:uniquify:name:propertize
                  :buffer         buffer
                  :filepath-abs   path/absolute/file
                  ;; Do not provide any text properteries in these!
@@ -249,7 +224,7 @@ parent directory."
 
           (setq name/buffer/propertized
                 ;; Create the buffer name from the project settings.
-                (int<path>:uniquify:name:propertize
+                (_:path:uniquify:name:propertize
                  :buffer         buffer
                  :filepath-abs   path/absolute/file
                  ;; Do propertize these as desired.
@@ -261,36 +236,32 @@ parent directory."
         ;;------------------------------
         ;; Create our settings (alist tree structure).
         ;;------------------------------
-        (nub:debug:func/return
-            :path:uniquify
-            func/name
-            func/tags
-          ;; Create & Return
-          (list (list :managed?
-                      ;; We only create the settings; someone else should set their flag when they set the name.
-                      (cons :buffer   nil)  ;; Name in `buffer-name'.
-                      (cons :modeline nil)  ;; Name in `mode-line-format' or `doom-modeline'.
-                      (cons :title    nil)) ;; Name in `frame-title-format'.
-                (list :path
-                      (cons :parent    path/absolute/directory)
-                      (cons :filepath  path/absolute/file)
-                      (cons :filename  (file:name path/absolute/file)))
-                (cons :project         project)
-                (list :name
-                      ;; Name Emacs asked for.
-                      (cons :requested name/requested)
-                      ;; And the actual `buffer-name'.
-                      (cons :buffer             name/buffer/naked)
-                      (cons :buffer/propertized name/buffer/propertized)
-                      ;; These will be set when created.
-                      ;; (cons :modeline                "...")
-                      ;; (cons :modeline/propertized    "...")
-                      )))))))
+        ;; Create & Return
+        (list (list :managed?
+                    ;; We only create the settings; someone else should set their flag when they set the name.
+                    (cons :buffer   nil)  ;; Name in `buffer-name'.
+                    (cons :modeline nil)  ;; Name in `mode-line-format' or `doom-modeline'.
+                    (cons :title    nil)) ;; Name in `frame-title-format'.
+              (list :path
+                    (cons :parent    path/absolute/directory)
+                    (cons :filepath  path/absolute/file)
+                    (cons :filename  (file:name path/absolute/file)))
+              (cons :project         project)
+              (list :name
+                    ;; Name Emacs asked for.
+                    (cons :requested name/requested)
+                    ;; And the actual `buffer-name'.
+                    (cons :buffer             name/buffer/naked)
+                    (cons :buffer/propertized name/buffer/propertized)
+                    ;; These will be set when created.
+                    ;; (cons :modeline                "...")
+                    ;; (cons :modeline/propertized    "...")
+                    ))))))
 ;; path:uniquify:settings/local
-;; (int<path>:uniquify:settings/build (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
+;; (_:path:uniquify:settings/build (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 
 
-(defun int<path>:uniquify:settings/create (path/absolute/directory
+(defun _:path:uniquify:settings/create (path/absolute/directory
                                            name/requested
                                            buffer)
   "Create settings alist from args.
@@ -302,18 +273,18 @@ PATH/ABSOLUTE/DIRECTORY should be a string of the absolute path to the file's
 parent directory."
   (with-current-buffer buffer
     (setq path:uniquify:settings/local
-          (int<path>:uniquify:settings/build path/absolute/directory
+          (_:path:uniquify:settings/build path/absolute/directory
                                              name/requested
                                              buffer))))
-;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
+;; (_:path:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 ;; path:uniquify:settings/local
 
 
-(defun int<path>:uniquify:settings/clear (buffer)
+(defun _:path:uniquify:settings/clear (buffer)
   "Clear `path:uniquify:settings/local' by setting it to nil.
 
 BUFFER should be a buffer object."
-  (let ((func/name "int<path>:uniquify:settings/clear")
+  (let ((func/name "_:path:uniquify:settings/clear")
         (func/tags '(:settings))
         (special? (string-match-p
                    ;; Special buffers start with "*", optionally with leading space.
@@ -323,26 +294,10 @@ BUFFER should be a buffer object."
                        "*")
                    (buffer-name buffer))))
     (with-current-buffer buffer
-      (unless special?
-        (nub:debug
-            :path:uniquify
-            func/name
-            func/tags
-          "before clear: %S"
-          path:uniquify:settings/local))
-
-      (setq path:uniquify:settings/local nil)
-
-      (unless special?
-        (nub:debug
-            :path:uniquify
-            func/name
-            func/tags
-          "after clear: %S"
-          path:uniquify:settings/local)))))
+      (setq path:uniquify:settings/local nil))))
 
 
-(defun int<path>:uniquify:settings/get (keywords settings)
+(defun _:path:uniquify:settings/get (keywords settings)
   "Get KEYWORDS value from the SETTINGS alist tree.
 
 KEYWORDS should be:
@@ -350,58 +305,35 @@ KEYWORDS should be:
   - a list of keywords: `(:path :filepath)'
 
 SETTINGS should be `path:uniquify:settings/local' or a sub-alist thereof."
-  (let ((func/name "int<path>:uniquify:settings/get")
+  (let ((func/name "_:path:uniquify:settings/get")
         (func/tags '(:settings)))
-    (nub:debug:func/start
-        :path:uniquify
-        func/name
-        func/tags
-      (cons 'keywords keywords)
-      (cons 'settings settings))
-
     (cond ((null keywords)
-           (nub:error
-               :path:uniquify
-               func/name
-             '("Cannot get value in settings; no keyword? "
-               "keywords: %S, buffer: %S, settings: %S")
-             keywords
-             buffer
-             settings))
+           (error "%S: Cannot get value in settings; no keyword? keywords: %S, buffer: %S, settings: %S"
+                  func/name
+                  keywords
+                  buffer
+                  settings))
 
           ;; Actually get the value.
           ((keywordp keywords)
-           (nub:debug:func/return
-               :path:uniquify
-               func/name
-               func/tags
-             ;; Return value.
-             (alist-get keywords settings)))
+             (alist-get keywords settings))
 
           ((and (listp keywords)
                 (= 1 (length keywords)))
-           (nub:debug:func/return
-               :path:uniquify
-               func/name
-               func/tags
-             ;; Return value.
-             (alist-get (car keywords) settings)))
+             (alist-get (car keywords) settings))
 
           ;; Recurse into settings a level.
           ((listp keywords)
            (let ((keyword (pop keywords)))
-             (int<path>:uniquify:settings/get keywords
+             (_:path:uniquify:settings/get keywords
                                               (alist-get keyword settings))))
 
           ;; ???
           (t
-           (nub:error
-               :path:uniquify
-               func/name
-             '("Cannot get value in settings; don't know what to do with keywords! "
-               "keywords: %S, settings: %S")
-             keywords
-             settings)))))
+           (error "%S: Cannot get value in settings; don't know what to do with keywords! keywords: %S, settings: %S"
+                  func/name
+                  keywords
+                  settings)))))
 
 
 (defun path:uniquify:settings/get (keywords buffer)
@@ -413,12 +345,12 @@ KEYWORDS should be:
   - a keyword: `:project'
   - a list of keywords: `(:path :filepath)'"
   (with-current-buffer buffer
-    (int<path>:uniquify:settings/get keywords path:uniquify:settings/local)))
+    (_:path:uniquify:settings/get keywords path:uniquify:settings/local)))
 ;; path:uniquify:settings/local
 ;; (path:uniquify:settings/get '(:path :parent) (current-buffer))
 
 
-(defun int<path>:uniquify:settings/set (keywords value settings)
+(defun _:path:uniquify:settings/set (keywords value settings)
   "Set KEYWORDS to VALUE in the local variable `path:uniquify:settings/local'.
 
 KEYWORDS should be:
@@ -428,16 +360,13 @@ KEYWORDS should be:
 SETTINGS should be `path:uniquify:settings/local' or a sub-alist.
 
 NOTE: Must be call in context of buffer that owns SETTINGS."
-  (let ((func/name "int<path>:uniquify:settings/set"))
+  (let ((func/name "_:path:uniquify:settings/set"))
     (cond ((null keywords)
-           (nub:error
-               :path:uniquify
-               func/name
-             '("Cannot set value in settings; no keyword? "
-               "keywords: %S, value: %S, settings: %S")
-             keywords
-             value
-             settings))
+           (error "%S: Cannot set value in settings; no keyword? keywords: %S, value: %S, settings: %S"
+                  func/name
+                  keywords
+                  value
+                  settings))
 
           ;; Actually set the value.
           ((keywordp keywords)
@@ -455,20 +384,17 @@ NOTE: Must be call in context of buffer that owns SETTINGS."
            (let ((keyword (pop keywords)))
              (setf (alist-get keyword settings)
                    ;; Recurse into w/ rest of keywords to update/set value.
-                   (int<path>:uniquify:settings/set keywords
+                   (_:path:uniquify:settings/set keywords
                                                     value
                                                     (alist-get keyword settings)))))
 
           ;; ???
           (t
-           (nub:error
-               :path:uniquify
-               func/name
-             '("Cannot set value in settings; don't know what to do with keywords! "
-               "keywords: %S, value: %S, settings: %S")
-             keywords
-             value
-             settings)))
+           (error "%S: Cannot set value in settings; don't know what to do with keywords! keywords: %S, value: %S, settings: %S"
+                  func/name
+                  keywords
+                  value
+                  settings)))
 
     ;; Return this level of settings.
     settings))
@@ -484,21 +410,21 @@ KEYWORDS should be:
   - a keyword: `:project'
   - a list of keywords: `(:path :filepath)'"
   (with-current-buffer buffer
-    (int<path>:uniquify:settings/set keywords value path:uniquify:settings/local)))
-;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
+    (_:path:uniquify:settings/set keywords value path:uniquify:settings/local)))
+;; (_:path:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 ;; (pp path:uniquify:settings/local)
 ;; (path:uniquify:settings/get '(:path :filename) (current-buffer))
 ;; (path:uniquify:settings/set '(:path :filename) "jeff" (current-buffer))
 ;; (path:uniquify:settings/set '(:managed? :buffer) t (current-buffer))
 
 
-(defun int<path>:uniquify:settings/set:name/buffer (buffer)
+(defun _:path:uniquify:settings/set:name/buffer (buffer)
   "Update BUFFER's name with data from `path:uniquify:settings/local'.
 
 BUFFER should be a buffer object.
 `path:uniquify:settings/local' should be up-to-date."
   (with-current-buffer buffer
-    (let ((func/name "int<path>:uniquify:settings/set:name/buffer")
+    (let ((func/name "_:path:uniquify:settings/set:name/buffer")
           (func/tags '(:settings))
           (name (path:uniquify:settings/get '(:name :buffer) buffer)))
       ;;------------------------------
@@ -507,23 +433,15 @@ BUFFER should be a buffer object.
       (cond ((null name)
              ;; Error for now so we can work on hunting this down.
              ;; Ideally no erroring? Maybe?
-             (nub:error
-                 :path:uniquify
-                 func/name
-               '(:line:each
-                 "Cannot name this buffer; no name in settings?!"
-                 "`%s': %S")
-               (symbol-name 'path:uniquify:settings/local)
-               path:uniquify:settings/local))
+             (error "%S: Cannot name this buffer; no name in settings?! `%s': %S"
+                    func/name
+                    (symbol-name 'path:uniquify:settings/local)
+                    path:uniquify:settings/local))
             ((not (stringp name))
-             (nub:error
-                 :path:uniquify
-                 func/name
-               '(:line:each
-                 "Cannot name this buffer; no name in settings?!"
-                 "`%s': %S")
-               (symbol-name 'path:uniquify:settings/local)
-               path:uniquify:settings/local))
+             (error "%S: Cannot name this buffer; no name in settings?! `%s': %S"
+                    func/name
+                    (symbol-name 'path:uniquify:settings/local)
+                    path:uniquify:settings/local))
             ;;------------------------------
             ;; Buffer Naming (Or Not)
             ;;------------------------------
@@ -531,47 +449,31 @@ BUFFER should be a buffer object.
              ;; Nothing to do; name already set?
              nil)
             (t
-             (nub:debug
-                 :path:uniquify
-                 func/name
-                 func/tags
-               "Set buffer name via `rename-buffer'.")
              ;; Use non-nil UNIQUE arg in order to avoid infinite loop recursion
              ;; due to our advising of `rename-buffer'.
              (rename-buffer name :path:uniquify)
              ;; Mark buffer's name as managed.
-             (int<path>:uniquify:buffer/manage buffer :buffer t))))))
-;; (int<path>:uniquify:settings/set:name/buffer (current-buffer))
+             (_:path:uniquify:buffer/manage buffer :buffer t))))))
+;; (_:path:uniquify:settings/set:name/buffer (current-buffer))
 
 
-(defun int<path>:uniquify:settings/set:name/modeline (buffer path/unique truncated?)
+(defun _:path:uniquify:settings/set:name/modeline (buffer path/unique truncated?)
   "Set BUFFER's modeline name and mark BUFFER as managed for modeline.
 
 Use PATH/UNIQUE for the path & filename part of BUFFER's name.
 
 If TRUNCATED? is non-nil, add truncated string `path:name:truncate' before
 PATH/UNIQUE."
-  (let ((func/name "int<path>:uniquify:settings/set:name/modeline")
+  (let ((func/name "_:path:uniquify:settings/set:name/modeline")
         (func/tags '(:settings :modeline)))
     (with-current-buffer buffer
-      (nub:debug:func/start
-          :path:uniquify
-          func/name
-          func/tags
-        (cons 'buffer      buffer)
-        (cons 'path/unique path/unique)
-        (cons 'truncated?  truncated?)
-        (cons 'path:uniquify:settings/local path:uniquify:settings/local))
-
       ;;------------------------------
       ;; Error Checks
       ;;------------------------------
       ;; Settings should already be created.
       (unless path:uniquify:settings/local
-        (nub:error
-            :path:uniquify
-            func/name
-          "Buffer has no `path:uniquify:settings/local'! Cannot set modeline name."))
+        (error "%S: Buffer has no `path:uniquify:settings/local'! Cannot set modeline name."
+               func/name))
 
       ;;------------------------------
       ;; Set the modeline settings.
@@ -584,7 +486,7 @@ PATH/UNIQUE."
         ;; No properties supplied.
         (path:uniquify:settings/set
          '(:name :modeline)
-         (int<path>:uniquify:name:propertize :buffer         buffer
+         (_:path:uniquify:name:propertize :buffer         buffer
                                              :filepath-abs   filepath
                                              :project-props  (list (alist-get :project/name project/alist))
                                              :filepath-props (list path/unique)
@@ -595,7 +497,7 @@ PATH/UNIQUE."
         ;; Yes properties supplied.
         (path:uniquify:settings/set
          '(:name :modeline/propertized)
-         (int<path>:uniquify:name:propertize :buffer         buffer
+         (_:path:uniquify:name:propertize :buffer         buffer
                                              :filepath-abs   filepath
                                              :project-props  (list (alist-get :project/name project/alist)
                                                                    'face 'underline)
@@ -605,15 +507,9 @@ PATH/UNIQUE."
          buffer)
 
         ;; Mark modeline's name as managed.
-        (int<path>:uniquify:buffer/manage buffer :modeline t)
-
-        (nub:debug:func/end
-            :path:uniquify
-            func/name
-            func/tags
-          (cons 'path:uniquify:settings/local path:uniquify:settings/local))))))
+        (_:path:uniquify:buffer/manage buffer :modeline t)))))
 ;; path:uniquify:settings/local
-;; (int<path>:uniquify:settings/set:name/modeline (current-buffer) "+uniquify.el" t)
+;; (_:path:uniquify:settings/set:name/modeline (current-buffer) "+uniquify.el" t)
 
 
 ;;--------------------------------------------------------------------------------
@@ -647,20 +543,20 @@ Return nil/non-nil."
 ;; (path:uniquify:buffer/managed? (current-buffer) :any)
 
 
-(defun int<path>:uniquify:buffer/manage (buffer type managed?)
+(defun _:path:uniquify:buffer/manage (buffer type managed?)
   "Update BUFFER's `:managed?' settings for TYPE to MANAGED?."
   (path:uniquify:settings/set (list :managed? type)
                               ;; cast to bool
                               (not (null managed?))
                               buffer))
 ;; path:uniquify:settings/local
-;; (int<path>:uniquify:buffer/manage (current-buffer) :modeline t)
-;; (int<path>:uniquify:buffer/manage (current-buffer) :modeline nil)
-;; (int<path>:uniquify:buffer/manage (current-buffer) :title t)
-;; (int<path>:uniquify:buffer/manage (current-buffer) :title nil)
+;; (_:path:uniquify:buffer/manage (current-buffer) :modeline t)
+;; (_:path:uniquify:buffer/manage (current-buffer) :modeline nil)
+;; (_:path:uniquify:buffer/manage (current-buffer) :title t)
+;; (_:path:uniquify:buffer/manage (current-buffer) :title nil)
 
 
-(defun int<path>:uniquify:buffer/should-manage? (buffer filepath)
+(defun _:path:uniquify:buffer/should-manage? (buffer filepath)
   "Should we be managing BUFFER's name?
 
 BUFFER should be a buffer object.
@@ -693,14 +589,14 @@ Will check settings:
                      (string-match (path:uniquify:ignore/buffer:name/rx) (buffer-name buffer)))
                 ;; Should we ignore due to buffer's mode?
                 (memq major-mode path:uniquify:ignore/buffer:mode/major))))))
-;; (int<path>:uniquify:buffer/should-manage? (current-buffer) (path:current:file))
+;; (_:path:uniquify:buffer/should-manage? (current-buffer) (path:current:file))
 
 
 ;;--------------------------------------------------------------------------------
 ;; Buffers - Uniquify Management
 ;;--------------------------------------------------------------------------------
 
-(defun int<path>:uniquify:modeline:doom-modeline (buffer filepath)
+(defun _:path:uniquify:modeline:doom-modeline (buffer filepath)
   "Set BUFFER modeline name based on `doom-modeline-buffer-file-name-style'.
 
 FILEPATH should be absolute path to BUFFER's file.
@@ -729,29 +625,19 @@ In order for this to actually do anything:
      example:
      (setq doom-modeline-buffer-file-name-style
            'path:uniquify:project/truncate-to-unique)"
-  (let ((func/name "int<path>:uniquify:modeline:doom-modeline")
+  (let ((func/name "_:path:uniquify:modeline:doom-modeline")
         (func/tags '(:settings :modeline :doom-modeline)))
     (with-current-buffer buffer
-      (nub:debug:func/start
-          :path:uniquify
-          func/name
-          func/tags
-        (cons 'buffer   buffer)
-        (cons 'filepath filepath)
-        (cons 'path:uniquify:settings/local         path:uniquify:settings/local)
-        (cons 'doom-modeline-buffer-file-name-style doom-modeline-buffer-file-name-style))
 
       ;; Only do something if `doom-modeline' exists and we should be styling it.
-      (when (int<path>:uniquify:doom-modeline/style?)
+      (when (_:path:uniquify:doom-modeline/style?)
         ;;------------------------------
         ;; Error Checks
         ;;------------------------------
         ;; Settings should already be created.
         (unless path:uniquify:settings/local
-          (nub:error
-              :path:uniquify
-              func/name
-            "Buffer has no `path:uniquify:settings/local'! Cannot set modeline name."))
+          (error "%S: Buffer has no `path:uniquify:settings/local'! Cannot set modeline name."
+                 func/name))
 
         ;;------------------------------
         ;; Set Buffer's Name for Modeline
@@ -762,39 +648,19 @@ In order for this to actually do anything:
           ;;------------------------------
           ('path:uniquify:project/truncate-to-file
            ;; Name this buffer; no need to uniquify.
-           (int<path>:uniquify:settings/set:name/modeline
+           (_:path:uniquify:settings/set:name/modeline
             buffer
             (file:name filepath)
             t))
 
           ('path:uniquify:project/truncate-to-unique
            ;; First name it, assuming it's already unique.
-           (nub:debug
-               :path:uniquify
-               func/name
-               func/tags
-             "truncate to unique")
-
-           (int<path>:uniquify:settings/set:name/modeline buffer
+           (_:path:uniquify:settings/set:name/modeline buffer
                                                           (file:name filepath)
                                                           t)
 
-           (nub:debug
-               :path:uniquify
-               func/name
-               func/tags
-             "modeline name set to: %S"
-             (path:uniquify:settings/get '(:name :modeline) buffer))
-
            ;; Now we can uniquify all buffers.
-           (int<path>:uniquify:buffers/refresh :modeline)
-
-           (nub:debug
-               :path:uniquify
-               func/name
-               func/tags
-             "modeline name refreshed to: %S"
-             (path:uniquify:settings/get '(:name :modeline) buffer)))
+           (_:path:uniquify:buffers/refresh :modeline))
 
           ;;------------------------------
           ;; Standard Style?
@@ -803,18 +669,12 @@ In order for this to actually do anything:
           (_
            ;; Unset `(:managed? :modeline)' flag if set.
            (when (path:uniquify:buffer/managed? buffer :modeline)
-             (int<path>:uniquify:buffer/manage buffer :modeline nil))))
-
-        (nub:debug:func/end
-            :path:uniquify
-            func/name
-            func/tags
-          (cons 'path:uniquify:settings/local path:uniquify:settings/local))))))
+             (_:path:uniquify:buffer/manage buffer :modeline nil))))))))
 ;; path:uniquify:settings/local
-;; (int<path>:uniquify:modeline:doom-modeline (current-buffer))
+;; (_:path:uniquify:modeline:doom-modeline (current-buffer))
 
 
-(defun int<path>:uniquify:buffers/refresh (type)
+(defun _:path:uniquify:buffers/refresh (type)
   "Refresh all buffer name TYPEs managed by `path:uniquify'.
 
 TYPE should be:
@@ -824,28 +684,21 @@ TYPE should be:
   - `:any'
 
 Update any that need extra uniquification in e.g. modeline buffer name."
-  (let ((func/name "int<path>:uniquify:buffers/refresh")
+  (let ((func/name "_:path:uniquify:buffers/refresh")
         (func/tags '(:buffer :refresh))
         (type/valid '(:buffer :modeline :title :any))
         ;; managed/all is an alist-tree:
         ;;   '(("project-dir-name" . (("filename.el" (<buffer> <buffer>)))))
         managed/all)
-    (nub:debug:func/start
-        :path:uniquify
-        func/name
-        func/tags
-      (cons 'type type))
 
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
     (unless (memq type type/valid)
-      (nub:error
-          :path:uniquify
-          func/name
-        "Unknown TYPE! Got `%S', expected one of: %S"
-        type
-        type/valid))
+      (error "%S:Unknown TYPE! Got `%S', expected one of: %S"
+             func/name
+             type
+             type/valid))
 
     ;;------------------------------
     ;; Look For Naming Conflicts
@@ -860,13 +713,6 @@ Update any that need extra uniquification in e.g. modeline buffer name."
                                            nil nil #'string=)
                                 nil nil #'string=))))
 
-    (nub:debug
-        :path:uniquify
-        func/name
-        func/tags
-      "managed/all: %S"
-      managed/all)
-
     (dolist (managed/project managed/all)
       (let ((managed/project/name (car managed/project))
             (managed/project/files (cdr managed/project)))
@@ -877,11 +723,6 @@ Update any that need extra uniquification in e.g. modeline buffer name."
             ;; Resolve Conflicts
             ;;------------------------------
             (when (> (length managed/file/buffers) 1)
-              (nub:debug
-                  :path:uniquify
-                  func/name
-                  func/tags
-                "name conflicts exist; uniquify...")
 
               ;; Found some buffers that have the same project & filename.
               ;; Need to uniquify their display name for the TYPE.
@@ -890,33 +731,18 @@ Update any that need extra uniquification in e.g. modeline buffer name."
               (let ((path/common (apply #'path:ancestor/common
                                         ;; Need list of buffer's filepaths from the list of buffers.
                                         (seq-map (lambda (buffer) (path:uniquify:settings/get '(:path :filepath) buffer)) managed/file/buffers))))
-                (nub:debug
-                    :path:uniquify
-                    func/name
-                    func/tags
-                  "path/common: %S"
-                  path/common)
 
                 (dolist (buffer managed/file/buffers)
                   (with-current-buffer buffer
                     ;; Uniquify by removing common parts of path.
                     (let ((path/unique (path:relative (path:uniquify:settings/get '(:path :filepath) buffer)
                                                       path/common)))
-                      (nub:debug
-                          :path:uniquify
-                          func/name
-                          func/tags
-                        '(:line:each
-                          "buffer:      %S"
-                          "path/unique: %S")
-                        buffer
-                        path/common)
 
                       ;; Set whatever TYPE says to.
                       (pcase type
                         (:modeline
                          ;; NOTE: No display update needed; modeline will pick up new name when it redisplays.
-                         (int<path>:uniquify:settings/set:name/modeline
+                         (_:path:uniquify:settings/set:name/modeline
                           buffer
                           path/unique
                           ;; Truncated if not equal to its relative-from-project-root path.
@@ -926,33 +752,27 @@ Update any that need extra uniquification in e.g. modeline buffer name."
                         (:buffer
                          ;; TODO: `:buffer' uniquity.
                          ;; TODO: Force update of anything in order to get new name displayed?
-                         (nub:error
-                             :path:uniquify
-                             func/name
-                           "TYPE `%S' not implemented yet..."
-                           type))
+                         (error "%S: TYPE `%S' not implemented yet..."
+                                func/name
+                                type))
 
                         (:title
                          ;; TODO: `:title' uniquity.
                          ;; TODO: Force update of anything in order to get new name displayed?
-                         (nub:error
-                             :path:uniquify
-                             func/name
-                           "TYPE `%S' not implemented yet..."
-                           type))
+                         (error "%S: TYPE `%S' not implemented yet..."
+                                func/name
+                                type))
 
                         (:any
                          ;; Do all three.
                          ;; TODO: `:buffer' uniquity.
                          ;; TODO: `:title' uniquity.
-                         (nub:error
-                             :path:uniquify
-                             func/name
-                           "TYPE `%S' not implemented yet..."
-                           type)
+                         (error "%S: TYPE `%S' not implemented yet..."
+                                func/name
+                                type)
 
                          ;; `:modeline'
-                         (int<path>:uniquify:settings/set:name/modeline
+                         (_:path:uniquify:settings/set:name/modeline
                           buffer
                           path/unique
                           (not
@@ -960,24 +780,15 @@ Update any that need extra uniquification in e.g. modeline buffer name."
                                         (path:uniquify:settings/get '(:project :path) buffer)))))
 
                         (_
-                         (nub:error
-                             :path:uniquify
-                             func/name
-                           "TYPE `%S' not understood?"
-                           type))))))))))))
-
-    (nub:debug:func/end
-        :path:uniquify
-        func/name
-        func/tags
-      ;; TODO:nub: Make `nub:debug:func/end' not print "  <--[RETURN]--" when we don't supply anything to it here.
-      )))
-;; (int<path>:uniquify:settings/set:name/modeline (current-buffer) "a/+uniquify.el" t)
-;; (int<path>:uniquify:settings/set:name/modeline (get-buffer "+uniquify.el") "b/+uniquify.el" t)
-;; (int<path>:uniquify:buffers/refresh :modeline)
+                         (error "%S: TYPE `%S' not understood?"
+                                func/name
+                                type))))))))))))))
+;; (_:path:uniquify:settings/set:name/modeline (current-buffer) "a/+uniquify.el" t)
+;; (_:path:uniquify:settings/set:name/modeline (get-buffer "+uniquify.el") "b/+uniquify.el" t)
+;; (_:path:uniquify:buffers/refresh :modeline)
 
 
-(cl-defun int<path>:uniquify:name:propertize (&key buffer
+(cl-defun _:path:uniquify:name:propertize (&key buffer
                                                    filepath-abs
                                                    project-props
                                                    filepath-props
@@ -999,22 +810,12 @@ Keyword Parameters:
                  - non-nil - FILEPATH has been truncated.
     - MODELINE?  - nil     - Do nothing.
                  - non-nil - Add modeline properties to returned name string."
-  (let ((func/name "int<path>:uniquify:name:propertize")
+  (let ((func/name "_:path:uniquify:name:propertize")
         (func/tags '(:settings))
         (buffer (if buffer
                     (get-buffer buffer)
                   (current-buffer)))
         name)
-    (nub:debug:func/start
-        :path:uniquify
-        func/name
-        func/tags
-      (cons 'buffer                       buffer)
-      (cons 'filepath-abs                 filepath-abs)
-      (cons 'project-props                project-props)
-      (cons 'filepath-props               filepath-props)
-      (cons 'truncated?                   truncated?)
-      (cons 'modeline?                    modeline?))
 
     (with-current-buffer buffer
       ;;------------------------------
@@ -1034,39 +835,35 @@ Keyword Parameters:
       ;;------------------------------
       ;; Propertize for Modeline?
       ;;------------------------------
-      (nub:debug:func/return
-          :path:uniquify
-          func/name
-          func/tags
-        ;; Returned value:
-        (if modeline?
-            (let ((filepath (path:abbreviate:file filepath-abs)))
-              ;; Shouldn't overwrite any propertize, as these are non-dispaly properties for modeline help.
-              (apply #'str:propertize
-                     name
-                     ;; Smush list of property pair lists into just a list of properties.
-                     (flatten-list
-                      ;; Keep all non-nil property pairs.
-                      (seq-filter (lambda (x) (not (null x)))
-                                  (list
-                                   ;; (Required): Add the usual modeline extras.
-                                   (list 'mouse-face 'mode-line-highlight)
-                                   (list 'help-echo (concat filepath
-                                                            (unless (string= (file-name-nondirectory filepath)
-                                                                             (buffer-name buffer))
-                                                              (concat "\n" (buffer-name buffer)))
-                                                            "\nmouse-1: Previous buffer\nmouse-3: Next buffer"))
-                                   (list 'local-map mode-line-buffer-identification-keymap)
+      ;; Returned value:
+      (if modeline?
+          (let ((filepath (path:abbreviate:file filepath-abs)))
+            ;; Shouldn't overwrite any propertize, as these are non-dispaly properties for modeline help.
+            (apply #'str:propertize
+                   name
+                   ;; Smush list of property pair lists into just a list of properties.
+                   (flatten-list
+                    ;; Keep all non-nil property pairs.
+                    (seq-filter (lambda (x) (not (null x)))
+                                (list
+                                 ;; (Required): Add the usual modeline extras.
+                                 (list 'mouse-face 'mode-line-highlight)
+                                 (list 'help-echo (concat filepath
+                                                          (unless (string= (file-name-nondirectory filepath)
+                                                                           (buffer-name buffer))
+                                                            (concat "\n" (buffer-name buffer)))
+                                                          "\nmouse-1: Previous buffer\nmouse-3: Next buffer"))
+                                 (list 'local-map mode-line-buffer-identification-keymap)
 
-                                   ;; (Optional): Add stuff that would be responsibility of `doom-modeline-buffer-file-name'?
-                                   (when (int<path>:uniquify:doom-modeline/style?)
-                                     (list 'face 'doom-modeline-buffer-file)))))))
+                                 ;; (Optional): Add stuff that would be responsibility of `doom-modeline-buffer-file-name'?
+                                 (when (_:path:uniquify:doom-modeline/style?)
+                                   (list 'face 'doom-modeline-buffer-file)))))))
 
-          ;; No modeline properties.
-          name)))))
-;; (int<path>:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '("path/to/file.txt"))
-;; (int<path>:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '(     "to/file.txt") :truncated? t)
-;; (int<path>:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '("path/to/file.txt") :modeline? t)
+        ;; No modeline properties.
+        name))))
+;; (_:path:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '("path/to/file.txt"))
+;; (_:path:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '(     "to/file.txt") :truncated? t)
+;; (_:path:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '("path/to/file.txt") :modeline? t)
 
 
 ;;--------------------------------------------------------------------------------
@@ -1084,7 +881,7 @@ Keyword Parameters:
                     (path:uniquify:settings/get '(:name :buffer) buffer)))
 
           ;; Say why we wouldn't do anything.
-          ((not (int<path>:uniquify:buffer/should-manage? buffer
+          ((not (_:path:uniquify:buffer/should-manage? buffer
                                                           (buffer-file-name (buffer-base-buffer buffer))))
            ;; Ignored due to buffer name regexes?
            (cond ((and path:uniquify:ignore/buffer:name/rx
@@ -1102,10 +899,10 @@ Keyword Parameters:
 
           ;; Say what we would do if we were doing things.
           (t
-           (let ((settings (int<path>:uniquify:settings/create (path:parent (path:current:file))
+           (let ((settings (_:path:uniquify:settings/create (path:parent (path:current:file))
                                                                (file:name (path:current:file)))))
              (message "Would name buffer: %S"
-                      (int<path>:uniquify:settings/get '(:name :buffer) settings))))))
+                      (_:path:uniquify:settings/get '(:name :buffer) settings))))))
   nil)
 ;; (path:cmd:uniquify:buffer/test)
 
@@ -1169,21 +966,6 @@ Return a string of the name actually given to the buffer."
                     (buffer-name buffer)))
          name/actual)
     (with-current-buffer buffer
-      ;; Don't do the debug message for special buffers.
-      (unless special?
-        (nub:debug:func/start
-            :path:uniquify
-            func/name
-            func/tags
-          ;; (cons 'func           func)
-          (cons 'name/requested name/requested)
-          (cons 'unique?        unique?)
-          (cons 'args           args)
-          (cons '-----          "-----")
-          (cons 'name/proposed  name/proposed)
-          (cons 'buffer         buffer)
-          (cons 'path:uniquify:settings/local path:uniquify:settings/local)))
-
       ;;------------------------------
       ;; Do we do anything or..?
       ;;------------------------------
@@ -1192,75 +974,25 @@ Return a string of the name actually given to the buffer."
        ;; Do Not Uniquify
        ;;------------------------------
        (unique?
-        (unless special?
-          (nub:debug
-              :path:uniquify
-              func/name
-              func/tags
-            "Do nothing; leave settings alone.")
-
-          (nub:debug
-              :path:uniquify
-              func/name
-              func/tags
-            "path:uniquify:settings/local: %S"
-            path:uniquify:settings/local))
-
         ;; Just ignore the buffer rename this time; could be we already
         ;; renamed it in e.g. `path:advice:uniquify:create-file-buffer'.
-        (setq name/actual name/proposed)
-
-        (unless special?
-          (nub:debug
-              :path:uniquify
-              func/name
-              func/tags
-            "name (proposed & actual): %S"
-            name/proposed)))
+        (setq name/actual name/proposed))
 
        ;; NOTE: `path:current:file' is ok here since this is a buffer rename and
        ;; the buffer definitely already exists. Just don't let it error out; it
        ;; errors when it can't find a file name and that happens (e.g. special
        ;; buffers).
-       ((not (int<path>:uniquify:buffer/should-manage? buffer (path:current:file :no-error)))
-        (unless special?
-          (nub:debug
-              :path:uniquify
-              func/name
-              func/tags
-            "Do nothing & clear settings!")
-
-          (nub:debug
-              :path:uniquify
-              func/name
-              func/tags
-            "path:uniquify:settings/local: %S"
-            path:uniquify:settings/local))
-
+       ((not (_:path:uniquify:buffer/should-manage? buffer (path:current:file :no-error)))
         ;; Don't mess with it; mark this buffer as not-named-by-us and leave its name alone.
-        (int<path>:uniquify:settings/clear buffer)
-        (setq name/actual name/proposed)
-
-        (unless special?
-          (nub:debug
-              :path:uniquify
-              func/name
-              func/tags
-            "name (proposed & actual): %S"
-            name/proposed)))
+        (_:path:uniquify:settings/clear buffer)
+        (setq name/actual name/proposed))
 
        ;;------------------------------
        ;; Uniquify Buffer Name
        ;;------------------------------
        (t
-        (nub:debug
-            :path:uniquify
-            func/name
-            func/tags
-          "Uniquify buffer name!")
-
         ;; Clear any old settings.
-        (int<path>:uniquify:settings/clear buffer)
+        (_:path:uniquify:settings/clear buffer)
 
         ;; Figure (& save) out /our/ name for this buffer.
         ;;---
@@ -1269,49 +1001,28 @@ Return a string of the name actually given to the buffer."
         ;;---
         ;; NOTE: If `path:current:file' is erroring here due to no file path,
         ;; then _probably_ it's a buffer that /should/ be caught by
-        ;; `int<path>:uniquify:buffer/should-manage?' in the `cond` case above
+        ;; `_:path:uniquify:buffer/should-manage?' in the `cond` case above
         ;; and /should not/ get into this `cond` case.
-        (int<path>:uniquify:settings/create (path:parent (path:current:file))
+        (_:path:uniquify:settings/create (path:parent (path:current:file))
                                             name/proposed
                                             buffer)
 
         ;; Actually set the buffer's new name.
         ;; NOTE: This "recurses" back into `rename-buffer', which will call this
         ;; advice, which we ignore because UNIQUE? is non-nil.
-        (int<path>:uniquify:settings/set:name/buffer buffer)
+        (_:path:uniquify:settings/set:name/buffer buffer)
         (setq name/actual (buffer-name buffer))
-
-        (nub:debug
-            :path:uniquify
-            func/name
-            func/tags
-          "path:uniquify:settings/local: %S"
-          path:uniquify:settings/local)
-        (nub:debug
-            :path:uniquify
-            func/name
-            func/tags
-          "settings->filepath: %S"
-          (path:uniquify:settings/get '(:path :filepath) buffer))
 
         ;; Should we be doing anything else for this buffer?
         ;; Manage its modeline name separate from buffer name maybe?
-        (int<path>:uniquify:modeline:doom-modeline
+        (_:path:uniquify:modeline:doom-modeline
          buffer
          (path:uniquify:settings/get '(:path :filepath) buffer))))
 
       ;;------------------------------
       ;; Return Name
       ;;------------------------------
-      ;; Ignore debugging for special buffers.
-      (if special?
-          name/actual
-        (nub:debug:func/return
-            :path:uniquify
-            func/name
-            func/tags
-          ;; Returned value:
-          name/actual)))))
+      name/actual)))
 
 
 ;;------------------------------
@@ -1332,35 +1043,23 @@ Return the buffer created by `create-file-buffer'."
         ;; Get the actual buffer from `create-file-buffer'...
         (buffer (apply func filepath args)))
     (with-current-buffer buffer
-      (nub:debug:func/start
-          :path:uniquify
-          func/name
-          func/tags
-        (cons 'func     func)
-        (cons 'filepath filepath)
-        (cons 'args     args)
-        (cons '-----    "-----")
-        (cons 'buffer   buffer)
-        ;; Should be nil right now?
-        (cons 'path:uniquify:settings/local path:uniquify:settings/local))
-
-      (if (int<path>:uniquify:buffer/should-manage? buffer filepath)
+      (if (_:path:uniquify:buffer/should-manage? buffer filepath)
           ;;------------------------------
           ;; Tweak Buffer Name
           ;;------------------------------
           (progn
             ;; Figure out a buffer name.
-            (int<path>:uniquify:settings/create (path:parent filepath)
+            (_:path:uniquify:settings/create (path:parent filepath)
                                                 (file:name filepath)
                                                 buffer)
 
             ;; Actually set the buffer's new name (& return it).
             ;; TODO: Do we want `rename-buffer' to get involved here?
-            (int<path>:uniquify:settings/set:name/buffer buffer)
+            (_:path:uniquify:settings/set:name/buffer buffer)
 
             ;; Should we be doing anything else for this buffer?
             ;; Manage its modeline name separate from buffer name maybe?
-            (int<path>:uniquify:modeline:doom-modeline
+            (_:path:uniquify:modeline:doom-modeline
              buffer
              (path:uniquify:settings/get '(:path :filepath) buffer)))
 
@@ -1368,18 +1067,11 @@ Return the buffer created by `create-file-buffer'."
         ;; Ignore This Buffer
         ;;------------------------------
         ;; Don't mess  with it; mark this buffer as not-named-by-us and leave its name alone.
-        (int<path>:uniquify:settings/clear buffer))
+        (_:path:uniquify:settings/clear buffer))
 
       ;;------------------------------
       ;; Return Buffer Object
       ;;------------------------------
-      (nub:debug:func/end
-          :path:uniquify
-          func/name
-          func/tags
-        (cons 'buffer buffer)
-        (cons 'path:uniquify:settings/local path:uniquify:settings/local))
-
       buffer)))
 
 
@@ -1410,57 +1102,25 @@ not recognized as `path:uniquify' custom styles."
   (let ((func/name "path:advice:uniquify:doom-modeline-buffer-file-name")
         (func/tags '(:advice))
         (buffer (current-buffer)))
-    (nub:debug:func/start
-        :path:uniquify
-        func/name
-        func/tags
-      (cons 'func     func)
-      (cons 'args     args)
-      (cons '-----    "-----")
-      (cons 'buffer   buffer)
-      (cons 'path:uniquify:settings/local path:uniquify:settings/local))
-
     ;;------------------------------
     ;; NOTE: This is called a lot (every frame) to populate the modeline.
     ;; Try to avoid doing (too) much?
     ;; All the figuring out of stuff should maybe happen elsewhere?
     ;;------------------------------
-    (nub:debug
-        :path:uniquify
-        func/name
-        func/tags
-      "modeline name ours? %S & %S => %S"
-      (int<path>:uniquify:doom-modeline/style?)
-      (path:uniquify:buffer/managed? buffer
-                                     :modeline)
-      (and (int<path>:uniquify:doom-modeline/style?)
-           (path:uniquify:buffer/managed? buffer
-                                          :modeline)))
-
-    (if (and (int<path>:uniquify:doom-modeline/style?)
+    (if (and (_:path:uniquify:doom-modeline/style?)
              (path:uniquify:buffer/managed? buffer
                                             :modeline))
         ;;------------------------------
         ;; Custom Style
         ;;------------------------------
         ;; Just get our name, which should already be set based on the style.
-        (nub:debug:func/return
-            :path:uniquify
-            func/name
-            func/tags
-          ;; Return Value:
-          (path:uniquify:settings/get '(:name :modeline) buffer))
+        (path:uniquify:settings/get '(:name :modeline) buffer)
 
       ;;------------------------------
       ;; Standard Style
       ;;------------------------------
       ;; Otherwise dunno what that style is; pass through to original function.
-      (nub:debug:func/return
-          :path:uniquify
-          func/name
-          func/tags
-        ;; Return Value:
-        (apply func args)))))
+      (apply func args))))
 ;; doom-modeline-buffer-file-name
 ;; doom-modeline-buffer-file-name-style
 ;; path:uniquify:settings/local
@@ -1488,39 +1148,6 @@ not recognized as `path:uniquify' custom styles."
     (when (advice-member-p #'path:advice:uniquify:rename-buffer #'rename-buffer)
       (advice-add 'uniquify-buffer-base-name :around #'path:advice:uniquify:uniquify-buffer-base-name))))
 ;; (path:uniquify:set-up)
-
-
-;; TODO:emacs-29: Delete when upgraded to Emacs 29!
-;; TODO:package: Or depend on compat package for this function?
-(if (version< emacs-version "29")
-    (unless (functionp 'function-alias-p)
-      (defun function-alias-p (func &optional noerror)
-        "Return nil if FUNC is not a function alias.
-If FUNC is a function alias, return the function alias chain.
-
-If the function alias chain contains loops, an error will be
-signalled.  If NOERROR, the non-loop parts of the chain is returned."
-        (declare (side-effect-free t))
-        (let ((chain nil)
-              (orig-func func))
-          (nreverse
-           (catch 'loop
-             (while (and (symbolp func)
-                         (setq func (symbol-function func))
-                         (symbolp func))
-               (when (or (memq func chain)
-                         (eq func orig-func))
-                 (if noerror
-                     (throw 'loop chain)
-                   (signal 'cyclic-function-indirection (list orig-func))))
-               (push func chain))
-             chain)))))
-  (nub:warning
-      :path:uniquify
-      caller
-    '("Emacs %s: This `if' block for `function-alias-p' can be deleted once "
-      "Emacs 29+ is on all systems.")
-    emacs-version))
 
 
 (defun path:uniquify:tear-down ()
@@ -1554,7 +1181,7 @@ signalled.  If NOERROR, the non-loop parts of the chain is returned."
 
       ;; Extract ourself from `doom-modeline', if being used.
       (advice-remove 'doom-modeline-buffer-file-name #'path:advice:uniquify:doom-modeline-buffer-file-name)
-      (when (int<path>:uniquify:doom-modeline/style?)
+      (when (_:path:uniquify:doom-modeline/style?)
         ;; `auto' might be a better value to revert to, in general?
         (setq doom-modeline-buffer-file-name-style 'buffer-name))
 
@@ -1565,7 +1192,7 @@ signalled.  If NOERROR, the non-loop parts of the chain is returned."
 
       ;; Clear settings in separate step in case we're having bugs.
       (dolist (managed buffers/managed)
-        (int<path>:uniquify:settings/clear (car managed)))))
+        (_:path:uniquify:settings/clear (car managed)))))
 
   nil)
 ;; (path:uniquify:tear-down)
@@ -1574,4 +1201,4 @@ signalled.  If NOERROR, the non-loop parts of the chain is returned."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :path '+uniquify)
+(imp-provide path +uniquify)

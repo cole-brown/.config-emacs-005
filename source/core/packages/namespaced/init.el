@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-05-15
-;; Timestamp:  2025-11-03
+;; Timestamp:  2025-11-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -45,6 +45,7 @@
   ;; Require other namespaced libs:
   (imp "./str/init")   ; requires `elisp'        ;; TODO: finish refactor
   (imp "./theme/init") ; requires `elisp', `str' ;; TODO: finish refactor
+  (imp "./path/init")  ; requires `elisp', `str', `alist'
 
 
   ;; TODO: refactor the rest of 'em:
@@ -52,7 +53,6 @@
   ;; (imp "./emacs/init")
   ;; (imp "./input/init")
   ;; (imp "./output/init")
-  ;; (imp "./path/init")
 
 
   ;; End load timing.

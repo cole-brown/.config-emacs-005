@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/files.el --- Filename & files functions. -*- lexical-binding: t; -*-
+;;; namespaced/path/files.el --- Filename & files functions. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-07-29
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -19,8 +19,7 @@
 
 (require 'cl-lib)
 
-
-(imp:require :path 'path)
+(imp-require path:/path)
 
 
 ;;------------------------------------------------------------------------------
@@ -580,4 +579,4 @@ On loan from Doom's `doom-project-find-file' in \"core/autoload/projects.el\"."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :path 'files)
+(imp-provide path files)

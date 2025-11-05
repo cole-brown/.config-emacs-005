@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/git.el --- Version Control & Paths -*- lexical-binding: t; -*-
+;;; namespaced/path/git.el --- Version Control & Paths -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-08-04
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,7 +17,7 @@
 ;;; Code:
 
 
-(imp:require :path 'path)
+(imp-require path:/path)
 
 
 ;; TODO:path: how to autoload / lazy require magit for these functions?
@@ -29,7 +29,7 @@
 
 (defcustom path:vc/git:rooted ":/"
   "Git uses ':/' as \"the root of this repo\" in its pathspec."
-  :group 'path:group
+  :group 'path
   :type 'string)
 
 
@@ -217,4 +217,4 @@ If FILEPATH is not in the `current-project' path, return nil."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :path 'git)
+(imp-provide path git)

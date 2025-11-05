@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/buffer.el --- Buffer-Related Path Functions -*- lexical-binding: t; -*-
+;;; namespaced/path/buffer.el --- Buffer-Related Path Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-12-04
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,8 +21,8 @@
 (require 'dired)
 (require 'project)
 
-(imp:require :path 'path)
-(imp:require :path 'git)
+(imp-require path:/path)
+(imp-require path:/git)
 
 
 ;;--------------------------------------------------------------------------------
@@ -258,4 +258,4 @@ Return a path string."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :path 'buffer)
+(imp-provide path buffer)

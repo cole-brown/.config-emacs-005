@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/path.el --- Path Functions -*- lexical-binding: t; -*-
+;;; namespaced/path/path.el --- Path Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2023-08-28
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,8 +17,8 @@
 ;;; Code:
 
 
-(imp:require :str)
-(imp:require :elisp 'utils 'functions)
+(imp-require str)
+(imp-require elisp:/functions)
 
 ;; TODO: defaliases for emacs's path functions?
 ;;   - file-name-as-directory == path->dir ?
@@ -39,7 +39,7 @@
 
 (defcustom path:name:truncate "…"
   "String to use as a replacement in paths that need truncation."
-  :group 'path:group
+  :group 'path
   :type '(string))
 
 
@@ -71,7 +71,7 @@
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Kinds-of-Files.html")
 
 
-(defconst int<path>:system:types
+(defconst _:path:system:types
   '((:windows . windows-nt)
     (:linux   . gnu/linux)
     (:wsl     . nil)
@@ -110,7 +110,7 @@ Useful for `path:children' and `path:children:types'.")
 ;; Predicates
 ;;------------------------------------------------------------------------------
 
-(defun int<path>:type:valid? (caller type &optional nil-invalid?)
+(defun _:path:type:valid? (caller type &optional nil-invalid?)
   "Error if TYPE is invalid. Return TYPE if valid (can be nil).
 
 CALLER should be the name of the calling function, for use in the error messages."
@@ -171,7 +171,7 @@ say \"we're on linux but yeah, 'C:/' is absolute.\"
 
 This understands paths regardless of current system type.
 
-See `int<path>:system:types' for system types it can handle."
+See `_:path:system:types' for system types it can handle."
   ;; Check for various absolute paths, return truthy.
   ;; Failure to absolute means relative.
 
@@ -207,7 +207,7 @@ say \"we're on linux but yeah, 'C:/' is absolute.\"
 
 This understands paths regardless of current system type.
 
-See `int<path>:system:types' for system types it can handle."
+See `_:path:system:types' for system types it can handle."
   (not (path:absolute? path)))
 
 
@@ -220,7 +220,7 @@ If TYPE is provided, PATH must exist \and\ be the correct type."
   ;; Error Cases
   ;;------------------------------
   ;; Errors on invaild type.
-  (int<path>:type:valid? "path:exists?" type)
+  (_:path:type:valid? "path:exists?" type)
 
   ;; Sanity check path...
   (cond ((not (stringp path))
@@ -426,7 +426,7 @@ If TYPES is non-nil, return only children of those types."
     ;;------------------------------
     ;; Errors on invaild type.
     (dolist (type types)
-      (int<path>:type:valid? "path:children:types" type))
+      (_:path:type:valid? "path:children:types" type))
 
     (let ((func/name "path:children:types"))
       (unless (stringp path:dir)
@@ -531,7 +531,7 @@ If REGEX is non-nil, return only children whose filename matches the REGEX."
 ;; (path:children (path:current:dir) nil :dir)
 
 
-(defun int<path>:walk (root dir callback)
+(defun _:path:walk (root dir callback)
   "Helper for walking a directory tree.
 
 Gets children from ROOT subdirectory DIR, calls CALLBACK for each child.
@@ -589,9 +589,9 @@ non-nil to continue and nil to halt the walk."
           (if child:dirs
               (cons dir child:dirs)
             nil))))
-;; (int<path>:walk (path:current:dir) "." (lambda (x) (message "hi %S" x)))
-;; (int<path>:walk (path:current:dir) nil (lambda (x) (message "hi %S" x)))
-;; (int<path>:walk (path:current:dir) ".." (lambda (x) (message "hi %S" x)) t)
+;; (_:path:walk (path:current:dir) "." (lambda (x) (message "hi %S" x)))
+;; (_:path:walk (path:current:dir) nil (lambda (x) (message "hi %S" x)))
+;; (_:path:walk (path:current:dir) ".." (lambda (x) (message "hi %S" x)) t)
 
 
 (defun path:walk (root callback)
@@ -607,10 +607,10 @@ non-nil to continue and nil to halt the walk."
   ;; Validate input.
   ;;------------------------------
   (cond ((null callback)
-         (error "int<path>:walk: Must have a CALLBACK function to walk directory tree! Got: %S"
+         (error "_:path:walk: Must have a CALLBACK function to walk directory tree! Got: %S"
                 callback))
         ((not (functionp callback))
-         (error "int<path>:walk: CALLBACK must be a `functionp' to walk directory tree! Got: %S --functionp?--> %S"
+         (error "_:path:walk: CALLBACK must be a `functionp' to walk directory tree! Got: %S --functionp?--> %S"
                 callback
                 (functionp callback)))
         (t
@@ -623,7 +623,7 @@ non-nil to continue and nil to halt the walk."
   ;; Start our walk.
   (let* ((path-root (path:canonicalize:dir root))
          ;; walked is (continue . (dir . children))
-         (walked   (int<path>:walk root
+         (walked   (_:path:walk root
                                    nil
                                    callback))
          (continue (car walked))
@@ -639,7 +639,7 @@ non-nil to continue and nil to halt the walk."
         (while (and continue
                     children)
           ;; Walk a child directory.
-          (setq walked (int<path>:walk root
+          (setq walked (_:path:walk root
                                        (path:join dir (pop children))
                                        callback)
                 continue (car walked))
@@ -658,7 +658,7 @@ non-nil to continue and nil to halt the walk."
 
 ;; TODO: `path:validate' function?
 
-(defun int<path>:append (parent next)
+(defun _:path:append (parent next)
   "Append NEXT element to PARENT, adding dir separator between them.
 
 PARENT & NEXT are normalized via `str:normalize:any', so keywords or symbol
@@ -667,7 +667,7 @@ names can be used as well as strings."
               (null next))
          ;; Change this to just return nil so `path:join' can be a little more robust?
          nil
-         ;; (error "int<path>:append: Cannot append nulls! parent: %S, next: %S"
+         ;; (error "_:path:append: Cannot append nulls! parent: %S, next: %S"
          ;;        parent
          ;;        next)
          )
@@ -678,23 +678,23 @@ names can be used as well as strings."
         (t
          (concat (file-name-as-directory (str:normalize:any parent))
                  (str:normalize:any next)))))
-;; (int<path>:append nil "jeff")
-;; (int<path>:append "jeff" "jill")
-;; (int<path>:append "jeff/" "jill")
-;; (int<path>:append 'jeff :jill)
-;; (int<path>:append 'jeff nil)
-;; (int<path>:append nil nil)
+;; (_:path:append nil "jeff")
+;; (_:path:append "jeff" "jill")
+;; (_:path:append "jeff/" "jill")
+;; (_:path:append 'jeff :jill)
+;; (_:path:append 'jeff nil)
+;; (_:path:append nil nil)
 
 
 ;; TODO: Make `list` module, move there?
-(defun int<path>:flatten (list)
+(defun _:path:flatten (list)
   "Flatten LIST to a single, non-nested list.
 
 Filter out nil."
   (declare (pure t) (side-effect-free t))
 
   (if (and (listp list) (listp (cdr list)))
-      (mapcan #'int<path>:flatten list)
+      (mapcan #'_:path:flatten list)
     (list list)))
 
 
@@ -703,8 +703,8 @@ Filter out nil."
 
 (path:join \"jeff\" \"jill.el\")
   ->\"jeff/jill.el\""
-  (seq-reduce #'int<path>:append
-              (apply #'str:normalize:each (int<path>:flatten path))
+  (seq-reduce #'_:path:append
+              (apply #'str:normalize:each (_:path:flatten path))
               nil))
 ;; (path:join "jeff" "jill")
 ;; (path:join "jeff" "jill/")
@@ -718,7 +718,7 @@ Filter out nil."
 ;; Split
 ;;------------------------------------------------------------------------------
 
-(defvar int<path>:separators:rx (rx-to-string '(one-or-more (or ?/ ?\\)) ;; '(or ?/ ?\\)
+(defvar _:path:separators:rx (rx-to-string '(one-or-more (or ?/ ?\\)) ;; '(or ?/ ?\\)
                                               :no-group)
   "Separators for Windows and Linux paths.")
 
@@ -748,39 +748,39 @@ Filter out nil."
 ;; Path Segments
 ;;------------------------------
 
-(defun int<path>:normalize:system-type (type &optional type-of-auto)
+(defun _:path:normalize:system-type (type &optional type-of-auto)
   "Normalize TYPE.
 
 TYPE should be a valid value of `system-type', which see.
   - Also acceptable: `:auto', `:windows', `:linux', `:mac'
 
-Return value will be a keyword & valid key of `int<path>:system:types'.
+Return value will be a keyword & valid key of `_:path:system:types'.
 
 NOTE: TYPE `:auto' will be normalized to TYPE-OF-AUTO, or to system's type if
 TYPE-OF-AUTO is nil."
-  (let ((keyword (if-let ((assoc (rassoc type int<path>:system:types)))
+  (let ((keyword (if-let ((assoc (rassoc type _:path:system:types)))
                      ;; Got a `system-type' we support; return the keyword.
                      (car assoc)
                    ;; Is it a supported keyword already?
-                   (if (assoc type int<path>:system:types)
+                   (if (assoc type _:path:system:types)
                        type
                      ;; Dunno; give up.
-                     (error "int<path>:normalize:system-type: Unknown/unsupported system type: %S"
+                     (error "_:path:normalize:system-type: Unknown/unsupported system type: %S"
                             type)))))
 
     ;; Figured out the type keyword; do we need to resolve `:auto'?
     (when (eq keyword :auto)
       (setq keyword (or type-of-auto
-                        (car (rassoc system-type int<path>:system:types))))
+                        (car (rassoc system-type _:path:system:types))))
       (unless keyword
-        (error "int<path>:normalize:system-type: Unsupported system type for `:auto': %S"
+        (error "_:path:normalize:system-type: Unsupported system type for `:auto': %S"
                (or type-of-auto system-type))))
 
     keyword))
-;; (int<path>:normalize:system-type :auto)
-;; (int<path>:normalize:system-type :windows)
-;; (int<path>:normalize:system-type 'windows-nt)
-;; (int<path>:normalize:system-type 'gnu/linux)
+;; (_:path:normalize:system-type :auto)
+;; (_:path:normalize:system-type :windows)
+;; (_:path:normalize:system-type 'windows-nt)
+;; (_:path:normalize:system-type 'gnu/linux)
 
 
 (defun path:segments (type &rest path)
@@ -804,7 +804,7 @@ Returned PLIST will have these keys (if their values are non-nil).
            - \"/foo/bar/\" -> \"bar\"
            - \"/foo/bar.tar.gz\" -> \"bar.tar.gz\""
   (setq path (apply #'path:join path))
-  (let ((type (int<path>:normalize:system-type type))
+  (let ((type (_:path:normalize:system-type type))
         drive
         root
         ;; `segments' will get split into `parents' and `name'.
@@ -847,7 +847,7 @@ Returned PLIST will have these keys (if their values are non-nil).
   ;; Split each input into segments.
   (dolist (path paths)
     (dolist (segment (split-string path
-                                   int<path>:separators:rx
+                                   _:path:separators:rx
                                    t
                                    split-string-default-separators))
       (push segment segments)))
@@ -1161,14 +1161,14 @@ For `:windows' -> `:wsl':
   ;; Resolve `:auto'?
   ;;------------------------------
   (setq from (if (eq from :auto)
-                 (int<path>:type translate-path)
-               (int<path>:normalize:system-type from)))
+                 (_:path:type translate-path)
+               (_:path:normalize:system-type from)))
 
   (setq to (if (eq to :auto)
                (if (eq from :windows)
                    :linux
                  :windows)
-             (int<path>:normalize:system-type to)))
+             (_:path:normalize:system-type to)))
 
   ;;------------------------------
   ;; Translate path.
@@ -1249,7 +1249,7 @@ For `:windows' -> `:wsl':
 ;; (path:translate :windows :wsl "~/path/to/somewhere.txt")
 
 
-(defun int<path>:type (path)
+(defun _:path:type (path)
   "Try to guess a PATH type.
 
 Return:
@@ -1284,7 +1284,7 @@ Return:
 (defun path:cmd:translate (path)
   "Try to auto-guess PATH type and then translate the path."
   (interactive "sPath: ")
-  (let* ((source (int<path>:type path))
+  (let* ((source (_:path:type path))
          (dest (if (eq source :windows)
                    ;; WSL should work for translating to Linux too?
                    :wsl
@@ -1422,4 +1422,4 @@ Original from Doom's `doom--sudo-file-path' in \"core/autoload/files.el\"."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :path 'path)
+(imp-provide path path)

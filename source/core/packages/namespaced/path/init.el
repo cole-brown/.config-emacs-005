@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/init.el --- Nicer path & file functions. -*- lexical-binding: t; -*-
+;;; namespaced/path/init.el --- Nicer path & file functions. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-22
-;; Timestamp:  2023-08-11
+;; Timestamp:  2025-11-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -32,18 +32,15 @@
 ;; Set imp Root
 ;;------------------------------------------------------------------------------
 
-(imp:path:root/set :path
-                   (imp:path:current:dir)
-                   "init.el")
+(imp-path-root-set 'path (imp-path-current-dir))
 
 
 ;;------------------------------------------------------------------------------
 ;; Set up custom vars.
 ;;------------------------------------------------------------------------------
 
-(defgroup path:group nil
+(defgroup path nil
   "Path functions."
-  :prefix "path:"
   :group 'tools)
 
 
@@ -51,41 +48,23 @@
 ;; Load Files
 ;;------------------------------------------------------------------------------
 
-(imp:timing
-    :path
-    "init.el"
-    (imp:path:current:dir)
+(imp-timing
+    'path
+    (imp-path-current-file)
 
-
-  ;; Always load.
-  (imp:load :feature  '(:path path)
-            :filename "path")
-  (imp:load :feature  '(:path files)
-            :filename "files")
-  (imp:load :feature  '(:path dir)
-            :filename "dir")
-  (imp:load :feature  '(:path regex)
-            :filename "regex")
-  (imp:load :feature  '(:path git)
-            :filename "git")
-  (imp:load :feature  '(:path buffer)
-            :filename "buffer")
-  (imp:load :feature  '(:path +uniquify)
-            :filename "+uniquify")
-
+  (imp path:/path)      ; requires `str', `elisp:/functions'
+  (imp path:/files)     ; requires `path:/path'
+  (imp path:/dir)       ; requires `path:/path'
+  (imp path:/regex)     ; requires `list/alist:/type/string'
+  (imp path:/git)       ; requires `path:/path'
+  (imp path:/buffer)    ; requires `path:/path', `path:/git'
+  (imp path:/+uniquify) ; requires `path:/path', `path:/git', `path:/buffer'
 
   ;; End load timing.
   )
 
 
-;;--------------------------------------------------------------------------------
-;; Init
-;;--------------------------------------------------------------------------------
-
-(int<path>:uniquify:nub:init)
-
-
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :path)
+(imp-provide path)

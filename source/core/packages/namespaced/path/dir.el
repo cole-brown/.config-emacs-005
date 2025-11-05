@@ -1,10 +1,10 @@
-;;; core/modules/emacs/path/dir.el --- Directory Functions -*- lexical-binding: t; -*-
+;;; namespaced/path/dir.el --- Directory Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-04-07
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-11-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -20,7 +20,7 @@
 (require 'cl-lib)
 
 
-(imp:require :path 'path)
+(imp-require path:/path)
 
 
 ;;------------------------------------------------------------------------------
@@ -43,4 +43,4 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :path 'dir)
+(imp-provide path dir)
