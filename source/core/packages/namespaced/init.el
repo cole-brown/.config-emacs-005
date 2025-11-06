@@ -44,7 +44,7 @@
 
   ;; Require other namespaced libs:
   (imp "./str/init")   ; requires `elisp'
-  (imp "./theme/init") ; requires `elisp', `str' ;; TODO: finish refactor
+  (imp "./theme/init") ; requires `elisp', `str'
   (imp "./path/init")  ; requires `elisp', `str', `alist'
 
 

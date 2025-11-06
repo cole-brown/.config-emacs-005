@@ -1,10 +1,10 @@
-;;; namespaced/innit/theme.el --- Theme Helpers -*- lexical-binding: t; -*-
+;;; namespaced/theme/theme.el --- Theme Helpers -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-06
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-11-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,86 +24,8 @@
 ;;
 ;;; Code:
 
-(imp-require-assert :str 'normalize)
-(imp-require-assert :elisp 'functions) ;; :list 'normalize) or something eventally
-
-
-;;------------------------------------------------------------------------------
-;; Theme Loading
-;;------------------------------------------------------------------------------
-
-;; ;;----------------------------
-;; ;; Loading Hooks
-;; ;;----------------------------
-
-;; (defvar hook://theme:customize nil
-;;   "Hook to run for theme customization.
-
-;; This hook is run by `hook://theme:load'.")
-
-
-;; (defvar hook://theme:load nil
-;;   "Hook run after the theme is loaded.
-
-;; Run when loaded with `load-theme' or reloaded with `theme:reload'.")
-
-
-;; (defun hook-runner://theme:customize ()
-;;   "Run `hook://theme:customize' functions."
-;;   (run-hooks 'hook://theme:customize))
-
-
-;; ;; Always run `theme:customize:hook' when running ``hook://theme:load'.
-;; (add-hook 'hook://theme:load  #'hook-runner://theme:customize)
-
-
-;; ;;----------------------------
-;; ;; Load Theme
-;; ;;----------------------------
-
-;; (defvar theme:loaded nil
-;;   "Theme that user has loaded, or nil for \"not loaded (yet)\".")
-
-
-;; (defun theme:load (theme)
-;;   "Load THEME and mark as loaded.
-
-;; THEME must be the theme's quoted symbol name (e.g. `'zenburn'); it will be
-;; passed to `load-theme'."
-;;   ;; Load the theme please and yes, I do want to load a theme thank you.
-;;   (load-theme theme :no-confirm)
-;;   ;; Save that theme was loaded.
-;;   (setq theme:loaded theme)
-;;   ;; Apply the hook funcs now that the theme is loaded.
-;;   (innit:hook:run '`hook://theme:load))
-
-
-;; ;; TODO: Currently doesn't interact with `theme:loaded'. Should it?
-;; (defun theme:reload ()
-;;   "Reload the current Emacs theme(s)."
-;;   (interactive)
-;;   (unless theme:feature
-;;     ;; TODO: nub error func?
-;;     (user-error (concat "theme:reload: "
-;;                         "No theme is active. "
-;;                         "Make sure `theme:feature', `theme:path', "
-;;                         "and `theme:file' are set properly.")))
-;;   (let ((themes (copy-sequence custom-enabled-themes)))
-;;     ;; Turn themes off and back on again...
-;;     (mapc #'disable-theme custom-enabled-themes)
-;;     (let (`hook://theme:load) ; Disable load hook while we re-enable the themes.
-;;       (mapc #'enable-theme (reverse themes)))
-;;     ;; Apply the hook funcs once now that the themes are all reloaded.
-;;     (innit:hook:run '`hook://theme:load)
-;;     ;; TODO: Steal Doom fonts init/functions/etc too?
-;;     ;; (doom/reload-font)
-;;     (message "%s %s"
-;;              (propertize
-;;               (format "Reloaded %d theme%s:"
-;;                       (length themes)
-;;                       (if (cdr themes) "s" ""))
-;;               'face 'bold)
-;;              (mapconcat #'prin1-to-string themes ", "))))
+(imp-require str:/normalize)
+(imp-require elisp:/functions)
 
 
 ;;------------------------------------------------------------------------------
