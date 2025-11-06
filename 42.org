@@ -4111,6 +4111,229 @@ CLOSED: [2025-11-03 Mon 13:50]
 * -- U R HERE --
 <<here>>
 
+* ├CURRENT┤ namespace
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-11-03 Mon 22:13]
+:END:
+
+BE ON ~feature/namespaced~ GIT BRANCH!!!!
+
+done:
+  - [X] elisp (done-ish)
+  - [X] datetime
+  - [X] unit
+  - [X] buffer (done-ish)
+  - [X] window/init
+  - [X] color/init
+  - [X] list/init
+  - [X] path/init
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+BE ON ~feature/namespaced~ GIT BRANCH!!!!
+
+query regex replace =M-S-C-%=:
+  from: int<\([a-z]+\)>
+  to:   _:\1
+
+And then?
+  - [ ] str (finish)
+  - [ ] theme (finish)
+  - [ ] emacs/init
+  - [ ] input/init
+  - [ ] output/init
+  - [ ] elisp/dlv/...
+    - [[file:source/core/packages/namespaced/elisp/init.el::;; (imp ./dlv/init)][here]]
+  - [ ] buffer/+...
+    - [[file:source/core/packages/namespaced/buffer/init.el::;; (imp buffer:/+commands)][here]]
+
+** rename str to string?
+
+so that they show up with the string functions?
+
+** use window
+
+want my ~window:kill-or-quit~
+  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
+  - and ~deadgrep~ maybe?
+
+** slash instead of colon?
+
+Slash seems like maybe a better separator?
+
+** path - update/add funcs from imp/path.el
+
+wait til they're all settled though?
+  - [[*imp/path: move imp :path normalizers to path.el][imp/path: move imp :path normalizers to path.el]]
+
+** defgroups - no "group" in name
+
+deadgrep for it inside the ~namespaced~ dir.
+
+** buffer:/line remaps
+
+[[file:source/core/packages/namespaced/buffer/line.el::;; (use-package emacs][line.el]]
+
+#+begin_src elisp
+;; (use-package emacs
+;;
+;;   ;;------------------------------
+;;   :bind ; emacs
+;;   ;;------------------------------
+;;
+;;   ;; Remap C-a to `buffer:cmd:line/smart:move-beginning/logical'
+;;   (([remap move-beginning-of-line] . buffer:cmd:line/smart:move-beginning/logical)
+;;
+;;    ;; Remap C-a to `buffer:cmd:line/smart:move-beginning/visual' in visual-line-mode-map
+;;    :map visual-line-mode-map
+;;    ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning/visual)
+;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning/visual)
+;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end/visual)
+;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end/visual)))
+#+end_src
+
+put that in my init
+
+** private vars
+
+deadgrep for "int<" in namespaced dir.
+replace all ~int<NAME>:...~ with ~_:$NAME:...~
+
+* ├CURRENT┤ csharp & treesit?
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-10-08 Wed 23:01]
+:END:
+
+~M-x treesit-install-language-grammar~
+
+NO:   https://github.com/tree-sitter/csharp-tree-sitter
+YES?: https://github.com/tree-sitter/tree-sitter-c-sharp
+
+mmmh... yay. -_-
+#+begin_quote
+⛔ Warning (treesit): The installed language grammar for csharp cannot be located or has problems (symbol-error): /home/main/.config/emacs/tree-sitter/libtree-sitter-csharp.so: undefined symbol: tree_sitter_csharp
+#+end_quote
+
+TODO: make csharp config file
+
+
+* imp statistics
+
+fix stuff
+
+#+begin_src imp-timing
+loading namespaced...
+├─loading \./elisp/init...
+│ ├─loading elisp...
+│ │ ├─loading \./types...
+│ │ │ └─00.0009 seconds
+│ │ ├─loading \./functions...
+│ │ │ └─00.0011 seconds
+│ │ ├─loading \./predicates...
+│ │ │ └─00.0007 seconds
+│ │ ├─loading \./test...
+│ │ │ └─00.0007 seconds
+│ │ └─00.0039 seconds
+│ └─00.0080 seconds
+├─loading \./buffer/init...
+│ ├─loading buffer...
+│ │ ├─loading buffer:/delete...
+│ │ │ └─00.0007 seconds
+│ │ ├─loading buffer:/region...
+│ │ │ └─00.0009 seconds
+│ │ ├─loading buffer:/narrow...
+│ │ │ └─00.0006 seconds
+│ │ ├─loading buffer:/type...
+│ │ │ └─00.0012 seconds
+│ │ ├─loading buffer:/eval...
+│ │ │ └─00.0006 seconds
+│ │ ├─loading buffer:/manage...
+│ │ │ └─00.0010 seconds
+│ │ ├─loading buffer:/name...
+│ │ │ └─00.0007 seconds
+│ │ ├─loading buffer:/point...
+│ │ │ └─00.0006 seconds
+│ │ ├─loading buffer:/line...
+│ │ │ └─00.0010 seconds
+│ │ ├─loading buffer:/search...
+│ │ │ └─00.0009 seconds
+│ │ ├─loading buffer:/yank...
+│ │ │ └─00.0007 seconds
+│ │ └─00.0100 seconds
+│ └─00.0119 seconds
+├─loading \./unit/init...
+│ ├─loading unit...
+│ │ ├─loading unit:/units...
+│ │ │ └─00.0009 seconds
+│ │ └─00.0012 seconds
+│ └─00.0044 seconds
+├─loading \./datetime/init...
+│ ├─loading datetime...
+│ │ ├─loading \./datetime...
+│ │ │ └─00.0014 seconds
+│ │ ├─loading \./format...
+│ │ │ └─00.0014 seconds
+│ │ ├─loading \./timestamp...
+│ │ │ └─00.0010 seconds
+│ │ └─00.0043 seconds
+│ └─00.0083 seconds
+├─loading \./str/init...
+#+end_src
+
+** dedup
+#+begin_quote
+├─loading \./elisp/init...
+│ ├─loading elisp...
+#+end_quote
+
+dedup. Should just be:
+#+begin_quote
+├─loading elisp...
+#+end_quote
+
+** root & children
+
+#+begin_quote
+│ ├─loading elisp...
+│ │ ├─loading \./types...
+#+end_quote
+
+maybe should be?
+#+begin_quote
+│ ├─loading elisp...
+│ │ ├─loading elisp:/types...
+#+end_quote
+
+maybe this is:
+"Find canonical feature name from provided"
+
+* eval after
+
+Find ~(when (imp-feature?~
+example
+  - [[file:source/user/config/help.el::;; TODO: change to eval-after:][here]]
+
+Fix to eval after said feature.
+
+
+
+* my public IP(s)
+
+is there a package that will figure out my IP for me?
+
+else just make a call to the one that I used for the bash prompt
+
+* auth-source / 1pass
+
+what dis? ~gptel~ uses it by default to find API key.
+
+Can I hook in 1pass?
+  - probably, but pkg isn't very used.
+https://melpa.org/#/auth-source-1password
+
 * imp-provide & native compilation
 
 This is in *Async-native-compile-log* buffer after emacs init:
@@ -4152,34 +4375,16 @@ wtf is imp doing?
 
 Do whatever `imp` does for that.
 
+I think the macro returns code so that when the code runs
+there isn't a macro in the way.
+
 * imp/path: move imp :path normalizers to path.el
 
 Integrate them into eg `imp-path` function.
 
-* auth-source / 1pass
-
-what dis? ~gptel~ uses it by default to find API key.
-
-Can I hook in 1pass?
-
-
-* namespace
-
-want my ~window:kill-or-quit~
-  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
-  - and ~deadgrep~ maybe?
-
-most wanted:
-  1. path
-  2. datetime
-  3. buffer
-  4. unit
-
-* my public IP(s)
-
-is there a package that will figure out my IP for me?
-
-else just make a call to the one that I used for the bash prompt
+Rename ~imp-path-root-set~ to...
+  - ~imp-root~?
+  - ~imp-root-set~?
 
 * org-babel no confirm
 
@@ -4226,34 +4431,6 @@ gptel can support PrivateGPT
 https://github.com/zylon-ai/private-gpt
 
 Get that running on my work org notes?
-* ├CURRENT┤ csharp & treesit?
-:LOGBOOK:
-- State "├CURRENT┤"  from              [2025-10-08 Wed 23:01]
-:END:
-
-~M-x treesit-install-language-grammar~
-
-NO:   https://github.com/tree-sitter/csharp-tree-sitter
-YES?: https://github.com/tree-sitter/tree-sitter-c-sharp
-
-mmmh... yay. -_-
-#+begin_quote
-⛔ Warning (treesit): The installed language grammar for csharp cannot be located or has problems (symbol-error): /home/main/.config/emacs/tree-sitter/libtree-sitter-csharp.so: undefined symbol: tree_sitter_csharp
-#+end_quote
-
-TODO: make csharp config file
-
-
-* eval after
-
-Find ~(when (imp-feature?~
-example
-  - [[file:source/user/config/help.el::;; TODO: change to eval-after:][here]]
-
-Fix to eval after said feature.
-
-
-
 * treesit: how can you do it in the init file?
 
 prev treesits:
