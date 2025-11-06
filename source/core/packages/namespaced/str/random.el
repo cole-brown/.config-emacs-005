@@ -1,10 +1,10 @@
-;;; core/modules/emacs/str/+random.el --- Random Strings -*- lexical-binding: t; -*-
+;;; namespaced/str/random.el --- Random Strings -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-17
-;; Timestamp:  2023-06-26
+;; Timestamp:  2025-11-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,13 +21,13 @@
 ;;; Code:
 
 
-(imp:require :str 'string)
+(imp-require str:/string)
 
 
 ;;--------------------------------------------------------------------------------
 ;; Random: ...Numbers?!?
 ;;--------------------------------------------------------------------------------
-;; TODO:str: Move out of "str/+random.el".
+;; TODO:str: Move out of "str/random.el".
 
 (defun num:random:big (limit)
   "Returns a random integer between 0 and LIMIT.
@@ -197,7 +197,7 @@ LENGTH should be an integer (default: 5).
 URL `http://ergoemacs.org/emacs/elisp_insert_random_number_string.html'
 Version 2017-05-24"
   (interactive "P")
-  (int<str>:str:insert->str #'str:random:number/insert length))
+  (_:str:insert->str #'str:random:number/insert length))
 ;; (str:random:number/string 10)
 
 
@@ -209,7 +209,7 @@ LENGTH should be an integer (default: 5).
 URL `http://ergoemacs.org/emacs/elisp_insert_random_number_string.html'
 Version 2017-08-03"
   (interactive "P")
-  (int<str>:str:insert->str #'str:random:hex/insert length))
+  (_:str:insert->str #'str:random:hex/insert length))
 ;; (str:random:hex/string 10)
 
 
@@ -223,7 +223,7 @@ LENGTH should be an integer (default: 5).
 URL `http://ergoemacs.org/emacs/elisp_insert_random_number_string.html'
 Version 2018-08-03"
   (interactive "P")
-  (int<str>:str:insert->str #'str:random:string/insert length))
+  (_:str:insert->str #'str:random:string/insert length))
 ;; (str:random:string/string 10)
 
 
@@ -240,7 +240,7 @@ Emacs.
 URL `http://ergoemacs.org/emacs/elisp_generate_uuid.html'
 Version 2020-06-04"
   (interactive)
-  (int<str>:str:insert->str #'str:random:uuid/insert length))
+  (_:str:insert->str #'str:random:uuid/insert length))
 ;; (str:random:uuid/string)
 
 
@@ -248,4 +248,4 @@ Version 2020-06-04"
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :str '+random)
+(imp-provide str random)

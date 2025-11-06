@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-02-16
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-11-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -27,14 +27,13 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp-path-root-set :str
-                   (imp-path-current-dir))
+(imp-path-root-set 'str (imp-path-current-dir))
 
 ;;------------------------------------------------------------------------------
 ;; Set up custom vars.
 ;;------------------------------------------------------------------------------
 
-(defgroup str:group nil
+(defgroup str nil
   "String manipulation functions."
   :group 'tools)
 
@@ -44,23 +43,20 @@
 ;;------------------------------------------------------------------------------
 
 (imp-timing
-    :str
+    'str
     (imp-path-current-file)
 
   (imp str:/normalize)
-  ;; TODO: refactor the rest of 'em.
-  ;; (imp str:/regex)
-  ;; (imp str:/buffer)
-  ;; (imp str:/string)
-  ;; (imp str:/propertize)
-  ;; (imp str:/hash)
+  (imp str:/regex)
+  (imp str:/buffer)
+  (imp str:/string)
+  (imp str:/propertize)
+  (imp str:/random)      ; requires 'str:/string'
+  (imp str:/hash)        ; requires 'str:/normalize', 'str:/string'
+  (imp str:/case)        ; requires 'str:/normalize', 'str:/string', 'str:/regex'
 
-  ;; ;; Requires 'normalize', 'regex', and 'string'.
-  ;; (imp str:/+case)
-  ;; (imp str:/+case-hydra)
-
-  ;; ;; Requires 'string'.
-  ;; (imp str:/+random)
+  ;; Waits for `hydra' to load.
+  (imp str:/+case-hydra) ; requires 'str:/normalize', 'str:/string', 'str:/regex'
 
   ;; End load timing.
   )

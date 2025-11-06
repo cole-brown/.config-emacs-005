@@ -1,10 +1,10 @@
-;;; core/modules/emacs/str/propertize.el --- Pretty Strings -*- lexical-binding: t; -*-
+;;; namespaced/str/propertize.el --- Pretty Strings -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-04-17
-;; Timestamp:  2023-06-26
+;; Timestamp:  2025-11-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -121,4 +121,4 @@ If APPEND is non-nil, append FACE to the end of the face list instead."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :str 'propertize)
+(imp-provide str propertize)

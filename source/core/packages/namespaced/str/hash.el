@@ -1,10 +1,10 @@
-;;; core/modules/emacs/str/hash.el --- String Hashes -*- lexical-binding: t; -*-
+;;; namespaced/str/hash.el --- String Hashes -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2023-06-23
+;; Timestamp:  2025-11-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,8 +17,8 @@
 ;;; Code:
 
 
-(imp:require :str 'normalize)
-(imp:require :str 'string)
+(imp-require str:/normalize)
+(imp-require str:/string)
 
 
 ;;------------------------------------------------------------------------------
@@ -160,4 +160,4 @@ Finally, it join prefixes string and inputs hash string with
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :str 'hash)
+(imp-provide str hash)

@@ -1,10 +1,10 @@
-;;; core/modules/emacs/str/regex.el --- Regular Expressions -*- lexical-binding: t; -*-
+;;; namespaced/str/regex.el --- Regular Expressions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-21
-;; Timestamp:  2023-06-26
+;; Timestamp:  2025-11-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,7 +24,7 @@
 (defcustom str:rx:default:separators.word
   '(any "-" "_" " ")
   "An `rx' list for what is considered 'word-separators'."
-  :group 'str:group)
+  :group 'str)
 
 
 ;;------------------------------------------------------------------------------
@@ -50,4 +50,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :str 'regex)
+(imp-provide str regex)

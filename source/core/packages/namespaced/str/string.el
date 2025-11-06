@@ -1,10 +1,10 @@
-;;; core/modules/emacs/str/string.el --- String Functions -*- lexical-binding: t; -*-
+;;; namespaced/str/string.el --- String Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-04-17
-;; Timestamp:  2023-07-11
+;; Timestamp:  2025-11-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -119,22 +119,22 @@ case sensitivity!"
 ;; To String
 ;;------------------------------------------------------------------------------
 
-(defun int<str>:str:print->str (func &rest args)
+(defun _:str:print->str (func &rest args)
   "Call FUNC with ARGS; return `standard-output' as a string."
   (with-output-to-string
     (apply func args)))
 
 
-(defun int<str>:str:insert->str (func &rest args)
+(defun _:str:insert->str (func &rest args)
   "Call FUNC with ARGS in a temp buffer; return the temp buffer as a string."
   (with-temp-buffer
     (apply func args)
     (buffer-string)))
 
 
-;;--------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;; Formatting
-;;--------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 
 (defun str:format (format-string &rest objects)
   "Format a string out of a FORMAT-STRING and OBJECTS.
@@ -167,4 +167,4 @@ See `format' for details."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :str 'string)
+(imp-provide str string)
