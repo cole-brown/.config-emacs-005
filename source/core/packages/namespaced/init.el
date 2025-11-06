@@ -35,7 +35,7 @@
   (imp "./elisp/init") ; TODO: refactor "elisp/dlv/*"
 
   ;; Incidentally standalone:
-  (imp "./buffer/init") ; TODO: refactor "+blah" ("optional") files
+  (imp "./buffer/init")
   (imp "./color/init")
   (imp "./datetime/init")
   (imp "./list/init") ; contains `list', `alist', `plist'

@@ -1,10 +1,10 @@
-;;; core/modules/emacs/buffer/+commands.el --- Interactive Buffer Functions -*- lexical-binding: t; -*-
+;;; namespaced/buffer/+commands.el --- Interactive Buffer Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-22
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,7 +17,7 @@
 ;;; Code:
 
 
-(imp:require :buffer 'region)
+(imp-require buffer region)
 
 
 ;;------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ from: nhoffman http://nhoffman.github.io/.emacs.d/#org40b27e4
     (fill-paragraph nil)))
 
 
-(defun int<buffer>:fill/paragraph/fn-for-mode ()
+(defun _:buffer:fill/paragraph/fn-for-mode ()
   "Mode-aware fill-paragraph.
 
 So I only have to bind one thing in the fill hydra. Separated the 'get func' out
@@ -162,7 +162,7 @@ So I only have to bind one thing in the fill prefix map.
 If optional JUSTIFY? is non-nil, justify the text filled (see function
 `fill-paragraph')."
   (interactive "P")
-  (funcall (int<buffer>:fill/paragraph/fn-for-mode) justify?))
+  (funcall (_:buffer:fill/paragraph/fn-for-mode) justify?))
 
 
 (defun buffer:cmd:fill/region/single-line (&optional justify?)
@@ -225,4 +225,4 @@ Borrowed from Doom's `doom/toggle-narrow-buffer' in \"core/autoload/ui.el\"."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer '+commands)
+(imp-provide buffer +commands)
