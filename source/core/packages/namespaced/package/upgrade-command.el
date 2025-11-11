@@ -1,10 +1,10 @@
-;;; core/modules/emacs/innit/package-upgrade-command.el --- Package Upgrade Command -*- lexical-binding: t; -*-
+;;; namespaced/package/upgrade-command.el --- Package Upgrade Command -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-07-19
-;; Timestamp:  2023-09-27
+;; Timestamp:  2025-11-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,50 +17,49 @@
 ;;; Code:
 
 
-(imp:require :innit 'package 'upgrade 'mode)
-
 (require 'rx)
+(imp-require package:/upgrade/mode)
 
 
 ;;--------------------------------------------------------------------------------
 ;; Settings
 ;;--------------------------------------------------------------------------------
 
-(defcustom innit:package/upgrade:buffer:tail? t
+(defcustom package:upgrade:buffer:tail? t
   "Should the timing buffer be tailed?"
-  :group 'innit:group
+  :group 'package
   :type '(boolean))
 
 
-(defcustom innit:package/upgrade:buffer:show t
-  "If non-nil, show `innit:package/upgrade:buffer:name' every time it gets a new message."
-  :group 'innit:group
+(defcustom package:upgrade:buffer:show t
+  "If non-nil, show `package:upgrade:buffer:name' every time it gets a new message."
+  :group 'package
   :type  '(boolean))
 
 
-(defcustom innit:package/upgrade:buffer:name
-  "ⓘ-innit:package:upgrade-ⓘ"
+(defcustom package:upgrade:buffer:name
+  "*package:upgrade*"
   "Buffer name to print to.
 
 If you want it to go to *Messages* with the usual minibuffer interaction, set
 to: `:messages'."
-  :group 'innit:group
+  :group 'package
   :type '(choice (string :tag "Name of Buffer")
                  (const :tag "Use `message' to send to *Messages* buffer with the usual minibuffer interactions."
                         :messages)))
 
 
-(defun innit:package/upgrade:buffer:name ()
-  "Return the string name of `innit:package/upgrade:buffer:name' custom variable.
+(defun package:upgrade:buffer:name ()
+  "Return the string name of `package:upgrade:buffer:name' custom variable.
 
 NOTE: This converts a value `:messages' to \"*Messages*\"."
-  (if (int<innit>:package/upgrade:buffer:messages?)
+  (if (_:package:upgrade:buffer:messages?)
       "*Messages*"
-    innit:package/upgrade:buffer:name))
-;; (innit:package/upgrade:buffer:name)
+    package:upgrade:buffer:name))
+;; (package:upgrade:buffer:name)
 
 
-(defcustom innit:package/upgrade:timestamp/format "%Y-%m-%d %H:%M:%S"
+(defcustom package:upgrade:timestamp/format "%Y-%m-%d %H:%M:%S"
   "`format-time-string' datetime formatting string.
 
 Default is RFC-3339 datetime format, which outputs like:
@@ -68,7 +67,7 @@ Default is RFC-3339 datetime format, which outputs like:
 
 ISO-8601 format is: \"%Y-%m-%dT%T%z\", which outputs like:
   2001-02-03T14:15:16-0700"
-  :group 'innit:group
+  :group 'package
   :type 'string)
 
 
@@ -76,27 +75,27 @@ ISO-8601 format is: \"%Y-%m-%dT%T%z\", which outputs like:
 ;; Package Upgrade Functions: Buffers
 ;;------------------------------------------------------------------------------
 
-(defun int<innit>:package/upgrade:buffer:messages? ()
-  "Is `innit:package/upgrade:buffer:name' equivalent to \"*Messages*\" buffer?
+(defun _:package:upgrade:buffer:messages? ()
+  "Is `package:upgrade:buffer:name' equivalent to \"*Messages*\" buffer?
 
 NOTE: This covers our `:messages' value as well as the string name."
   ;; Check for `:messages' keyword as well as a name match to the buffer.
-  (cond ((and (keywordp innit:package/upgrade:buffer:name)
+  (cond ((and (keywordp package:upgrade:buffer:name)
               (eq :messages
-                  innit:package/upgrade:buffer:name)))
-        ((and (stringp innit:package/upgrade:buffer:name)
+                  package:upgrade:buffer:name)))
+        ((and (stringp package:upgrade:buffer:name)
               (string= "*Messages*"
-                       innit:package/upgrade:buffer:name)))
+                       package:upgrade:buffer:name)))
         ;; Else it's some other buffer.
         (t
          nil)))
 
 
-(defun int<innit>:package/upgrade:buffer:get ()
-  "Create buffer and set to `innit-package-upgrade-mode'.
+(defun _:package:upgrade:buffer:get ()
+  "Create buffer and set to `package-upgrade-mode'.
 
 Return created buffer object."
-   (let ((buffer-or-name (innit:package/upgrade:buffer:name)))
+   (let ((buffer-or-name (package:upgrade:buffer:name)))
     ;; If it already exists, we're done; just return it.
     (cond ((get-buffer buffer-or-name))
 
@@ -106,25 +105,25 @@ Return created buffer object."
              ;; TODO
              ;; TODO
              ;; TODO
-             ;; (innit-package-upgrade-mode)
+             ;; (package-upgrade-mode)
              (current-buffer))))))
-;; (int<innit>:package/upgrade:buffer:get)
+;; (_:package:upgrade:buffer:get)
 
 
 ;; https://stackoverflow.com/a/4685005/425816
-(defun int<innit>:package/upgrade:buffer:tail ()
+(defun _:package:upgrade:buffer:tail ()
   "Tail the package upgrade buffer.
 
-NOTE: Does nothing if `innit:package/upgrade:buffer:tail?' is nil, or
+NOTE: Does nothing if `package:upgrade:buffer:tail?' is nil, or
 the '*Messages*' buffer is used instead of a separate buffer.
 
 NOTE: Cannot use `auto-revert-tail-mode' as it only works on file-based buffers.
 So, this just throws an error:
   (require 'autorevert)
   (auto-revert-tail-mode +1)"
-  (when (and innit:package/upgrade:buffer:tail?
-             (not (int<innit>:package/upgrade:buffer:messages?)))
-    (with-current-buffer (int<innit>:package/upgrade:buffer:get)
+  (when (and package:upgrade:buffer:tail?
+             (not (_:package:upgrade:buffer:messages?)))
+    (with-current-buffer (_:package:upgrade:buffer:get)
       ;; Set point to max for the buffer in general.
       (goto-char (point-max))
 
@@ -136,67 +135,67 @@ So, this just throws an error:
           (set-window-point window (point-max)))))))
 
 
-(defun int<innit>:package/upgrade:buffer:show (force-show?)
+(defun _:package:upgrade:buffer:show (force-show?)
   "Show package/upgrade buffer or not, depending on settings.
 
 FORCE-SHOW?, if non-nil, will always show the buffer."
   (when (or force-show?
-            (int<innit>:package/upgrade:buffer:messages?))
-    (display-buffer (innit:package/upgrade:buffer:name))))
+            (_:package:upgrade:buffer:messages?))
+    (display-buffer (package:upgrade:buffer:name))))
 
 
-(defun innit:cmd:package/upgrade:buffer:bury (&optional ignore-messages-buffer)
-  "Hide and bury the innit package/upgrade output buffer.
+(defun package:upgrade:buffer:bury (&optional ignore-messages-buffer)
+  "Hide and bury the package upgrade output buffer.
 
 If IGNORE-MESSAGES-BUFFER is non-nil and the output buffer is \"*Messages*\",
 does nothing instead."
   (interactive)
   ;; Ignore entirely if IGNORE-MESSAGES-BUFFER is set and we are using the messages buffer.
   (unless (and ignore-messages-buffer
-               (int<innit>:package/upgrade:buffer:messages?))
+               (_:package:upgrade:buffer:messages?))
     ;; Bury only when we find the window currently displaying it.
-    (when-let* ((name (innit:package/upgrade:buffer:name))
+    (when-let* ((name (package:upgrade:buffer:name))
                 (window (get-buffer-window name)))
       (with-selected-window window
         (bury-buffer))
-      (message "innit:package/upgrade: Buried package/upgrade buffer: %s"
+      (message "package:upgrade: Buried package/upgrade buffer: %s"
                name))))
-;; (innit:cmd:package/upgrade:buffer:bury)
+;; (package:upgrade:buffer:bury)
 
 
-(defun innit:cmd:package/upgrade:buffer:kill (&optional ignore-messages-buffer)
-  "Kill the innit package/upgrade output buffer.
+(defun package:upgrade:buffer:kill (&optional ignore-messages-buffer)
+  "Kill the package upgrade output buffer.
 
 If IGNORE-MESSAGES-BUFFER is non-nil and the output buffer is \"*Messages*\",
 does nothing instead."
   (interactive)
   ;; Ignore entirely if IGNORE-MESSAGES-BUFFER is set and we are using the messages buffer.
   (unless (and ignore-messages-buffer
-               (int<innit>:package/upgrade:buffer:messages?))
+               (_:package:upgrade:buffer:messages?))
     ;; Bury only when we find the window currently displaying it in order to
     ;; prevent "No buffer named <...>" messages.
-    (when-let* ((buffer (int<innit>:package/upgrade:buffer:get)))
+    (when-let* ((buffer (_:package:upgrade:buffer:get)))
       (kill-buffer buffer)
-      (message "innit:package/upgrade: Killed package/upgrade buffer: %s"
+      (message "package:upgrade: Killed package/upgrade buffer: %s"
                name))))
-;; (innit:cmd:package/upgrade:buffer:kill)
+;; (package:upgrade:buffer:kill)
 
 
 ;;------------------------------------------------------------------------------
 ;; Package Upgrade Functions: Output
 ;;------------------------------------------------------------------------------
 
-(defun int<innit>:package/upgrade:buffer:insert (string)
+(defun _:package:upgrade:buffer:insert (string)
   "Insert finalized message STRING into output buffer."
   ;; *Messages* buffer: Just use the `message' function.
-  (if (int<innit>:package/upgrade:buffer:messages?)
+  (if (_:package:upgrade:buffer:messages?)
       (message string)
 
     ;; Some other buffer: Insert at the end.
-    (with-current-buffer (int<innit>:package/upgrade:buffer:get)
+    (with-current-buffer (_:package:upgrade:buffer:get)
       ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
       (goto-char (point-max))
-      ;; If we're in `innit-package-upgrade-mode', we'll probably need to deal with the
+      ;; If we're in `package-upgrade-mode', we'll probably need to deal with the
       ;; fact that the buffer is read-only...
       (let ((inhibit-read-only t))
         ;; Prepend a newline, unless this is a new/empty buffer.
@@ -206,11 +205,11 @@ does nothing instead."
                         string)))))
 
     ;; Tail buffer if desired.
-    (int<innit>:package/upgrade:buffer:tail)
+    (_:package:upgrade:buffer:tail)
 
     ;; Show buffer if desired.
-    (when innit:package/upgrade:buffer:show
-      (let ((name (innit:package/upgrade:buffer:name)))
+    (when package:upgrade:buffer:show
+      (let ((name (package:upgrade:buffer:name)))
         ;; Don't want to end up with multiple windows after start up, so be a good
         ;; steward and just use the same window as whatever's already here.
         (let ((display-buffer-alist (list (list name
@@ -218,22 +217,22 @@ does nothing instead."
           (display-buffer name)))))
 
 
-(defun int<innit>:package/upgrade:message (message &rest args)
+(defun _:package:upgrade:message (message &rest args)
   "Format MESSAGE with ARGS, then insert into output buffer."
-  (int<innit>:package/upgrade:buffer:insert
+  (_:package:upgrade:buffer:insert
    (apply #'format message args)))
 
 
-(defun int<innit>:package/upgrade:message/dry (dry-run message &rest args)
+(defun _:package:upgrade:message/dry (dry-run message &rest args)
   "Output MESSAGE formatted with ARGS, with \"[DRY] \" prefix if DRY-RUN."
-  (apply #'int<innit>:package/upgrade:message
+  (apply #'_:package:upgrade:message
          (concat (if dry-run "[DRY] " "")
                  message)
          args))
-;; (int<innit>:package/upgrade:message/dry :dry "hello %s" "there")
+;; (_:package:upgrade:message/dry :dry "hello %s" "there")
 
 
-(defun int<innit>:package/upgrade:message/status (dry-run status message &rest args)
+(defun _:package:upgrade:message/status (dry-run status message &rest args)
   "Output STATUS with MESSAGE (formatted with ARGS).
 
 If DRY-RUN is non-nil, prefix status with \"DRY:\".
@@ -242,7 +241,7 @@ If DRY-RUN is non-nil, prefix status with \"DRY:\".
     [DRY:OK] - DRY-RUN non-nil
 
 If MESSAGE is nil, output only the status."
-  (apply #'int<innit>:package/upgrade:message
+  (apply #'_:package:upgrade:message
          (concat "  ["
                  (if dry-run "DRY:" "")
                  (pcase status
@@ -261,35 +260,35 @@ If MESSAGE is nil, output only the status."
                      " ")
                  message)
          args))
-;; (int<innit>:package/upgrade:message/status :dry :ok "hello")
-;; (int<innit>:package/upgrade:message/status :dry :ok nil)
+;; (_:package:upgrade:message/status :dry :ok "hello")
+;; (_:package:upgrade:message/status :dry :ok nil)
 
 
-(defun int<innit>:package/upgrade:message/error (dry-run message &rest args)
+(defun _:package:upgrade:message/error (dry-run message &rest args)
   "Output ERROR status MESSAGE (formatted with ARGS), then throw to `:error'.
 
 If DRY-RUN is non-nil, prefix status with \"DRY:\".
   e.g.:
     [OK]     - DRY-RUN nil
     [DRY:OK] - DRY-RUN non-nil"
-  (int<innit>:package/upgrade:message/newline) ; Always give some whitespace to the error message.
-  (apply #'int<innit>:package/upgrade:message/status dry-run :error message args)
+  (_:package:upgrade:message/newline) ; Always give some whitespace to the error message.
+  (apply #'_:package:upgrade:message/status dry-run :error message args)
   ;; Throw to `:exit' handler with value `:error'.
   (throw :exit :error))
 
 
-(defun int<innit>:package/upgrade:message/echo (message &rest args)
+(defun _:package:upgrade:message/echo (message &rest args)
   "Format MESSAGE with ARGS, insert into output buffer, and echo to minibuffer."
   (let ((output (apply #'format message args)))
     ;; Add to the output buffer.
-    (int<innit>:package/upgrade:buffer:insert output)
+    (_:package:upgrade:buffer:insert output)
     ;; Echo to minibuffer without sending to *Messages* buffer.
     (let (message-log-max)
       (message output))))
-;; (int<innit>:package/upgrade:message/echo "hello %s" "there")
+;; (_:package:upgrade:message/echo "hello %s" "there")
 
 
-(defun int<innit>:package/upgrade:message/separator ()
+(defun _:package:upgrade:message/separator ()
   "Output an ASCII Box Art line separator unless buffer is empty.
 
 https://en.wikipedia.org/wiki/Box-drawing_character
@@ -297,19 +296,19 @@ https://en.wikipedia.org/wiki/Box-drawing_character
 Act like predicate:
 Return t if line was acutally inserted, else nil."
   ;; Be in the correct buffer so `window-width' is correct.
-  (with-current-buffer (int<innit>:package/upgrade:buffer:get)
+  (with-current-buffer (_:package:upgrade:buffer:get)
     (unless (= (point-min) (point-max)) ; Empty buffer?
-      (int<innit>:package/upgrade:message
+      (_:package:upgrade:message
        "\n\n%s"
        (make-string (- (window-max-chars-per-line) 2) ; One less for `whitespace-mode' EOL char & one more for luck.
                     ?─ ; ASCII Box Art line character
                     :multibyte))
       ;; Return non-nil since we actually did something.
       t)))
-;; (int<innit>:package/upgrade:message/separator)
+;; (_:package:upgrade:message/separator)
 
 
-(defun int<innit>:package/upgrade:message/newline (&optional number)
+(defun _:package:upgrade:message/newline (&optional number)
   "Output NUMBER (1 if nil) of empty line(s)."
   ;; If we only want one newline, we need to message with zero newline chars.
   ;; If two, message with 1.
@@ -318,13 +317,13 @@ Return t if line was acutally inserted, else nil."
                             (if (natnump number)
                                 number
                               1)))))
-    (int<innit>:package/upgrade:message
+    (_:package:upgrade:message
      (make-string num-chars ?\n))))
-;; (int<innit>:package/upgrade:message/newline)
-;; (int<innit>:package/upgrade:message/newline 2)
+;; (_:package:upgrade:message/newline)
+;; (_:package:upgrade:message/newline 2)
 
 
-(defun int<innit>:package/upgrade:message/list (title type items)
+(defun _:package:upgrade:message/list (title type items)
   "Format ITEMS into a TYPE list and print each to the output buffer.
 
 TITLE, if non-nil, will be printed just before the list.
@@ -350,7 +349,7 @@ ITEMS should be a list where each item is one of:
                                 ((or :bulleted 'bulleted :bullet 'bullet)
                                  "•")
                                 (_
-                                 (error "int<innit>:package/upgrade:message/list: unknown TYPE %S: %S"
+                                 (error "_:package:upgrade:message/list: unknown TYPE %S: %S"
                                         (type-of type)
                                         type)))
                               " ")))
@@ -359,15 +358,15 @@ ITEMS should be a list where each item is one of:
     ;; Print TITLE?
     ;;------------------------------
     (cond ((stringp title)
-           (int<innit>:package/upgrade:buffer:insert title))
+           (_:package:upgrade:buffer:insert title))
           ;; Checking for `listp', so need to make sure it's not nil first.
           ((null title)
            ;; No-op.
            nil)
           ((listp title)
-           (apply #'int<innit>:package/upgrade:message title))
+           (apply #'_:package:upgrade:message title))
           (t
-           (error "int<innit>:package/upgrade:message/list: unknown TITLE type %S: %S"
+           (error "_:package:upgrade:message/list: unknown TITLE type %S: %S"
                   (type-of title)
                   title)))
 
@@ -376,7 +375,7 @@ ITEMS should be a list where each item is one of:
     ;;------------------------------
     (dotimes (i count)
       (let ((item (pop items)))
-        (int<innit>:package/upgrade:buffer:insert
+        (_:package:upgrade:buffer:insert
          (concat
           ;; Bullet or Number
           (format format/list i)
@@ -395,13 +394,13 @@ ITEMS should be a list where each item is one of:
                 (t
                  ;; Attempt to translate the unknown to a string.
                  (format "%S" item)))))))))
-;; (int<innit>:package/upgrade:message/list "Hello There!"
+;; (_:package:upgrade:message/list "Hello There!"
 ;;                                          :numbered
 ;;                                          '(1
 ;;                                            2
 ;;                                            ("third %s" . "thing")
 ;;                                            ("%s %d" foo 33)))
-;; (int<innit>:package/upgrade:message/list "Hello There!"
+;; (_:package:upgrade:message/list "Hello There!"
 ;;                                          :bullet
 ;;                                          '(1
 ;;                                            2
@@ -447,16 +446,16 @@ ITEMS should be a list where each item is one of:
 
 
 ;; TODO: Delete? Use for minibuffer only?
-(defcustom innit:package:upgrade:pretty-print-packages 10
+(defcustom package:upgrade:pretty-print-packages 10
   "Pretty print packages-to-upgrade list if greater than or equal to this amount.
 
-`innit:cmd:package:upgrade' will pretty print the info buffer, and truncate the
+`package:upgrade' will pretty print the info buffer, and truncate the
 prompt."
-  :group 'innit:group
+  :group 'package
   :type  '(natnum)) ; non-negative integer
 
 
-(defun int<innit>:package:version (package-name package-description-alist)
+(defun _:package:version (package-name package-description-alist)
   "Get version for PACKAGE-NAME from PACKAGE-DESCRIPTION-ALIST.
 
 Return nil if PACKAGE-NAME is not in PACKAGE-DESCRIPTION-ALIST."
@@ -465,7 +464,7 @@ Return nil if PACKAGE-NAME is not in PACKAGE-DESCRIPTION-ALIST."
       (package-desc-version package-desc))))
 
 
-(cl-defun innit:package:upgrade (&key max dry-run)
+(cl-defun package:upgrade:core (&key max dry-run)
   "Upgrade all packages automatically without showing the '*Packages*' buffer.
 
 First update package metadata, then upgrade all packages that have newer
@@ -476,7 +475,7 @@ by `string-to-number', and number to upgrade is greater than MAX.
 
 If DRY-RUN is non-nil, do everything posible except actually upgrading any
 packages."
-  (let* ((func/name "innit:package:upgrade")
+  (let* ((funcname 'package:upgrade)
          (length/max (cond ((null max)
                             nil)
                            ((and (stringp max)
@@ -487,11 +486,9 @@ packages."
                            ((numberp max)
                             max)
                            (t
-                            (nub:error
-                                :innit
-                                func/name
-                              "Cannot convert MAX to number: %S"
-                              max))))
+                            (error "%S: Cannot convert MAX to number: %S"
+                                   funcname
+                                   max))))
          ;; Sanity:
          ;;   - 0 lurking around as a valid string-to-number for "IDK" is annoying.
          ;;   - Negative or 0 from weird user inputs should be handled...
@@ -525,23 +522,23 @@ packages."
           ;; Titular Infos
           ;;------------------------------
           ;; Start out with separator, unless we don't need it, in which don't.
-          (int<innit>:package/upgrade:message/separator)
+          (_:package:upgrade:message/separator)
 
           ;; Start Message
-          (int<innit>:package/upgrade:message/dry
+          (_:package:upgrade:message/dry
            dry-run
            "Upgrade Installed Emacs Packages")
 
           ;; Start Timestamp
-          (int<innit>:package/upgrade:message/dry dry-run
-                                                  (format-time-string innit:package/upgrade:timestamp/format time/start))
+          (_:package:upgrade:message/dry dry-run
+                                                  (format-time-string package:upgrade:timestamp/format time/start))
 
           ;;------------------------------
           ;; Error Checks
           ;;------------------------------
           (when (and (not (null max))
                      (not (natnump length/max)))
-            (int<innit>:package/upgrade:message/error
+            (_:package:upgrade:message/error
              dry-run
              "Don't know what to do with intended MAX number: %S"
              max))
@@ -549,52 +546,52 @@ packages."
           ;;------------------------------
           ;; Package Metadata
           ;;------------------------------
-          (int<innit>:package/upgrade:message/newline)
-          (int<innit>:package/upgrade:message "Refreshing package metadata...")
+          (_:package:upgrade:message/newline)
+          (_:package:upgrade:message "Refreshing package metadata...")
 
           ;; Update the package metadata from the package repos.
           (package-refresh-contents)
-          (int<innit>:package/upgrade:message/status dry-run :ok nil)
+          (_:package:upgrade:message/status dry-run :ok nil)
 
           ;;------------------------------
           ;; Find Packages to Upgrades
           ;;------------------------------
-          (int<innit>:package/upgrade:message/newline)
-          (int<innit>:package/upgrade:message "Checking for packages to upgrade...")
+          (_:package:upgrade:message/newline)
+          (_:package:upgrade:message "Checking for packages to upgrade...")
 
           (dolist (package (mapcar #'car package-alist))
-            (let ((in-archive (int<innit>:package:version package package-archive-contents)))
+            (let ((in-archive (_:package:version package package-archive-contents)))
               (when (and in-archive
-                         (version-list-< (int<innit>:package:version package package-alist)
+                         (version-list-< (_:package:version package package-alist)
                                          in-archive))
                 (push (cadr (assq package package-archive-contents))
                       upgrades/all))))
           (setq length/all (length upgrades/all))
 
-          (int<innit>:package/upgrade:message (concat "    Installed Packages:  "
+          (_:package:upgrade:message (concat "    Installed Packages:  "
                                                       format/num-packages)
                                               length/installed)
-          (int<innit>:package/upgrade:message (concat "    Upgradable Packages: "
+          (_:package:upgrade:message (concat "    Upgradable Packages: "
                                                       format/num-packages)
                                               length/all)
           ;; Don't display max when it's "I don't care".
           (when (/= length/max most-positive-fixnum)
-            (int<innit>:package/upgrade:message (concat "    Max to Upgrade:      "
+            (_:package:upgrade:message (concat "    Max to Upgrade:      "
                                                         format/num-packages)
                                                 length/max))
 
-          (int<innit>:package/upgrade:message/status dry-run :ok nil)
+          (_:package:upgrade:message/status dry-run :ok nil)
 
           ;;------------------------------
           ;; Show Packages to Upgrade
           ;;------------------------------
-          (int<innit>:package/upgrade:message/newline)
+          (_:package:upgrade:message/newline)
 
           (when (null upgrades/all)
             ;;---
             ;; Nothing - done!
             ;;---
-            (int<innit>:package/upgrade:message/status dry-run
+            (_:package:upgrade:message/status dry-run
                                                        :ok
                                                        "All packages are up to date.")
             (throw :exit :no-op))
@@ -602,7 +599,7 @@ packages."
           ;;---
           ;; Show Full List
           ;;---
-          (int<innit>:package/upgrade:message/list "Upgradable Packages:"
+          (_:package:upgrade:message/list "Upgradable Packages:"
                                                    :numbered
                                                    (seq-map (lambda (upgrade)
                                                               (concat "`"
@@ -618,9 +615,9 @@ packages."
               (progn
                 ;; Chop upgrades down to the maximum allowed right now.
                 (setq upgrades/subset (seq-take upgrades/all length/max))
-                (int<innit>:package/upgrade:message/newline)
-                (int<innit>:package/upgrade:message "Too many packages to upgrade!")
-                (int<innit>:package/upgrade:message/list "Upgrading Package Subset:"
+                (_:package:upgrade:message/newline)
+                (_:package:upgrade:message "Too many packages to upgrade!")
+                (_:package:upgrade:message/list "Upgrading Package Subset:"
                                                          :numbered
                                                          (seq-map #'package-desc-full-name
                                                                   upgrades/subset)))
@@ -628,8 +625,8 @@ packages."
             (setq upgrades/subset upgrades/all))
           (setq length/subset (length upgrades/subset))
 
-          (int<innit>:package/upgrade:message/newline)
-          (int<innit>:package/upgrade:message "Upgrade %d Package%s..."
+          (_:package:upgrade:message/newline)
+          (_:package:upgrade:message "Upgrade %d Package%s..."
                                               length/subset
                                               (if (= length/subset 1) "" "s"))
 
@@ -648,17 +645,17 @@ packages."
                                            (format "%d" length/subset))
                                          (if (= length/subset 1) "" "s"))))
             ;; Push the prompt into the output buffer.
-            (int<innit>:package/upgrade:message (concat "  " packages/prompt))
+            (_:package:upgrade:message (concat "  " packages/prompt))
             ;; Actually prompt:
             (if (yes-or-no-p packages/prompt)
                 ;;---
                 ;; Update
                 ;;---
                 (progn
-                  (int<innit>:package/upgrade:message "    <- Yes")
+                  (_:package:upgrade:message "    <- Yes")
 
-                  (int<innit>:package/upgrade:message/newline)
-                  (int<innit>:package/upgrade:message "%sUpgrading Packages..."
+                  (_:package:upgrade:message/newline)
+                  (_:package:upgrade:message "%sUpgrading Packages..."
                                                       (if dry-run "[DRY] " ""))
                   (let ((format/list (concat "  %"
                                              (number-to-string (1+ (floor (log length/subset 10))))
@@ -673,7 +670,7 @@ packages."
                                                               package-desc/new)
                                                              package-alist))))
                           ;; Install new version.
-                          (int<innit>:package/upgrade:message format/list
+                          (_:package:upgrade:message format/list
                                                               i
                                                               "Upgrading to"
                                                               (package-desc-full-name package-desc/new))
@@ -681,14 +678,14 @@ packages."
                             (package-install package-desc/new))
 
                           ;; Uninstall old version.
-                          (int<innit>:package/upgrade:message format/list
+                          (_:package:upgrade:message format/list
                                                               i
                                                               "Deleting old"
                                                               (package-desc-full-name package-desc/old))
                           (unless dry-run
                             (package-delete package-desc/old)))))
 
-                    (int<innit>:package/upgrade:message/status
+                    (_:package:upgrade:message/status
                      dry-run
                      :ok
                      nil)))
@@ -696,9 +693,9 @@ packages."
               ;;---
               ;; Cancel
               ;;---
-              (int<innit>:package/upgrade:message "    <- No")
-              (int<innit>:package/upgrade:message/newline)
-              (int<innit>:package/upgrade:message/dry dry-run
+              (_:package:upgrade:message "    <- No")
+              (_:package:upgrade:message/newline)
+              (_:package:upgrade:message/dry dry-run
                                                       "Package update declined.")
               (throw :exit :cancel))))
 
@@ -710,10 +707,10 @@ packages."
       ;; Failure
       ;;---
       (:error
-       (int<innit>:package/upgrade:message/newline)
-       (int<innit>:package/upgrade:message/dry dry-run
+       (_:package:upgrade:message/newline)
+       (_:package:upgrade:message/dry dry-run
                                                "Done:")
-       (int<innit>:package/upgrade:message/status
+       (_:package:upgrade:message/status
         dry-run
         :failure
         "Error happened during package upgrade."))
@@ -723,20 +720,20 @@ packages."
       ;;---
       ;; Null success case.
       (:no-op
-       (int<innit>:package/upgrade:message/newline)
-       (int<innit>:package/upgrade:message/dry dry-run
+       (_:package:upgrade:message/newline)
+       (_:package:upgrade:message/dry dry-run
                                                "Done:")
-       (int<innit>:package/upgrade:message/status
+       (_:package:upgrade:message/status
         dry-run
         :ok
         "No Updates Needed; Nothing To Do"))
 
       ;; Success through inaction case.
       (:cancel
-       (int<innit>:package/upgrade:message/newline)
-       (int<innit>:package/upgrade:message/dry dry-run
+       (_:package:upgrade:message/newline)
+       (_:package:upgrade:message/dry dry-run
                                                "Done:")
-       (int<innit>:package/upgrade:message/status
+       (_:package:upgrade:message/status
         dry-run
         :ok
         "No Updates Applied (0/%d)"
@@ -744,10 +741,10 @@ packages."
 
       ;; Success through action case.
       (_
-       (int<innit>:package/upgrade:message/newline)
-       (int<innit>:package/upgrade:message/dry dry-run
+       (_:package:upgrade:message/newline)
+       (_:package:upgrade:message/dry dry-run
                                                "Done:")
-       (int<innit>:package/upgrade:message/status
+       (_:package:upgrade:message/status
         dry-run
         :ok
         "%s Package%s Updated"
@@ -758,14 +755,14 @@ packages."
           (format "%d" length/subset))
         (if (= length/subset 1) "" "s"))
        (unless dry-run
-           (int<innit>:package/upgrade:message/newline)
-           (int<innit>:package/upgrade:message "Restart Emacs to start using new packages."))))))
-;; (innit:package:upgrade :dry-run t)
+           (_:package:upgrade:message/newline)
+           (_:package:upgrade:message "Restart Emacs to start using new packages."))))))
+;; (package:upgrade :dry-run t)
 
 
 ;; Less manual. Upgrade all packages without showing *Packages* buffer.
 ;; https://emacs.stackexchange.com/questions/16398/noninteractively-upgrade-all-packages
-(defun innit:cmd:package:upgrade (&optional max)
+(defun package:upgrade (&optional max)
   "Upgrade all packages automatically without showing the '*Packages*' buffer.
 
 First updates package metadata, then upgrades all packages that have newer
@@ -780,7 +777,7 @@ Will only upgrade the first MAX if MAX is numberp or can be converted by
   (when (listp max)
     (setq max (nth 0 max)))
 
-  (innit:package:upgrade :max max))
+  (package:upgrade:core :max max))
 
 ;; http://nhoffman.github.io/.emacs.d/#orgf46780c
 ;; Some useful ELPA variables and functions:
@@ -790,34 +787,35 @@ Will only upgrade the first MAX if MAX is numberp or can be converted by
 ;;   package-installed-p        - true if package is installed
 
 
-(defvar innit:upgrade:hook nil
-  "Functions to run after updating packages in `innit:cmd:upgrade'.")
+;; TODO(package): add the upgrade hook stuff to `package:upgrade'?
+;; (defvar package:upgrade:hook nil
+;;   "Functions to run after updating packages in `package:upgrade'.")
 
 
-(defun innit:cmd:upgrade (&optional max-packages)
-  "Upgrade all the things! Packages, LSP servers...
+;; (defun package:upgrade (&optional max-packages)
+;;   "Upgrade all the things! Packages, LSP servers...
 
-First update the packages, then run all hooks in `innit:hook:upgrade'
+;; First update the packages, then run all hooks in `package:hook:upgrade'
 
-First updates package metadata, then upgrades all packages that have newer
-versions.
+;; First updates package metadata, then upgrades all packages that have newer
+;; versions.
 
-Will only upgrade the first MAX if MAX is numberp or can be converted by
-`string-to-number', and number to upgrade is greater than MAX."
-  (interactive "P")
+;; Will only upgrade the first MAX if MAX is numberp or can be converted by
+;; `string-to-number', and number to upgrade is greater than MAX."
+;;   (interactive "P")
 
-  ;;------------------------------
-  ;; 1st: Upgrade packages...
-  ;;------------------------------
-  (funcall #'innit:cmd:package:upgrade max-packages)
+;;   ;;------------------------------
+;;   ;; 1st: Upgrade packages...
+;;   ;;------------------------------
+;;   (funcall #'package:upgrade:core max-packages)
 
-  ;;------------------------------
-  ;; 2nd: Upgrade hook...
-  ;;------------------------------
-  (innit:hook:run 'innit:upgrade:hook))
+;;   ;;------------------------------
+;;   ;; 2nd: Upgrade hook...
+;;   ;;------------------------------
+;;   (innit:hook:run 'package:upgrade:hook))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :innit 'package 'upgrade 'command)
+(imp-provide package upgrade command)

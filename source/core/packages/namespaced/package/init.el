@@ -1,10 +1,10 @@
-;;; namespaced/emacs/init/init.el --- Emacs init "help", innit? -*- lexical-binding: t; -*-
+;;; namespaced/package/init.el --- Emacs Packages -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
-;; Created:    2022-04-13
-;; Timestamp:  2025-10-29
+;; Created:    2021-02-16
+;; Timestamp:  2025-11-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,18 +12,21 @@
 ;;
 ;;; Commentary:
 ;;
-;; Emacs init "help", innit?
-;; Complicating, innit?
-;; Adding structure to the uncomplicated, innit?
-;;
 ;;; Code:
 
+(require 'rx)
+
+
 ;;------------------------------------------------------------------------------
-;; Set up imp.
+;; Setup
 ;;------------------------------------------------------------------------------
 
-(imp-path-root-set :init
-                   (imp-path-current-dir))
+(imp-path-root-set 'package (imp-path-current-dir))
+
+
+(defgroup package nil
+  "Package upgrade & manipulation functions."
+  :group 'tools)
 
 
 ;;------------------------------------------------------------------------------
@@ -31,30 +34,16 @@
 ;;------------------------------------------------------------------------------
 
 (imp-timing
-    :init
+    'package
     (imp-path-current-file)
 
-  ;; (imp init:/vars)
-  ;; (imp init:/error)
-  ;; (imp init:/debug)
-  ;; (imp init:/nub)
-  ;; (imp init:/os)
-  ;; (imp init:/time)
-  ;; (imp init:/optimize)
-  ;; (imp init:/server)
-  ;; (imp init:/package)
-  ;; (imp init:/package-upgrade-mode)
-  ;; (imp init:/package-upgrade-command)
-  ;; (imp init:/squelch)
-  ;; (imp init:/hook)
-  ;; (imp init:/advice)
-  ;; (imp init:/theme)
-
-  ;; End load timing.
-  )
+  (imp package:/upgrade/mode ; requires `rx'
+    :path "./upgrade-mode.el")
+  (imp package:/upgrade/command ; requires `rx', `package:/upgrade/mode'
+    :path "./upgrade-command.el"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide init)
+(imp-provide package)

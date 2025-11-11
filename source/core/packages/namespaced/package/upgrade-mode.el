@@ -1,10 +1,10 @@
-;;; core/modules/emacs/innit/package-upgrade-mode.el --- Package Upgrade Mode -*- lexical-binding: t; -*-
+;;; namespaced/package/upgrade-mode.el --- Package Upgrade Mode -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-07-19
-;; Timestamp:  2023-09-27
+;; Timestamp:  2025-11-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,7 +24,7 @@
 ;; Settings
 ;;--------------------------------------------------------------------------------
 
-(defcustom innit:package/upgrade:timestamp/rx
+(defcustom package:upgrade:timestamp/rx
   (rx-to-string
    ;; yyyy-mm-dd
    `(sequence
@@ -45,8 +45,8 @@
   "Regex to match timestamp strings.
 
 Must match strings formatted using `format-time-string' and
-`innit:package/upgrade:timestamp/format'."
-  :group 'innit:group
+`package:upgrade:timestamp/format'."
+  :group 'package
   :type 'string)
 
 
@@ -54,7 +54,7 @@ Must match strings formatted using `format-time-string' and
 ;; Major Mode
 ;;--------------------------------------------------------------------------------
 
-(defun int<innit>:package/mode:font-lock-keywords:highlight/create (matcher subexp facename &optional override laxmatch)
+(defun _:package:mode:font-lock-keywords:highlight/create (matcher subexp facename &optional override laxmatch)
   "Create a 'MATCH-HIGHLIGHT' entry for the `font-lock-keywords' list.
 
 See `font-lock-keywords' for full details.
@@ -102,10 +102,10 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
           ;; (Optional) LAXMATCH Flag:
           ;; If LAXMATCH is non-nil, that means don't signal an error if there is no match for SUBEXP in MATCHER.
           (list laxmatch))))))))
-;; (int<innit>:package/mode:font-lock-keywords:highlight/create "foo" 0 'font-lock-comment-face nil t)
+;; (_:package:mode:font-lock-keywords:highlight/create "foo" 0 'font-lock-comment-face nil t)
 
 ;; TODO: Make this function or delete
-;; (defun int<innit>:package/mode:font-lock-keywords:anchored/create (matcher subexp facename &optional override laxmatch)
+;; (defun _:package:mode:font-lock-keywords:anchored/create (matcher subexp facename &optional override laxmatch)
 ;;   "Create a 'MATCH-' entry for the `font-lock-keywords' list.
 
 ;; See `font-lock-keywords' for full details.
@@ -202,11 +202,11 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
 ;;           ;; (Optional) LAXMATCH Flag:
 ;;           ;; If LAXMATCH is non-nil, that means don't signal an error if there is no match for SUBEXP in MATCHER.
 ;;           (list laxmatch))))))))
-;; ;; (int<innit>:package/mode:font-lock-keywords:anchored/create "foo" 0 'font-lock-comment-face nil t)
+;; ;; (_:package:mode:font-lock-keywords:anchored/create "foo" 0 'font-lock-comment-face nil t)
 
 
 
-(defconst int<innit>:package/mode:font-lock-keywords
+(defconst _:package:mode:font-lock-keywords
   (let (flk ; The font lock keywords list that will become this const.
 
         ;;------------------------------
@@ -265,7 +265,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
         ;; ;; case we normalize/change the tenses...
         ;; (rx/status/info    (rx-to-string `(or "load" "loading"  "loaded")  :no-group))
         ;; (rx/status/warning (rx-to-string `(or "skip" "skipping" "skipped") :no-group))
-        ;; (rx/reason/warning (rx-to-string `(and ,innit:package:reason
+        ;; (rx/reason/warning (rx-to-string `(and ,package:reason
         ;;                                        (one-or-more any)
         ;;                                        line-end)
         ;;                                  :no-group))
@@ -290,8 +290,8 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
         ;; (rx/feature (rx-to-string `(and ":"
         ;;                                 (one-or-more
         ;;                                  ;; Emacs Lisp is super permissive about what a symbol name can be...
-        ;;                                  ;; How permissive should we be about what an Innit Feature Name should be?
-        ;;                                  ;; NOTE: Similar but different from `int<innit>:feature:replace:rx'.
+        ;;                                  ;; How permissive should we be about what Feature Name should be?
+        ;;                                  ;; NOTE: Similar but different from `_:feature:replace:rx'.
         ;;                                  ;; Careful how this goes or you lose the question mark...
         ;;                                  (any "?" ":" "-" "_" "/" "."
         ;;                                       alphanumeric)))
@@ -300,7 +300,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
         ;; ;;------------------------------
         ;; ;; Final Status
         ;; ;;------------------------------
-        ;; ;; Not currently printed to 'innit:package' buffer?
+        ;; ;; Not currently printed to 'package' buffer?
         )
 
     ;; NOTE: `M-x list-faces-display' and go to 'font-lock-' to see all the
@@ -313,7 +313,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Statuses
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            (rx-to-string `(or "[" ":" "]")
                          :no-group)
            0
@@ -322,7 +322,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
            nil)
           flk)
 
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            "OK"
            0
            ;; 'success ;; `success' face doesn't work? Just use a font-lock face?
@@ -330,7 +330,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
            t
            t)
           flk)
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            (rx-to-string `(or "ERROR" "FAILURE")
                          :no-group)
            0
@@ -340,7 +340,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
           flk)
 
     ;; HIGHEST-PRIORITY STATUS!
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            "DRY"
            0
            'font-lock-warning-face
@@ -350,7 +350,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Unicode Box Drawing Characters
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            rx/unicode-box ; Match Regex
            0 ; Match's Group Number from Match Regex
            'font-lock-comment-delimiter-face
@@ -361,7 +361,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Lists
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            (rx-to-string `(and
                            line-start
                            (one-or-more " ")
@@ -379,7 +379,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Package Names
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            (rx-to-string `(and
                            "`"
                            (group (one-or-more
@@ -396,7 +396,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
            nil
            nil)
           flk)
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            (rx-to-string `(and
                            "`"
                            (group (one-or-more
@@ -417,15 +417,15 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Intro Lines
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    (push (_:package:mode:font-lock-keywords:highlight/create
            "Upgrade Installed Emacs Packages"
            0
            'font-lock-preprocessor-face
            nil
            nil)
           flk)
-    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
-           innit:package/upgrade:timestamp/rx
+    (push (_:package:mode:font-lock-keywords:highlight/create
+           package:upgrade:timestamp/rx
            0
            'font-lock-preprocessor-face
            nil
@@ -437,7 +437,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Getting a bit too colored?
     ;; Also this didn't cover "[DRY] Upgrading Packages..."
-    ;; (push (int<innit>:package/mode:font-lock-keywords:highlight/create
+    ;; (push (_:package:mode:font-lock-keywords:highlight/create
     ;;        (rx-to-string `(and
     ;;                        line-start
     ;;                        (or "Refreshing package metadata..."
@@ -466,7 +466,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;; Done; Return Font Lock Keywords
     ;;------------------------------
     flk)
-  "Syntax keywords for `innit-package-upgrade-mode' buffer.
+  "Syntax keywords for `package-upgrade-mode' buffer.
 
 See `font-lock-keywords' for various formatting options of these entries.
 Each element in a user-level keywords list should have one of these forms:
@@ -476,10 +476,10 @@ Each element in a user-level keywords list should have one of these forms:
   - (MATCHER . HIGHLIGHT)
   - (MATCHER HIGHLIGHT ...)
   - (eval . FORM)")
-;; (pp int<innit>:package/mode:font-lock-keywords)
+;; (pp _:package:mode:font-lock-keywords)
 
 
-(defconst int<innit>:package/mode:font-lock-defaults
+(defconst _:package:mode:font-lock-defaults
   ;; Format for list:
   ;;  (KEYWORDS [KEYWORDS-ONLY [CASE-FOLD [SYNTAX-ALIST ...]]])
   ;; See for more info:
@@ -490,7 +490,7 @@ Each element in a user-level keywords list should have one of these forms:
    ;; KEYWORDS
    ;;------------------------------
    ;; See `font-lock-keywords' for various formatting options of these entries.
-   int<innit>:package/mode:font-lock-keywords
+   _:package:mode:font-lock-keywords
 
    ;;------------------------------
    ;; KEYWORDS-ONLY?
@@ -525,9 +525,9 @@ See help for `font-lock-defaults' for what all this does/can do.")
 
 
 ;; Just use expected name instead of my... unique naming conventions.
-(defvar innit-package-upgrade-mode-map
+(defvar package-upgrade-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; This will be set innitlictly by `define-derived-mode' if not set explictly.
+    ;; This will be set by `define-derived-mode' if not set explictly.
     (set-keymap-parent map special-mode-map)
 
     ;;------------------------------
@@ -535,7 +535,7 @@ See help for `font-lock-defaults' for what all this does/can do.")
     ;;------------------------------
     ;; "g" is `revert-buffer' by default (inherited from `special-mode-map')
     ;; but is often used as "refresh buffer" (e.g. `deadgrep-mode' binds it to `deadgrep-restart').
-    ;; `innit-package-upgrade-mode' doesn't really have a "refresh", since it's just historical.
+    ;; `package-upgrade-mode' doesn't really have a "refresh", since it's just historical.
     (define-key map (kbd "g") nil) ; unbind `revert-buffer'
 
     ;;------------------------------
@@ -548,8 +548,8 @@ See help for `font-lock-defaults' for what all this does/can do.")
 
 
 ;;;###autoload
-(define-derived-mode innit-package-upgrade-mode special-mode "innit:package:upgrade"
-  "Major mode for output of the `innit:cmd:package:upgrade' command.
+(define-derived-mode package-upgrade-mode special-mode "package:upgrade"
+  "Major mode for output of the `package:upgrade' command.
 
 Derive from `special-mode' as a start:
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html"
@@ -559,11 +559,11 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html
   ;; Non-Standard Variable Names?
   ;;---
   ;; If we had a syntax table, and if it's not named `<mode>-syntax-table'
-  ;; (`innit-package-upgrade-mode-syntax-table'), say so:
-  ;; :syntax-table int<innit>:package/mode:syntax-table
+  ;; (`package-upgrade-mode-syntax-table'), say so:
+  ;; :syntax-table _:package:mode:syntax-table
   ;; Don't want an `abbrev-table' as we're a read-only mode so it's a bit
   ;; pointless, but same thing as the `:syntax-table' arg.
-  ;; :abbrev-table int<innit>:package/mode:abbrev-table
+  ;; :abbrev-table _:package:mode:abbrev-table
 
   ;;------------------------------
   ;; BODY
@@ -572,7 +572,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html
   ;;---
   ;; Fontification / Colorization / Syntax Highlighting
   ;;---
-  (setq font-lock-defaults int<innit>:package/mode:font-lock-defaults)
+  (setq font-lock-defaults _:package:mode:font-lock-defaults)
 
   ;;---
   ;; Other Things
@@ -587,10 +587,10 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html
 
 ;; NOTE: We aren't a file-based mode, so we don't register ourselves for anything in `auto-mode-alist'.
 ;; ;;;###autoload
-;; (add-to-list 'auto-mode-alist '("\\.fileextension" . innit-package-upgrade-mode))
+;; (add-to-list 'auto-mode-alist '("\\.fileextension" . package-upgrade-mode))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :innit 'package 'upgrade 'mode)
+(imp-provide package upgrade mode)
