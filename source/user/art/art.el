@@ -1,10 +1,10 @@
-;;; modules/input/art.el --- Artsy Stuff -*- lexical-binding: t; -*-
+;;; user/art/box.el --- Box Drawing -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-11
-;; Timestamp:  2023-06-29
+;; Timestamp:  2025-11-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,16 +12,12 @@
 ;;
 ;;; Commentary:
 ;;
-;; Artsy Stuff
 ;;
 ;;; Code:
 
 
 (require 'hydra)
-
-
-(imp:require :buffer 'manage)
-(imp:require :mantle 'config 'hydra)
+(imp-require 'buffer 'manage)
 
 
 ;;------------------------------------------------------------------------------
@@ -160,10 +156,10 @@
 ;; Single Lines Hydra
 ;;------------------------------------------------------------------------------
 
-(defhydra art:hydra:box/single (:color amaranth ;; default to warn if non-hydra key
-                                ;;:color pink   ;; defaults to not exit unless explicit
-                                ;;:idle 0.75    ;; no help for x seconds
-                                :hint none)     ;; no hint - just docstr
+(defhydra /art/hydra/box/single (:color amaranth ; default to warn if non-hydra key
+                                 ;;:color pink   ; defaults to not exit unless explicit
+                                 ;;:idle 0.75    ; no help for x seconds
+                                 :hint none)     ; no hint - just docstr
   "
 Draw box characters.
 _'_: ?'?  _,_: ?,?  _._: ?.?   _p_: ?p?   ^ ^  ^ ^     ^ ^        _c_: up    ^ ^            _-_: undo     _d_: ?d?
@@ -228,22 +224,22 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;; Movement Keys
   ;;------------------------------
   ("c"
-   (if (imp:flag? :keybinds +evil)
+   (if (featurep 'evil)
        (evil-previous-line)
      (previous-line))
    "up")
   ("h"
-      (if (imp:flag? :keybinds +evil)
+      (if (featurep 'evil)
           (evil-backward-char)
         (backward-char))
       "left")
   ("t"
-      (if (imp:flag? :keybinds +evil)
+      (if (featurep 'evil)
           (evil-next-line)
         (next-line))
       "down")
   ("n"
-      (if (imp:flag? :keybinds +evil)
+      (if (featurep 'evil)
           (evil-forward-char)
         (forward-char))
       "right")
@@ -255,21 +251,20 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ("<insert>"
    #'buffer:overwrite:toggle
    (if (buffer:overwriting?)
-       (if (imp:flag? :keybinds +evil) "insert state" "insert mode")
-     (if (imp:flag? :keybinds +evil) "replace state" "overwrite mode")))
+       (if (featurep 'evil) "insert state" "insert mode")
+     (if (featurep 'evil) "replace state" "overwrite mode")))
   ("x"
-   (if (imp:flag? :keybinds +evil)
+   (if (featurep 'evil)
        (evil-delete-char)
      (delete-char 1))
    "delete char")
   ("X"
-   (if (imp:flag? :keybinds +evil)
+   (if (featurep 'evil)
        (evil-delete-backward-char)
      (delete-backward-char 1))
    "delete backwards char")
-  ;; TODO-meow: Check for `undo-tree'? Or use evil/meow undo (and redo?) command?
   ("-"
-   (if (imp:flag? :emacs +undo-tree)
+   (if (featurep 'undo-tree)
        (undo-tree-undo)
      (undo))
    "undo")
@@ -289,7 +284,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ("d"   (hydra:nest 'art:hydra:box/double) "double lines (╬)" :exit t)
   ("G"
-   (cond ((imp:flag? :keybinds +evil)
+   (cond ((featurep 'evil)
           ;; TODO-evil: this never did anything special when I was using evil,
           ;; so I think it works right? Then again, I almost never use(d) it...
           ;;
@@ -300,7 +295,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
          (t
           nil))
    (concat "quit"
-           (cond ((imp:flag? :keybinds +evil)
+           (cond ((featurep 'evil)
                   " (to insert state)")
                  ((imp:flag? :keybinds +meow)
                   " (to insert mode)")
@@ -308,7 +303,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
                   nil)))
    :color blue)
   ("g"
-   (cond ((imp:flag? :keybinds +evil)
+   (cond ((featurep 'evil)
           (evil-normal-state))
          ((imp:flag? :keybinds +meow)
           (unless (meow-normal-mode-p)
@@ -316,7 +311,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
          (t
           nil))
    (concat "quit"
-           (cond ((imp:flag? :keybinds +evil)
+           (cond ((featurep 'evil)
                   " (to normal state)")
                  ((imp:flag? :keybinds +meow)
                   " (to normal mode)")
@@ -324,7 +319,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
                   nil)))
    :color blue)
   ("C-g"
-   (cond ((imp:flag? :keybinds +evil)
+   (cond ((featurep 'evil)
           (evil-normal-state))
          ((imp:flag? :keybinds +meow)
           (unless (meow-normal-mode-p)
@@ -332,7 +327,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
          (t
           nil))
    (concat "quit"
-           (cond ((imp:flag? :keybinds +evil)
+           (cond ((featurep 'evil)
                   " (to normal state)")
                  ((imp:flag? :keybinds +meow)
                   " (to normal mode)")
@@ -390,22 +385,22 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;; Movement Keys
   ;;------------------------------
   ("c"
-   (if (imp:flag? :keybinds +evil)
+   (if (featurep 'evil)
        (evil-previous-line)
      (previous-line))
    "up")
   ("h"
-      (if (imp:flag? :keybinds +evil)
+      (if (featurep 'evil)
           (evil-backward-char)
         (backward-char))
       "left")
   ("t"
-      (if (imp:flag? :keybinds +evil)
+      (if (featurep 'evil)
           (evil-next-line)
         (next-line))
       "down")
   ("n"
-      (if (imp:flag? :keybinds +evil)
+      (if (featurep 'evil)
           (evil-forward-char)
         (forward-char))
       "right")
@@ -417,15 +412,15 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ("<insert>"
    #'buffer:overwrite:toggle
    (if (buffer:overwriting?)
-       (if (imp:flag? :keybinds +evil) "insert state" "insert mode")
-     (if (imp:flag? :keybinds +evil) "replace state" "overwrite mode")))
+       (if (featurep 'evil) "insert state" "insert mode")
+     (if (featurep 'evil) "replace state" "overwrite mode")))
   ("x"
-   (if (imp:flag? :keybinds +evil)
+   (if (featurep 'evil)
        (evil-delete-char)
      (delete-char 1))
    "delete char")
   ("X"
-   (if (imp:flag? :keybinds +evil)
+   (if (featurep 'evil)
        (evil-delete-backward-char)
      (delete-backward-char 1))
    "delete backwards char")
@@ -451,7 +446,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ("d"   (hydra:nest 'art:hydra:box/single) "single lines (┼)" :exit t)
   ("G"
-   (cond ((imp:flag? :keybinds +evil)
+   (cond ((featurep 'evil)
           ;; TODO-evil: this never did anything special when I was using evil,
           ;; so I think it works right? Then again, I almost never use(d) it...
           ;;
@@ -462,7 +457,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
          (t
           nil))
    (concat "quit"
-           (cond ((imp:flag? :keybinds +evil)
+           (cond ((featurep 'evil)
                   " (to insert state)")
                  ((imp:flag? :keybinds +meow)
                   " (to insert mode)")
@@ -470,7 +465,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
                   nil)))
    :color blue)
   ("g"
-   (cond ((imp:flag? :keybinds +evil)
+   (cond ((featurep 'evil)
           (evil-normal-state))
          ((imp:flag? :keybinds +meow)
           (unless (meow-normal-mode-p)
@@ -478,7 +473,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
          (t
           nil))
    (concat "quit"
-           (cond ((imp:flag? :keybinds +evil)
+           (cond ((featurep 'evil)
                   " (to normal state)")
                  ((imp:flag? :keybinds +meow)
                   " (to normal mode)")
@@ -486,7 +481,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
                   nil)))
    :color blue)
   ("C-g"
-   (cond ((imp:flag? :keybinds +evil)
+   (cond ((featurep 'evil)
           (evil-normal-state))
          ((imp:flag? :keybinds +meow)
           (unless (meow-normal-mode-p)
@@ -494,7 +489,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
          (t
           nil))
    (concat "quit"
-           (cond ((imp:flag? :keybinds +evil)
+           (cond ((featurep 'evil)
                   " (to normal state)")
                  ((imp:flag? :keybinds +meow)
                   " (to normal mode)")
@@ -558,4 +553,4 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
 ;;------------------------------------------------------------------------------
 ;; The End
 ;;------------------------------------------------------------------------------
-(imp:provide :input 'art)
+(imp-provide art box)
