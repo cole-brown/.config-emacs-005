@@ -4118,6 +4118,11 @@ CLOSED: [2025-11-03 Mon 13:50]
 
 BE ON ~feature/namespaced~ GIT BRANCH!!!!
 
+** ├DONE───┤ make most of namespaced stuff loadable
+CLOSED: [2025-11-10 Mon 22:35]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-11-10 Mon 22:35]
+:END:
 done:
   - [X] elisp (done-ish)
   - [X] datetime
@@ -4127,12 +4132,10 @@ done:
   - [X] color/init
   - [X] list/init
   - [X] path/init
+  - [X] str (finish)
+  - [X] theme (finish)
+  - [X] buffer/+...
 
-╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-╠══TODO══╣            ║                                                                                                          ║
-╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
-╠══TODO══╣            ║                                                                                                          ║
-╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 BE ON ~feature/namespaced~ GIT BRANCH!!!!
 
 query regex replace =M-S-C-%=:
@@ -4140,15 +4143,121 @@ query regex replace =M-S-C-%=:
   to:   _:\1
 
 And then?
-  - [ ] str (finish)
-  - [ ] theme (finish)
-  - [ ] emacs/init
-  - [ ] input/init
-  - [ ] output/init
-  - [ ] elisp/dlv/...
-    - [[file:source/core/packages/namespaced/elisp/init.el::;; (imp ./dlv/init)][here]]
-  - [ ] buffer/+...
-    - [[file:source/core/packages/namespaced/buffer/init.el::;; (imp buffer:/+commands)][here]]
+  - [X] input/init
+    - this is my box drawing hydra
+    - Not namespaced.
+    - [X] move to user/art?
+    - [X] add hydra package to init
+      - moved to [[*pkg: hydra][pkg: hydra]]
+  - [X] output/init
+    - this is ~nub~
+    - Not namespaced.
+    - [X] Put in source/core/packages/_delete-maybe/nub
+
+** ├CURRENT┤ ns/emacs sort, refactor, etc
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-11-10 Mon 22:34]
+:END:
+
+1. I don't think I should name this one "emacs".
+2. Its actually ~innit~ and ~system~.
+3. ~emacs/init.el~ does not load anything.
+4. do they really belong in "namespaced"?
+   - They belong in source/user/???/...
+   - or core/packages/???
+
+well, look at all the files and figure out what to do.
+
+
+delete files:
+  - [X] nine of 'em
+
+move:
+  - [X] ns/emacs/os.el -> ns/system/os.el
+    - [[file:source/core/packages/namespaced/emacs/init/os.el::;; TODO(namespaced): move to ns/os/init.el][here]]
+    - and add to ns/init.el
+  - [X] ns/emacs/package-upgrade-* -> ns/package/
+    - 2 files
+    - and add to ns/init.el
+  - [X] ns/emacs/init/* -> ns/emacs/*
+    - [X] ns/emacs/server.el -> ???
+      - ...this one might actually belong in ~emacs~
+      - [[file:source/core/packages/namespaced/emacs/init/server.el][here]]
+    - [X] ns/emacs/squelch.el
+      - this might actually belong here too
+
+pblblblblfffft
+Still can't call it ~emacs~; that already has a feature:
+#+begin_src elisp
+(featurep 'emacs)
+#+end_src
+
+#+RESULTS:
+: t
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+rename ns/emacs
+  - [ ] to?!?
+    - [ ] emacsns or emacs-ns or nsemacs or ns-emacs or ns/emacs or ...
+    - [ ] emacs-actual
+or... move server and squelch elsewhere?
+  - [ ] squelch:
+    - [ ] ns/squelch.el?
+    - [ ] ns/squelch/init.el?
+    - [ ] ns/output/squelch.el?
+    - [ ] ns/message/squelch.el?
+  - [ ] server:
+    - Emacs's shit is in ~(featurep 'server)~
+    - [ ] ns/daemon/init.el
+    - [ ] ns/server/init.el
+    - [ ] ns/emacs-server/init.el
+
+Hm......
+  - dir:     ~emacs~
+  - feature: ~ns/emacs~
+  - funcs:
+    - ~squelch:...~
+    - ~emacs:server:...~ or ~server:...~?
+yes/no?
+
+
+
+
+
+
+refactor:
+  - [ ] server.el
+  - [ ] squelch.el
+
+
+** ns/emacs/system
+
+contains:
+  - secret
+  - multiplexer
+
+*** secret
+
+Move secret to user/secret?
+  - probably slate it all for deletion?
+    - current way seems to work well?
+      - except needs a system multiplexer bit...
+
+*** multiplexer
+
+Move to ns/system/multiplexer?
+  - trim down?
+
+** refactor: elisp/dlv/...
+
+see
+  - [[file:source/core/packages/namespaced/elisp/dlv/init.el][here]]
+  - uncomment: [[file:source/core/packages/namespaced/elisp/init.el::;; (imp ./dlv/init)][here]]
+
 
 ** rename str to string?
 
@@ -4201,6 +4310,20 @@ put that in my init
 
 deadgrep for "int<" in namespaced dir.
 replace all ~int<NAME>:...~ with ~_:$NAME:...~
+
+* pkg: hydra
+
+get config from 004:
+  - +file:../2023-07-23_sn004/mantle/config/undo-tree.el+
+
+load user/art/init.el in init
+  - or just user/art/box.el?
+
+* pkg: undo-tree
+
+add undo-tree
+get config from 004:
+  - file:../2023-07-23_sn004/mantle/config/undo-tree.el
 
 * ├CURRENT┤ csharp & treesit?
 :LOGBOOK:
@@ -4320,6 +4443,17 @@ Fix to eval after said feature.
 
 
 
+* source/core/packages/_todo
+
+has:
+  - signature
+    - want
+  - taskspace
+    - want
+  - template
+    - hmmm....
+
+
 * my public IP(s)
 
 is there a package that will figure out my IP for me?
@@ -4378,7 +4512,7 @@ Do whatever `imp` does for that.
 I think the macro returns code so that when the code runs
 there isn't a macro in the way.
 
-* imp/path: move imp :path normalizers to path.el
+o* imp/path: move imp :path normalizers to path.el
 
 Integrate them into eg `imp-path` function.
 
