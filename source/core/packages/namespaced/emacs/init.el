@@ -1,10 +1,10 @@
-;;; modules/tools/init.el --- `:tools' namespace -*- lexical-binding: t; -*-
+;;; namespaced/jeff/init.el --- Emacs servers, messages, etc -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-11
-;; Timestamp:  2023-06-29
+;; Timestamp:  2025-11-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,27 +12,22 @@
 ;;
 ;;; Commentary:
 ;;
-;;  `:tools' namespace initialization
-;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; Set-Up.
+;; Setup
 ;;------------------------------------------------------------------------------
 
-(imp:path:root/set :tools
-                   (imp:path:current:dir))
+(imp-path-root-set 'jeff (imp-path-current-dir))
 
 
 ;;------------------------------------------------------------------------------
-;; Loading.
+;; Loading...
 ;;------------------------------------------------------------------------------
-
-;; Don't load any of the `:tools' modules - let the user decided what to do.
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :tools)
+(imp-provide jeff)
