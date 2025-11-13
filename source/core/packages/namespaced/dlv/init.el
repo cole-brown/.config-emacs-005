@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-10
-;; Timestamp:  2023-06-21
+;; Timestamp:  2025-11-12
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -15,14 +15,6 @@
 ;; Code-Defined Directory Local Variables
 ;; Code-Defined File Local Variables
 ;;
-;; ------------------------------
-;; NOTE: Namespaces
-;; ---
-;; dlv has three 'namespace' prefixes:
-;;   `dlv:'       - public/API functions, variables, etc
-;;   `int<dlv>:'  - private/internal functions, variables, etc
-;;   `test<dlv>:' - Emacs ERT functions, variables, etc
-;; ------------------------------
 ;;
 ;; `dlv' looks for these `imp:flag' flags:
 ;;   - `:dlv +debug' : Default to enabling `:info' and `:debug' log statements.

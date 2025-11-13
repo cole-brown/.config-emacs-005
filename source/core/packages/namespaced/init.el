@@ -52,15 +52,8 @@
   (imp ./system/init)  ; requires `path'
   (imp ./emacs-server) ; requires `path'
 
-
-
-  ;; TODO: refactor the rest of 'em:
-  ;; (imp "./input/init")
-  ;; (imp "./output/init")
-  ;; (imp "./emacs/init")
-
-
-  ;; End load timing.
+  ;; TODO: DLV!
+  ;; (imp ./dlv/init)
   )
 
 
