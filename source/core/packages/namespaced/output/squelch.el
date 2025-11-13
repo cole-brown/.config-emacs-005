@@ -1,10 +1,10 @@
-;;; core/modules/emacs/innit/squelch.el --- Squelch Output -*- lexical-binding: t; -*-
+;;; namespaced/output/squelch.el --- Squelch Output -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-01
-;; Timestamp:  2023-06-22
+;; Timestamp:  2025-11-12
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,32 +12,36 @@
 ;;
 ;;; Commentary:
 ;;
-;; Squelch / Quiet / Silence / Muffle / Whatever your output.
+;; Squelch / Quiet / Silence / Muffle / Whatever Your Output
+;;
+;; Essentially, squelch is a specialized type of noise gate designed to
+;; suppress weak signals.
+;;   - https://en.wikipedia.org/wiki/Squelch
 ;;
 ;;; Code:
 
-
 (require 'cl-macs)
+
+;; TODO(debug): move this to debug.el?
+(defun debug:debugging? ()
+  "Are we debugging right now?"
+  (or debug-on-error
+      debug-on-quit
+      init-file-debug))
 
 ;;------------------------------------------------------------------------------
 ;; Silent Function Replacements
 ;;------------------------------------------------------------------------------
 
-;;------------------------------
-;; Save Originals
-;;------------------------------
+;; Save originals so we can still call them when we have them redefined.
 
-(defconst innit:unsquelched:write-region    (symbol-function #'write-region))
-(defconst innit:unsquelched:load            (symbol-function #'load))
-(defconst innit:unsquelched:message         (symbol-function #'message))
-(defconst innit:unsquelched:standard-output standard-output)
+(defconst _:output:unsquelched:write-region    (symbol-function #'write-region))
+(defconst _:output:unsquelched:load            (symbol-function #'load))
+(defconst _:output:unsquelched:message         (symbol-function #'message))
+(defconst _:output:unsquelched:standard-output standard-output)
 
 
-;;------------------------------
-;; Silent Replacements
-;;------------------------------
-
-(defun innit:squelch:write-region (start end filename &optional append visit lockname mustbenew)
+(defun output:squelch:write-region (start end filename &optional append visit lockname mustbenew)
   "Silent version of `write-region'.
 
 See `write-region' for details on args: START, END, FILENAME, APPEND, VISIT,
@@ -45,7 +49,7 @@ LOCKNAME, and MUSTBENEW.
 
 Will set VISIT to `no-message' before calling `write-region' unless it is
 non-nil."
-  (funcall innit:unsquelched:write-region
+  (funcall _:output:unsquelched:write-region
            start
            end
            filename
@@ -55,13 +59,13 @@ non-nil."
            mustbenew))
 
 
-(defun innit:squelch:load (file &optional noerror nomessage nosuffix must-suffix)
+(defun output:squelch:load (file &optional noerror nomessage nosuffix must-suffix)
   "Silent version of `load'.
 
 See `load' for details on args: FILE, NOERROR, NOMESSAGE, NOSUFFIX, MUST-SUFFIX
 
 Ignore NOMESSAGE and call `load' with NOMESSAGE == `:no-message' instead."
-  (funcall innit:unsquelched:load
+  (funcall _:output:unsquelched:load
            file
            noerror
            :no-message
@@ -69,14 +73,14 @@ Ignore NOMESSAGE and call `load' with NOMESSAGE == `:no-message' instead."
            must-suffix))
 
 
-(defun innit:squelch:message (&rest _)
+(defun output:squelch:message (&rest _)
   "Like `message', except it will ignore all inputs and do nothing."
   ;; Take message format string and args and I don't care.
   ;; We're being silent.
   nil)
 
 
-(defun innit:squelch:standard-output (&rest _)
+(defun output:squelch:standard-output (&rest _)
   "A character output stream to nowhere.
 
 `standard-output' is generally t for having `print' output to echo area. Set
@@ -90,7 +94,7 @@ Ignore NOMESSAGE and call `load' with NOMESSAGE == `:no-message' instead."
 ;; Squelch API
 ;;------------------------------------------------------------------------------
 
-(defmacro innit:squelch (&rest forms)
+(defmacro output:squelch (&rest forms)
   "Run FORMS without generating any output.
 
 This silences calls to `message', `load', `write-region' and anything that
@@ -98,12 +102,10 @@ writes to `standard-output'. In interactive sessions this won't suppress writing
 to *Messages*, only inhibit output in the echo area.
 
 Originally from Doom's `quiet!' macro."
-  ;; Can use `innit:debug?' optional param `:any' if we want to not squelch for
-  ;; any of: `innit:debug?', `debug-on-error', `init-file-debug'
-  `(if (innit:debug?)
+  `(if (debug:debugging?)
        ;; Debugging; don't squelch!
        (progn ,@forms)
-     ,(if innit:interactive?
+     ,(if (not noninteractive)
           ;; Be less bossy; allow output to *Messages* buffer but not to the
           ;; minibuffer.
           `(let ((inhibit-message t)
@@ -116,14 +118,14 @@ Originally from Doom's `quiet!' macro."
                (message "")))
         ;; Full powered squelching; prevent output by just redefining commonly
         ;; chatty functions.
-        `(cl-letf ((standard-output                 #'innit:squelch:standard-output)
-                  ((symbol-function #'message)      #'innit:squelch:message)
-                  ((symbol-function #'load)         #'innit:squelch:load)
-                  ((symbol-function #'write-region) #'innit:squelch:write-region))
+        `(cl-letf ((standard-output                 #'output:squelch:standard-output)
+                  ((symbol-function #'message)      #'output:squelch:message)
+                  ((symbol-function #'load)         #'output:squelch:load)
+                  ((symbol-function #'write-region) #'output:squelch:write-region))
            ,@forms))))
 
 
-(defun innit:advice:squelch (fn &rest args)
+(defun output:advice:squelch (fn &rest args)
   "Generic advice function for silencing noisy functions.
 
 Lexically set some variables to squelch output, then call FN with ARGS,
@@ -135,24 +137,24 @@ minibuffer. They are still logged to *Messages*.
 In tty Emacs, messages are suppressed completely.
 
 Usage:
-  (advice-add #'undo-tree-save-history :around #'innit:advice:squelch)
+  (advice-add #'undo-tree-save-history :around #'output:advice:squelch)
 
 Originally from Doom's `doom-shut-up-a' function."
-  (innit:squelch (apply fn args)))
+  (output:squelch (apply fn args)))
 
 
-(cl-defmacro innit:squelch/unless (&rest forms
-                                   &key  interactive?
-                                         innit-debug?
-                                         allow-message?
-                                   &allow-other-keys)
+(cl-defmacro output:squelch/unless (&rest forms
+                                    &key  interactive?
+                                    output-debug?
+                                    allow-message?
+                                    &allow-other-keys)
   "Run FORMS, probably without generating any output.
 
 If INTERACTIVE? is non-nil, squelch unless called by user (as per function
 `called-interactively-p').
 
-If INNIT-DEBUG? is non-nil, squelch unless debugging (as per function
-`innit:debug?').
+If OUTPUT-DEBUG? is non-nil, squelch unless debugging (as per function
+`debug:debugging?').
 
 If ALLOW-MESSAGE? is non-nil, allow `message' output to '*Messages*' buffer.
 Will clear the minibuffer after FORMS are run.
@@ -169,7 +171,7 @@ Originally from Doom's `quiet!' macro."
         macro:body)
     (dolist (form forms)
       ;; If this is one of our keywords, save that fact for the next `form' in FORMS.
-      (cond ((memq form '(:interactive? :innit-debug? :allow-message?))
+      (cond ((memq form '(:interactive? :output-debug? :allow-message?))
              (setq macro:key form))
 
             ;; Last `form' was one of our keywords, so this one is its value.
@@ -193,11 +195,8 @@ Originally from Doom's `quiet!' macro."
      ;; Normal / Unsquelched
      ;;------------------------------
      ;; Squelch unless debugging?
-     ((and innit-debug?
-           ;; Could use `innit:debug?' optional param `:any' here, if we want to
-           ;; not squelch for any of: `innit:debug?', `debug-on-error',
-           ;; `init-file-debug'.
-           (innit:debug?))
+     ((and output-debug?
+           (debug:debugging?))
       ;; We are debugging and don't want to squelch!
       `(progn ,@macro:body))
 
@@ -213,7 +212,7 @@ Originally from Doom's `quiet!' macro."
      ;; Allow message output?
      ;;   - But only if Emacs able to be interacted with (e.g. not batch mode).
      ((and allow-message?
-           innit:interactive?)
+           (not noninteractive))
       ;; Be less bossy; allow output to *Messages* buffer but not to the
       ;; minibuffer.
       `(let ((inhibit-message t)
@@ -228,16 +227,16 @@ Originally from Doom's `quiet!' macro."
      ;; Full powered squelching!
      (t
       ;; Prevent output by just redefining commonly chatty functions.
-      `(cl-letf ((standard-output                  #'innit:squelch:standard-output)
-                 ((symbol-function #'message)      #'innit:squelch:message)
-                 ((symbol-function #'load)         #'innit:squelch:load)
-                 ((symbol-function #'write-region) #'innit:squelch:write-region))
+      `(cl-letf ((standard-output                  #'output:squelch:standard-output)
+                 ((symbol-function #'message)      #'output:squelch:message)
+                 ((symbol-function #'load)         #'output:squelch:load)
+                 ((symbol-function #'write-region) #'output:squelch:write-region))
          ,@macro:body)))))
-;; (innit:squelch/unless :interactive? t :allow-message? t (message "hello there"))
-;; (innit:squelch/unless :interactive? t (message "hello there"))
+;; (output:squelch/unless :interactive? t :allow-message? t (message "hello there"))
+;; (output:squelch/unless :interactive? t (message "hello there"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :innit 'squelch)
+(imp-provide output squelch)
