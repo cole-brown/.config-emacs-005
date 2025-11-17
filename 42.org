@@ -4154,8 +4154,10 @@ And then?
     - Not namespaced.
     - [X] Put in source/core/packages/_delete-maybe/nub
 
-** ├CURRENT┤ ns/emacs sort, refactor, etc
+** ├DONE───┤ ns/emacs sort, refactor, etc
+CLOSED: [2025-11-12 Wed 21:32]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-12 Wed 21:32]
 - State "├CURRENT┤"  from              [2025-11-10 Mon 22:34]
 :END:
 
@@ -4204,12 +4206,15 @@ rename ns/emacs
   - [ ] to?!?
     - [ ] emacsns or emacs-ns or nsemacs or ns-emacs or ns/emacs or ...
     - [ ] emacs-actual
+
 or... move server and squelch elsewhere?
   - [ ] squelch:
     - [ ] ns/squelch.el?
     - [ ] ns/squelch/init.el?
     - [ ] ns/output/squelch.el?
     - [ ] ns/message/squelch.el?
+    - Essentially, squelch is a specialized type of noise gate designed to suppress weak signals.
+      - https://en.wikipedia.org/wiki/Squelch
   - [ ] server:
     - Emacs's shit is in ~(featurep 'server)~
     - [ ] ns/daemon/init.el
@@ -4224,92 +4229,74 @@ Hm......
     - ~emacs:server:...~ or ~server:...~?
 yes/no?
 
-
-
-
-
+Mmmh.....
+    - [ ] ns/output/squelch.el
+    - [X] ns/emacs-server.el
+      - beh. wanna emacs/server.el :(
+      - ok use this I guess
 
 refactor:
-  - [ ] server.el
+  - [X] server.el
   - [ ] squelch.el
 
+blerh.
+Need a ~debug~ after all maybe.
+There's: ~debug-on-error~, ~init-file-debug~
 
-** ns/emacs/system
+what was this?
+~output:interactive?~
+[[file:source/core/packages/namespaced/emacs/squelch.el::output:interactive?)][here]]
+
+refactor:
+  - [X] server.el
+  - [X] squelch.el
+
+move to output/
+  - k
+
+
+** ├DONE───┤ ns/emacs/system
+CLOSED: [2025-11-12 Wed 21:46]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-12 Wed 21:46]
+- State "├CURRENT┤"  from              [2025-11-12 Wed 21:36]
+:END:
 
 contains:
   - secret
   - multiplexer
 
-*** secret
+Neither of these is really a ~namespaced~ thing tho, right?
 
-Move secret to user/secret?
-  - probably slate it all for deletion?
-    - current way seems to work well?
-      - except needs a system multiplexer bit...
+stuff them into user/_todo and be done.
 
-*** multiplexer
 
-Move to ns/system/multiplexer?
-  - trim down?
-
-** refactor: elisp/dlv/...
+** ├DONE───┤ refactor: elisp/dlv/
+CLOSED: [2025-11-17 Mon 15:40]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-17 Mon 15:40]
+- State "├CURRENT┤"  from              [2025-11-12 Wed 21:47]
+:END:
 
 see
   - [[file:source/core/packages/namespaced/elisp/dlv/init.el][here]]
   - uncomment: [[file:source/core/packages/namespaced/elisp/init.el::;; (imp ./dlv/init)][here]]
 
+mmmh.......
+Is this really elisp though?
+Maybe it should just be ~namespaced/dlv~?
+  - yeah...
+  - [X] k
 
-** rename str to string?
+refactor shit....
 
-so that they show up with the string functions?
+[[file:source/core/packages/namespaced/dlv/init.el::TODO TODO HERE][u r here]]
 
-** use window
+* pkg: undo-tree
 
-want my ~window:kill-or-quit~
-  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
-  - and ~deadgrep~ maybe?
-
-** slash instead of colon?
-
-Slash seems like maybe a better separator?
-
-** path - update/add funcs from imp/path.el
-
-wait til they're all settled though?
-  - [[*imp/path: move imp :path normalizers to path.el][imp/path: move imp :path normalizers to path.el]]
-
-** defgroups - no "group" in name
-
-deadgrep for it inside the ~namespaced~ dir.
-
-** buffer:/line remaps
-
-[[file:source/core/packages/namespaced/buffer/line.el::;; (use-package emacs][line.el]]
-
-#+begin_src elisp
-;; (use-package emacs
-;;
-;;   ;;------------------------------
-;;   :bind ; emacs
-;;   ;;------------------------------
-;;
-;;   ;; Remap C-a to `buffer:cmd:line/smart:move-beginning/logical'
-;;   (([remap move-beginning-of-line] . buffer:cmd:line/smart:move-beginning/logical)
-;;
-;;    ;; Remap C-a to `buffer:cmd:line/smart:move-beginning/visual' in visual-line-mode-map
-;;    :map visual-line-mode-map
-;;    ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning/visual)
-;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning/visual)
-;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end/visual)
-;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end/visual)))
-#+end_src
-
-put that in my init
-
-** private vars
-
-deadgrep for "int<" in namespaced dir.
-replace all ~int<NAME>:...~ with ~_:$NAME:...~
+add undo-tree
+get config from 004:
+  - file:../2023-07-23_sn004/mantle/config/undo-tree.el
 
 * pkg: hydra
 
@@ -4318,12 +4305,13 @@ get config from 004:
 
 load user/art/init.el in init
   - or just user/art/box.el?
+* source/_todo/multiplexer
 
-* pkg: undo-tree
+delete or use
 
-add undo-tree
-get config from 004:
-  - file:../2023-07-23_sn004/mantle/config/undo-tree.el
+* source/_todo/secret
+
+delete or use
 
 * ├CURRENT┤ csharp & treesit?
 :LOGBOOK:
@@ -4442,6 +4430,66 @@ example
 Fix to eval after said feature.
 
 
+
+* namespace again
+** rename str to string?
+
+so that they show up with the string functions?
+
+** use window
+
+want my ~window:kill-or-quit~
+  - for ~helpful~: [[file:source/user/config/help.el::;; TODO: needs namespaced:window lib][here]]
+  - and ~deadgrep~ maybe?
+
+** slash instead of colon?
+
+Slash seems like maybe a better separator?
+
+** ns/debug.el
+
+There's: ~debug-on-error~, ~init-file-debug~
+
+make file
+move func to it from [[file:source/core/packages/namespaced/emacs/squelch.el::;; TODO(debug): move this to debug.el?][here]]
+
+** path - update/add funcs from imp/path.el
+
+wait til they're all settled though?
+  - [[*imp/path: move imp :path normalizers to path.el][imp/path: move imp :path normalizers to path.el]]
+
+** defgroups - no "group" in name
+
+deadgrep for it inside the ~namespaced~ dir.
+
+** buffer:/line remaps
+
+[[file:source/core/packages/namespaced/buffer/line.el::;; (use-package emacs][line.el]]
+
+#+begin_src elisp
+;; (use-package emacs
+;;
+;;   ;;------------------------------
+;;   :bind ; emacs
+;;   ;;------------------------------
+;;
+;;   ;; Remap C-a to `buffer:cmd:line/smart:move-beginning/logical'
+;;   (([remap move-beginning-of-line] . buffer:cmd:line/smart:move-beginning/logical)
+;;
+;;    ;; Remap C-a to `buffer:cmd:line/smart:move-beginning/visual' in visual-line-mode-map
+;;    :map visual-line-mode-map
+;;    ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning/visual)
+;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning/visual)
+;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end/visual)
+;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end/visual)))
+#+end_src
+
+put that in my init
+
+** private vars
+
+deadgrep for "int<" in namespaced dir.
+replace all ~int<NAME>:...~ with ~_:$NAME:...~
 
 * source/core/packages/_todo
 
@@ -4785,37 +4833,6 @@ Skip/avoid for now?
 
     
     
-* "REFACTOR": namespaced
-
-Need to refactor a buncha shite
-
-Make a func that does all the function/var find & replace stuff?
-
-M-x refactor-go-brrr
-
-
-(defvar refactoring
-  '(("imp:foo:bar/baz" . "imp-foo-bar-baz")
-    ("imp:old:name" . "imp-name-something-different")
-    ...)
-  "alist of strings: (rx-to-find . replacement-str)")
-
-Overall init file [[file:source/core/packages/namespaced/init.el][here]]
-  - [ ] finish elisp/
-  - [ ] finish str/
-  - [ ] finish init/
-  - [ ] start the rest...
-
-* "REFACTOR": zenburn
-
-Finish the zenburn refactor.
-
-do
-  - [ ] config/theme/zenburn/org.el
-  - [ ] config/theme/zenburn/whitespace.el
-  - [ ] config/theme/zenburn/init.el
-    - partially done; finish
-
 * repo buffernames
 
 TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
