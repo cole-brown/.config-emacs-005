@@ -1,10 +1,10 @@
-;;; core/modules/emacs/dlv/+display.el --- Display DLV info. -*- lexical-binding: t; -*-
+;;; namespaced/dlv/+display.el --- Display DLV info. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-21
-;; Timestamp:  2023-07-18
+;; Timestamp:  2025-11-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -19,7 +19,7 @@
 ;;; Code:
 
 
-(imp:require :dlv 'dlv)
+(imp-require dlv:/dlv)
 
 
 ;;------------------------------------------------------------------------------
@@ -34,7 +34,6 @@ EXPECTED is output with actual value, and also used to check DLV safeness via
 
 Output to '*Messages*' buffer."
   (let ((func/name "dlv:check")
-        ;; (func/tags '(:info))
         (file/existed? (file-exists-p filepath))
         (buffer/existed? (get-file-buffer filepath))
         buffer/local
@@ -95,11 +94,11 @@ Output to '*Messages*' buffer."
 ;; (let* ((dir "~/dlv-test/")
 ;;        (filename (format "locals-%S.txt" (datetime:format 'iso-8601 'file)))
 ;;        (filepath (concat dir filename))
-;;        (class 'int<dlv>:test:class)
+;;        (class '_:dlv:test:class)
 ;;        (mode nil)
-;;        (tuple '(int<dlv>:test:variable :test/local int<dlv>:test:safe-p)))
+;;        (tuple '(_:dlv:test:variable :test/local _:dlv:test:safe-p)))
 ;;   (dlv:set class dir mode tuple)
-;;   (dlv:check filepath 'int<dlv>:test:variable :test/local))
+;;   (dlv:check filepath '_:dlv:test:variable :test/local))
 
 
 ;;------------------------------------------------------------------------------
@@ -116,7 +115,7 @@ Output to '*Messages*' buffer."
   (let ((func/name "dlv:cmd:buffer-locals:show/all")
         ;; (func/tags '(:cmd :info))
         )
-    (int<dlv>:message:boxed.xml :start func/name
+    (_:dlv:message:boxed.xml :start func/name
                                 (cons "buffer" (buffer-name))
                                 (cons "path" (buffer-file-name)))
     (message "")
@@ -124,7 +123,7 @@ Output to '*Messages*' buffer."
     (pp (buffer-local-variables))
 
     (message "")
-    (int<dlv>:message:boxed.xml :end func/name)))
+    (_:dlv:message:boxed.xml :end func/name)))
 
 
 (defun dlv:cmd:buffer-locals:show/dlvs ()
@@ -137,7 +136,7 @@ Output to '*Messages*' buffer."
   (let ((func/name "dlv:cmd:buffer-locals:show/dlvs")
         ;; (func/tags '(:cmd :info))
         )
-    (int<dlv>:message:boxed.xml :start func/name
+    (_:dlv:message:boxed.xml :start func/name
                                 (cons "buffer" (buffer-name))
                                 (cons "path" (buffer-file-name)))
     (message "")
@@ -148,17 +147,17 @@ Output to '*Messages*' buffer."
            (file-locals (alist-get 'file-local-variables-alist
                                    all-locals)))
 
-      (int<dlv>:message:line ?─)
+      (_:dlv:message:line ?─)
       (message "dir-local-variables-alist:")
       (pp dir-locals)
 
       (message "")
-      (int<dlv>:message:line ?─)
+      (_:dlv:message:line ?─)
       (message "file-local-variables-alist:")
       (pp file-locals))
 
     (message "")
-    (int<dlv>:message:boxed.xml :end func/name)))
+    (_:dlv:message:boxed.xml :end func/name)))
 
 
 (defun dlv:cmd:dir-locals/show/all (filepath)
@@ -197,28 +196,28 @@ Output to '*Messages*' buffer."
       (setq dlv.class-alist (funcall indent (funcall char-to-str dlv.class-alist)))
       (setq dlv.safe-local-vars (funcall indent (funcall char-to-str dlv.safe-local-vars))))
 
-    (int<dlv>:message:boxed.xml :start func/name (cons "path" filepath))
+    (_:dlv:message:boxed.xml :start func/name (cons "path" filepath))
     (message "")
 
     (message "`enable-local-variables': %S"
              enable-local-variables)
 
-    (int<dlv>:message:line ?─)
+    (_:dlv:message:line ?─)
     (message "dir local classes:\n%s"
              dlv.classes)
 
-    (int<dlv>:message:line ?─)
+    (_:dlv:message:line ?─)
     (message "`dir-locals-directory-cache':\n%s"
              dlv.dir-cache)
 
-    (int<dlv>:message:line ?─)
+    (_:dlv:message:line ?─)
     (message "`dir-locals-class-alist':\n%s"
              dlv.class-alist)
 
-    (int<dlv>:message:line ?─)
+    (_:dlv:message:line ?─)
     (message "`safe-local-variable-values':\n%s"
              dlv.safe-local-vars)
-    (int<dlv>:message:boxed.xml :end func/name)))
+    (_:dlv:message:boxed.xml :end func/name)))
 
 
 ;;------------------------------------------------------------------------------
@@ -227,14 +226,14 @@ Output to '*Messages*' buffer."
 ;; TODO: move all of these to mis/nub/whatever?
 ;;---
 
-(defmacro int<dlv>:message:stream.chars (stream)
+(defmacro _:dlv:message:stream.chars (stream)
   "Return a lambda that will store the supplied char into the STREAM variable."
-  `(let ((int<dlv>:message:stream.chars:stream ,stream))
-     (lambda (char) (setq int<dlv>:message:stream.chars:stream
-                          (cons char int<dlv>:message:stream.chars:stream)))))
+  `(let ((_:dlv:message:stream.chars:stream ,stream))
+     (lambda (char) (setq _:dlv:message:stream.chars:stream
+                          (cons char _:dlv:message:stream.chars:stream)))))
 
 
-(defun int<dlv>:message:stream->str (stream)
+(defun _:dlv:message:stream->str (stream)
   "Convert the character STREAM into a string destructively.
 
 Uses `nreverse' on STREAM."
@@ -242,7 +241,7 @@ Uses `nreverse' on STREAM."
 
 
 ;; TODO: Should this trim (just) before returing? Won't that mess up the first indent?
-(defun int<dlv>:message:indent (str &optional indent)
+(defun _:dlv:message:indent (str &optional indent)
   "Indent each line in STR by INDENT amount (default 2).
 
 Trim string of leading/trailing whitespace before returning."
@@ -256,17 +255,17 @@ Trim string of leading/trailing whitespace before returning."
                                      "\n"))))))
 
 
-(defun int<dlv>:message:line (char &optional width)
+(defun _:dlv:message:line (char &optional width)
   "Print a line of CHAR to the '*Messages*' buffer.
 
 If WIDTH is a positive integer, output line will be WIDTH wide.
 The default, otherwise, is 80.
 
-(int<dlv>:message:line ?─ 10)
+(_:dlv:message:line ?─ 10)
   -> \"\n──────────\n\"
-(int<dlv>:message:line ?- 10)
+(_:dlv:message:line ?- 10)
   -> \"\n----------\n\"
-(int<dlv>:message:line ?x 10)
+(_:dlv:message:line ?x 10)
   -> \"\nxxxxxxxxxx\n\""
   ;; Figure out what width to use.
   (let ((width.usable (if (and (integerp width) (> width 0))
@@ -276,7 +275,7 @@ The default, otherwise, is 80.
              (make-string width.usable char))))
 
 
-(defun int<dlv>:message:boxed.xml (start? title &rest kvp)
+(defun _:dlv:message:boxed.xml (start? title &rest kvp)
   "Print a message boxed in an ASCII double-line box.
 
 Vaguely XML-themed format.
@@ -292,13 +291,13 @@ KVP, if not nil, should be 2-tuples (cons) of field-name and field-value
 strings.
 
 Example:
-\(int<dlv>:message:boxed.xml t \"testing\"
+\(_:dlv:message:boxed.xml t \"testing\"
                             (cons \"greeting\" \"hello\")
                             (cons \"subject\" \"world\"))
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ <testing                                                                     ║
-║   greeting=\"hello\"                                                           ║
-║   subject=\"world\">                                                           ║
+║   greeting=\"hello\"                                                         ║
+║   subject=\"world\">                                                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝"
   (let* ((width.total 80)
          (width.sides 2)
@@ -365,12 +364,12 @@ Example:
              line.width.middle
              "╝")
     nil))
-;; (int<dlv>:message:boxed.xml nil "testing")
-;; (int<dlv>:message:boxed.xml nil "testing" (cons "hello" "there"))
-;; (int<dlv>:message:boxed.xml t "testing" (cons "greeting" "hello") (cons "subject" "world"))
+;; (_:dlv:message:boxed.xml nil "testing")
+;; (_:dlv:message:boxed.xml nil "testing" (cons "hello" "there"))
+;; (_:dlv:message:boxed.xml t "testing" (cons "greeting" "hello") (cons "subject" "world"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :dlv 'display)
+(imp-provide dlv display)
