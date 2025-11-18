@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-30
+;; Timestamp:  2025-11-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -444,7 +444,7 @@ KWARGS should be a plist. All default to t:
 
 (defun imp-file-current (&optional no-ext)
   "Return the filename (no path, just filename) this is called from."
-  (funcall (if no-ext #'imp--path-sans-extension #'identity)
+  (funcall (if no-ext #'imp-path-sans-extension #'identity)
            (file-name-nondirectory (imp-path-current-file))))
 ;; (imp-file-current)
 ;; (imp-file-current t)
@@ -637,26 +637,26 @@ Return a string."
 
 
 ;; TODO(path): change to pass in EXT, check for EXT, remove if matching.
-(defun imp--path-sans-extension (&rest path)
+(defun imp-path-sans-extension (&rest path)
   "Join PATH elements together and then remove any extension.
 
-(imp--path-sans-extension \"jeff\" \"jill.el\")
+(imp-path-sans-extension \"jeff\" \"jill.el\")
   ->\"jeff/jill\""
   (file-name-sans-extension (imp-path-join path)))
-;; (imp--path-sans-extension "foo" "bar/")
-;; (imp--path-sans-extension "foo" "bar/" "baz.el")
+;; (imp-path-sans-extension "foo" "bar/")
+;; (imp-path-sans-extension "foo" "bar/" "baz.el")
 
 
-(defun imp--path-with-extension (path ext)
+(defun imp-path-with-extension (path ext)
   "Ensure PATH has an extension of EXT.
 
-(imp--path-with-extension \"jeff/jill.el\" \".el\")
+(imp-path-with-extension \"jeff/jill.el\" \".el\")
   ->\"jeff/jill.el\"
 
-(imp--path-with-extension \"jeff/jill\" \"el\")
+(imp-path-with-extension \"jeff/jill\" \"el\")
   ->\"jeff/jill.el\"
 
-(imp--path-with-extension \"jeff/jill..\" \"...el\")
+(imp-path-with-extension \"jeff/jill..\" \"...el\")
   ->\"jeff/jill.el\""
   (if (string-suffix-p ext path 'ignore-case)
       ;; PATH has suffix already. Do nothing.
@@ -669,9 +669,9 @@ Return a string."
      (replace-regexp-in-string (rx (one-or-more ".") string-end)
                                         ""
                                         ext))))
-;; (imp--path-with-extension "foo/bar/baz" ".el")
-;; (imp--path-with-extension "foo/bar/baz.el" "el")
-;; (imp--path-with-extension nil "el")
+;; (imp-path-with-extension "foo/bar/baz" ".el")
+;; (imp-path-with-extension "foo/bar/baz.el" "el")
+;; (imp-path-with-extension nil "el")
 
 
 ;;------------------------------------------------------------------------------
