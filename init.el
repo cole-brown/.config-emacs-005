@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-10-30
+;; Timestamp:  2025-11-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -250,7 +250,7 @@
 ;; PRIORITY: `imp'
 ;;------------------------------------------------------------------------------
 
-;; Let this load error; imps are a fundamental to this init.
+;; Let this load error; imps are fundamental to this init.
 (load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
 
 ;; Have imp time all `imp-load' and output a pretty buffer of info.
@@ -467,11 +467,6 @@
 
 
   ;;------------------------------------------------------------------------------
-  ;; PRIORITY: Everything: Emacs Settings
-  ;;------------------------------------------------------------------------------
-
-
-  ;;------------------------------------------------------------------------------
   ;; Chrome?: Colorize Color Codes
   ;;------------------------------------------------------------------------------
 
@@ -550,14 +545,8 @@
   ;;------------------------------------------------------------------------------
 
   (imp user:/config/emacs)
-
   (imp user:/config/help)
-
-
-  ;;------------------------------------------------------------------------------
-  ;; Whitespace
-  ;;------------------------------------------------------------------------------
-
+  (imp user:/config/undo)
   (imp user:/config/whitespace)
 
 
@@ -951,8 +940,8 @@ NOTE: This assumes you have set `use-package-hook-name-suffix' to nil:
    '(cape colorful-mode corfu deadgrep elisp-demos embark-consult git-gutter-fringe
           git-modes gptel hc-zenburn-theme helpful highlight-quoted hurl-mode
           macrostep magit marginalia minions no-littering orderless ox-gfm
-          rainbow-delimiters terraform-mode vertico ws-butler yaml-mode
-          yasnippet zenburn-theme))
+          rainbow-delimiters terraform-mode undo-tree vertico ws-butler
+          yaml-mode yasnippet zenburn-theme))
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode"))))
 (custom-set-faces
