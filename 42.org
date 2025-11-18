@@ -4305,6 +4305,11 @@ get config from 004:
 * -- U R HERE --
 <<here>>
 
+* ├CURRENT┤ init: break stuff off into files & imp them
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-11-17 Mon 16:21]
+:END:
+
 * pkg: hydra
 
 get config from 004:
@@ -4312,8 +4317,6 @@ get config from 004:
 
 load user/art/init.el in init
   - or just user/art/box.el?
-
-* init: break stuff off into files & imp them
 
 * source/_todo/multiplexer
 
@@ -4339,6 +4342,21 @@ mmmh... yay. -_-
 #+end_quote
 
 TODO: make csharp config file
+
+
+* imp-provide helper?
+
+turn this:
+#+begin_src elisp
+(imp-provide user (imp-path-relative 'user (imp-path-sans-extension (imp-path-current-file))))
+#+end_src
+
+into a func
+  - ~imp-provide-this~?
+
+#+begin_src elisp
+(imp-provide-this user)
+#+end_src
 
 
 * imp statistics
