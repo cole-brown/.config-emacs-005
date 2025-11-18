@@ -4108,11 +4108,10 @@ CLOSED: [2025-11-03 Mon 13:50]
 :END:
 
 
-* -- U R HERE --
-<<here>>
-
-* ├CURRENT┤ namespace
+* ├DONE───┤ namespace
+CLOSED: [2025-11-17 Mon 15:42]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-17 Mon 15:42]
 - State "├CURRENT┤"  from              [2025-11-03 Mon 22:13]
 :END:
 
@@ -4292,11 +4291,19 @@ refactor shit....
 
 [[file:source/core/packages/namespaced/dlv/init.el::TODO TODO HERE][u r here]]
 
-* pkg: undo-tree
+* ├DONE───┤ pkg: undo-tree
+CLOSED: [2025-11-17 Mon 16:02]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-11-17 Mon 16:02]
+:END:
 
 add undo-tree
 get config from 004:
   - file:../2023-07-23_sn004/mantle/config/undo-tree.el
+
+
+* -- U R HERE --
+<<here>>
 
 * pkg: hydra
 
@@ -4305,6 +4312,9 @@ get config from 004:
 
 load user/art/init.el in init
   - or just user/art/box.el?
+
+* init: break stuff off into files & imp them
+
 * source/_todo/multiplexer
 
 delete or use
