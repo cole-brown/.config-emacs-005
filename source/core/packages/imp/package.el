@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-20
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-11-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -46,61 +46,62 @@
 ;; TODO Make this an optional file?
 ;; TODO
 
-(cond ((not imp-use-package-extension-enabled)
-       nil)
-      ((not (featurep 'use-package))
-       ;; We need `use-package' to be loaded for e.g. `imp--use-package-keyword-add'.
-       (imp--output :info
-                    "imp/package.el"
-                    "`use-package' feature not loaded. Add to init before `imp': (require 'use-package)"))
-      (t
-       (progn
-         ;;----------------------------
-         ;; Define our `use-package' extension.
-         ;;----------------------------
+(with-eval-after-load 'use-package
 
-         (defconst imp--use-package-keyword :imp
-           "imp's keyword for `use-package'.")
+  (cond ((not imp-use-package-extension-enabled)
+         nil)
+        ((not (featurep 'use-package))
+         ;; We need `use-package' to be loaded for e.g. `imp--use-package-keyword-add'.
+         (imp--error "imp/package.el"
+                     "`use-package' feature not loaded. Add to init before `imp': (require 'use-package)"))
+        (t
+         (progn
+           ;;----------------------------
+           ;; Define our `use-package' extension.
+           ;;----------------------------
 
-
-         (defun imp--use-package-init-default ()
-           "Idempotently add `use-package-always-imp' to `use-package-defaults'."
-           (add-to-list 'use-package-defaults
-                        (list imp--use-package-keyword t)
-                        :append))
-         ;; (imp--use-package-init-default)
-         ;; use-package-defaults
+           (defconst imp--use-package-keyword :imp
+             "imp's keyword for `use-package'.")
 
 
-         (defun imp--use-package-init-keyword ()
-           "Idempotently add imp's keyword to `use-package-keywords'."
-           (unless (and (bound-and-true-p use-package-keywords)
-                        (memq imp--use-package-keyword use-package-keywords))
-
-             ;; Demand to be in front of the line so we can time every millisecond.
-             (push imp--use-package-keyword use-package-keywords)
-
-             ;; ;; inject into middle of list:
-             ;; (seq-concatenate 'list
-             ;;                  (seq-take-while (lambda (k) (not (eq k :init))) use-package-keywords)
-             ;;                  '(:imp)
-             ;;                  (seq-drop-while (lambda (k) (not (eq k :init))) use-package-keywords))
-             ))
-         ;; use-package-keywords
-         ;; (imp--use-package-init-keyword)
-
-         (defun imp--use-package-init ()
-           "Idempotently initialize `:imp' keyword for `use-package'."
-           (imp--use-package-init-keyword)
-           (imp--use-package-init-default))
+           (defun imp--use-package-init-default ()
+             "Idempotently add `use-package-always-imp' to `use-package-defaults'."
+             (add-to-list 'use-package-defaults
+                          (list imp--use-package-keyword t)
+                          :append))
+           ;; (imp--use-package-init-default)
+           ;; use-package-defaults
 
 
-         (defalias 'use-package-normalize/:imp 'use-package-normalize-predicate
-           "Normalize `imp' args to boolean.")
+           (defun imp--use-package-init-keyword ()
+             "Idempotently add imp's keyword to `use-package-keywords'."
+             (unless (and (bound-and-true-p use-package-keywords)
+                          (memq imp--use-package-keyword use-package-keywords))
+
+               ;; Demand to be in front of the line so we can time every millisecond.
+               (push imp--use-package-keyword use-package-keywords)
+
+               ;; ;; inject into middle of list:
+               ;; (seq-concatenate 'list
+               ;;                  (seq-take-while (lambda (k) (not (eq k :init))) use-package-keywords)
+               ;;                  '(:imp)
+               ;;                  (seq-drop-while (lambda (k) (not (eq k :init))) use-package-keywords))
+               ))
+           ;; use-package-keywords
+           ;; (imp--use-package-init-keyword)
+
+           (defun imp--use-package-init ()
+             "Idempotently initialize `:imp' keyword for `use-package'."
+             (imp--use-package-init-keyword)
+             (imp--use-package-init-default))
 
 
-         (defun use-package-handler/:imp (name keyword arg rest state)
-           "Resolve `use-package' keyword `:imp'.
+           (defalias 'use-package-normalize/:imp 'use-package-normalize-predicate
+             "Normalize `imp' args to boolean.")
+
+
+           (defun use-package-handler/:imp (name keyword arg rest state)
+             "Resolve `use-package' keyword `:imp'.
 
 Given this example:
   (use-package example-foo
@@ -127,51 +128,53 @@ STATE is a plist of shit from other handlers that you can add to for other handl
         (let ((body (use-package-process-keywords name rest
                       (plist-put state :load-path arg))))
           ...)"
-           ;; This happens at macro expansion time, not when the expanded code is
-           ;; compiled or evaluated.
-           (let ((body (use-package-process-keywords name rest state)))
-             `((imp--timing-macro-helper
-                '(:use-package ,keyword)
-                ,@body))))
+             ;; This happens at macro expansion time, not when the expanded code is
+             ;; compiled or evaluated.
+             (let ((body (use-package-process-keywords name rest state)))
+               `((imp--timing-macro-helper
+                  '(:use-package ,keyword)
+                  ,@body))))
 
-         ;; this is idempotent
-         (imp--use-package-init))))
+           ;; this is idempotent
+           (imp--use-package-init))))
 
-;; (use-package-handler/:imp 'test-imp-up
-;;                           :imp
-;;                           t
-;;                           '(:ensure (t) :catch t :init ((message "init")) :load (test-imp-up) :config ((message "config")))
-;;                           nil)
-;; (use-package test-imp-up
-;;   :imp
-;;   :init
-;;   (message "init")
-;;   :config
-;;   (message "config"))
+  ;; (use-package-handler/:imp 'test-imp-up
+  ;;                           :imp
+  ;;                           t
+  ;;                           '(:ensure (t) :catch t :init ((message "init")) :load (test-imp-up) :config ((message "config")))
+  ;;                           nil)
+  ;; (use-package test-imp-up
+  ;;   :imp
+  ;;   :init
+  ;;   (message "init")
+  ;;   :config
+  ;;   (message "config"))
 
 
-;;------------------------------------------------------------------------------
-;; Use-Package: (old) use-package + imp timings replacement macro
-;;------------------------------------------------------------------------------
+  ;;------------------------------------------------------------------------------
+  ;; Use-Package: (old) use-package + imp timings replacement macro
+  ;;------------------------------------------------------------------------------
 
-(defmacro imp-use-package (name &rest args)
-  "Wrap `use-package' in imp timing.
+  (defmacro imp-use-package (name &rest args)
+    "Wrap `use-package' in imp timing.
 
 NAME and ARGS should be exactly as `use-package' requires.
 
 Does not load `use-package'; call should load it prior to using this."
-  (declare (indent 1))
-  (let ((macro<imp>:feature (list :use-package name)))
-    `(let ((macro<imp>:path ,(imp-path-abbreviate (imp-path-current-file))))
-       (imp-timing
-           (quote ,macro<imp>:feature)
-           macro<imp>:path
-         (use-package ,name
-           ,@args)))))
-;; (imp-use-package test-foo)
-;; (imp-use-package test-foo
-;;   :init
-;;   (message "hello %S" macro<imp>:path/file))
+    (declare (indent 1))
+    (let ((macro<imp>:feature (list :use-package name)))
+      `(let ((macro<imp>:path ,(imp-path-abbreviate (imp-path-current-file))))
+         (imp-timing
+             (quote ,macro<imp>:feature)
+             macro<imp>:path
+           (use-package ,name
+             ,@args)))))
+  ;; (imp-use-package test-foo)
+  ;; (imp-use-package test-foo
+  ;;   :init
+  ;;   (message "hello %S" macro<imp>:path/file))
+
+  ) ; with-eval-after-load 'use-package
 
 
 ;;------------------------------------------------------------------------------
