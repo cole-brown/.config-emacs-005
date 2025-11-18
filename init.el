@@ -110,6 +110,7 @@
 
   (imp user:/config/emacs/package)
 
+
   ;;----------------------------------------------------------------------------
   ;; BASICALLY REQUIRED: `namespaced'
   ;;----------------------------------------------------------------------------
@@ -135,9 +136,9 @@
     :path (imp-path user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
 
 
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; PRIORITY: `no-littering'
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; Keep the `user-emacs-directory' clean by changing where Emacs & packages
   ;; store their data. Move it from various & sundry places in and under
   ;; `user-emacs-directory' to be in one of two `user-emacs-directory'
@@ -145,11 +146,11 @@
   ;;   - `no-littering-etc-directory'
   ;;   - `no-littering-var-directory'
 
+  (imp user:/config/emacs/no-littering)
 
-
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; PRIORITY: Theme
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; If this doesn't happen sooner, the Emacs frame will pop, flicker, and
   ;; maybe resize. Set theme ASAP and hope it gets resolved before the OS can
   ;; show Emacs to us.
@@ -184,87 +185,17 @@
   (imp user:/config/theme/zenburn/init.el)
 
 
-  ;;------------------------------------------------------------------------------
-  ;; The Unbinding of Emacs
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
+  ;; The Binding of Emacs
+  ;;----------------------------------------------------------------------------
+  ;; Key (un)binds for Emacs itself.
+  ;; Package's keybinds should go in their init file.
 
-  ;; `suspend-frame': C-z aka C-x C-z
-  ;;----------------
-  ;; C-z is bound to "BEGON YE FOOLISH EMACS WINDOW!"
-  ;; You know...
-  ;; Ctrl-Z.
-  ;; Undo.
-  ;; Everyone else's "undo" is Emacs' "minimize app".
-  ;; Gets frustrating after the 111th time.
-  ;; So yeah; no; fuck off.
-  ;; C-z is nothing.
-  (keymap-global-unset "C-z")
-  ;; C-x C-z the same exact thing.
-  ;; Because one default keybind isn't enough.
-  (keymap-global-unset "C-x C-z")
+  (imp user:/config/emacs/keybinds)
 
-  ;; `save-buffers-kill-terminal': C-x C-c
-  ;;-----------------------------
-  ;; Now that I'm back on QWERTY, I've noticed something.
-  ;; The 'x' and 'c' keys are right the fuck next to each other.
-  ;; My fingers are +fat+ big-boned.
-  ;; C-x and C-c are the most and second most chocked full of shit keymaps.
-  ;; This accidentally happens almost as much the fuckin' "Banishment of Emacs"
-  ;; C-z. It accidentally happens so much that I don't care that I don't know
-  ;; how to close `emacsclient' (and leave server alone) right now.
-  (keymap-global-unset "C-x C-c")
-
-  ;;------------------------------
-  ;; NOTE: Mice & `kbd` strings:
-  ;;------------------------------
-  ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Mouse-Input.html
-  ;; left   mouse click: `mouse-1'
-  ;; middle mouse click: `mouse-2'
-  ;; right  mouse click: `mouse-3'
-  ;;
-  ;; mouse wheel: `wheel-up', `wheel-down', `wheel-left', `wheel-right'
-  ;;   - those also have `double-*' and `triple-*' varients.
-  ;;   - legacy:  `mouse-4',  `mouse-5',    `mouse-6',    `mouse-7'
-  ;;
-  ;; But you gotta lasso 'em with angles: (key-valid-p "<wheel-up>")
-  ;;
-  ;; Also "C-h f" doesn't understand mouse events so it can't tell me what's what!?
-  ;; This works though:
-  ;;   (describe-key (kbd "<wheel-up>"))
-  ;;   (describe-key (kbd "C-<wheel-up>"))
-
-  ;; `mouse-wheel-text-scale': C-mouse-wheel-{up,down}
-  ;;----------------------------
-  ;; You ever accidentally used your mousewheel in Emacs?
-  ;;   (Ridiculous.
-  ;;      A mouse? In Emacs‽)
-  ;; It scrolls the buffer around.
-  ;; Neat.
-  ;; Now I need to hit Control-Something;
-  ;; Emacs makes you use the control key sometimes.
-  ;; Oh shit, my mouse wheelin' and controllin' crossed streams.
-  ;; Now the font is 72 points.
-  ;; And it's slightly impossible to figure out where zoom
-  ;; level "DON'T ZOOM MY TEXT; WTF" is anymore.
-  ;; But there's a command for that somewhere!
-  ;; Emacs is famous for its discoverablilty!
-  ;; Quick!
-  ;; "M-x zoom...
-  ;; "M-x text.....
-  ;; "M-x ¯\_(ツ)_/¯"
-  ;; Yeah. No please.
-  (keymap-global-unset "C-<wheel-up>")
-  (keymap-global-unset "C-<wheel-down>")
-  ;; BTW: To rezero text scaling:
-  ;;   - C-x C-0
-  ;;     - NOTE: To anyone who can't see this anymore:
-  ;;       "C-x 0" is different. That's `delete-window'.
-  ;;   - `text-scale-adjust' (text-scale-adjust 0)
-
-
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; Chrome?: Colorize Color Codes
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
 
   ;; https://github.com/DevelopmentCool2449/colorful-mode
   ;; https://elpa.gnu.org/packages/colorful-mode.html
