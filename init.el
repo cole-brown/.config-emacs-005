@@ -37,49 +37,20 @@
 ;;
 ;;; Code:
 
-
-
-
-
 ;;------------------------------------------------------------------------------
-;; TEMP Scripts for Recovering from Emacs Bankruptcy
+;; PRIORITY: `imp'
 ;;------------------------------------------------------------------------------
-;; TODO MOVE TO ./scripts
+;; Let this load error; imps are fundamental to this init.
+(load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
 
-(defvar --/refactor/rx-replacements
-  ;; NOTE: Try to keep alphabetically sorted.
-  `(
+;; Have imp time all `imp-load' and output a pretty buffer of info.
+;; This is now default.
+;; (customize-set-variable 'imp-timing-enabled? t)
 
-    ("core/modules/emacs/" . "namespaced/")
-
-    ;; `imp'
-    ;;------
-    ("imp:eval:after" . "imp-eval-after")
-    ("imp:file:current" . "imp-file-current")
-    (,(rx-to-string "imp:flag?" :no-group) . "imp-flag?")
-    ("imp:load" . "imp-load")
-    ("imp:path:root/set" . "imp-path-root-set")
-    ("imp:path:current:dir" . "imp-path-current-dir")
-    ("imp:provide" . "imp-provide")
-    ("imp:timing" . "imp-timing")
-    ("imp:use-package" . "use-package")
-
-
-    ("mantle/config/" . "source/user/config/")
-    (":mantle 'config" . ":user 'config")
-    )
-  "alist of regex to replacement string")
-
-(defun /cmd/refactor/by-rx ()
-  "replace the old with the new"
-  (interactive)
-  (save-excursion
-    (dolist (pair --/refactor/rx-replacements)
-      (goto-char (point-min))
-
-      (while (re-search-forward (car pair) nil t)
-        (replace-match (cdr pair))))
-    (save-buffer)))
+;; TODO: imp-load user w/ root flag?
+;; imp-roots
+(imp-path-root-set 'user
+                   (imp-path user-emacs-directory 'source 'user))
 
 
 ;;------------------------------------------------------------------------------
@@ -245,26 +216,11 @@
 ;; It defaults to off/nil but still...
 (customize-set-variable 'use-package-expand-minimally nil)
 
-
 ;;------------------------------------------------------------------------------
-;; PRIORITY: `imp'
-;;------------------------------------------------------------------------------
-
-;; Let this load error; imps are fundamental to this init.
-(load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
-
-;; Have imp time all `imp-load' and output a pretty buffer of info.
-;; This is now default.
-;; (customize-set-variable 'imp-timing-enabled? t)
-
-;; TODO: imp-load user w/ root flag?
-;; imp-roots
-(imp-path-root-set 'user
-                   (imp-path user-emacs-directory 'source 'user))
-
 ;;------------------------------
 ;; Time the Rest
 ;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Put the rest of user Emacs init under the `:emacs.d' namespace.
 (imp-timing :emacs.d
     (imp-path-current-file)
