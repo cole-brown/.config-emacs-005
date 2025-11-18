@@ -93,11 +93,11 @@
 (--/exe/require "git")
 
 
-;;------------------------------------------------------------------------------
-;;------------------------------
-;; Time the Rest
-;;------------------------------
-;;------------------------------------------------------------------------------
+;;┌──────────────┬─────────────────────────────────────────────────────────────┐
+;;├──────────────┘                                                             │
+;;│ Time the Rest                                                              │
+;;├──────────────┐                                                             │
+;;└──────────────┴─────────────────────────────────────────────────────────────┘
 ;; Put the rest of user Emacs init under the `:emacs.d' namespace.
 (imp-timing 'emacs.d
     (imp-path-current-file)
@@ -194,6 +194,7 @@
   ;;----------------------------------------------------------------------------
   ;; Secret: Init
   ;;----------------------------------------------------------------------------
+  ;; Shhh!...
 
   ;; TODO: paths per computer machine host
   ;; use (system-name)?
@@ -235,13 +236,13 @@
   ;;   - `dabbrev': https://www.gnu.org/software/emacs/manual/html_node/emacs/Dynamic-Abbrevs.html
   (imp user:/config/completion)
   (imp user:/config/snippets)
-
+  (imp user:/config/hydra)
 
   ;;----------------------------------------------------------------------------
-  ;; Emacs
+  ;; Miscellaneous
   ;;----------------------------------------------------------------------------
-  ;; Config for Emacs Actual or global stuff.
 
+  ;; Emacs Actual or Global Stuff
   ;; TODO(init): move all/any of these to new "user/config/emacs/" dir?
   (imp user:/config/color)
   (imp user:/config/emacs)
@@ -250,16 +251,15 @@
   (imp user:/config/undo)
   (imp user:/config/whitespace)
 
-
-  ;;----------------------------------------------------------------------------
   ;; File Stuff. `recentf', `deadgrep', etc
-  ;;----------------------------------------------------------------------------
   (imp user:/config/files)
 
+  ;; ┌─────────────────┐
+  ;; │  ASCII box art  │
+  ;; └─────────────────┘
+  (imp user:/art/box)
 
-  ;;----------------------------------------------------------------------------
-  ;; Modes
-  ;;----------------------------------------------------------------------------
+  ;; Org-Mode
   (imp user:/config/org/init)
 
 
@@ -342,9 +342,9 @@
  '(package-selected-packages
    '(cape colorful-mode corfu deadgrep elisp-demos embark-consult git-gutter-fringe
           git-modes gptel hc-zenburn-theme helpful highlight-quoted hurl-mode
-          macrostep magit marginalia minions no-littering orderless ox-gfm
-          rainbow-delimiters terraform-mode undo-tree vertico ws-butler
-          yaml-mode yasnippet zenburn-theme))
+          hydra macrostep magit major-mode-hydra marginalia minions no-littering
+          orderless ox-gfm rainbow-delimiters terraform-mode undo-tree vertico
+          ws-butler yaml-mode yasnippet zenburn-theme))
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode"))))
 (custom-set-faces

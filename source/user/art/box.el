@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-11
-;; Timestamp:  2025-11-10
+;; Timestamp:  2025-11-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -162,13 +162,23 @@
                                  :hint none)     ; no hint - just docstr
   "
 Draw box characters.
-_'_: ?'?  _,_: ?,?  _._: ?.?   _p_: ?p?   ^ ^  ^ ^     ^ ^        _c_: up    ^ ^            _-_: undo     _d_: ?d?
-_a_: ?a?  _o_: ?o?  _e_: ?e?   _u_: ?u?   ^ ^  ^ ^     _h_: left  _t_: down  _n_: right     ^ ^           _g_: ?g?
-_;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           _G_: ?G?
+_q_: ?q?  _w_: ?w?  _e_: ?e?   _r_: ?r?   ^ ^  ^ ^     ^ ^        _i_: up    ^ ^            _/_: undo     _h_: ?h?
+_a_: ?a?  _s_: ?s?  _d_: ?d?   _f_: ?f?   ^ ^  ^ ^     _j_: left  _k_: down  _l_: right     ^ ^
+_z_: ?z?  _x_: ?x?  _c_: ?c?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^
 ^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           _<SPC>_: ?<SPC>?
-^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _x_: ?x?   ^ ^            ^ ^   ^^^^^^^^_<insert>_: ?<insert>?
-^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _X_: ?X?
+^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _b_: ?b?   ^ ^            ^ ^   ^^^^^^^^_<insert>_: ?<insert>?
+^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _B_: ?B?
 "
+;; Dvorak:  "
+;; Draw box characters.
+;; _'_: ?'?  _,_: ?,?  _._: ?.?   _p_: ?p?   ^ ^  ^ ^     ^ ^        _c_: up    ^ ^            _-_: undo     _d_: ?d?
+;; _a_: ?a?  _o_: ?o?  _e_: ?e?   _u_: ?u?   ^ ^  ^ ^     _h_: left  _t_: down  _n_: right     ^ ^           _g_: ?g?
+;; _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           _G_: ?G?
+;; ^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           _<SPC>_: ?<SPC>?
+;; ^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _x_: ?x?   ^ ^            ^ ^   ^^^^^^^^_<insert>_: ?<insert>?
+;; ^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _X_: ?X?
+;; "
+
   ;; NOTE: You _MUST_ start off with a newline in docstr, otherwise you will get:
   ;;  > Debugger entered--Lisp error: (error "Not enough arguments for format string")
   ;;  > format("Draw box characters.\n%s: %s  %s: %s  %s: %s   %s: ...")
@@ -177,31 +187,30 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Box Characters
   ;;------------------------------
-  ("'" (buffer:insert-or-overwrite "┌") "┌") ;; down and right
-  ("," (buffer:insert-or-overwrite "┬") "┬") ;; down and horizontal
-  ("." (buffer:insert-or-overwrite "┐") "┐") ;; down and left
+  ("q" (buffer:insert-or-overwrite "┌") "┌") ;; down and right
+  ("w" (buffer:insert-or-overwrite "┬") "┬") ;; down and horizontal
+  ("e" (buffer:insert-or-overwrite "┐") "┐") ;; down and left
+  ("r" (buffer:insert-or-overwrite "─") "─") ;; horizontal
 
   ("a" (buffer:insert-or-overwrite "├") "├") ;; vertical and right
-  ("o" (buffer:insert-or-overwrite "┼") "┼") ;; vertical and horizontal
-  ("e" (buffer:insert-or-overwrite "┤") "┤") ;; vertical and left
+  ("s" (buffer:insert-or-overwrite "┼") "┼") ;; vertical and horizontal
+  ("d" (buffer:insert-or-overwrite "┤") "┤") ;; vertical and left
+  ("f" (buffer:insert-or-overwrite "│") "│") ;; vertical
 
-  (";" (buffer:insert-or-overwrite "└") "└") ;; up and right
-  ("q" (buffer:insert-or-overwrite "┴") "┴") ;; up and horizontal
-  ("j" (buffer:insert-or-overwrite "┘") "┘") ;; up and left
-
-  ("p" (buffer:insert-or-overwrite "─") "─") ;; horizontal
-  ("u" (buffer:insert-or-overwrite "│") "│") ;; vertical
+  ("z" (buffer:insert-or-overwrite "└") "└") ;; up and right
+  ("x" (buffer:insert-or-overwrite "┴") "┴") ;; up and horizontal
+  ("c" (buffer:insert-or-overwrite "┘") "┘") ;; up and left
 
   ;;---
   ;; Not Working in Emacs w/ Current Fonts:
   ;;---
   ;; The keymap string if these worked:
-  ;; _'_: ?'?  _,_: ?,?  _._: ?.?   _p_: ?p?   _y_: ?y?     ^ ^        _c_: up    ^ ^            _-_: undo     _d_: ?d?
-  ;; _a_: ?a?  _o_: ?o?  _e_: ?e?   _u_: ?u?   _i_: ?i?     _h_: left  _t_: down  _n_: right     ^ ^           _g_: ?g?
-  ;; _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           _G_: ?G?
+  ;; _q_: ?q?  _w_: ?w?  _e_: ?e?   _r_: ?r?   _t_: ?t?     ^ ^        _i_: up    ^ ^            _/_: undo     _d_: ?d?
+  ;; _a_: ?a?  _s_: ?s?  _d_: ?d?   _f_: ?f?   _g_: ?g?     _j_: left  _k_: down  _l_: right     ^ ^           _g_: ?g?
+  ;; _z_: ?z?  _x_: ?x?  _c_: ?c?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           _G_: ?G?
   ;; ^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            SPC: ?<SPC>?
-  ;; ^ ^  ^ ^  _<_: ?<?  ^ ^  ^ ^   _P_: ?P?   _Y_: ?Y?     ^ ^        ^ ^        ^ ^            _x_: ?x?
-  ;; _A_: ?A?  ^ ^  ^ ^  _E_: ?E?   _U_: ?U?   _I_: ?I?     ^ ^        ^ ^        ^ ^            _X_: ?X?
+  ;; ^ ^  ^ ^  _<_: ?<?  ^ ^  ^ ^   _R_: ?R?   _Y_: ?Y?     ^ ^        ^ ^        ^ ^            _b_: ?b?
+  ;; _A_: ?A?  ^ ^  ^ ^  _E_: ?E?   _U_: ?U?   _I_: ?I?     ^ ^        ^ ^        ^ ^            _B_: ?B?
   ;; ^ ^  ^ ^  _Q_: ?Q?  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           ^ ^  (hi)
   ;;
   ;; ("y" (buffer:insert-or-overwrite "┄") "┄") ;; triple dash horizontal
@@ -213,7 +222,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;; ("Q" (buffer:insert-or-overwrite "╵") "╵") ;; up
   ;; ("E" (buffer:insert-or-overwrite "╴") "╴") ;; left
   ;;
-  ;; ("P" (buffer:insert-or-overwrite "╌") "╌") ;; double dash horizontal
+  ;; ("R" (buffer:insert-or-overwrite "╌") "╌") ;; double dash horizontal
   ;; ("U" (buffer:insert-or-overwrite "╎") "╎") ;; double dash vertical
   ;;
   ;; ("Y" (buffer:insert-or-overwrite "┈") "┈") ;; quadruple dash horizontal
@@ -223,26 +232,26 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Movement Keys
   ;;------------------------------
-  ("c"
-   (if (featurep 'evil)
+  ("i"
+   (if (bound-and-true-p evil-mode)
        (evil-previous-line)
      (previous-line))
    "up")
-  ("h"
-      (if (featurep 'evil)
-          (evil-backward-char)
-        (backward-char))
-      "left")
-  ("t"
-      (if (featurep 'evil)
-          (evil-next-line)
-        (next-line))
-      "down")
-  ("n"
-      (if (featurep 'evil)
-          (evil-forward-char)
-        (forward-char))
-      "right")
+  ("j"
+   (if (bound-and-true-p evil-mode)
+       (evil-backward-char)
+     (backward-char))
+   "left")
+  ("k"
+   (if (bound-and-true-p evil-mode)
+       (evil-next-line)
+     (next-line))
+   "down")
+  ("l"
+   (if (bound-and-true-p evil-mode)
+       (evil-forward-char)
+     (forward-char))
+   "right")
 
   ;;------------------------------
   ;; Misc.
@@ -251,30 +260,30 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ("<insert>"
    #'buffer:overwrite:toggle
    (if (buffer:overwriting?)
-       (if (featurep 'evil) "insert state" "insert mode")
-     (if (featurep 'evil) "replace state" "overwrite mode")))
-  ("x"
-   (if (featurep 'evil)
+       (if (bound-and-true-p evil-mode) "insert state" "insert mode")
+     (if (bound-and-true-p evil-mode) "replace state" "overwrite mode")))
+  ("b"
+   (if (bound-and-true-p evil-mode)
        (evil-delete-char)
      (delete-char 1))
    "delete char")
-  ("X"
-   (if (featurep 'evil)
+  ("B"
+   (if (bound-and-true-p evil-mode)
        (evil-delete-backward-char)
      (delete-backward-char 1))
    "delete backwards char")
-  ("-"
-   (if (featurep 'undo-tree)
+  ("/"
+   (if (bound-and-true-p undo-tree)
        (undo-tree-undo)
      (undo))
    "undo")
   ("_"
-   (if (imp:flag? :emacs +undo-tree)
+   (if (bound-and-true-p undo-tree)
        (undo-tree-undo)
      (undo))
    "undo")
   ("C-_"
-   (if (imp:flag? :emacs +undo-tree)
+   (if (bound-and-true-p undo-tree)
        (undo-tree-undo)
      (undo))
    "undo")
@@ -282,77 +291,77 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Get Me Out Of Here!!!
   ;;------------------------------
-  ("d"   (hydra:nest 'art:hydra:box/double) "double lines (╬)" :exit t)
-  ("G"
-   (cond ((featurep 'evil)
-          ;; TODO-evil: this never did anything special when I was using evil,
-          ;; so I think it works right? Then again, I almost never use(d) it...
-          ;;
-          nil)
-         ((imp:flag? :keybinds +meow)
-          (unless (meow-insert-mode-p)
-            (meow-insert-mode)))
-         (t
-          nil))
-   (concat "quit"
-           (cond ((featurep 'evil)
-                  " (to insert state)")
-                 ((imp:flag? :keybinds +meow)
-                  " (to insert mode)")
-                 (t
-                  nil)))
-   :color blue)
-  ("g"
-   (cond ((featurep 'evil)
-          (evil-normal-state))
-         ((imp:flag? :keybinds +meow)
-          (unless (meow-normal-mode-p)
-            (meow-normal-mode)))
-         (t
-          nil))
-   (concat "quit"
-           (cond ((featurep 'evil)
-                  " (to normal state)")
-                 ((imp:flag? :keybinds +meow)
-                  " (to normal mode)")
-                 (t
-                  nil)))
-   :color blue)
+  ("h"   (hydra:nest '/art/hydra/box/double) "double lines (╬)" :exit t)
+  ;; ("G"
+  ;;  (cond ((bound-and-true-p evil-mode)
+  ;;         ;; TODO-evil: this never did anything special when I was using evil,
+  ;;         ;; so I think it works right? Then again, I almost never use(d) it...
+  ;;         ;;
+  ;;         nil)
+  ;;        ((bound-and-true-p meow-global-mode)
+  ;;         (unless (meow-insert-mode-p)
+  ;;           (meow-insert-mode)))
+  ;;        (t
+  ;;         nil))
+  ;;  (concat "quit"
+  ;;          (cond ((bound-and-true-p evil-mode)
+  ;;                 " (to insert state)")
+  ;;                ((bound-and-true-p meow-global-mode)
+  ;;                 " (to insert mode)")
+  ;;                (t
+  ;;                 nil)))
+  ;;  :color blue)
+  ;; ("g"
+  ;;  (cond ((bound-and-true-p evil-mode)
+  ;;         (evil-normal-state))
+  ;;        ((bound-and-true-p meow-global-mode)
+  ;;         (unless (meow-normal-mode-p)
+  ;;           (meow-normal-mode)))
+  ;;        (t
+  ;;         nil))
+  ;;  (concat "quit"
+  ;;          (cond ((bound-and-true-p evil-mode)
+  ;;                 " (to normal state)")
+  ;;                ((bound-and-true-p meow-global-mode)
+  ;;                 " (to normal mode)")
+  ;;                (t
+  ;;                 nil)))
+  ;;  :color blue)
   ("C-g"
-   (cond ((featurep 'evil)
+   (cond ((bound-and-true-p evil-mode)
           (evil-normal-state))
-         ((imp:flag? :keybinds +meow)
+         ((bound-and-true-p meow-global-mode)
           (unless (meow-normal-mode-p)
             (meow-normal-mode)))
          (t
           nil))
    (concat "quit"
-           (cond ((featurep 'evil)
+           (cond ((bound-and-true-p evil-mode)
                   " (to normal state)")
-                 ((imp:flag? :keybinds +meow)
+                 ((bound-and-true-p meow-global-mode)
                   " (to normal mode)")
                  (t
                   nil)))
    :color blue))
-;; (art:hydra:box/single/body)
+;; (/art/hydra/box/single/body)
 
 
 ;;------------------------------------------------------------------------------
 ;; Double Lines Hydra
 ;;------------------------------------------------------------------------------
 
-(defhydra art:hydra:box/double (:color amaranth ;; default to warn if non-hydra key
-                                ;;:color pink   ;; defaults to not exit unless explicit
-                                ;;:idle 0.75    ;; no help for x seconds
-                                :hint none)     ;; no hint - just docstr)
+(defhydra /art/hydra/box/double (:color amaranth ;; default to warn if non-hydra key
+                                 ;;:color pink   ;; defaults to not exit unless explicit
+                                 ;;:idle 0.75    ;; no help for x seconds
+                                 :hint none)     ;; no hint - just docstr)
   "
 Draw box characters.
-_'_: ?'?  _,_: ?,?  _._: ?.?   _p_: ?p?   ^ ^  ^ ^     ^ ^        _c_: up    ^ ^            _-_: undo     _d_: ?d?
-_a_: ?a?  _o_: ?o?  _e_: ?e?   _u_: ?u?   ^ ^  ^ ^     _h_: left  _t_: down  _n_: right     ^ ^           _g_: ?g?
-_;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           _G_: ?G?
+_q_: ?q?  _w_: ?w?  _e_: ?e?   _r_: ?r?   ^ ^  ^ ^     ^ ^        _i_: up    ^ ^            _/_: undo     _h_: ?h?
+_a_: ?a?  _s_: ?s?  _d_: ?d?   _f_: ?f?   ^ ^  ^ ^     _j_: left  _k_: down  _l_: right     ^ ^
+_z_: ?z?  _x_: ?x?  _c_: ?c?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^
 ^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           _<SPC>_: ?<SPC>?
-^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _x_: ?x?   ^ ^            ^ ^   ^^^^^^^^_<insert>_: ?<insert>?
-^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _X_: ?X?
+^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _b_: ?b?   ^ ^            ^ ^   ^^^^^^^^_<insert>_: ?<insert>?
+^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        _B_: ?B?
 "
   ;; If ever the single line hydra gets its dotted lines and/or line-termination chars working, add this to the keymap string:
   ;; ^ ^  ^ ^  ^ ^  ^ ^  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           ^ ^  (hi)
@@ -366,44 +375,43 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;; Box Characters:
   ;; Double Lines! Double Lines!
   ;;------------------------------
-  ("'" (buffer:insert-or-overwrite "╔") "╔") ;; double down and right
-  ("," (buffer:insert-or-overwrite "╦") "╦") ;; double down and horizontal
-  ("." (buffer:insert-or-overwrite "╗") "╗") ;; double down and left
+  ("q" (buffer:insert-or-overwrite "╔") "╔") ;; double down and right
+  ("w" (buffer:insert-or-overwrite "╦") "╦") ;; double down and horizontal
+  ("e" (buffer:insert-or-overwrite "╗") "╗") ;; double down and left
+  ("r" (buffer:insert-or-overwrite "═") "═") ;; double horizontal
 
   ("a" (buffer:insert-or-overwrite "╠") "╠") ;; double vertical and righ
-  ("o" (buffer:insert-or-overwrite "╬") "╬") ;; double vertical and horizontal
-  ("e" (buffer:insert-or-overwrite "╣") "╣") ;; double vertical and left
+  ("s" (buffer:insert-or-overwrite "╬") "╬") ;; double vertical and horizontal
+  ("d" (buffer:insert-or-overwrite "╣") "╣") ;; double vertical and left
+  ("f" (buffer:insert-or-overwrite "║") "║") ;; double vertical
 
-  (";" (buffer:insert-or-overwrite "╚") "╚") ;; double up and right
-  ("q" (buffer:insert-or-overwrite "╩") "╩") ;; double up and horizontal
-  ("j" (buffer:insert-or-overwrite "╝") "╝") ;; double up and left
-
-  ("p" (buffer:insert-or-overwrite "═") "═") ;; double horizontal
-  ("u" (buffer:insert-or-overwrite "║") "║") ;; double vertical
+  ("z" (buffer:insert-or-overwrite "╚") "╚") ;; double up and right
+  ("x" (buffer:insert-or-overwrite "╩") "╩") ;; double up and horizontal
+  ("c" (buffer:insert-or-overwrite "╝") "╝") ;; double up and left
 
   ;;------------------------------
   ;; Movement Keys
   ;;------------------------------
-  ("c"
-   (if (featurep 'evil)
+  ("i"
+   (if (bound-and-true-p evil-mode)
        (evil-previous-line)
      (previous-line))
    "up")
-  ("h"
-      (if (featurep 'evil)
-          (evil-backward-char)
-        (backward-char))
-      "left")
-  ("t"
-      (if (featurep 'evil)
-          (evil-next-line)
-        (next-line))
-      "down")
-  ("n"
-      (if (featurep 'evil)
-          (evil-forward-char)
-        (forward-char))
-      "right")
+  ("j"
+   (if (bound-and-true-p evil-mode)
+       (evil-backward-char)
+     (backward-char))
+   "left")
+  ("k"
+   (if (bound-and-true-p evil-mode)
+       (evil-next-line)
+     (next-line))
+   "down")
+  ("l"
+   (if (bound-and-true-p evil-mode)
+       (evil-forward-char)
+     (forward-char))
+   "right")
 
   ;;------------------------------
   ;; Misc.
@@ -412,31 +420,30 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ("<insert>"
    #'buffer:overwrite:toggle
    (if (buffer:overwriting?)
-       (if (featurep 'evil) "insert state" "insert mode")
-     (if (featurep 'evil) "replace state" "overwrite mode")))
-  ("x"
-   (if (featurep 'evil)
+       (if (bound-and-true-p evil-mode) "insert state" "insert mode")
+     (if (bound-and-true-p evil-mode) "replace state" "overwrite mode")))
+  ("b"
+   (if (bound-and-true-p evil-mode)
        (evil-delete-char)
      (delete-char 1))
    "delete char")
-  ("X"
-   (if (featurep 'evil)
+  ("B"
+   (if (bound-and-true-p evil-mode)
        (evil-delete-backward-char)
      (delete-backward-char 1))
    "delete backwards char")
-  ;; TODO-meow: Check for `undo-tree'? Or use evil/meow undo (and redo?) command?
-  ("-"
-   (if (imp:flag? :emacs +undo-tree)
+  ("/"
+   (if (bound-and-true-p undo-tree)
        (undo-tree-undo)
      (undo))
    "undo")
   ("_"
-   (if (imp:flag? :emacs +undo-tree)
+   (if (bound-and-true-p undo-tree)
        (undo-tree-undo)
      (undo))
    "undo")
   ("C-_"
-   (if (imp:flag? :emacs +undo-tree)
+   (if (bound-and-true-p undo-tree)
        (undo-tree-undo)
      (undo))
    "undo")
@@ -444,59 +451,59 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Get Me Out Of Here!!!
   ;;------------------------------
-  ("d"   (hydra:nest 'art:hydra:box/single) "single lines (┼)" :exit t)
-  ("G"
-   (cond ((featurep 'evil)
-          ;; TODO-evil: this never did anything special when I was using evil,
-          ;; so I think it works right? Then again, I almost never use(d) it...
-          ;;
-          nil)
-         ((imp:flag? :keybinds +meow)
-          (unless (meow-insert-mode-p)
-            (meow-insert-mode)))
-         (t
-          nil))
-   (concat "quit"
-           (cond ((featurep 'evil)
-                  " (to insert state)")
-                 ((imp:flag? :keybinds +meow)
-                  " (to insert mode)")
-                 (t
-                  nil)))
-   :color blue)
-  ("g"
-   (cond ((featurep 'evil)
-          (evil-normal-state))
-         ((imp:flag? :keybinds +meow)
-          (unless (meow-normal-mode-p)
-            (meow-normal-mode)))
-         (t
-          nil))
-   (concat "quit"
-           (cond ((featurep 'evil)
-                  " (to normal state)")
-                 ((imp:flag? :keybinds +meow)
-                  " (to normal mode)")
-                 (t
-                  nil)))
-   :color blue)
+  ("h"   (hydra:nest '/art/hydra/box/single) "single lines (┼)" :exit t)
+  ;; ("G"
+  ;;  (cond ((bound-and-true-p evil-mode)
+  ;;         ;; TODO-evil: this never did anything special when I was using evil,
+  ;;         ;; so I think it works right? Then again, I almost never use(d) it...
+  ;;         ;;
+  ;;         nil)
+  ;;        ((bound-and-true-p meow-global-mode)
+  ;;         (unless (meow-insert-mode-p)
+  ;;           (meow-insert-mode)))
+  ;;        (t
+  ;;         nil))
+  ;;  (concat "quit"
+  ;;          (cond ((bound-and-true-p evil-mode)
+  ;;                 " (to insert state)")
+  ;;                ((bound-and-true-p meow-global-mode)
+  ;;                 " (to insert mode)")
+  ;;                (t
+  ;;                 nil)))
+  ;;  :color blue)
+  ;; ("g"
+  ;;  (cond ((bound-and-true-p evil-mode)
+  ;;         (evil-normal-state))
+  ;;        ((bound-and-true-p meow-global-mode)
+  ;;         (unless (meow-normal-mode-p)
+  ;;           (meow-normal-mode)))
+  ;;        (t
+  ;;         nil))
+  ;;  (concat "quit"
+  ;;          (cond ((bound-and-true-p evil-mode)
+  ;;                 " (to normal state)")
+  ;;                ((bound-and-true-p meow-global-mode)
+  ;;                 " (to normal mode)")
+  ;;                (t
+  ;;                 nil)))
+  ;;  :color blue)
   ("C-g"
-   (cond ((featurep 'evil)
+   (cond ((bound-and-true-p evil-mode)
           (evil-normal-state))
-         ((imp:flag? :keybinds +meow)
+         ((bound-and-true-p meow-global-mode)
           (unless (meow-normal-mode-p)
             (meow-normal-mode)))
          (t
           nil))
    (concat "quit"
-           (cond ((featurep 'evil)
+           (cond ((bound-and-true-p evil-mode)
                   " (to normal state)")
-                 ((imp:flag? :keybinds +meow)
+                 ((bound-and-true-p meow-global-mode)
                   " (to normal mode)")
                  (t
                   nil)))
    :color blue))
-;; (art:hydra:box/double/body)
+;; (/art/hydra/box/double/body)
 
 
 ;;------------------------------------------------------------------------------
@@ -537,13 +544,12 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
 ;; Hydras' Entry Function
 ;;------------------------------------------------------------------------------
 
-(defun art:cmd:box/draw ()
+(defun /art/cmd/box/draw ()
   "Get into the box drawing hydra in the proper evil state."
   (interactive)
-  ;; TODO-meow: meow
-  (when (imp:mode? 'evil-mode)
+  (when (bound-and-true-p evil-mode)
     (evil-insert 0))
-  (call-interactively #'art:hydra:box/single/body))
+  (call-interactively #'/art/hydra/box/single/body))
 ;; ┌────┐
 ;; ├────┤
 ;; │ hi │
