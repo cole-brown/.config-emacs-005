@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-23
-;; Timestamp:  2025-11-05
+;; Timestamp:  2025-11-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -1419,7 +1419,7 @@ integers/marker according to CASES keywords."
   "Toggle the case of the character at point between upper and lower case."
   (interactive)
 
-  (if (imp:mode? 'evil-mode)
+  (if (bound-and-true-p evil-mode)
       ;; Evil has its own thing:
       (evil-invert-case)
     ;; DIY:
@@ -1446,7 +1446,7 @@ integers/marker according to CASES keywords."
   "Toggle the case of each character between START and END of region."
   (interactive "r")
 
-  (if (imp:mode? 'evil-mode)
+  (if (bound-and-true-p evil-mode)
       ;; Evil has its own thing:
       (evil-invert-case)
     ;; DIY:

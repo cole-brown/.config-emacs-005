@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-02-24
-;; Timestamp:  2025-11-03
+;; Timestamp:  2025-11-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -305,7 +305,7 @@ On loan from Doom's \"core/autoload/buffers.el\"."
 Evil-Aware / Evil-Optional: Is buffer in `evil-replace-state'?
 Doesn't need to be Meow-Aware / Meow-Optional."
   ;; Are you evil? Use `evil' functions, evil-doer.
-  (if (imp:mode? 'evil-mode)
+  (if (bound-and-true-p evil-mode)
       (evil-replace-state-p)
     (not (null overwrite-mode))))
 
@@ -320,7 +320,7 @@ Evil: Toggles between 'insert' and 'replace' evil states.
 Good: Toggles between 'insert' and 'overwrite'."
   (interactive)
   ;; Are you evil? Use `evil' functions, evil-doer.
-  (if (imp:mode? 'evil-mode)
+  (if (bound-and-true-p evil-mode)
       (if (evil-replace-state-p)
           (evil-append 0)
         (evil-replace-state))
@@ -354,7 +354,7 @@ evil's replace state backspace 'undo' functionality."
   ;; First delete a character at point so we end up "replacing" it.
 
   ;; Evil has its own special overwrite mode called the "replace" state.
-  (if (and (imp:mode? 'evil-mode)
+  (if (and (bound-and-true-p evil-mode)
            (evil-replace-state-p))
       (progn
       ;; TODO-evil: Will this let evil's backspace/delete 'undo' functionality work?
