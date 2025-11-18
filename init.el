@@ -261,104 +261,46 @@
   ;; Files
   ;;----------------------------------------------------------------------------
 
+  ;; File Stuff. `recentf', `deadgrep', etc
   (imp user:/config/files)
 
 
   ;;----------------------------------------------------------------------------
-  ;; Org-Mode
+  ;; Modes
   ;;----------------------------------------------------------------------------
-
   (imp user:/config/org/init)
 
 
   ;;----------------------------------------------------------------------------
-  ;; Languages
+  ;; dev-env: Languages
   ;;----------------------------------------------------------------------------
 
   (imp user:/config/languages/common)
   (imp user:/config/languages/elisp)
   (imp user:/config/languages/json)
 
+  ;; TODO(imp): make required/optional exe check an imp thing?
+  ;;---
+  ;; Lodge a complaint if 'terraform' isn't installed on the system. But don't
+  ;; skip the `terraform-mode' `use-package', since it only needs the exe for the
+  ;; compile stuff.
+  (--/exe/optional "terraform")
+  (imp user:/config/languages/terraform)
+
+  (imp user:/config/languages/yaml)
+
 
   ;;----------------------------------------------------------------------------
-  ;; Version Control
+  ;; dev-env: Version Control
   ;;----------------------------------------------------------------------------
   (imp user:/config/magit.el)
 
 
   ;;------------------------------------------------------------------------------
-  ;; AI: ChatGPT & Friends!
+  ;; dev-env: AI: ChatGPT & Friends!
   ;;------------------------------------------------------------------------------
 
   (imp user:/config/ai)
-
-  ;;------------------------------------------------------------------------------
-  ;; dev-env: Language: YAML
-  ;;------------------------------------------------------------------------------
-  ;; 2023-07-23_sn004:sn004/mantle/config/dev-env/languages/yaml.el
-
-  ;; `yaml-mode'
-  ;;------------
-  (use-package yaml-mode
-    ;;------------------------------
-    :init
-    ;;------------------------------
-
-    (defun --/hook/yaml/settings ()
-      "Settings for YAML mode. Non-LSP stuff."
-
-      ;; `fill-column' is always a buffer-local var (see its help).
-      ;; Use `setq-local' so we remember what to use for things that aren't auto-buffer-local?
-      (setq-local fill-column --/fill-column/standard)
-
-      ;; NOTE [OLD]: `yaml-mode' does not use `tab-width'. It uses its own var: `yaml-indent-offset'.
-      ;; ;; Use smaller indents than is standard for code.
-      ;; (setq tab-width yaml-indent-offset)
-      )
-
-
-    ;;------------------------------
-    :hook
-    ;;------------------------------
-    (yaml-mode-hook . --/hook/yaml/settings)
-
-
-    ;;------------------------------
-    :custom
-    ;;------------------------------
-
-    ;; Use smaller indents than is standard for code.
-    ;; NOTE: `yaml-indent-offset' is 2 by default. Set it explicitly in case I change my mind about tab sizes.
-    (yaml-indent-offset --/tab/small))
-
-
-  ;;------------------------------------------------------------------------------
-  ;; dev-env: Language: Terraform (HCL)
-  ;;------------------------------------------------------------------------------
-  ;; 2023-07-23_sn004:/mantle/config/dev-env/languages/terraform.el
-
-  ;;------------------------------------------------------------------------------
-  ;; Sanity Check
-  ;;------------------------------------------------------------------------------
-
-  ;; Lodge a complaint if 'terraform' isn't installed on the system. But don't
-  ;; skip the `terraform-mode' `use-package', since it only needs the exe for the
-  ;; compile stuff.
-  (--/exe/optional "terraform")
-
-  ;;------------------------------------------------------------------------------
-  ;; Syntax Highlighting
-  ;;------------------------------------------------------------------------------
-
-  ;; `terraform-mode'
-  ;;-----------------
-  (use-package terraform-mode
-    ;;------------------------------
-    :custom
-    ;;------------------------------
-
-    ;; `terraform fmt` uses 2 spaces per indent level
-    (terraform-indent-level 2))
 
 
   ;;------------------------------------------------------------------------------
