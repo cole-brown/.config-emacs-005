@@ -33,11 +33,10 @@
 ;; This is the actual beginning.
 ;; ...anyways.
 ;;
-;; In the beginning there was
 ;;; Code:
 
 ;;------------------------------------------------------------------------------
-;; PRIORITY: `imp'
+;; In the beginning there was `imp'
 ;;------------------------------------------------------------------------------
 ;; Let this load error; imps are fundamental to this init.
 (load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
@@ -192,9 +191,9 @@
   (imp user:/config/emacs/keybinds)
 
 
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; Secret: Init
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
 
   ;; TODO: paths per computer machine host
   ;; use (system-name)?
@@ -219,9 +218,9 @@
              "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
 
 
-  ;;--------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; Completion Frameworks
-  ;;--------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; "VMOCE Stack": Vertico & Friends
   ;;   - `vertico':    https://github.com/minad/vertico
   ;;   - `marginalia': https://github.com/minad/marginalia
@@ -234,12 +233,7 @@
   ;;   - `corfu':   https://github.com/minad/corfu
   ;;   - `cape':    https://github.com/minad/cape
   ;;   - `dabbrev': https://www.gnu.org/software/emacs/manual/html_node/emacs/Dynamic-Abbrevs.html
-
   (imp user:/config/completion)
-
-  ;;------------------------------
-  ;; Completion: `yasnippets'
-  ;;------------------------------
   (imp user:/config/snippets)
 
 
@@ -252,16 +246,14 @@
   (imp user:/config/color)
   (imp user:/config/emacs)
   (imp user:/config/help)
-  (imp user:/config/emacs/timestamp.el
+  (imp user:/config/emacs/timestamp.el)
   (imp user:/config/undo)
   (imp user:/config/whitespace)
 
 
   ;;----------------------------------------------------------------------------
-  ;; Files
-  ;;----------------------------------------------------------------------------
-
   ;; File Stuff. `recentf', `deadgrep', etc
+  ;;----------------------------------------------------------------------------
   (imp user:/config/files)
 
 
@@ -272,8 +264,12 @@
 
 
   ;;----------------------------------------------------------------------------
-  ;; dev-env: Languages
+  ;; dev-env: Taking the "I" out of IDE.
   ;;----------------------------------------------------------------------------
+
+  ;;------------------------------
+  ;; dev-env: Languages
+  ;;------------------------------
 
   ;; TODO(imp): make required/optional exe check an imp thing?
   ;;---
@@ -291,20 +287,21 @@
   (imp user:/config/languages/yaml)
 
 
-  ;;----------------------------------------------------------------------------
+  ;;------------------------------
   ;; dev-env: Version Control
-  ;;----------------------------------------------------------------------------
+  ;;------------------------------
   (imp user:/config/magit.el)
 
 
-  ;;------------------------------------------------------------------------------
+  ;;------------------------------
   ;; dev-env: AI: ChatGPT & Friends!
-  ;;------------------------------------------------------------------------------
+  ;;------------------------------
   (imp user:/config/ai)
 
-  ;;------------------------------------------------------------------------------
+
+  ;;----------------------------------------------------------------------------
   ;; Fin: End of user Emacs init.
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; Clean up, final hellos, load summeries...
 
   ;; TODO: Can I put this in the `imp' section?
