@@ -275,18 +275,19 @@
   ;; dev-env: Languages
   ;;----------------------------------------------------------------------------
 
-  (imp user:/config/languages/common)
-  (imp user:/config/languages/elisp)
-  (imp user:/config/languages/json)
-
   ;; TODO(imp): make required/optional exe check an imp thing?
   ;;---
   ;; Lodge a complaint if 'terraform' isn't installed on the system. But don't
   ;; skip the `terraform-mode' `use-package', since it only needs the exe for the
   ;; compile stuff.
+  (--/exe/optional "hurl")
   (--/exe/optional "terraform")
-  (imp user:/config/languages/terraform)
 
+  (imp user:/config/languages/common)
+  (imp user:/config/languages/elisp)
+  (imp user:/config/languages/hurl)
+  (imp user:/config/languages/json)
+  (imp user:/config/languages/terraform)
   (imp user:/config/languages/yaml)
 
 
@@ -299,32 +300,7 @@
   ;;------------------------------------------------------------------------------
   ;; dev-env: AI: ChatGPT & Friends!
   ;;------------------------------------------------------------------------------
-
   (imp user:/config/ai)
-
-
-  ;;------------------------------------------------------------------------------
-  ;; dev-env: Rest Client/Language: Hurl
-  ;;------------------------------------------------------------------------------
-
-  ;;`hurl-mode'
-  ;;-----------
-  ;; https://hurl.dev/docs/installation.html
-  ;; https://github.com/JasZhe/hurl-mode
-  (use-package hurl-mode
-    :mode "\\.hurl\\'"
-
-    ;;------------------------------
-    :init
-    ;;------------------------------
-    ;; `package-vs-install' "bug":
-    ;;   1. It wants to be interactive.
-    ;;   2. It doesn't know what to do if the package is already installed.
-    ;; Therefore, hide behind installed check:
-    (unless (package-installed-p 'hurl-mode)
-      ;; Not on (M)ELPA. Tell Emacs where/how to get it.
-      (package-vc-install "https://github.com/JasZhe/hurl-mode")))
-
 
   ;;------------------------------------------------------------------------------
   ;; Fin: End of user Emacs init.
