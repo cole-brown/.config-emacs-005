@@ -34,7 +34,6 @@
 ;; ...anyways.
 ;;
 ;; In the beginning there was
-;;
 ;;; Code:
 
 ;;------------------------------------------------------------------------------
@@ -107,7 +106,6 @@
   ;;----------------------------------------------------------------------------
   ;; Packages: `package' & `use-package'
   ;;----------------------------------------------------------------------------
-
   (imp user:/config/emacs/package)
 
 
@@ -193,28 +191,6 @@
 
   (imp user:/config/emacs/keybinds)
 
-  ;;----------------------------------------------------------------------------
-  ;; Chrome?: Colorize Color Codes
-  ;;----------------------------------------------------------------------------
-
-  ;; https://github.com/DevelopmentCool2449/colorful-mode
-  ;; https://elpa.gnu.org/packages/colorful-mode.html
-  (use-package colorful-mode
-    :demand t
-    :diminish
-
-    :custom
-    (colorful-use-prefix t)
-
-    ;; TODO: Can it trigger in comments as well?
-    ;; #f00
-    ;; "#f00"
-
-
-    :config
-    ;; Switch to hooking `colorful-mode' if global is too much.
-    (global-colorful-mode +1))
-
 
   ;;------------------------------------------------------------------------------
   ;; Secret: Init
@@ -267,10 +243,13 @@
   (imp user:/config/snippets)
 
 
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ;; Emacs
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
+  ;; Config for Emacs Actual or global stuff.
 
+  ;; TODO(init): move all/any of these to new "user/config/emacs/" dir?
+  (imp user:/config/color)
   (imp user:/config/emacs)
   (imp user:/config/help)
   (imp user:/config/undo)
