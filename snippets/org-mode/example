@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# contributor: Cole Brown <code@brown.dev>
+# name: /ex: org-mode source code block
+# key: /ex
+# notes: Block of source code with syntax highlighting, etc.
+# --
+
+#+begin_example $1
+$2
+#+end_example
+$0
