@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-12
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-11-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -91,7 +91,7 @@
 (imp whitespace
   :path pwd
   :after org
-  :after zenburn)
+  :after zenburn-theme)
 
 
 ;;------------------------------------------------------------------------------
