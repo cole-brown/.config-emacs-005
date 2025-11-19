@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-16
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-11-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -16,66 +16,73 @@
 ;;
 ;;; Code:
 
+;; Loader is responsible for ordering and delaying.
+;; So throw a tantrum and die.
+(unless (and (featurep 'zenburn-theme)
+             (featurep 'org)
+             (fboundp 'zenburn-with-color-variables))
+  (error "`zenburn-theme' or `org' not loaded! Cannot tweak `org' for `zenburn'. %s %s %s @%s"
+         (featurep 'zenburn-theme)
+         (featurep 'org)
+         (fboundp 'zenburn-with-color-variables)
+         (imp-path-current-file)))
+
+
 (imp-require theme face)
+
 
 ;;------------------------------------------------------------------------------
 ;; Zenburn Theme Tweaks for Whitespace-Mode
 ;;------------------------------------------------------------------------------
 
-;; Run this after both `zenburn-theme' and `whitespace' have loaded.
-;; Need elisp from both in order to evaluate this.
-(eval-after-load 'zenburn-theme
-  (eval-after-load 'whitespace
-    (macroexp-progn
+;; Set variables from color names in:
+;;   - `zenburn-default-colors-alist'
+;;   - `zenburn-override-colors-alist'
+(zenburn-with-color-variables
 
-     ;; Set variables from color names in:
-     ;;   - `zenburn-default-colors-alist'
-     ;;   - `zenburn-override-colors-alist'
-     (zenburn-with-color-variables
+  ;;---------------------------------------------------------------------------
+  ;; Configure Org-Mode
+  ;;---------------------------------------------------------------------------
+  ;; I need to customize some whitespace-mode faces - they're not the greatest (IMO)
+  ;; in Zenburn...
+  ;;
+  ;; ...ok, last I checked, default Zenburn's Whitespace-Mode is downright garish.
+  ;; Like, ow, my eyeballs...
+  ;;------------------------------
 
-       ;;---------------------------------------------------------------------------
-       ;; Configure Org-Mode
-       ;;---------------------------------------------------------------------------
-       ;; I need to customize some whitespace-mode faces - they're not the greatest (IMO)
-       ;; in Zenburn...
-       ;;
-       ;; ...ok, last I checked, default Zenburn's Whitespace-Mode is downright garish.
-       ;; Like, ow, my eyeballs...
-       ;;------------------------------
+  (theme:face:set! 'zenburn
+    ;;---
+    ;; "Good" Whitespace
+    ;;---
+    (list 'whitespace-space   :foreground zenburn-bg+2)
+    (list 'whitespace-newline :foreground zenburn-bg+2)
+    ;; whitespace-hspace - leave as-is?
+    ;; whitespace-indentation - leave as-is?
 
-       (theme:face:set! 'zenburn
-         ;;---
-         ;; "Good" Whitespace
-         ;;---
-         (list 'whitespace-space   :foreground zenburn-bg+2)
-         (list 'whitespace-newline :foreground zenburn-bg+2)
-         ;; whitespace-hspace - leave as-is?
-         ;; whitespace-indentation - leave as-is?
+    ;;---
+    ;; "Ambivalent" Whitespace
+    ;;---
+    (list 'whitespace-tab :foreground zenburn-orange)
+    ;; whitespace-empty - what is this?
+    ;; (list 'whitespace-empty :foreground zenburn-red)
 
-         ;;---
-         ;; "Ambivalent" Whitespace
-         ;;---
-         (list 'whitespace-tab :foreground zenburn-orange)
-         ;; whitespace-empty - what is this?
-         ;; (list 'whitespace-empty :foreground zenburn-red)
-
-         ;;---
-         ;; "Bad" Whitespace
-         ;;---
-         (list 'whitespace-line
-               :foreground zenburn-magenta
-               ;;:background zenburn-bg-05
-               )
-         ;; whitespace-trailing - leave as-is?
-         ;; whitespace-big-indent - Don't know if I've ever seen this... leave as-is for now.
-         ;; Less eyebleedy.
-         (list 'whitespace-space-after-tab
-               :foreground zenburn-bg-05
-               :background zenburn-magenta)
-         ;; Less eyebleedy.
-         (list 'whitespace-space-before-tab
-               :foreground zenburn-bg-05
-               :background zenburn-violet))))))
+    ;;---
+    ;; "Bad" Whitespace
+    ;;---
+    (list 'whitespace-line
+          :foreground zenburn-magenta
+          ;;:background zenburn-bg-05
+          )
+    ;; whitespace-trailing - leave as-is?
+    ;; whitespace-big-indent - Don't know if I've ever seen this... leave as-is for now.
+    ;; Less eyebleedy.
+    (list 'whitespace-space-after-tab
+          :foreground zenburn-bg-05
+          :background zenburn-magenta)
+    ;; Less eyebleedy.
+    (list 'whitespace-space-before-tab
+          :foreground zenburn-bg-05
+          :background zenburn-violet)))
 
 
 ;;------------------------------------------------------------------------------
