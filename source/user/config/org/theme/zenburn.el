@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-12
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-11-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -45,7 +45,8 @@
 
 ;; Oh, hey; you're alive. Good job.
 
-(imp-require-assert 'theme 'face)
+
+(imp-require theme:/face)
 
 
 ;;------------------------------------------------------------------------------
