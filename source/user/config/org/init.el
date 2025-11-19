@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-03-16
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-11-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -30,10 +30,11 @@
 
 (imp ./mode)
 
-;; ...And now theme org mode itself...
-(imp ./theme/zenburn
-  :after zenburn-theme
-  :after org)
+;; This has been moved to user/theme/zenburn/org-mode.el.
+;; ;; ...And now theme org mode itself...
+;; (imp ./theme/zenburn
+;;   :after zenburn-theme
+;;   :after org)
 
 ;; Skip agenda for now... It doesn't jive well with hundreds of org files...
 ;; (imp agenda :path pwd)

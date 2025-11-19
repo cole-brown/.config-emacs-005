@@ -71,44 +71,44 @@
   ;; NOTE: If I want to figure out these faces and shit better, org defines
   ;;       its faces in `org-faces.el' @ file:/usr/share/emacs/30.1/lisp/org/org-faces.el
 
-  (defgroup --/theme=zenburn/face=org-todo nil
+  (defgroup --/zenburn/org-todo nil
     "A place to hide `org-todo' faces."
     :group 'tools
     ;; TODO: What is this repo called?
     ;; :link '(url-link "https://github.com/cole-brown/.config-emacs")
     )
 
-  (defface --/theme=zenburn/face=org-todo/keyword=current
+  (defface --/zenburn/org-todo/current
     (list (cons
            ;; display type
            t
            ;; attributes
            '(:inherit (bold font-lock-constant-face org-todo))))
     "Face spec for 'current' todo sequence keyword(s)."
-    :group '--/theme=zenburn/face=org-todo)
+    :group '--/zenburn/org-todo)
 
 
-  (defface --/theme=zenburn/face=org-todo/keyword=project
+  (defface --/zenburn/org-todo/project
     (list (cons
            ;; display type
            t
            ;; attributes
            '(:inherit (bold font-lock-doc-face org-todo))))
     "Face spec for 'project' todo sequence keyword(s)."
-    :group '--/theme=zenburn/face=org-todo)
+    :group '--/zenburn/org-todo)
 
 
-  (defface --/theme=zenburn/face=org-todo/keyword=holding
+  (defface --/zenburn/org-todo/holding
     (list (cons
            ;; display type
            t
            ;; attributes
            '(:inherit (bold warning org-todo))))
     "Face spec for 'on-hold' todo sequence keyword(s)."
-    :group '--/theme=zenburn/face=org-todo)
+    :group '--/zenburn/org-todo)
 
 
-  (defface --/theme=zenburn/face=org-todo/keyword=todo
+  (defface --/zenburn/org-todo/todo
     (list (cons
            ;; display type
            t
@@ -120,10 +120,10 @@
                  :background zenburn-bg-05
                  :weight 'bold)))
     "Face spec for 'todo' keyword in todo sequence."
-    :group '--/theme=zenburn/face=org-todo)
+    :group '--/zenburn/org-todo)
 
 
-  (defface --/theme=zenburn/face=org-todo/keyword=done-good
+  (defface --/zenburn/org-todo/done-good
     (list (cons
            ;; display type
            t
@@ -133,10 +133,10 @@
            (list :background zenburn-bg-05
                  :inherit 'org-done)))
     "Face spec for good/successful 'done'/'finished' keyword in todo sequence."
-    :group '--/theme=zenburn/face=org-todo)
+    :group '--/zenburn/org-todo)
 
 
-  (defface --/theme=zenburn/face=org-todo/keyword=done-bad
+  (defface --/zenburn/org-todo/done-bad
     (list (cons
            ;; display type
            t
@@ -146,10 +146,10 @@
            (list :background zenburn-bg-05
                  :foreground zenburn-red-5)))
     "Face spec for bad/failed 'done'/'finished' keyword in todo sequence."
-    :group '--/theme=zenburn/face=org-todo)
+    :group '--/zenburn/org-todo)
 
 
-  (defface --/theme=zenburn/face=org-todo/keyword=info
+  (defface --/zenburn/org-todo/info
     (list (cons
            ;; display type
            t
@@ -159,10 +159,10 @@
            (list :background zenburn-bg-05
                  :foreground zenburn-bg+3)))
     "Face spec for info keyword in todo sequence."
-    :group '--/theme=zenburn/face=org-todo)
+    :group '--/zenburn/org-todo)
 
 
-  (defface --/theme=zenburn/face=org-todo/keyword=null
+  (defface --/zenburn/org-todo/null
     (list (cons
            ;; display type
            t
@@ -172,15 +172,15 @@
            (list :background zenburn-bg-05
                  :foreground zenburn-bg+3)))
     "Face spec for empty/null/spacer keyword in todo sequence."
-    :group '--/theme=zenburn/face=org-todo))
+    :group '--/zenburn/org-todo))
 
 
 ;;---------------------------------------------------------------------------
 ;; Configure Org-Mode
 ;;---------------------------------------------------------------------------
 
-(theme:face:set! 'zenburn
-  (zenburn-with-color-variables
+(zenburn-with-color-variables
+  (theme:face:set! 'zenburn
     ;;---
     ;; Done states - little less dark.
     ;;---
@@ -191,7 +191,7 @@
     ;; "Done" Headlines - success/fail/info/etc.
     ;;    - Would be nice to have green, red, and gray... but we only have the one 'done' face.
     ;;    - So a lighter gray?
-    `(org-headline-done :foreground zenburn-fg-05)
+    `(org-headline-done :foreground ,zenburn-fg-05)
     ;; `(org-headline-done :foreground zenburn-green-3)
 
     ;;---
@@ -213,15 +213,15 @@
     ;; Org TODO States
     ;;---
     ;; ├CURRENT┤
-    `(--/theme=zenburn/face=org-todo/keyword=current
+    `(--/zenburn/org-todo/current
           :foreground ,zenburn-violet
           :background ,zenburn-bg-05)
     ;; ├WAITING┤, ├HOLDING┤
-    `(--/theme=zenburn/face=org-todo/keyword=holding
+    `(--/zenburn/org-todo/holding
           :foreground ,zenburn-magenta-03
           :background ,zenburn-bg-05)
     ;; ├PROJECT┤
-    `(--/theme=zenburn/face=org-todo/keyword=project
+    `(--/zenburn/org-todo/project
           :foreground ,zenburn-blue-3
           :background ,zenburn-bg-05)
 
@@ -241,9 +241,9 @@
     ;;---
     `(org-document-info-keyword :foreground ,zenburn-bg+3)))
 ;; `C-h o' to see help for these:
-;; --/theme=zenburn/face=org-todo/keyword=current
-;; --/theme=zenburn/face=org-todo/keyword=holding
-;; --/theme=zenburn/face=org-todo/keyword=project
+;; --/zenburn/org-todo/current
+;; --/zenburn/org-todo/holding
+;; --/zenburn/org-todo/project
 ;; org-checkbox
 ;; org-checkbox-statistics-todo
 ;; org-headline-todo
@@ -283,18 +283,18 @@
 
   ;; And set some faces for these. strings.
   (customize-set-variable 'org-todo-keyword-faces
-                          `((,(--/org/todo/keyword "TODO"    wrap) . --/theme=zenburn/face=org-todo/keyword=todo)
-                            (,(--/org/todo/keyword "PROJECT" wrap) . --/theme=zenburn/face=org-todo/keyword=project)
-                            (,(--/org/todo/keyword "CURRENT" wrap) . --/theme=zenburn/face=org-todo/keyword=current)
-                            (,(--/org/todo/keyword "WAITING" wrap) . --/theme=zenburn/face=org-todo/keyword=holding)
-                            (,(--/org/todo/keyword "HOLDING" wrap) . --/theme=zenburn/face=org-todo/keyword=holding)
-                            (,(--/org/todo/keyword "INFO"    wrap) . --/theme=zenburn/face=org-todo/keyword=info)
-                            (,(--/org/todo/keyword "MEETING" wrap) . --/theme=zenburn/face=org-todo/keyword=info)
-                            (,(--/org/todo/keyword "MOVED"   wrap) . --/theme=zenburn/face=org-todo/keyword=info)
-                            (,(--/org/todo/keyword "DONE"    wrap) . --/theme=zenburn/face=org-todo/keyword=done-good)
-                            (,(--/org/todo/keyword "SUCCESS" wrap) . --/theme=zenburn/face=org-todo/keyword=done-good)
-                            (,(--/org/todo/keyword "FAILURE" wrap) . --/theme=zenburn/face=org-todo/keyword=done-bad)
-                            (,(--/org/todo/keyword "KILLED"  wrap) . --/theme=zenburn/face=org-todo/keyword=done-bad)))
+                          `((,(--/org/todo/keyword "TODO"    wrap) . --/zenburn/org-todo/todo)
+                            (,(--/org/todo/keyword "PROJECT" wrap) . --/zenburn/org-todo/project)
+                            (,(--/org/todo/keyword "CURRENT" wrap) . --/zenburn/org-todo/current)
+                            (,(--/org/todo/keyword "WAITING" wrap) . --/zenburn/org-todo/holding)
+                            (,(--/org/todo/keyword "HOLDING" wrap) . --/zenburn/org-todo/holding)
+                            (,(--/org/todo/keyword "INFO"    wrap) . --/zenburn/org-todo/info)
+                            (,(--/org/todo/keyword "MEETING" wrap) . --/zenburn/org-todo/info)
+                            (,(--/org/todo/keyword "MOVED"   wrap) . --/zenburn/org-todo/info)
+                            (,(--/org/todo/keyword "DONE"    wrap) . --/zenburn/org-todo/done-good)
+                            (,(--/org/todo/keyword "SUCCESS" wrap) . --/zenburn/org-todo/done-good)
+                            (,(--/org/todo/keyword "FAILURE" wrap) . --/zenburn/org-todo/done-bad)
+                            (,(--/org/todo/keyword "KILLED"  wrap) . --/zenburn/org-todo/done-bad)))
 
   ;; I guess this guy is covered by `hl-todo' instead of `org'?
   ;; (push `(,(--/org/todo/keyword "TODO" wrap) warning bold) hl-todo-keyword-faces)

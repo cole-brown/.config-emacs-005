@@ -83,10 +83,10 @@
 ;; Load Other Zenburn Files
 ;;------------------------------------------------------------------------------
 
-;; (imp org-mode
-;;   :path pwd
-;;   :after org
-;;   :after zenburn)
+(imp org-mode
+  :path pwd
+  :after org
+  :after zenburn-theme)
 
 (imp whitespace
   :path pwd
