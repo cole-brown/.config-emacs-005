@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-02
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-11-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -221,8 +221,12 @@
   ;;---
   ;; Professionally Used:
   ;;---
-  (push '("C#"                      . csharp-ts)     org-src-lang-modes) ; dotnet
-  (push '("csharp"                  . csharp-ts)     org-src-lang-modes)
+  ;; TODO(org): put these in their language's config file?
+  (push '("C#"                      . csharp)     org-src-lang-modes) ; dotnet
+  (push '("csharp"                  . csharp)     org-src-lang-modes)
+  ;; TODO(csharp): switch to `csharp-ts-mode'.
+  ;; (push '("C#"                      . csharp-ts)     org-src-lang-modes) ; dotnet
+  ;; (push '("csharp"                  . csharp-ts)     org-src-lang-modes)
 
   (push '("hcl"                     . hcl)        org-src-lang-modes) ; HashiCorp Configuration Language
   (push '("terraform"               . hcl)        org-src-lang-modes)

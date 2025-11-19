@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-11-17
+;; Timestamp:  2025-11-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -279,7 +279,11 @@
   (--/exe/optional "hurl")
   (--/exe/optional "terraform")
 
+  ;; Load common first.
   (imp user:/config/languages/common)
+
+  ;; Alphabetical
+  (imp user:/config/languages/csharp)
   (imp user:/config/languages/elisp)
   (imp user:/config/languages/hurl)
   (imp user:/config/languages/json)
@@ -340,13 +344,15 @@
  ;; If there is more than one, they won't work right.
  '(org-fold-catch-invisible-edits 'show-and-error nil nil "Customized with use-package org")
  '(package-selected-packages
-   '(cape colorful-mode corfu deadgrep elisp-demos embark-consult git-gutter-fringe
-          git-modes gptel hc-zenburn-theme helpful highlight-quoted hurl-mode
-          hydra macrostep magit major-mode-hydra marginalia minions no-littering
-          orderless ox-gfm rainbow-delimiters terraform-mode undo-tree vertico
-          ws-butler yaml-mode yasnippet zenburn-theme))
+   '(cape colorful-mode corfu csproj-mode deadgrep elisp-demos embark-consult
+          git-gutter-fringe git-modes gptel hc-zenburn-theme helpful
+          highlight-quoted hurl-mode hydra macrostep magit major-mode-hydra
+          marginalia minions no-littering orderless ox-gfm rainbow-delimiters
+          sharper sln-mode terraform-mode undo-tree vertico ws-butler yaml-mode
+          yasnippet zenburn-theme))
  '(package-vc-selected-packages
-   '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode"))))
+   '((sln-mode :vc-backend Git :url "https://github.com/sensorflo/sln-mode")
+     (hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
