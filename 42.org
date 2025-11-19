@@ -4302,32 +4302,303 @@ get config from 004:
   - file:../2023-07-23_sn004/mantle/config/undo-tree.el
 
 
-* -- U R HERE --
-<<here>>
-
-* ├CURRENT┤ init: break stuff off into files & imp them
+* ├DONE───┤ init: break stuff off into files & imp them
+CLOSED: [2025-11-17 Mon 17:47]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-17 Mon 17:47]
 - State "├CURRENT┤"  from              [2025-11-17 Mon 16:21]
 :END:
 
-* pkg: hydra
+* ├DONE───┤ pkg: hydra
+CLOSED: [2025-11-17 Mon 22:55]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-17 Mon 22:55]
+- State "├CURRENT┤"  from              [2025-11-17 Mon 21:51]
+:END:
 
 get config from 004:
-  - +file:../2023-07-23_sn004/mantle/config/undo-tree.el+
+  - file:../2023-07-23_sn004/mantle/config/hydra/init.el
 
 load user/art/init.el in init
   - or just user/art/box.el?
 
-* source/_todo/multiplexer
+* ├DONE───┤ csharp sans treesit?
+CLOSED: [2025-11-18 Tue 16:47]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-18 Tue 16:47]
+- State "├CURRENT┤"  from              [2025-11-18 Tue 16:20]
+:END:
 
-delete or use
+pull config for csharp from sn004
+file:../2023-07-23_sn004/mantle/config/dev-env/languages/csharp.el
+
+(package-installed-p 'csharp-mode)
+(package-installed-p 'csproj-mode)
+
+
+
+* ├DONE───┤ org mode & theme tweaks
+CLOSED: [2025-11-18 Tue 22:04]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-11-18 Tue 22:04]
+- State "├CURRENT┤"  from              [2025-11-18 Tue 22:02]
+:END:
+
+Where are my org tweaks for color of TODO/headline?
+They aint working.
+There's supposed to be purples and grays and shit
+
+#+begin_src elisp
+(pp-to-string imp-features)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+((art (box)) (secret.d) (namespaced) (emacs-server) (system nil (os))
+ (path nil (+uniquify) (buffer) (git) (regex) (dir) (files) (path))
+ (theme nil (face))
+ (str nil (+case-hydra) (case) (hash) (random) (propertize) (string) (buffer)
+      (regex) (normalize))
+ (dlv nil (display) (dlv) (class) (path) (debug)) (output nil (squelch))
+ (package nil (upgrade (command) (mode))) (window nil (window))
+ (unit nil (units)) (list)
+ (alist nil (generic) (type (string) (keyword) (default) (types)) (internal))
+ (datetime nil (timestamp) (format) (datetime)) (color)
+ (buffer nil (yank) (search) (line) (point) (name) (manage) (eval) (type)
+         (narrow) (region) (delete))
+ (elisp nil (utils (test) (predicates)) (functions) (types))
+ (user (mode (hydra (init)) (org nil (link) (keyword)))
+       (config (hydra) (ai) (languages (csharp) (elisp) (common))
+               (org (theme (zenburn)) nil (mode)) (files) (whitespace)
+               (undo-tree) (help) (snippets) (completion)
+               (theme (zenburn (whitespace)))
+               (emacs nil (keybinds) (no-littering) (package))))
+ (imp nil (package) (require) (load) (provide)))
+#+end_example
+
+#+begin_src elisp
+(pp-to-string features)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+(user:/config/languages/csharp sln-mode-autoloads package-vc csproj-mode
+                               csproj-mode-autoloads let-alist sharper-autoloads
+                               yaml-mode pulse gptel-curl gptel-org gptel
+                               gptel-openai dired-aux helpful cc-langs cc-vars
+                               cc-defs trace edebug info-look f elisp-refs
+                               cl-print debug backtrace art/box
+                               user:/config/hydra user:/mode/hydra/init
+                               major-mode-hydra pretty-hydra
+                               major-mode-hydra-autoloads pretty-hydra-autoloads
+                               hydra lv hydra-autoloads lv-autoloads
+                               loaddefs-gen lisp-mnt tar-mode arc-mode
+                               archive-mode mm-archive network-stream url-cache
+                               url-http url-auth url-gw nsm vc-hg vc-bzr vc-src
+                               vc-sccs vc-svn vc-cvs vc-rcs log-view vc
+                               bug-reference magit-extras face-remap help-fns
+                               radix-tree misearch multi-isearch org-indent
+                               oc-basic ol-eww eww url-queue mm-url ol-rmail
+                               ol-mhe ol-irc ol-info ol-gnus nnselect gnus-art
+                               mm-uu mml2015 mm-view mml-smime smime gnutls dig
+                               gnus-sum shr pixel-fill kinsoku url-file svg dom
+                               gnus-group gnus-undo gnus-start gnus-dbus dbus
+                               xml gnus-cloud nnimap nnmail mail-source utf7
+                               nnoo parse-time gnus-spec gnus-int gnus-range
+                               gnus-win gnus nnheader ol-docview doc-view
+                               image-mode exif ol-bibtex bibtex iso8601 ol-bbdb
+                               ol-w3m ol-doi org-link-doi
+                               user:/config/org/theme/zenburn ox-gfm ox-md
+                               ox-odt rng-loc rng-uri rng-parse rng-match rng-dt
+                               rng-util rng-pttrn nxml-parse nxml-ns nxml-enc
+                               xmltok nxml-util ox-latex ox-icalendar org-agenda
+                               ox-html table ox-ascii ox-publish ox org-attach
+                               ob-shell embark-org org-element org-persist xdg
+                               org-id org-refile org-element-ast inline avl-tree
+                               generator org ob ob-tangle ob-ref ob-lob ob-table
+                               ob-exp org-macro org-src sh-script smie treesit
+                               executable ob-comint org-pcomplete org-list
+                               org-footnote org-faces org-entities ob-emacs-lisp
+                               ob-core ob-eval org-cycle org-table ol org-fold
+                               org-fold-core org-keys oc org-loaddefs find-func
+                               cal-menu calendar cal-loaddefs org-version
+                               org-compat org-macs vc-git vc-dispatcher
+                               jka-compr vertico-sort mule-util embark-consult
+                               consult magit-bookmark bookmark compile
+                               rainbow-delimiters highlight-quoted cus-start
+                               terraform-mode noutline outline hcl-mode
+                               user:/config/ai magit-submodule magit-blame
+                               magit-stash magit-reflog magit-bisect magit-push
+                               magit-pull magit-fetch magit-clone magit-remote
+                               magit-commit magit-sequence magit-notes
+                               magit-worktree magit-tag magit-merge magit-branch
+                               magit-reset magit-files magit-refs magit-status
+                               magit magit-repos magit-apply magit-wip magit-log
+                               magit-diff smerge-mode diff-mode track-changes
+                               git-commit log-edit message sendmail yank-media
+                               puny rfc822 mml mml-sec epa epg rfc6068
+                               epg-config gnus-util text-property-search
+                               mm-decode mm-bodies mm-encode mail-parse rfc2231
+                               rfc2047 rfc2045 mm-util ietf-drums mail-prsvr
+                               mailabbrev mail-utils gmm-utils mailheader
+                               pcvs-util add-log magit-core magit-autorevert
+                               magit-margin magit-transient magit-process
+                               with-editor shell pcomplete comint ansi-osc
+                               magit-mode transient benchmark magit-git
+                               magit-base magit-section format-spec
+                               cursor-sensor crm llama
+                               user:/config/languages/elisp elisp-demos
+                               macrostep ring user:/config/languages/common
+                               which-func imenu user:/config/org
+                               user:/config/org/mode user:/mode/org
+                               user:/mode/org/link user:/mode/org/keyword
+                               user:/config/files deadgrep spinner dash s
+                               recentf tree-widget time-stamp
+                               user:/config/whitespace disp-table whitespace
+                               ws-butler user:/config/undo-tree undo-tree diff
+                               queue user:/config/help which-key
+                               user:/config/emacs minions ansi-color comp
+                               comp-cstr warnings comp-run comp-common profiler
+                               display-line-numbers autorevert filenotify
+                               user:/config/snippets yasnippet
+                               user:/config/completion dabbrev cape corfu embark
+                               ffap thingatpt edmacro kmacro orderless
+                               marginalia savehist vertico secret.d
+                               colorful-mode user:/config/emacs/keybinds
+                               user:/config/theme/zenburn zenburn-theme
+                               user:/config/emacs/no-littering no-littering
+                               compat namespaced emacs-server server system
+                               system:/os path path:/+uniquify path:/buffer
+                               project dired dired-loaddefs path:/git
+                               path:/regex path:/dir path:/files path:/path
+                               theme theme:/face str str:/+case-hydra str:/case
+                               str:/hash str:/random str:/propertize str:/string
+                               str:/buffer str:/regex str:/normalize dlv
+                               dlv:/display dlv:/dlv dlv:/class dlv:/path
+                               dlv:/debug output output:/squelch
+                               package:/upgrade/command package:/upgrade/mode
+                               window:/window unit unit:/units list alist
+                               alist:/type/string alist:/type/keyword
+                               alist:/type/default alist:/generic
+                               alist:/type/types alist:/internal datetime
+                               datetime:/timestamp datetime:/format
+                               datetime:/datetime color buffer buffer:/yank
+                               buffer:/search buffer:/line buffer:/point
+                               buffer:/name buffer:/manage buffer:/eval
+                               buffer:/type buffer:/narrow buffer:/region
+                               buffer:/delete elisp elisp:/utils/test
+                               elisp:/utils/predicates elisp:/functions
+                               elisp:/types time-date user:/config/emacs/package
+                               use-package use-package-delight
+                               use-package-bind-key bind-key easy-mmode
+                               finder-inf cl-extra help-mode use-package-ensure
+                               use-package-diminish use-package-core imp
+                               imp:/package imp:/require imp:/load imp:/provide
+                               derived range rx cus-edit pp cus-load wid-edit
+                               cape-autoloads colorful-mode-autoloads
+                               corfu-autoloads deadgrep-autoloads
+                               elisp-demos-autoloads embark-consult-autoloads
+                               consult-autoloads embark-autoloads
+                               git-gutter-fringe-autoloads
+                               fringe-helper-autoloads git-gutter-autoloads
+                               git-modes-autoloads gptel-autoloads
+                               hc-zenburn-theme-autoloads helpful-autoloads
+                               elisp-refs-autoloads f-autoloads
+                               highlight-quoted-autoloads hurl-mode-autoloads
+                               macrostep-autoloads magit-autoloads pcase
+                               magit-section-autoloads llama-autoloads
+                               marginalia-autoloads minions-autoloads
+                               no-littering-autoloads orderless-autoloads
+                               ox-gfm-autoloads rainbow-delimiters-autoloads
+                               s-autoloads spinner-autoloads
+                               terraform-mode-autoloads dash-autoloads
+                               hcl-mode-autoloads transient-autoloads
+                               undo-tree-autoloads queue-autoloads
+                               vertico-autoloads info with-editor-autoloads
+                               ws-butler-autoloads yaml-mode-autoloads
+                               yasnippet-autoloads zenburn-theme-autoloads
+                               package browse-url url url-proxy url-privacy
+                               url-expand url-methods url-history url-cookie
+                               generate-lisp-file url-domsuf url-util mailcap
+                               url-handlers url-parse auth-source cl-seq eieio
+                               eieio-core cl-macs icons password-cache json
+                               subr-x map byte-opt gv bytecomp byte-compile
+                               url-vars cl-loaddefs cl-lib rmc iso-transl
+                               tooltip cconv eldoc paren electric uniquify
+                               ediff-hook vc-hooks lisp-float-type elisp-mode
+                               mwheel term/x-win x-win term/common-win x-dnd
+                               touch-screen tool-bar dnd fontset image
+                               regexp-opt fringe tabulated-list replace
+                               newcomment text-mode lisp-mode prog-mode register
+                               page tab-bar menu-bar rfn-eshadow isearch
+                               easymenu timer select scroll-bar mouse jit-lock
+                               font-lock syntax font-core term/tty-colors frame
+                               minibuffer nadvice seq simple cl-generic
+                               indonesian philippine cham georgian utf-8-lang
+                               misc-lang vietnamese tibetan thai tai-viet lao
+                               korean japanese eucjp-ms cp51932 hebrew greek
+                               romanian slovak czech european ethiopic indian
+                               cyrillic chinese composite emoji-zwj charscript
+                               charprop case-table epa-hook jka-cmpr-hook help
+                               abbrev obarray oclosure cl-preloaded button
+                               loaddefs theme-loaddefs faces cus-face macroexp
+                               files window text-properties overlay sha1 md5
+                               base64 format env code-pages mule custom widget
+                               keymap hashtable-print-readable backquote threads
+                               dbusbind inotify lcms2 dynamic-setting
+                               system-font-setting font-render-setting cairo gtk
+                               x-toolkit xinput2 x multi-tty move-toolbar
+                               make-network-process native-compile emacs)
+#+end_example
+
+bug:
+#+begin_src elisp
+(theme:face:set! 'zenburn
+  (zenburn-with-color-variables
+    ;;---
+    ;; Done states - little less dark.
+    ;;---
+    `(org-done                     :foreground ,zenburn-green-3)
+    ...
+#+end_src
+
+fix:
+#+begin_src elisp
+(zenburn-with-color-variables
+  (theme:face:set! 'zenburn
+    ;;---
+    ;; Done states - little less dark.
+    ;;---
+    `(org-done                     :foreground ,zenburn-green-3)
+    ...
+#+end_src
+
+
+* -- U R HERE --
+<<here>>
 
 * source/_todo/secret
 
 delete or use
 
-* ├CURRENT┤ csharp & treesit?
+* LSP
+
+Get language server stuff set up?
+
+
+Grab LSP config from sn004
+
+find todos:
+#+begin_src elisp
+;; TODO(lsp): uncomment:
+#+end_src
+  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
+
+use Omnisharp for csharp.
+
+* ├HOLDING┤ csharp & treesit?
 :LOGBOOK:
+- State "├HOLDING┤"  from "├CURRENT┤"  [2025-11-18 Tue 16:51]
 - State "├CURRENT┤"  from              [2025-10-08 Wed 23:01]
 :END:
 
@@ -4341,8 +4612,62 @@ mmmh... yay. -_-
 ⛔ Warning (treesit): The installed language grammar for csharp cannot be located or has problems (symbol-error): /home/main/.config/emacs/tree-sitter/libtree-sitter-csharp.so: undefined symbol: tree_sitter_csharp
 #+end_quote
 
-TODO: make csharp config file
+#+begin_src elisp
+(pp-to-string treesit-language-source-alist)
+#+end_src
 
+#+RESULTS:
+: nil
+
+oh... if I use "c-sharp" instead of "csharp" it will find the repo automatically?
+nope.
+Add a thing to ~treesit-language-source-alist~
+
+#+begin_src elisp
+(add-to-list 'treesit-language-source-alist '(c-sharp "https://github.com/tree-sitter/tree-sitter-c-sharp"))
+#+end_src
+
+#+begin_quote
+⛔ Warning (treesit): The installed language grammar for c-sharp cannot be located or has problems (version-mismatch): 15
+#+end_quote
+
+hm... delete the .so first?
+  - deleted both (=csharp= and =c-sharp=)
+
+reinstall
+~M-x treesit-install-language-grammar~
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Maybe look at this first:
+https://www.reddit.com/r/emacs/comments/1gjhe5a/is_developing_c_in_emacs_viable_without_obsolete/
+
+
+Maybe try ~tree-sitter-langs~ package instead of manual?
+https://github.com/emacs-tree-sitter/tree-sitter-langs
+
+#+begin_src elisp
+;; TODO(csharp): switch to `csharp-ts-mode'.
+#+end_src
+  - [[file:source/user/config/languages/csharp.el::;; TODO(csharp): switch to `csharp-ts-mode'.][here]]
+
+TODO: make csharp config file
+TODO: put ~treesit-language-source-alist~ recipe in config file?
+
+* submit whitespace+ws-butler bug to Emacs
+
+M-x report-bug or something
+
+* repo buffernames
+
+TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
+
+* source/_todo/multiplexer
+
+delete or use
 
 * imp-provide helper?
 
@@ -4861,10 +5186,6 @@ Skip/avoid for now?
 
     
     
-* repo buffernames
-
-TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
-
 * titlebar
 
 * Secrets: 1Password CLI?
