@@ -669,7 +669,7 @@ Need:
   - [X] ns:list
     - ~elisp:list:listify~ -> ~list:to-list~?
 
-back to the face funcs:      
+back to the face funcs:
 [[file:source/core/packages/namespaced/theme/face.el]]
 
 Annnd... it loads!
@@ -766,7 +766,7 @@ CLOSED: [2025-09-09 Tue 23:41]
 
 Where is it in 004?
 #+begin_src console
-2023-07-23_sn004 on  main [!?] 
+2023-07-23_sn004 on  main [!?]
 ❯ rg "use-package.*yas"
 mantle/config/dev-env/snippets.el
 111:(imp:use-package yasnippet
@@ -4577,9 +4577,49 @@ fix:
 * -- U R HERE --
 <<here>>
 
-* source/_todo/secret
+* pull latest in Win10VM
+* org: inline quote & code tweaks
+
+~code~
+=quote=
+
+Do:
+  - Remove underline.
+  - Make them different colors.
+  - Maybe not quite so bright?
+    - imitate Slack?
+      - burnt orange sorta color
+      - lighter background (already have this for code; quote is darker tho)
+
+* ├CURRENT┤ source/_todo/multiplexer
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-11-19 Wed 21:54]
+:END:
 
 delete or use
+
+use?
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+refactor & simplify
+  - multiplex.el
+    - u r [[file:source/_todo/multiplexer/multiplex.el::;; TODO: HERE][here]]
+
+
+
+* ├WAITING┤ source/_todo/secret
+:LOGBOOK:
+- State "├WAITING┤"  from              [2025-11-19 Wed 21:53] \\
+  multiplexer first
+:END:
+
+delete or use?
+
+oh. this requires ~multiplexer~
 
 * LSP
 
@@ -4665,9 +4705,31 @@ M-x report-bug or something
 
 TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
 
-* source/_todo/multiplexer
+* TRAMP into Win10 VM
 
-delete or use
+I probably need an ssh server running or something.
+
+I think Windows comes with OpenSSH now?
+  - Does it come with server?
+  - Else what should I use for the server?
+    - Putty?
+
+* org-babel no confirm
+
+write a func that ~org-confirm-babel-evaluate~ can use to decide
+whether to prompt with ~y-or-n-p~
+
+by source type (major-mode)?
+
+* eval after
+
+Find ~(when (imp-feature?~
+example
+  - [[file:source/user/config/help.el::;; TODO: change to eval-after:][here]]
+
+Fix to eval after said feature.
+
+
 
 * imp-provide helper?
 
@@ -4774,17 +4836,19 @@ maybe should be?
 maybe this is:
 "Find canonical feature name from provided"
 
-* eval after
+* namespaced/list/plist
 
-Find ~(when (imp-feature?~
-example
-  - [[file:source/user/config/help.el::;; TODO: change to eval-after:][here]]
+Start the ~plist~ lib with some of [[file:/usr/share/emacs/30.2/lisp/org/org-macs.el.gz][org plist funcs]]
 
-Fix to eval after said feature.
-
+~mux~ has plist delete: ~_mux-plist-delete~
 
 
 * namespace again
+** Namespace everything to 'ns'?
+
+ns/emacs/server?
+ns/string/split?
+
 ** rename str to string?
 
 so that they show up with the string functions?
@@ -4920,22 +4984,6 @@ Integrate them into eg `imp-path` function.
 Rename ~imp-path-root-set~ to...
   - ~imp-root~?
   - ~imp-root-set~?
-
-* org-babel no confirm
-
-write a func that ~org-confirm-babel-evaluate~ can use to decide
-whether to prompt with ~y-or-n-p~
-
-by source type (major-mode)?
-
-* TRAMP into Win10 VM
-
-I probably need an ssh server running or something.
-
-I think Windows comes with OpenSSH now?
-  - Does it come with server?
-  - Else what should I use for the server?
-    - Putty?
 
 * imp unit tests?
 
@@ -5184,8 +5232,8 @@ Skip/avoid for now?
   - [ ] toggl.el
 
 
-    
-    
+
+
 * titlebar
 
 * Secrets: 1Password CLI?
@@ -5357,7 +5405,7 @@ I do this a lot in init files:
 
 Make those the defaults?
 (imp-path-root-set :str)
-                   
+
 ** imp-timing default file/path
 
 90+% I just want current dir/file:
@@ -5374,8 +5422,8 @@ Can I make them optional?
   ...)
 
 maybe like `dolist'?
-(imp-timing (:elisp)  ...)  
-(imp-timing (:elisp ?path ?file)  ...)  
+(imp-timing (:elisp)  ...)
+(imp-timing (:elisp ?path ?file)  ...)
 
 
 Or split into two?
@@ -5389,7 +5437,7 @@ Or split into two?
     path
     file
   ...)
-    
+
 ** imp-load default filename
 
 Want to be able to just do this:
@@ -5438,9 +5486,9 @@ Can I make ~hc-zenburn~ piggyback on top of ~zenburn~?
   - Probably not... The colors are probably all hand-picked.
     - But ~hc-zenburn~ does have a script to mess with brightness.
       - https://github.com/edran/hc-zenburn-emacs/blob/master/change_brightness.py
-    - And I have funcs to mess with colors: 
+    - And I have funcs to mess with colors:
       - [[file:source/core/packages/innit/face.el::defun innit:color:darken (color alpha &optional colors-alist][here]] or [[file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/modules/mode/org/keyword.el][sn004]]
-        
+
 TODO: Make ~zenburn-high-contrast~ for ~zenburn~ somehow.
 
 
