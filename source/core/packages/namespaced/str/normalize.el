@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-27
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-11-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -74,6 +74,10 @@ Return a string or nil."
      ;;----------------------------
      ;; Normalize
      ;;----------------------------
+
+     ;; Numbers.
+     ((numberp input)
+      (number-to-string input))
 
      ;; String is String.
      ((stringp input)
