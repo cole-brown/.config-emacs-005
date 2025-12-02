@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-11-05
+;; Timestamp:  2025-11-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -83,7 +83,7 @@ If HASH is nil, default to `str:hash:default'."
 ;; (str:hash:full (list (system-name) system-type))
 
 
-(defun str:hash:pretty (input &optional hash slice join)
+(defun str:hash:short (input &optional hash slice join)
   "Hash INPUT (can be string, symbol or list of strings/symbols).
 
 If HASH is non-nil, will use that HASH algorithm (see `(secure-hash-algorithms)'
@@ -102,8 +102,9 @@ slices. Otherwise uses `str:hash:join/slices'."
     (concat (substring hash-full 0 slice)
             join
             (substring hash-full (- slice) nil))))
-;; (str:hash:pretty "jeff")
-;; (str:hash:pretty (list (system-name) system-type))
+;; (str:hash:short "jeff")
+;; (str:hash:short (list (system-name) system-type))
+;; (str:hash:full (list (system-name) system-type))
 
 
 (defun str:hash:recreate (prefixes pretty-hash)
@@ -111,7 +112,7 @@ slices. Otherwise uses `str:hash:join/slices'."
 
 PREFIXES should be: string, symbol, or list of strings/symbols.
 
-PRETTY-HASH should be a string like `str:hash:pretty' outputs.
+PRETTY-HASH should be a string like `str:hash:short' outputs.
 
 This joins all PREFIXES together into a string separated with
 `str:hash:join/prefixes'.
@@ -128,13 +129,13 @@ Then it joins the prefix string to the PRETTY-HASH string with
 ;; (str:hash:recreate '(jeff compy) "cab3d6-bad38c")
 
 
-(defun str:hash (prefixes inputs)
+(defun str:hash:pretty (prefixes inputs)
   "PREFIXES and INPUTS should be: string, symbol, or list of strings/symbols.
 
 This joins all PREFIXES together into a string separated with
 `str:hash:join/prefixes'.
 
-Then it hash INPUTS using `str:hash:pretty' function.
+Then it hash INPUTS using `str:hash:short' function.
 
 Finally, it join prefixes string and inputs hash string with
 `str:hash:join/prepend'."
@@ -144,8 +145,8 @@ Finally, it join prefixes string and inputs hash string with
           ;; ...add prepend separator...
           str:hash:join/prepend
           ;; ...and finish with the pretty hash.
-          (str:hash:pretty inputs)))
-;; (str:hash '(jeff compy) 'laptop-2020)
+          (str:hash:short inputs)))
+;; (str:hash:pretty '(jeff compy) 'laptop-2020)
 
 
 (defun str:hash:split (hash:pretty)
