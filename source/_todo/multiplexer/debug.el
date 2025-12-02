@@ -1,10 +1,10 @@
-;;; core/modules/system/multiplexer/debug.el --- Debugging/Error Help -*- lexical-binding: t; -*-
+;;; mux/debug.el --- Debugging/Error Help -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-03-09
-;; Timestamp:  2023-08-16
+;; Timestamp:  2025-11-19
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,40 +17,69 @@
 ;;; Code:
 
 
-(imp:require :nub)
+;;------------------------------------------------------------------------------
+;; Vars
+;;------------------------------------------------------------------------------
+
+(defvar mux-debugging? nil
+  "Set to non-nil to enable debug logs.")
 
 
 ;;------------------------------------------------------------------------------
-;; Initialization
+;; Debugging Commands
 ;;------------------------------------------------------------------------------
 
-(defun int<system/multiplexer>:nub:init ()
-  "Initialize nub user & settings for multiplexer."
-  (nub:vars:init :system/multiplexer))
-
-
-
-;;------------------------------------------------------------------------------
-;; Debugging Toggle
-;;------------------------------------------------------------------------------
-
-(defun system:multiplexer:debug:toggle ()
-  "Toggle debugging for dlv."
+(defun mux-debug-toggle ()
+  "Toggle debugging for mux."
   (interactive)
-  (nub:debug:toggle :system/multiplexer))
+  (setq mux-debugging? (not mux-debugging?))
+  (message "mux-debugging?: %S" mux-debugging?))
 
 
 ;;------------------------------------------------------------------------------
 ;; Debugging Functions
 ;;------------------------------------------------------------------------------
 
-;; Just use:
-;;   - `nub:debug'
-;;   - `nub:debug:func/start'
-;;   - `nub:debug:func/end'
+(defun _mux-debug (funcname format &rest args)
+  "debug messages
+
+FORMAT is one of:
+  - a string
+  - a list of strings"
+  (declare (indent 1))
+  (when mux-debugging?
+    (apply #'message
+           (concat "[mux:DEBUG] %S: "
+                   (if (proper-list-p format)
+                       (apply #'concat format)
+                     format))
+           funcname
+           args)))
+;; (_mux-debug 'test '("foo" "bar"))
+
+
+;;------------------------------------------------------------------------------
+;; Error Functions
+;;------------------------------------------------------------------------------
+
+(defun _mux-error (funcname format &rest args)
+  "error messages
+
+FORMAT is one of:
+  - a string
+  - a list of strings"
+  (declare (indent 1))
+  (apply #'error
+         (concat "[mux:ERROR] %S: "
+                 (if (proper-list-p format)
+                     (apply #'concat format)
+                   format))
+         funcname
+         args))
+;; (_mux-error 'test '("foo" "bar"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :system 'multiplexer 'debug)
+(imp-provide mux debug)

@@ -1,10 +1,10 @@
-;;; core/modules/system/multiplexer/multiplex.el --- Knowledge About All Systems -*- lexical-binding: t; -*-
+;;; mux/multiplex.el --- Knowledge About All Systems -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2023-06-26
+;; Timestamp:  2025-12-01
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -14,9 +14,9 @@
 ;;
 ;; Define all systems so that we can then know which system this system is.
 ;;
-;; Use `system:multiplexer:define' to define your systems.
+;; Use `mux-define' to define your systems.
 ;;
-;; Then you can use `system:multiplexer:set' and `system:multiplexer:get' to set
+;; Then you can use `mux-set' and `mux-get' to set
 ;; up in a system-agnostic(ish) manner.
 ;;
 ;;; Code:
@@ -24,572 +24,521 @@
 
 (require 'cl-lib)
 
-(imp:require :nub)
-(imp:require :jerky)
-(imp:require :str)
-(imp:require :path)
-(imp:require :buffer)
+(imp-require 'str)
+(imp-require 'path)
+(imp-require 'buffer)
 
 
 ;;------------------------------------------------------------------------------
-;; Getter/Setter for Multiplexer keys in Jerky.
+;; Customs, Constants, Etc.
 ;;------------------------------------------------------------------------------
 
-(defun int<system/multiplexer>:add (hash)
-  "Add HASH to the list of system hashes if not already present."
-  (let ((hashes (jerky:get 'system 'hashes)))
-    (when (not (member hash hashes))
-      (jerky:set 'system 'hashes
-                 :value (cons hash hashes)
-                 :docstr "List of all system hashes."))))
+;; TODO(mux): set this somehow. Make a func?
+(defvar mux-system-id nil
+  "ID for \this\ current system.")
 
 
-(defun int<system/multiplexer>:system/hashes ()
-  "Get a list of all system hashes."
-  (jerky:get 'system 'hashes))
-;; (int<system/multiplexer>:system/hashes)
+;; (setq mux-systems nil mux-system-id nil)
+(defcustom mux-systems '()
+  "Alist of all known system ids.
+
+Each entry has the format (HASH ID DOCSTR (PLIST))
+
+HASH   - keyword (see func `mux-hash')
+ID     - keyword (see func `mux-id')
+DOCSTR - string or nil
+PLIST  - property list or nil")
 
 
-(defun system:multiplexer:set (&rest plist)
+(defconst _mux-rx-hash (rx-to-string `(seq string-start
+                                           (optional ":") ; keyword?
+                                           (+ hex)
+                                           ,str:hash:join/slices
+                                           (+ hex)
+                                           string-end)
+                                     :no-group))
+
+
+(defconst _mux-rx-id (rx-to-string `(seq string-start
+                                         (optional ":") ; keyword?
+                                         ;; id strings
+                                         (zero-or-more
+                                          (one-or-more alphanumeric)
+                                          (optional ,str:hash:join/prefixes))
+                                         ;; strings/hash separator
+                                         ,str:hash:join/prepend
+                                         ;; hash
+                                         (+ hex)
+                                         ,str:hash:join/slices
+                                         (+ hex)
+                                         string-end)
+                                   :no-group))
+
+
+;;------------------------------------------------------------------------------
+;; Getter/Setter
+;;------------------------------------------------------------------------------
+
+(defun _mux-plist-delete (plist property)
+  "Delete PROPERTY from PLIST."
+  (let (p)
+    (while plist
+      (unless (eq property (car plist))
+          (setq p (plist-put p (car plist) (nth 1 plist))))
+      (setq plist (cddr plist)))
+    p))
+
+
+;; TODO(mux): func `mux-system-info' for printing out this system's info during
+;; init. or just during load of mux.
+
+
+(cl-defun mux-set (&rest plist &key hash (id nil) (docstr nil) &allow-other-keys)
   "For setting a system's multiplex settings.
 
-PLIST is a plist with keys:
-  - REQUIRED:
-    + `:hash'  - This system's hash string.
-    + `:key'   - A quoted symbol or list of symbols to use for storing settings.
-               - Will be prepended with `:system hash'.
-    + `:value' - The value to store.
-  - OPTIONAL:
-    + `:docstr' - Documentation string.
+- REQUIRED key:
+  + HASH (`:hash') - keyword or symbol (see `mux-hash')
+     - `:this' or `this' for \this\ system's hash
+- OPTIONAL key:
+  + ID (`:id') - keyword or symbol (see `mux-id') (default nil)
+    - nil, `:this', or `this' for \this\ system's id
+  + DOCSTR (`:docstr') - documentation string (default nil)
 
-Sets value in Jerky under key:
-  'system <this-system's-hash> <:keys-input>"
+The rest of the keyword/value pairs in PLIST will be stored as HASH's
+property list."
+  ;; Delete known keys from plist; rest should be key/value pairs to store.
+  (setq plist (_mux-plist-delete plist :hash))
+  (setq plist (_mux-plist-delete plist :id))
+  (setq plist (_mux-plist-delete plist :docstr))
 
-  (let ((func/name "system:multiplexer:set")
-        (hash   (plist-get plist :hash))
-        (key    (plist-get plist :key))
-        (value  (plist-get plist :value))
-        (docstr (plist-get plist :docstr)))
-
-    (nub:debug:func/start
-        :system/multiplexer
-        func/name
-        '(:system :multiplex)
-      (cons 'hash hash)
-      (cons 'key  key)
-      (cons 'value value)
-      (cons 'docstr docstr))
-
-    ;;------------------------------
-    ;; Check for required plist keys: Part 01
-    ;;------------------------------
-    (unless hash
-      (nub:error
-       :system/multiplexer
-       func/name
-       "Must have a `:hash' in plist params: %S"
-       plist))
-    (unless value
-      (nub:error
-       :system/multiplexer
-       func/name
-       "Must have a `:value' in plist params: %S"
-       plist))
+  (let ((funcname 'mux-set))
+    (_mux-debug funcname
+      '("args:\n"
+        "  HASH:   %S\n"
+        "  ID:     %S\n"
+        "  DOCSTR: %S\n"
+        "  PLIST:  %S")
+      hash
+      id
+      docstr
+      plist)
 
     ;;------------------------------
-    ;; Special Case: `hash' == `value'
+    ;; Validate.
     ;;------------------------------
-    ;; Save value as this system's hash if `hash' and `value' are equal and
-    ;; there are no `key' or `docstr'.
-    (if (and hash
-             value
-             (not key)
-             (not docstr)
-             (stringp hash)
-             (stringp value)
-             (string= hash value))
-        ;; Set the system's hash in Jerky.
-        (progn
-          (int<system/multiplexer>:add hash)
-          (nub:debug
-           :system/multiplexer
-           func/name
-           '(:system :multiplex)
-           "`%S' set to: %S"
-           '(:system :hash)
-           value)
-          (jerky:set 'system 'hash
-                     :value value))
+    (when (and (symbolp hash)
+               (memq hash '(:this this)))
+      (setq hash (mux-hash)))
 
-      ;;------------------------------
-      ;; Check for required plist keys: Part 02
-      ;;------------------------------
-      (cond ((not key)
-             (nub:error
-              :system/multiplexer
-              func/name
-              "Must have a `:key' in plist params: %S"
-              plist))
+    (when (and (symbolp id)
+               (memq id '(nil :this this)))
+      (setq id (mux-id)))
 
-            ((not (listp key))
-             (nub:error
-              :system/multiplexer
-              func/name
-              "`:key' must be a list; got: %S"
-              key))
+    (unless (or (keywordp hash)
+                (symbolp hash))
+      (_mux-error funcname
+        "`:hash' key parameter must have a (string) value; got: %S"
+        hash))
 
-           ((and docstr
-                 (not (stringp docstr)))
-            (nub:error
-             :system/multiplexer
-             func/name
-             "`:docstr' must be a string; got: %S"
-             docstr)))
+    (unless (or (null docstr)
+                (stringp docstr))
+      (_mux-error funcname
+        "`:docstr' key parameter must have a string or nil value; got: %S"
+        docstr))
 
-      ;;------------------------------
-      ;; Normalize KEY to a list
-      ;;------------------------------
-      (cond ((symbolp key)
-             (setq key (list key)))
+    (when plist
+      (let (plist-verify (seq-copy plist))
+        (while (> (length plist-verify) 2)
+          (let ((key   (pop plist-verify))
+                (value (pop plist-verify)))
+            (unless (and key
+                         (keywordp key))
+              (_mux-error funcname
+                "key parameter must be a keyword; got: %S"
+                key))
+            ;; ignore value. It can be anything; we don't care.
+            ))
+        ;; Shouldn't have any leftovers.
+        (unless plist
+          (_mux-error funcname
+            '("PLIST has extras after verifying. PLIST must be `:KEYWORD VALUE' pairs. "
+              "PLIST: %S "
+              "extra: %S")
+            plist
+            plist-verify))))
 
-            ((listp key)
-             ;; ok as-is
-             nil)
+    ;;------------------------------
+    ;; Save.
+    ;;------------------------------
 
-            (t
-             (nub:error
-              :system/multiplexer
-              func/name
-              '("KEY must be a single quoted symbol or a list of symbols. "
-                "got %S: %S")
-              (type-of key)
-              key)))
+    ;; Delete previous entry if it exists.
+    (when (and mux-systems
+               (alist-get hash mux-systems))
+      (setf (alist-get hash
+                       mux-systems
+                       nil
+                       'remove)
+            nil))
 
-      ;;------------------------------
-      ;; Valid - save it.
-      ;;------------------------------
-      (nub:debug:func/return
-       :system/multiplexer
-       func/name
-       '(:system :multiplex)
+    ;; Add this entry.
+    (let ((entry (list hash docstr plist)))
+      (if (null mux-systems)
+          (setq mux-systems (list entry))
+        (push entry mux-systems))
 
-       (int<system/multiplexer>:add hash)
-       (if docstr
-           (jerky:set 'system hash key
-                      :value value
-                      :docstr docstr)
-         (jerky:set 'system hash key
-                    :value value))))))
-;; (system:multiplexer:set :hash "foo" :key '(bar) :value 42 :docstr "hello there")
-;; (system:multiplexer:set :hash "foo" :key 'baz :value 43 :docstr "hello there")
-;; (system:multiplexer:set :hash "jeff" :value "jeff")
-;; (jerky:get 'system 'hash)
-;; (system:multiplexer:set :hash "5730ce-91e149" :value "5730ce-91e149")
-;; (jerky:get 'system 'hash)
+      (_mux-debug funcname
+        '("Added entry to `mux-systems':\n"
+          "  entry: %S\n"
+          "  mux-systems: %S\n")
+        entry
+        mux-systems)
+
+      ;; return this entry?
+      entry)))
+;; (setq mux-systems nil)
+;; mux-systems
+;; (mux-set :hash :test :foo 'bar :baz "qux")
+;; (mux-set :hash :test :docstr "hi" :foo 'bar :baz 'qux)
 
 
-(cl-defun system:multiplexer:get (&key hash key)
+(cl-defun mux-get (&key id key)
   "For getting a system's multiplex settings.
 
-HASH should be:
-  - a string of the system's hash used when saving the setting
-  - `this' or `:this' (for \"this system's hash\")
-  - nil (also for \"this system's hash\")
+ID should be:
+  - keyword or symbol of the system's id used when saving the setting
+    - `this' or `:this' for \"this current system's id\"
 
-KEY should be a single symbol or a list of symbols that the setting was saved
-under (which, see function `system:multiplexer:set').
-
-NOTES:
-  - KEY will be prepended with `:system' and the HASH to match where
-    `system:multiplexer:set' sets them in Jerky."
-  (let ((func/name "system:multiplexer:get"))
+KEY should be the keyword that the setting was saved under
+(which, see function `mux-set')."
+  (let ((funcname 'mux-get))
     ;;------------------------------
-    ;; Error Checks
+    ;; Validate Inputs
     ;;------------------------------
-    ;; Special Case: `this' system's HASH.
-    (cond ((or (eq hash 'this)
-               (eq hash :this))
-           (setq hash (jerky:get 'system 'hash)))
+    ;; TODO(mux): setq _mux-verify-id
+    ;; TODO(mux): get hash from id
 
-          ;; Not the special case so HASH must be a valid input value:
-          ;; nil, or a string.
-          ((and (not (null hash))
-                (not (stringp hash)))
-           (nub:error
-               :system/multiplexer
-               func/name
-             "HASH must be `this', `:this', nil, or a string; got: %S"
-             hash))
+    (cond ((not (keywordp key))
+           (_mux-error funcname
+             "KEY must be a keyword; got %S: %S"
+             (type-of key)
+             key))
 
-          ;; Otherwise, need key.
-          ((not key)
-           (nub:error
-            :system/multiplexer
-            func/name
-            "Must have `key' in params; got: %S"
-            key))
+          ((not (or (keywordp id)
+                    (symbolp id)))
+           (_mux-error funcname
+             "ID must be a symbol or keyword (`this'/`:this' for current system); got: %S"
+             id))
+
+          ;; Special Case: `this' system's ID.
+          ((or (eq id 'this)
+               (eq id :this))
+           ;; TODO(mux): error if `mux-system-id' is unset.
+           (setq id mux-system-id))
 
           (t
            nil))
 
     ;;------------------------------
-    ;; Normalization
+    ;; Get Multiplexer Value
     ;;------------------------------
-    ;; Normalize key to a list
-    (cond ((symbolp key)
-           (setq key (list key)))
+    (if-let ((plist (nth 2 (assoc id mux-systems))))
+        (plist-get plist key)
+      nil)))
+;; (setq mux-systems nil)
+;; mux-systems
+;; (mux-set :id :test :foo 'bar :baz "qux")
+;;
+;; (setq mux-system-id :test)
+;; (mux-get :id 'this :key :path/secret/emacs)
+;; (mux-get :id :test :key :foo)
+;; (mux-get :id :test :key 'foo)
 
-          ((listp key)
-           ;; ok as-is
-           nil)
 
+;;------------------------------------------------------------------------------
+;; Helpers
+;;------------------------------------------------------------------------------
+
+(defun _mux-str-to-keyword (str)
+  (if (keywordp str)
+      str
+
+    (unless (stringp str)
+      (_mux-error '_mux-str-to-keyword
+        "STR must be a string; got %S: %S"
+        (type-of str)
+        str))
+
+    (intern
+     (if (string-prefix-p ":" str)
+         str
+       (concat ":" str)))))
+;; (_mux-str-to-keyword "foo")
+;; (_mux-str-to-keyword :foo)
+
+
+(defun _mux-this? (hash/id)
+  (cond ((or (eq hash/id 'this)
+             (eq hash/id :this))
+         (mux-hash))
+        ((_mux= hash/id (mux-hash))
+         (mux-hash))
+        (_
+         nil)))
+
+
+(defun _mux-verify-hash (hash)
+  (let ((funcname '_mux-verify-hash))
+    (when (or (eq hash 'this)
+              (eq hash :this))
+      (setq hash (mux-hash)))
+
+    (unless (keywordp hash)
+      (_mux-error funcname
+        "HASH must be a keyword (`this'/`:this' for current system); got: %S"
+        hash))
+
+    (unless (string-match-p _mux-rx-hash (symbol-name hash))
+      (_mux-error funcname
+        "HASH does not match regex (%S); got: %S"
+        _mux-rx-hash
+        (symbol-name hash)))
+
+    hash))
+
+
+(defun _mux-verify-id (id)
+  (let ((funcname '_mux-verify-id))
+    (when (or (eq id 'this)
+              (eq id :this))
+      ;; TODO(mux): error if `mux-system-id' is unset.
+      (setq id mux-system-id))
+
+    (unless (keywordp id)
+      (_mux-error funcname
+        "ID must be a keyword (`this'/`:this' for current system); got: %S"
+        id))
+
+    (unless (string-match-p _mux-rx-id (symbol-name id))
+      (_mux-error funcname
+        "ID does not match regex (%S); got: %S"
+        _mux-rx-id
+        (symbol-name id)))
+
+    id))
+
+
+(defun _mux-id-to-hash (id)
+  "Return hash from ID."
+  (setq id (_mux-verify-id id))
+
+  (_mux-str-to-keyword
+   (nth 1 (string-split (symbol-name id) str:hash:join/prepend))))
+;; (mux-id-to-hash (mux-id))
+
+
+(defun _mux-hash-to-id (hash)
+  "Return ID from hash or nil."
+  (setq hash (_mux-verify-hash hash))
+
+  (nth 1 (assoc hash mux-systems)))
+;; (mux-id-to-hash (mux-id))
+
+
+(defun _mux-type-of (hash/id)
+  "Return `:hash', `:id' or nil."
+  (let ((str (if (stringp hash/id)
+                 hash/id
+               (symbol-name hash/id))))
+    (cond ((string-match-p _mux-rx-hash str)
+           :hash)
+          ((string-match-p _mux-rx-id str)
+           :id)
           (t
-           (nub:error
-            :system/multiplexer
-            func/name
-            '("KEY must be a single quoted symbol or a list of symbols. "
-              "got %S: %S")
-            (type-of key)
-            key)))
+           nil))))
+;; (_mux-type-of (mux-hash))
+;; (_mux-type-of (mux-id))
+;; (_mux-type-of (mux-id :foo "bar" 'etc))
+;; (_mux-type-of "jeff")
 
-    ;;------------------------------
-    ;; Get Multiplexer Setting from Jerky
-    ;;------------------------------
-    (jerky:get 'system hash key)))
-;; (system:multiplexer:get :hash 'this :key '(path secret emacs))
-;; (system:multiplexer:get :hash (jerky:get 'system 'hash) :key '(path secret emacs))
-;; (system:multiplexer:get :hash "foo" :key 'bar)
+
+(defun _mux-to-hash (hash/id)
+  (pcase (_mux-type-of hash/id)
+    (:hash hash/id)
+    (:id   (_mux-id-to-hash hash/id))
+    (_     nil)))
+;; (_mux-to-hash (mux-id))
+;; (_mux-to-hash (mux-id :foo "bar" 'etc))
+;; (_mux-to-hash (mux-hash))
+
+
+(defun _mux= (left right)
+  "Compare hashes and/or IDs.
+
+LEFT and RIGHT must be keywords and can be:
+  - hashes (see `mux-hash')
+  - IDs (see `mux-id')
+
+Return non-nil if the hashes are equal."
+  (and (keywordp left)
+       (keywordp right)
+       (eq (_mux-to-hash left)
+           (_mux-to-hash right))))
+;; (_mux= (mux-hash) (mux-id))
 
 
 ;;------------------------------------------------------------------------------
-;; System UID
+;; System Hash & ID
 ;;------------------------------------------------------------------------------
 
-(defun system:multiplexer:hash ()
-  "Return /this/ system's hash.
-
-If no system hash is set, first generate this system's hash from function
-`system-name' and variable `system-type'."
-  (if-let ((hash (jerky:get 'system 'hash)))
-      ;; Have hash; return hash.
-      hash
-    ;; No hash. Generate, save, and then return it.
-    (let ((hash (str:hash:pretty (list (system-name) system-type))))
-      (message "\n\n%1$S\nNo hash! Set hash to: %2$S\n%1$S\n"
-               (make-string 80 ?×)
-               hash)
-      (system:multiplexer:set :hash  hash
-                              :value hash)
-      hash)))
-;; (system:multiplexer:hash)
-;; (str:hash:pretty (list (system-name) system-type))
+(defun mux-hash ()
+  "Return /this/ system's short hash as keyword."
+  (_mux-str-to-keyword
+   (str:hash:short (list (system-name) system-type))))
+;; (mux-hash)
+;; (str:hash:short (list (system-name) system-type))
 
 
-(defun system:multiplexer:uid (domain date name)
-  "Generate a system UID from parameters.
+(defun mux-id (&rest prefixes)
+  "Generate a unique system ID from /this/ system's hash and PREFIXES.
 
-DOMAIN, DATE, and NAME should be strings. They can be anything, but are named
-after how my system names are (currently) created:
-  - DOMAIN:
+PREFIXES should be 0-3 strings or symbol.
+For example: I use a domain, date, and type for the system.
+  - DOMAIN: Where the system is or what its for.
     - \"work\", \"home\", ...
-  - DATE:
-    - Just the year, usually.
+  - DATE: When I got the system.
       -  \"2020\", \"2022\", etc.
-  - NAME:
-    - Some unimaginative name like \"desk\", \"lap\", etc...
+  - TYPE:
+    - \"desk\", \"lap\", etc...
 
-Return a system UID string from the specified DOMAIN, DATE and NAME, with
-function `system-name' and variable `system-type' as additional information."
-  (str:hash (list domain date name)
-            (list (system-name) system-type)))
-;; (system:multiplexer:uid "jeff" "2020" "compy")
-
-
-(defun system:multiplexer:path/rel (&optional unique-id)
-  "Convert system's UNIQUE-ID to a safe (relative) directory path.
-
-If UNIQUE-ID is nil, use this system's ID."
-  (let ((unique-id (or unique-id
-                       (system:multiplexer:get :hash 'this :key 'id))))
-    (replace-regexp-in-string "::" "_"
-                              (replace-regexp-in-string "/" "-"
-                                                        unique-id))))
-;; (system:multiplexer:path/rel)
-;; (system:multiplexer:path/rel (system:multiplexer:hash:uid "jeff" "2020" "compy"))
+Return an ID keyword with prefixes and hash.
+For example:
+  (mux-id 'work '2025 'lap)
+    => :work/2025/lap::c3cdd4-955447"
+  (_mux-str-to-keyword
+   (str:hash:pretty prefixes
+                    (list (system-name) system-type))))
+;; (mux-id 'work '2025 'lap)
+;; (mux-id "jeff" "2020" "compy")
+;; (mux-id)
 
 
-(defun system:multiplexer:path/abs (root unique-id)
-  "Convert system's UNIQUE-ID to a safe (absolute) directory path.
+;; TODO(path): didn't I have a path safing func in imp or ns:path?
+(defun _mux-to-string-path-safe (&optional arg)
+  ;; Just delete anything else that isn't safe.
+  (replace-regexp-in-string
+   "[<>:\"/\\|? *]" ""
+   ;; Replace expected things from `mux-id' with chars that make sense.
+   (replace-regexp-in-string
+    "::" "_"
+    (replace-regexp-in-string
+     "/" "-"
+     ;; Get rid of keyword's leading colon.
+     (string-remove-prefix
+      ":"
+      ;; Make ARG a string.
+      (cond ((memq arg '(nil this :this))
+             (symbol-name (mux-hash)))
+            ((or (symbolp arg)
+                 (keywordp arg))
+             (symbol-name arg))
+            ((stringp id)
+             id)
+            (t
+             (format "%S" arg))))))))
+;; (_mux-to-string-path-safe (mux-hash))
+;; (_mux-to-string-path-safe :this)
+;; (_mux-to-string-path-safe (mux-id 'work '2025 'lap))
+;; (_mux-to-string-path-safe "hello there")
+
+
+(defun mux-path-safe-dir (root id-or-hash)
+  "Convert system's ID-OR-HASH to a safe (absolute) directory path.
 
 ROOT must be an absolute path string.
 
+If ID-OR-HASH is `:this' or `this', use \this\ system's hash.
 If UNIQUE-ID is nil, use this system's ID."
   (path:abs:dir root
-                ;; Expect systems to be in the "system/" subdirectory.
-                "system"
-                (system:multiplexer:path/rel unique-id)))
-;; (system:multiplexer:path/abs "c:/foo" ":bar")
-;; (system:multiplexer:path/abs "/foo" ":bar")
+                (_mux-to-string-path-safe id-or-hash)))
+;; (mux-path-safe-dir "c:/foo" ":bar")
+;; (mux-path-safe-dir "/foo" ":bar")
+;; (mux-path-safe-dir "/foo" :this)
 
 
 ;;------------------------------------------------------------------------------
-;; Define a System
+;; Commands
 ;;------------------------------------------------------------------------------
 
-(cl-defun system:multiplexer:define (&key hash
-                                          domain
-                                          date
-                                          type
-                                          description
-                                          (path/secret/root "~/.config/secret")
-                                          (path/secret/init "emacs/2022-03-23_sn004")
-                                          (debug nil))
-  "Define a system based on the arguments plist.
+(defun _mux-show (id buffer)
+  "Display system multiplexer info for system identified by ID in BUFFER.
 
-HASH - /Must/ be a static string of a system's hash from
-       `system:multiplexer:hash', not a return value from dynamically
-       calling `system:multiplexer:hash'.
-       - You're defining systems, some of which aren't /this/ system, so you'll
-         need their hard-coded hashes.
-
-DOMAIN - A string/symbol of \"home\", \"work\", or other domain name.
-
-DATE - A string/symbol of the year, or year-month-day.
-
-TYPE - Another string/symbol for identifying the system.
-     - \"desk\", \"desktop\", \"lap\", etc.
-
-DOMAIN, DATE, and TYPE are combined with forward slashes to create the
-human-readable part of the system's ID. The HASH is applied after these: id =
-\"<domain>/<date>/<type>::<hash>\" e.g. \"home/2021/desk::12345-abcdef\" - See
-`str:hash:recreate'
-
-DESCRIPTION - A short string for the 'docstr' of the ID and the path.
-
-PATH/SECRET/ROOT - Absolute path to the specified system's secret folder.
-
-PATH/SECRET/INIT - Relative path from PATH/SECRET/ROOT to the Emacs init files
-                   for this system. - NOTE: Can be the init for the specified
-                   system, or for all systems, depending on how your secret's
-                   init is itself set up.
-
-DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
-  (let ((func/name "system:multiplexer:define"))
-    (nub:debug:func/start
-     :system/multiplexer
-     func/name
-     '(:system :multiplex)
-     (cons 'hash hash)
-     (cons 'domain domain)
-     (cons 'date date)
-     (cons 'type type)
-     (cons 'description description)
-     (cons 'path/secret/root path/secret/root)
-     (cons 'path/secret/init path/secret/init)
-     (cons 'debug debug))
-
-    ;;------------------------------
-    ;; Error Checking
-    ;;------------------------------
-    (let (errors)
-      (unless (stringp hash)
-        (push (format "HASH must be a string. Got type %S: %S"
-                      (type-of hash)
-                      hash)
-              errors))
-      (unless (or (stringp domain)
-                  (symbolp domain))
-        (push (format "DOMAIN must be a string or symbol. Got type: %S"
-                      (type-of domain)
-                      domain)
-              errors))
-      (unless (or (stringp date)
-                  (symbolp date))
-        (push (format "DATE must be a string or symbol. Got type: %S"
-                      (type-of date)
-                      date)
-              errors))
-      (unless (or (stringp type)
-                  (symbolp type))
-        (push (format "TYPE must be a string or symbol. Got type: %S"
-                      (type-of type)
-                      type)
-              errors))
-      (unless (stringp description)
-        (push (format "DESCRIPTION must be a string. Got type %S: %S"
-                      (type-of description)
-                      description)
-              errors))
-      (unless (stringp path/secret/root)
-        (push (format "PATH/SECRET/ROOT must be a string. Got type %S: %S"
-                      (type-of path/secret/root)
-                      path/secret/root)
-              errors))
-      (unless (stringp path/secret/init)
-        (push (format "PATH/SECRET/INIT must be a string. Got type %S: %S"
-                      (type-of path/secret/init)
-                      path/secret/init)
-              errors))
-
-      ;; NOTE: Cannot check paths' validity now as we define all systems and
-      ;; then figure out which one we are later. So the path validity will have
-      ;; to be checked once we know which we are.
-
-      (when errors
-        (nub:error
-         :system/multiplexer
-         func/name
-         (concat "Invalid parameter"
-                 (when (/= 1 (length errors))
-                   "s")
-                 ":\n"
-                 (mapconcat #'identity
-                            errors
-                            "\n")))))
-
-    (let* ((id (str:hash:recreate (list domain date type) hash))
-           (path/secret/init.abs (path:abs:dir path/secret/root path/secret/init)))
-      ;;------------------------------
-      ;; Debug?
-      ;;------------------------------
-      (if debug
-          (message (mapconcat #'identity
-                              '("System:"
-                                "  -> hash:          %S"
-                                "  -> domain:        %S"
-                                "  -> date:          %S"
-                                "  -> type:          %S"
-                                "  -> description:   %S"
-                                "  -> path/root:     %S"
-                                "  -> path/init:     %S"
-                                "  <- id:            %S"
-                                "  <- path/init.abs: %S")
-                              "\n")
-                   hash
-                   domain
-                   date
-                   type
-                   description
-                   path/secret/root
-                   path/secret/init
-                   id
-                   path/secret/init.abs)
-
-        ;;------------------------------
-        ;; Define the System.
-        ;;------------------------------
-
-        (system:multiplexer:set :hash hash
-                                :key (list 'path 'secret 'root)
-                                :value path/secret/root
-                                :docstr "Root for .secret.d")
-        (system:multiplexer:set :hash hash
-                                :key (list 'path 'secret 'emacs)
-                                :value path/secret/init.abs
-                                :docstr "Root for Per-Computer Set-Up of Emacs")
-        (system:multiplexer:set :hash hash
-                                :key (list 'id)
-                                :value id
-                                :docstr description)
-
-        ;; Have to set path per-system since some work comps have restrictions
-        ;; on where things can be, and home comps tend to have a random number
-        ;; of hard drives just wherever.
-        (system:multiplexer:set :hash hash
-                                :key (list 'path 'secret 'system)
-                                :value  (system:multiplexer:path/abs path/secret/init.abs id)
-                                :docstr description))
-
-      (nub:debug:func/end
-       :system/multiplexer
-       func/name
-       '(:system :multiplex)
-       (cons 'id id)
-       (cons 'path path/secret/init.abs)))))
-;; (system:multiplexer:define :debug t
-;;                            :hash "123456-abcdef"
-;;                            :domain "home"
-;;                            :date "2021"
-;;                            :type "desk"
-;;                            :description "test description"
-;;                            :path/secret/root "~/.config/secret"
-;;                            :path/secret/init "emacs/sn004")
-
-
-(defun int<system/multiplexer>:show (hash buffer)
-  "Display system multiplexer info for system identified by HASH in BUFFER.
-
-HASH should be a string from e.g. `system:multiplexer:hash'.
+ID should be a keyword from e.g. `mux-id'.
 
 BUFFER should be a buffer or buffer name string."
   (with-current-buffer (get-buffer-create buffer)
     (goto-char (point-max))
-    (let* ((current (string= hash (system:multiplexer:hash)))
-           (id (system:multiplexer:get :hash hash :key 'id))
-           ;; Split ID up into domain, date, and type.
-           (prefixes (nth 0 (if id
-                                (str:hash:split id)
-                              nil)))
-           (domain   (nth 0 prefixes))
-           (date     (nth 1 prefixes))
-           (type     (nth 2 prefixes))
-           (description (jerky:get 'system hash 'id
-                                   :field :docstr))
-           (path/root (system:multiplexer:get :hash hash :key '(path secret root)))
-           (path/init (system:multiplexer:get :hash hash :key '(path secret emacs))))
+    (let* ((assoc (assoc hash mux-systems))
+           (plist (nth 3 assoc))
+           (plist-str (cond ((null plist)
+                             "(empty)")
+                            ((not (proper-list-p plist))
+                             "(invalid)")
+                            (t
+                             (let (plist-str)
+                               ;; TODO(mux): this doesn't delete shit from `mux-systems', does it?
+                               (while (> (length plist) 2)
+                                 (setq plist-str (concat plist-str
+                                                         "\n"
+                                                         (format "      %S: %S"
+                                                                 (pop plist)
+                                                                 (pop plist)))))
+                               plist-str)))))
+
       (insert
        (format (mapconcat #'identity
-                          '("\n"
-                            "System %s:%s"
+                          '("System %s:%s"
+                            "  ---> THIS SYSTEM! <---"
                             "    -> hash:          %s"
-                            "    -> domain:        %s"
-                            "    -> date:          %s"
-                            "    -> type:          %s"
+                            "    -> id:            %s"
                             "    -> description:   %s"
-                            "    -> path/root:     %s"
-                            "    -> path/init:     %s")
+                            "    -> plist:         %s")
                           "\n")
                id
-               (if current
-                   "\n  --> THIS SYSTEM! <--"
+               (if (_mux-this? id)
+                   "\n  ---> THIS SYSTEM! <---"
                  "")
-               hash
-               domain
-               date
-               type
-               description
-               path/root
-               path/init)))))
+               (_mux-to-hash id)
+               (nth 2 assoc)
+               plist-str)))))
 
 
-(defun system:cmd:multiplexer:show (&optional hash)
-  "Display system info for system identified by HASH.
+(defun mux-cmd-show (&optional id)
+  "Display system info for system identified by ID.
 
-If HASH is nil, displays all systems' infos."
+If ID is nil, displays all systems' infos."
   (interactive)
-  ;;------------------------------
-  ;; Error Checking
-  ;;------------------------------
-  (unless (or (null hash)
-              (stringp hash))
-    (nub:error
+  ;; Error checking
+  (unless (or (null id)
+              (stringp id)
+              (keywordp id))
+    (_mux-error
      :system/multiplexer
-     "system:cmd:multiplexer:show"
-     "HASH must be a string or nil. Got type %S: %S"
-     (type-of hash)
-     hash))
+     "mux-cmd-show"
+     "ID must be a string, keyword, or nil. Got type %S: %S"
+     (type-of id)
+     id))
 
-  ;; Show each system, or just the matching system.
-  (let ((buffer (buffer:name:special "Systems" nil :info)))
-    (if hash
-        (int<system/multiplexer>:show hash buffer)
+  ;; Show the matching system, or all of 'em.
+  (let ((buffer "*mux: systems*"))
+    (if id
+        (_mux-show id buffer)
 
-      (dolist (hash/system (int<system/multiplexer>:system/hashes))
-        (int<system/multiplexer>:show hash/system buffer)))))
-;; (system:cmd:multiplexer:show)
+      (dolist (system mux-systems)
+        (_mux-show (nth 1 system) buffer)))))
+;; (mux-cmd-show)
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :system 'multiplexer 'multiplex)
+(imp-provide mux multiplex)

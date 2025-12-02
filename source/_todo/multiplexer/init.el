@@ -1,10 +1,10 @@
-;;; core/modules/system/multiplexer/init.el --- One .emacs to Rule Them All -*- lexical-binding: t; -*-
+;;; mux/init.el --- One .emacs to Rule Them All -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-08-28
-;; Timestamp:  2023-06-26
+;; Timestamp:  2025-12-01
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,6 +28,12 @@
 ;; ├──────────────┴────┬ What computer is this anyways? ┬───┴──────────────────┤
 ;; └───────────────────┴─── (probably the wrong one) ───┴──────────────────────┘
 ;;
+;; > In electronics, a multiplexer (or mux; spelled sometimes as multiplexor),
+;; > also known as a data selector, is a device that selects between several
+;; > analog or digital input signals and forwards the selected input to a single
+;; > output line.
+;;   - https://en.wikipedia.org/wiki/Multiplexer
+;;
 ;; Allow multiple systems (computers) to use the same init with small
 ;; differences.
 ;;
@@ -39,12 +45,13 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Set up custom vars.
+;; Setup: groups, vars, customs, etc.
 ;;------------------------------------------------------------------------------
 
-(defgroup system:multiplexer:group nil
-  "Group namespace for the `:system/multiplexer' defcustoms."
-  :prefix "system:multiplexer:"
+(imp-path-root-set 'mux (imp-path-current-dir))
+
+(defgroup mux nil
+  "Group namespace for `mux' defcustoms."
   :group 'environment)
 
 
@@ -52,35 +59,15 @@
 ;; Load our files.
 ;;------------------------------------------------------------------------------
 
-(imp:timing
-    '(:system multiplexer)
-    (imp:file:current)
-    (imp:path:current:dir)
+(imp-timing
+    'mux
+    (imp-path-current-file)
 
-  ;; Debugging!
-  (imp:load :feature  '(:system multiplexer debug)
-            :path     (imp:path:current:dir/relative :system)
-            :filename "debug")
-  ;; Initialize debugging before going any further.
-  (int<system/multiplexer>:nub:init)
-
-  ;; Set-up Jerky namespaces for systems.
-  (imp:load :feature  '(:system multiplexer namespaces)
-            :path     (imp:path:current:dir/relative :system)
-            :filename "namespaces")
-
-  ;; Multiple systems (computers) able to use this same init.
-  (imp:load :feature  '(:system multiplexer multiplex)
-            :path     (imp:path:current:dir/relative :system)
-            :filename "multiplex")
-
-  ;; Directory Local Variables
-  (imp:load :feature  '(:system multiplexer dlv)
-            :path     (imp:path:current:dir/relative :system)
-            :filename "dlv"))
+  (imp ./debug)
+  (imp ./multiplex))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :system 'multiplexer)
+(imp-provide mux)
