@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-12-01
+;; Timestamp:  2025-12-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -47,7 +47,8 @@ Each entry has the format (HASH ID DOCSTR (PLIST))
 HASH   - keyword (see func `mux-hash')
 ID     - keyword (see func `mux-id')
 DOCSTR - string or nil
-PLIST  - property list or nil")
+PLIST  - property list or nil"
+  :group 'mux)
 
 
 (defconst _mux-rx-hash (rx-to-string `(seq string-start
@@ -87,10 +88,6 @@ PLIST  - property list or nil")
           (setq p (plist-put p (car plist) (nth 1 plist))))
       (setq plist (cddr plist)))
     p))
-
-
-;; TODO(mux): func `mux-system-info' for printing out this system's info during
-;; init. or just during load of mux.
 
 
 (cl-defun mux-set (&rest plist &key hash (id nil) (docstr nil) &allow-other-keys)
@@ -466,8 +463,65 @@ If UNIQUE-ID is nil, use this system's ID."
 
 
 ;;------------------------------------------------------------------------------
-;; Commands
+;; Commands & Info
 ;;------------------------------------------------------------------------------
+
+(defun mux-bootstrap (minimal? &rest prefixes)
+  "Return a `mux-set' sexpr to use for this system.
+
+If MINIMAL? is non-nil, `mux-set' will only include hash & id.
+Else, an example docstr and custom keys will be included.
+
+PREFIXES should be 0-3 strings or symbol.
+See func `
+For example: I use a domain, date, and type for the system.
+  - DOMAIN: Where the system is or what its for.
+    - \"work\", \"home\", ...
+  - DATE: When I got the system.
+      -  \"2020\", \"2022\", etc.
+  - TYPE:
+    - \"desk\", \"lap\", etc...
+
+For example, IDs with and without prefixes:
+  (mux-id 'work '2025 'lap)
+    => :work/2025/lap::c3cdd4-955447
+  (mux-id)
+    => ::c3cdd4-955447"
+  (if minimal?
+      `(mux-set :hash   ,(mux-hash)
+                :id     ,(apply #'mux-id prefixes))
+    `(mux-set :hash   ,(mux-hash)
+              :id     ,(apply #'mux-id prefixes)
+              :docstr "TODO: ExampleCo work laptop 2025"
+              ::TODO:: "Replace this and the rest with your key/value pairs for this system"
+              ;; :key value
+              :dir-sys-init (mux-path-safe-dir "~/path/to/secret/mux/" ,(apply #'mux-id prefixes))
+              :dir-org   "TODO: ~/path/to/org/files/"
+              :dir-repos "TODO: ~/path/to/repositories"
+              :foo 'bar
+              :etc "...")))
+;; (mux-bootstrap nil 'work '2025 'lap)
+;; (mux-bootstrap t   'work '2025 'lap)
+
+
+(defun mux-system-info ()
+  "Print out this system's info.
+
+If this system is not in `mux-systems', print out code for adding it."
+  (if-let ((system (assoc (mux-hash) mux-systems)))
+      (_mux-show (nth 1 system) "*Messages*")
+    ;; else, print out info and the `mux-set' sexpr to get them started
+    (display-warning
+     'mux
+     (mapconcat (lambda (x) (format (if (stringp x) "%s" "%S") x))
+                `("Unknown system."
+                  "  Init system with something like:"
+                  ,(mux-bootstrap nil)
+                  "  For a more user-friendly ID, call `mux-bootstrap' with PREFIXES."
+                  "  Example: (mux-bootstrap nil 'work '2025 'laptop)")
+                "\n"))))
+;; (mux-system-info)
+
 
 (defun _mux-show (id buffer)
   "Display system multiplexer info for system identified by ID in BUFFER.
@@ -512,7 +566,7 @@ BUFFER should be a buffer or buffer name string."
                plist-str)))))
 
 
-(defun mux-cmd-show (&optional id)
+(defun mux-show (&optional id)
   "Display system info for system identified by ID.
 
 If ID is nil, displays all systems' infos."
@@ -521,12 +575,10 @@ If ID is nil, displays all systems' infos."
   (unless (or (null id)
               (stringp id)
               (keywordp id))
-    (_mux-error
-     :system/multiplexer
-     "mux-cmd-show"
-     "ID must be a string, keyword, or nil. Got type %S: %S"
-     (type-of id)
-     id))
+    (_mux-error 'mux-show
+      "ID must be a string, keyword, or nil. Got type %S: %S"
+      (type-of id)
+      id))
 
   ;; Show the matching system, or all of 'em.
   (let ((buffer "*mux: systems*"))
@@ -535,7 +587,7 @@ If ID is nil, displays all systems' infos."
 
       (dolist (system mux-systems)
         (_mux-show (nth 1 system) buffer)))))
-;; (mux-cmd-show)
+;; (mux-show)
 
 
 ;;------------------------------------------------------------------------------
