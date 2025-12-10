@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2025-11-17
+;; Timestamp:  2025-12-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -27,6 +27,9 @@
   ;;------------------------------
   :custom
   ;;------------------------------
+
+  ;; `terraform-format-on-save' (default nil)
+  (terraform-format-on-save t)
 
   ;; `terraform fmt` uses 2 spaces per indent level
   (terraform-indent-level 2))
