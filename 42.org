@@ -4574,8 +4574,216 @@ fix:
 #+end_src
 
 
+* ├DONE───┤ source/_todo/multiplexer
+CLOSED: [2025-12-01 Mon 22:43]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-01 Mon 22:43]
+- State "├CURRENT┤"  from              [2025-11-19 Wed 21:54]
+:END:
+
+delete or use
+
+use?
+
+
+refactor & simplify
+  - multiplex.el
+    - u r [[file:source/_todo/multiplexer/multiplex.el::;; TODO: HERE][here]]
+
+rename/move
+  - k
+
+* ├DONE───┤ imp: subsume mux
+CLOSED: [2025-12-10 Wed 13:41]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-10 Wed 13:41]
+- State "├CURRENT┤"  from              [2025-12-03 Wed 22:42]
+:END:
+
+check in mux bootstrap
+  - [X] k
+
+Do I /really/ need this?
+  - Can't I do the same thing with something like this?:
+#+begin_src elisp
+(imp secret:/system
+     :path (_mux-to-string-path-safe (mux-hash)))
+#+end_src
+Would need to
+  - move into ~imp~
+    - ~mux-hash~
+    - ~_mux-to-string-path-safe~
+    - ~mux-hash~
+      - is just: ~(str:hash:short (list (system-name) system-type))~
+      - ~str:hash:short~
+
+Copy `multiplex.el` into imp.
+  - [X] k
+
+comment out basically everything.
+
+refactor down to just making path safe hash/id strings.
+
+allow hash dir's name to have ignorable stuff?
+eg. /path/to/ignore-ignore_HASH-HASH
+  - u r [[file:source/core/packages/imp/mux.el::;; TODO THIS SHIT][here]]
+
+What format should ~(mux-system)~ return?
+  - mux-123456-abcdef
+  - imp123456-abcdefmux
+  - imp-mux-123456-abcdef
+  - imp-123456-abcdef-mux
+    - this one probably
+      - or imp-123456abcdef-mux
+  - imp.123456abcdef.mux
+    - maybe?
+      - but it makes the dir look like a file
+        - so maybe not
+  - imp123456abcdefmux
+
+rename mux to imp-mux in [[file:source/core/packages/imp/mux.el][here]]
+
+change all them hashes in strs/examples
+
+finish imp-mux-path-find
+  - [[file:source/core/packages/imp/mux.el::defun imp-mux-path-find (path][here]]
+
+* ├DONE───┤ Magit & whitespace
+CLOSED: [2025-12-10 Wed 15:24]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-12-10 Wed 15:24]
+:END:
+
+No whitespace-mode for ~magit-log-mode~
+probably other modes too.
+
+Yes whitespace-mode for modes with diffs (like main magit buffer)
+
 * -- U R HERE --
 <<here>>
+
+* ├CURRENT┤ imp-mux: mux keyword for imp
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-12-10 Wed 15:17]
+:END:
+
+** ├DONE───┤ Mmmh... how to do it?
+CLOSED: [2025-12-10 Wed 15:16]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-12-10 Wed 15:16]
+:END:
+
+#+begin_example elisp
+(imp secret:/system
+     :mux ;; or multiplex
+     :path (imp-mux-path nil "init.el"))
+
+(imp secret:/system
+     :path (imp-mux-path nil "init.el"))
+
+(imp secret:/system
+     :mux (imp-mux-path nil "init.el"))
+
+(imp secret:/system
+     :mux ("path/to" . "init.el"))
+
+(imp secret:/system
+     :mux (nil . "init.el"))
+
+(imp secret:/system
+     :mux "init.el")
+#+end_example
+
+any/all of these?
+#+begin_example elisp
+(imp secret:/system
+     :mux ;; or multiplex
+     :path (imp-mux-path nil "init.el"))
+
+(imp secret:/system
+     :mux (imp-mux-path nil "init.el"))
+
+(imp secret:/system
+     :mux ("path/to" . "init.el"))
+
+(imp secret:/system
+     :mux (nil . "init.el"))
+
+(imp secret:/system
+     :mux "init.el")
+#+end_example
+
+mux: hash vs (future)system-type/distro-id/distro-major-ver/etc:
+#+begin_example elisp
+(imp secret:/system
+     :mux 'hash
+     :path (imp-mux-path nil "init.el"))
+
+(imp secret:/system
+     :mux '(hash . (imp-mux-path nil "init.el")))
+
+(imp secret:/system
+     :mux '("path/to" hash "init.el"))
+
+(imp secret:/system
+     :mux '(hash (nil . "init.el")))
+
+(imp secret:/system
+     :mux '(hash . "init.el"))
+#+end_example
+vs
+#+begin_example elisp
+(imp secret:/system
+     :mux '(system-type distro-id distro-major-ver)
+     :path "init.el")
+
+(imp secret:/system
+     :mux '("path/to" (system-type distro-id distro-major-ver) "init.el"))
+
+(imp secret:/system
+     :mux '((system-type distro-id distro-major-ver) (nil . "init.el")))
+
+(imp secret:/system
+     :mux '((system-type distro-id distro-major-ver) . "init.el"))
+#+end_example
+
+I think this wins:
+#+begin_example elisp
+(imp secret:/system
+     :mux 'hash
+     :path (imp-mux-path nil "init.el"))
+
+(imp secret:/system
+     :mux '(system-type distro-id distro-major-ver)
+     :path "init.el")
+#+end_example
+
+** ├CURRENT┤ implement
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-12-10 Wed 15:17]
+:END:
+
+#+begin_example elisp
+(imp secret:/system
+     :mux 'hash
+     :path (imp-mux-path nil "init.el"))
+
+(imp secret:/system
+     :mux '(system-type distro-id distro-major-ver)
+     :path "init.el")
+#+end_example
+
+* init: use mux
+
+...what do I need it for again?
+
+* terraform: format on save
+
+add ~terraform-format-buffer~ to ~before-save-hook~
+
+* init: delay some packages instead of defer
+
+Like which-key and helpful?
 
 * pull latest in Win10VM
 * org: inline quote & code tweaks
@@ -4591,25 +4799,10 @@ Do:
       - burnt orange sorta color
       - lighter background (already have this for code; quote is darker tho)
 
-* ├CURRENT┤ source/_todo/multiplexer
-:LOGBOOK:
-- State "├CURRENT┤"  from              [2025-11-19 Wed 21:54]
-:END:
+* various debugs
 
-delete or use
-
-use?
-
-╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-╠══TODO══╣            ║                                                                                                          ║
-╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
-╠══TODO══╣            ║                                                                                                          ║
-╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-refactor & simplify
-  - multiplex.el
-    - u r [[file:source/_todo/multiplexer/multiplex.el::;; TODO: HERE][here]]
-
-
+Use (which-function) to determine func's name?
+http://yummymelon.com/devnull/writing-better-elisp-docstrings.html
 
 * ├WAITING┤ source/_todo/secret
 :LOGBOOK:
@@ -4620,6 +4813,8 @@ refactor & simplify
 delete or use?
 
 oh. this requires ~multiplexer~
+
+well ~imp~ ate ~mux~, so...
 
 * LSP
 
@@ -4728,6 +4923,43 @@ example
   - [[file:source/user/config/help.el::;; TODO: change to eval-after:][here]]
 
 Fix to eval after said feature.
+
+
+
+* imp-mux: by system-type, distro, etc?
+
+Add multiplexing like Ansible does?
+  - distro id, major ver, minor ver...
+
+#+begin_example elisp
+(imp secret:/system
+     :mux '(system-type (system-name)))
+(imp secret:/system
+     :mux '(system-type (system-name)))
+#+end_example
+
+does emacs have distro name etc like from:
+#+begin_src sh :results scalar
+cat /etc/os-release
+#+end_src
+
+#+RESULTS:
+#+begin_example
+NAME="Pop!_OS"
+VERSION="22.04 LTS"
+ID=pop
+ID_LIKE="ubuntu debian"
+PRETTY_NAME="Pop!_OS 22.04 LTS"
+VERSION_ID="22.04"
+HOME_URL="https://pop.system76.com"
+SUPPORT_URL="https://support.system76.com"
+BUG_REPORT_URL="https://github.com/pop-os/pop/issues"
+PRIVACY_POLICY_URL="https://system76.com/privacy"
+VERSION_CODENAME=jammy
+UBUNTU_CODENAME=jammy
+LOGO=distributor-logo-pop-os
+#+end_example
+
 
 
 
