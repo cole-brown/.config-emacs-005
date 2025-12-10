@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2025-11-17
+;; Timestamp:  2025-12-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -35,9 +35,14 @@
 (use-package magit
 
   ;;------------------------------
-  :init
+  :hook
   ;;------------------------------
+  (magit-log-mode-hook . (lambda () (whitespace-mode -1)))
 
+  ;; ;;------------------------------
+  ;; :init
+  ;; ;;------------------------------
+  ;;
   ;; (defun mantle:user:magit:buffer:kill ()
   ;;   "Kill all magit buffers."
   ;;   (interactive)
