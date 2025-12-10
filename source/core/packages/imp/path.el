@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-11-17
+;; Timestamp:  2025-12-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -634,6 +634,25 @@ Return a string."
 ;; (imp-path-join '("/foo" ("bar.el")))
 ;; (imp-path-join "foo" "bar.el")
 ;; (imp-path-join "foo")
+
+
+(defun imp-path-split (path)
+  "Split PATH into a list of dir/file names.
+
+(imp-path-split \"/path/to/some/where.txt\")
+  => (\"path\" \"to\" \"some\" \"where.txt\")
+
+Split on forward or backward slash if `system-type' is `windows-nt'.
+Else split on forward slash only."
+  (string-split path
+                ;; Only backslashes if Windows path.
+                (if (eq system-type 'windows-nt)
+                    (rx (any "/" "\\"))
+                  (rx "/"))
+                t))
+;; (imp-path-split (imp-path-current-file))
+;; (imp-path-split "/path/to/some/where.txt")
+;; (imp-path-split "C:\\path\\to\\some\\where.txt")
 
 
 ;; TODO(path): change to pass in EXT, check for EXT, remove if matching.

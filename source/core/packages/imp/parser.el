@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-11-03
+;; Timestamp:  2025-12-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -147,6 +147,12 @@ no more than once."
         ((functionp arg)
          `(funcall #',arg))
         (t arg)))
+
+(defun imp-parser-normalize-string-eval (arg)
+  "Eval ARG if a form/function. Otherwise return arg."
+  (if (stringp arg)
+      arg
+    (format "%S" (imp-parser-normalize-eval arg))))
 
 (defun imp-parser-normalize-symbols (keyword args &optional recursed)
   "Normalize a list of symbols."
