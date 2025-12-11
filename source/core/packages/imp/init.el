@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-29
+;; Timestamp:  2025-12-10
 ;; Version:    1.1.20220413
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -169,6 +169,7 @@ For example:
   (imp--init-load "tree")
   (imp--init-load "feature")
   (imp--init-load "path")
+  (imp--init-load "mux")
   (imp--init-load "timing")
   (imp--init-load "provide")
   (imp--init-load "load")
