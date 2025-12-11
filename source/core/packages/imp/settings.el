@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-04-16
-;; Timestamp:  2025-11-03
+;; Timestamp:  2025-12-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -43,7 +43,8 @@
 (defcustom imp-parser-keywords
   '(:disabled
     ;; TODO(stats): uncomment
-    ;; :stats :statistics
+    ;; :statistics :stats
+    :multiplex :mux
     :path
     :root
     :error

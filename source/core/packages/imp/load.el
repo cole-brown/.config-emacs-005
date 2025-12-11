@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-10-30
+;; Timestamp:  2025-12-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -80,9 +80,19 @@ extending any keys already present."
           (imp--error 'imp-parser-normalize-plist error-string))))))
 
 (defun imp-parser-unalias-keywords (feature args)
-  "Convert `:when' and `:unless' in ARGS to `:if'."
-  (setq args (cl-nsubstitute :stats :statistics args))
-  (setq args (cl-nsubstitute :if :when args))
+  "Convert aliased args to their canonical args.
+
+Convert:
+  - `:when'   -> `:if'
+  - `:unless' -> `:if'
+  - `:stats'  -> `:statistics'
+  - `:mux'    -> `:multiplex'"
+  ;; convert args            :from       :to
+  (setq args (cl-nsubstitute :multiplex  :mux   args))
+  (setq args (cl-nsubstitute :statistics :stats args))
+  (setq args (cl-nsubstitute :if         :when  args))
+
+  ;; convert `:unless' to `:if' (not)
   (let (temp)
     (while (setq temp (plist-get args :unless))
       (setq args (imp-parser-plist-delete-first args :unless)
