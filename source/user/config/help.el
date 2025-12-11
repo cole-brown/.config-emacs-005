@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-15
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-12-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -19,7 +19,7 @@
 (imp-require unit)
 
 ;;------------------------------------------------------------------------------
-;; Which-Key
+;; `which-key'
 ;;------------------------------------------------------------------------------
 
 ;; Which Key:
@@ -31,6 +31,8 @@
 ;; E.g. "C-h" and pausing for a sec will bring up which-key with all the
 ;; commands in the help-command map.
 (use-package which-key
+  ;; Don't want to wait 5 seconds for `which-key' to load interactively.
+  :defer 30 ; Wait til emacs has been idle for 30 seconds, then load this.
 
   ;;------------------------------
   :custom
@@ -126,13 +128,15 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Helpful - "A better Emacs *help* buffer"
+;; `helpful' - "A better Emacs *help* buffer"
 ;;------------------------------------------------------------------------------
 ;; Replace Emacs' default help bindings/buffer with Helpful's much more helpful
 ;; help buffer.
 
 ;; https://github.com/Wilfred/helpful
 (use-package helpful
+  ;; Don't want to wait 5 seconds for `helpful' to load interactively.
+  :defer 30 ; Wait til emacs has been idle for 30 seconds, then load this.
 
   ;; ;;------------------------------
   ;; :custom
