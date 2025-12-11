@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-11-18
+;; Timestamp:  2025-12-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -283,6 +283,7 @@
   (imp user:/config/languages/common)
 
   ;; Alphabetical
+  (imp user:/config/languages/conf)
   (imp user:/config/languages/csharp)
   (imp user:/config/languages/elisp)
   (imp user:/config/languages/hurl)

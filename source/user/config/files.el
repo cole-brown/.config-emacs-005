@@ -1,10 +1,10 @@
-;;; mantle/config/files.el --- File & Directory Settings -*- lexical-binding: t; -*-
+;;; user/config/files.el --- File & Directory Settings -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-29
-;; Timestamp:  2025-10-28
+;; Timestamp:  2025-12-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
