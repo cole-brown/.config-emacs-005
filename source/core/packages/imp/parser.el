@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-09-22
-;; Timestamp:  2025-12-03
+;; Timestamp:  2025-12-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -80,8 +80,9 @@ Else error."
     (car args))
    (t
     (imp--error 'imp-parser-args-only-one
-                "%S wants exactly one argument"
-                keyword))))
+                "%S wants exactly one argument. Got: %S"
+                keyword
+                args))))
 
 (defun imp-parser-only-one (keyword args func)
   "Call FUNC on the first member of ARGS if it has exactly one element.
@@ -92,8 +93,10 @@ Else error."
     (funcall func keyword (car args)))
    (t
     (imp--error 'imp-parser-only-one
-                "%S wants exactly one argument"
-                keyword))))
+                "%S wants exactly one argument. Got %s: %S"
+                keyword
+                (type-of args)
+                args))))
 
 (defun imp-parser-as-one (keyword args func &optional allow-empty)
   "Call FUNC on the first element of ARGS if it has one element, or all of ARGS.
@@ -105,8 +108,10 @@ If ALLOW-EMPTY is non-nil, it's OK for ARGS to be an empty list."
           (funcall func keyword (car args))
         (funcall func keyword args))
     (imp--error 'imp-parser-as-one
-                "%S wants a non-empty list"
-                keyword)))
+                "%S wants a non-empty list. Got %s: %S"
+                keyword
+                (type-of args)
+                args)))
 
 (defun imp-parser-memoize (func arg)
   "Ensure the macro-expansion of FUNC applied to ARG evaluates ARG
@@ -163,8 +168,10 @@ no more than once."
     (mapcar #'(lambda (x) (car (imp-parser-normalize-symbols keyword x t))) args))
    (t
     (imp--error 'imp-parser-normalize-symbols
-                "%S wants a symbol, or list of symbols"
-                keyword))))
+                "%S wants a symbol or list of symbols. Got %s: %S"
+                keyword
+                (type-of args)
+                args))))
 
 (defun imp-parser-normalize-symlist (feature keyword args)
   (imp-parser-as-one keyword args
@@ -206,8 +213,10 @@ no more than once."
             args))
    (t
     (imp--error 'imp-parser-normalize-recursive-symbols
-                "%S wants a symbol, or nested list of symbols"
-                keyword))))
+                "%S wants a symbol, or nested list of symbols. Got %s: %S"
+                keyword
+                (type-of args)
+                args))))
 
 (defun imp-parser-normalize-recursive-symlist (feature keyword args)
   (imp-parser-as-one keyword args
@@ -223,8 +232,10 @@ no more than once."
   "Given a list of forms, return it wrapped in `progn'."
   (unless (listp (car args))
     (imp--error 'imp-parser-normalize-form
-                "%S wants a sexp or list of sexps"
-                keyword))
+                "%S wants a sexp or list of sexps. Got %s: %S"
+                keyword
+                (type-of args)
+                args))
   (mapcar #'(lambda (form)
               (if (and (consp form)
                        (memq (car form)
