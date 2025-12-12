@@ -32,14 +32,28 @@
 
   (defun --/recentf/handler/file/truename (file)
     "Proudly nicked from Doom's 'core/core-editor.el'."
+    ;; local file using sudo?
     (if (or (not (file-remote-p file))
             (equal "sudo" (file-remote-p file 'method)))
+        ;; abbreviate $HOME -> ~ in filepaths
         (abbreviate-file-name
+         ;; resolve symlinks
          (file-truename
-          (if (fboundp #'tramp-file-name-localname)
-              (tramp-file-name-localname file)
+          (if (fboundp #'tramp-file-local-name)
+              ;; strip out the /sudo:X@ prefix in local tramp paths
+              (tramp-file-local-name file)
             file)))
+      ;; remote file or (non-sudo) local file
       file))
+
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+
+  ;; Clean up the recent list when Emacs is closed.
+  ;; Useful for non-client/server Emacs.
+  (kill-emacs-hook . recentf-cleanup)
 
 
   ;;------------------------------
@@ -48,8 +62,9 @@
 
   ;;`recentf-auto-cleanup'
   ;;----------------------
-  ;; Clean up the recent list when Emacs has been idle for over 30 seconds.
-  (recentf-auto-cleanup 30)
+  ;; Clean up the recent list when Emacs has been idle for a while.
+  ;; Useful for longer running server Emacs sessions.
+  (recentf-auto-cleanup (unit:second 2 'hours))
 
   ;; `recentf-max-saved-items'
   ;;--------------------------
@@ -86,25 +101,24 @@
   ;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2007-07/msg00019.html
   (add-to-list 'recentf-keep 'file-remote-p)
 
-  ;; TODO: a squelch function for this.
-  ;; ;; Don't want the minibuffer to always say
-  ;; ;;   "Cleaning up the recentf list...done (NN removed)"
-  ;; ;; when Emacs has been idle a while and `recentf' has run the auto-cleanup.
-  ;; ;;
-  ;; ;; NOTE: `recentf-auto-cleanup' just sets up a timer to call
-  ;; ;; `recentf-cleanup', which I do want to output messages when called
-  ;; ;; interactively... so only squelch if it's _not_ called interactively.
-  ;; (define-advice recentf-cleanup (:around (fn &rest args) mantle:user:squelch)
-  ;;   "`recentf-auto-cleanup' should not allow `recentf-cleanup' to be chatty."
-  ;;   (innit:squelch/unless :interactive? t
-  ;;                         (apply fn args)))
+  ;; Don't want the minibuffer to always say
+  ;;   "Cleaning up the recentf list...done (NN removed)"
+  ;; when Emacs has been idle a while and `recentf' has run the auto-cleanup.
+  (define-advice recentf-cleanup (:around (fn &rest args) --/advice/recentf/squelch)
+    "`recentf-auto-cleanup' should not allow `recentf-cleanup' to be chatty."
+    ;; NOTE: `recentf-auto-cleanup' just sets up a timer to call
+    ;; `recentf-cleanup', which I do want to output messages when called
+    ;; interactively... so only squelch if it's _not_ called interactively.
+    (output:squelch/unless :interactive? t
+                           :allow-message? t
+                           (apply fn args)))
 
-  ;; TODO: a squelch function for this.
-  ;; ;; Don't want a bunch of `load-file' messages when `recentf-load-list' runs.
-  ;; (define-advice recentf-load-list (:around (fn &rest args) mantle:user:squelch)
-  ;;   "Don't want a bunch of `load-file' messages when `recentf-load-list' runs."
-  ;;   (innit:squelch/unless :interactive? t
-  ;;                         (apply fn args)))
+  ;; Don't want a bunch of `load-file' messages when `recentf-load-list' runs.
+  (define-advice recentf-load-list (:around (fn &rest args) --/advice/recentf/squelch)
+    "Don't want a bunch of `load-file' messages when `recentf-load-list' runs."
+    (output:squelch/unless :interactive? t
+                           :allow-message? t
+                           (apply fn args)))
 
   ;; Excluded Files/Dirs:
   ;;---
@@ -137,6 +151,8 @@
 ;; ripgrep has first class support on Windows, macOS and Linux, with binary
 ;; downloads available for every release. ripgrep is similar to other popular
 ;; search tools like The Silver Searcher, ack and grep."
+
+
 
 
 ;;------------------------------
