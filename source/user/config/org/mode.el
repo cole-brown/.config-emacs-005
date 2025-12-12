@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-02
-;; Timestamp:  2025-11-18
+;; Timestamp:  2025-12-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -183,11 +183,19 @@
   ;; (default) nil == Remove org src block's leading indentation.
   ;; See related var: `org-edit-src-content-indentation'
   ;;
-  ;; I want to copy/paste from code to ord to code again often enough
+  ;; I want to copy/paste from code to org to code again often enough
   ;; to be annoyed at this. Killing off a rectangle of indentation is
-  ;; easy anyways (see `C-x r k' / `kill-rectangle'.
+  ;; easy anyways (see `C-x r k' / `kill-rectangle').
   (org-src-preserve-indentation t)
 
+  ;; `org-confirm-babel-evaluate'
+  ;;-----------------------------
+  ;; I eval elisp src blocks a lot. Almost always my own.
+  ;; I want to remove the confirmation for only elisp.
+  ;; It's fine for bash, etc.
+  (setq org-confirm-babel-evaluate
+   (lambda (lang body)
+     (not (string-equal lang "elisp"))))
 
   ;;------------------------------
   :config
