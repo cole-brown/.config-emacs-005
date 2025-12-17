@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-12-10
+;; Timestamp:  2025-12-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -534,6 +534,7 @@ what to say to end user."
     (let* ((funcname 'imp-parser-normalize-path-feature)
            (append-to-path (imp-feature-split feature)))
       (unless path
+        (message "path00: %S\nappend: %S" path append-to-path)
         ;; No path. We need to get an absolute path from FEATURE.
         ;; If we can't get one, we'll have to error.
         (cond
@@ -556,14 +557,19 @@ what to say to end user."
          ;; So... just leave path as nil.
          (t
           nil)))
+      (message "path01: %S\nappend: %S" path append-to-path)
 
-      ;; Did we end up with an absolute path?
+      ;; Should we append FEATURE to path?
       (when (and (stringp path)
-                 (file-name-absolute-p path))
+                 (file-name-absolute-p path)
+                 ;; hack. A better file/dir check should be done (or else none).
+                 (not (string-suffix-p ".el" path)))
         ;; Add (the rest of) FEATURE to the end of path.
-        (apply #'imp-path-join
-               path
-               append-to-path)))))
+        (setq path (apply #'imp-path-join
+                          path
+                          append-to-path)))
+
+      path)))
 ;; (imp-parser-normalize-path-feature './foo :path nil)
 ;; (imp-parser-normalize-path-feature 'imp/foo :path nil)
 ;; (imp-parser-normalize-path-feature 'imp/foo :path "/jeff")
@@ -603,6 +609,7 @@ If the path is relative, root it in one of:
                   paths
                   path))
 
+    (message "NORMAL PATH: %S" path)
     path))
 ;; (imp-parser-normalize/:path 'user :path '("/foo/bar"))
 ;; (imp-parser-normalize/:path 'user :path '("foo/bar"))
@@ -613,7 +620,12 @@ If the path is relative, root it in one of:
 
 (defun imp-parser-handler/:path (feature keyword arg rest state)
   "Put `:path' and `:path-load' into state."
+  ;; `:multiplex' path handling
+  (when (eq 'hash (plist-get state :multiplex))
+    (setq arg (imp--mux-path-find arg)))
+
   (setq state (imp-parser-plist-maybe-put state keyword arg))
+  (message "HANDLED PATH: %S" arg)
 
   (if-let ((path-load (imp-path-load-file arg)))
       (setq state (imp-parser-plist-maybe-put state :path-load path-load))
@@ -646,6 +658,31 @@ If the path is relative, root it in one of:
    `((imp-path-root-set ',arg
                         ,(imp-path-parent (plist-get state :path-load))))
    (imp-parser-process-keywords feature rest state)))
+
+;;------------------------------
+;;;; `:multiplex' `:mux'
+;;------------------------------
+;; `:mux' currently takes zero to one symbol args.
+;; Allowed symbols are:
+;;   - `hash' - multiplex based on system's hash
+
+(defun imp-parser-normalize/:multiplex (feature keyword args)
+  (if (null args)
+      ;; keyword used as a flag (by itself; no value), so normalize to default.
+      'hash
+    (let ((args* (imp-parser-normalize-only-one-symbol feature keyword args)))
+      (if (and (= 1 (length args*))
+               (memq (car-safe args*) '(hash :hash)))
+          'hash
+        (imp--error (which-function)
+                    '("`:multiplex' does not understand args. "
+                      "Only `hash', nil, and nothing are valid args: %S -> %S")
+                    args args*)))))
+;; (imp-parser-normalize/:multiplex :test :multiplex nil)
+;; (imp-parser-normalize/:multiplex :test :multiplex '(hash))
+;; (imp-parser-normalize/:multiplex :test :multiplex '(:hash))
+
+(defalias 'imp-parser-handler/:multiplex 'imp-parser-handle-state)
 
 ;; TODO(stats): uncomment
 ;; ;;------------------------------
