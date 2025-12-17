@@ -4659,8 +4659,310 @@ probably other modes too.
 
 Yes whitespace-mode for modes with diffs (like main magit buffer)
 
+* ├DONE───┤ terraform: format on save
+CLOSED: [2025-12-10 Wed 15:28]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-12-10 Wed 15:28]
+:END:
+
+add ~terraform-format-buffer~ to ~before-save-hook~
+
+* ├DONE───┤ init: delay some packages instead of defer
+CLOSED: [2025-12-10 Wed 15:39]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-12-10 Wed 15:39]
+:END:
+
+Like which-key and helpful?
+  - [X] k
+  - [X] and k
+
+
+* ├DONE───┤ conf[space] mode: no line wrap
+CLOSED: [2025-12-11 Thu 14:40]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-12-11 Thu 14:40]
+:END:
+
+[[file:~/.ssh/config::https://www.gnu.org/software/emacs/manual/html_node/tramp/Ssh-setup.html#Detection-of-session-hangouts][see here]]
+
+visual-line-mode
+  - no
+
+truncate-lines?
+  - try: ~M-x toggle-truncate-lines~
+    - yep. this one.
+
+* ├DONE───┤ recentf w/ TRAMP conf bug
+CLOSED: [2025-12-11 Thu 22:32]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-11 Thu 22:32]
+- State "├CURRENT┤"  from              [2025-12-11 Thu 14:43]
+:END:
+
+#+begin_src elisp
+(tramp-file-name-localname "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/42.org")
+#+end_src
+
+#+begin_quote
+Wrong type argument: tramp-file-name, "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/42.org"
+#+end_quote
+
+
+** ├DONE───┤ TRAMP or recentf issue? "Wrong type argument", "tramp-file-name ..."
+CLOSED: [2025-12-11 Thu 14:07]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-12-11 Thu 14:07]
+:END:
+
+First, figure out if this is recentf's fault or not.
+
+#+begin_quote
+Tramp: Opening connection for cole@win10vm using ssh...failed
+Cleaning up the recentf list...
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/42.org"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/ssh/config"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/load.el"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/parser.el"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/settings.el"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/mux.el"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/init.el"
+...
+#+end_quote
+
+...or are all those from ~recentf~?
+
+I do have this, but not exact match?
+#+begin_src elisp
+  (defun --/recentf/handler/file/truename (file)
+    "Proudly nicked from Doom's 'core/core-editor.el'."
+    (if (or (not (file-remote-p file))
+            (equal "sudo" (file-remote-p file 'method)))
+        (abbreviate-file-name
+         (file-truename
+          (if (fboundp #'tramp-file-name-localname)
+              (tramp-file-name-localname file)
+            file)))
+      file))
+#+end_src
+  - [[file:source/user/config/files.el::defun --/recentf/handler/file/truename (file][config/files.el]]
+
+it is:
+#+begin_src elisp
+(tramp-file-name-localname "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/42.org")
+#+end_src
+
+#+begin_quote
+Wrong type argument: tramp-file-name, "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/42.org"
+#+end_quote
+
+** ├DONE───┤ fix it!
+CLOSED: [2025-12-11 Thu 15:49]
+:LOGBOOK:
+- State "├DONE───┤"  from "├TODO───┤"  [2025-12-11 Thu 15:49]
+:END:
+
+#+begin_src elisp
+(tramp-file-name-localname "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/42.org")
+#+end_src
+
+#+begin_quote
+Wrong type argument: tramp-file-name, "/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/42.org"
+#+end_quote
+
+...do I need to fix it or is it just a complaint I can ignore?
+
+~tramp-file-name-localname~ is a struct getter, I think?
+This defines it:
+#+begin_src elisp
+(progn
+  (cl-defstruct (tramp-file-name (:type list) :named)
+    method user domain host port localname hop))
+#+end_src
+
+~cl-defstruct~
+#+begin_quote
+This macro defines a new data type called NAME that stores data
+in SLOTs.  It defines a make-NAME constructor, a copy-NAME
+copier, a NAME-p predicate, and slot accessors named NAME-SLOT.
+You can use the accessors to set the corresponding slots, via setf.
+#+end_quote
+
+~tramp-file-name-localname~
+#+begin_quote
+Access slot "localname" of tramp-file-name struct CL-X.
+#+end_quote
+
+So putting just a filename string as the arg is wrong then...
+or is ~file~ something else?
+
+#+begin_src elisp
+(add-to-list 'recentf-filename-handlers #'--/recentf/handler/file/truename)
+#+end_src
+
+~recentf-filename-handlers~
+#+begin_quote
+Functions to post process recent file names.
+
+They are successively passed a file name to transform it.
+
+This variable was added, or its default value changed, in Emacs 29.1.
+#+end_quote
+so ~file~ is a file name string.
+
+oh.
+maybe function was renamed?
+~tramp-file-local-name~
+#+begin_quote
+Return the local name component of NAME.
+
+This function removes from NAME the specification of the remote host and
+the method of accessing the host, leaving only the part that identifies
+NAME locally on the remote system.  If NAME does not match
+tramp-file-name-regexp, just file-local-name is called.  The
+returned file name can be used directly as argument of make-process,
+process-file, start-file-process, or shell-command.
+#+end_quote
+
+#+begin_src elisp
+(tramp-file-local-name "/ssh:USER@win10vm:Desktop/hello.txt")
+#+end_src
+
+fix didn't make tramp work but...
+#+begin_quote
+Tramp: Opening connection for cole@win10vm using ssh...failed
+Cleaning up the recentf list...
+File ~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/files.el removed from the recentf list
+File ~/ocean/vault/.config/emacs/2025-03-13_sn005/42.org removed from the recentf list
+File ~/ocean/vault/.config/ssh/config removed from the recentf list
+Cleaning up the recentf list...done (3 removed)
+#+end_quote
+
+We did fix /this/ error.
+
+** ├DONE───┤ squelch
+CLOSED: [2025-12-11 Thu 22:32]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-11 Thu 22:32]
+- State "├CURRENT┤"  from              [2025-12-11 Thu 15:49]
+:END:
+
+Don't want "Cleaning up the recentf list...done (0 removed)" in the minibuffer
+
+Use ~output:squelch/unless~
+#+begin_src elisp
+;; (output:squelch/unless :interactive? t :allow-message? t (message "hello there"))
+#+end_src
+  - [[file:source/core/packages/namespaced/output/squelch.el::;; (output:squelch/unless :interactive? t :allow-message? t (message "hello there"))][here]]
+
+(add-hook 'kill-emacs-hook #'recentf-cleanup)
+
+* ├DONE───┤ org-babel no confirm
+CLOSED: [2025-12-11 Thu 22:52]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-11 Thu 22:52]
+- State "├CURRENT┤"  from              [2025-12-11 Thu 22:43]
+:END:
+
+write a func that ~org-confirm-babel-evaluate~ can use to decide
+whether to prompt with ~y-or-n-p~
+
+by source type (major-mode)?
+
+InternGPT says:
+#+begin_src elisp
+(setq org-confirm-babel-evaluate
+      (lambda (lang body)
+        (not (string-equal lang "emacs-lisp"))))
+#+end_src
+
+test
+#+begin_src elisp
+(message "hello there")
+#+end_src
+
+#+RESULTS:
+: hello there
+
+
+
+* ├DONE───┤ pull latest in Win10VM
+CLOSED: [2025-12-16 Tue 16:44]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-16 Tue 16:44]
+- State "├CURRENT┤"  from              [2025-12-16 Tue 16:15]
+:END:
+
+Well this is a lot of errors...
+#+begin_example
+ ■  Error (use-package): Failed to install zenburn-theme: https://melpa.org/packages/zenburn-theme-20240926.619.tar: Not found
+ ■  Error (use-package): Cannot load zenburn-theme
+ ■  Error (use-package): Failed to install vertico: https://melpa.org/packages/vertico-20250419.816.tar: Not found
+ ■  Error (use-package): Cannot load vertico
+ ■  Error (use-package): Failed to install marginalia: https://melpa.org/packages/marginalia-20250317.1632.tar: Not found
+ ■  Error (use-package): marginalia/:init: Symbol’s function definition is void: marginalia-mode
+ ■  Error (use-package): Cannot load marginalia
+ ■  Error (use-package): Failed to install orderless: https://melpa.org/packages/orderless-20250316.2046.tar: Not found
+ ■  Error (use-package): Cannot load orderless
+ ■  Error (use-package): Failed to install consult: https://melpa.org/packages/consult-20250504.2026.tar: Not found [2 times]
+ ■  Error (use-package): Failed to install embark: https://melpa.org/packages/embark-20250423.1650.tar: Not found
+ ■  Error (use-package): Cannot load embark
+ ■  Error (use-package): Failed to install embark: https://melpa.org/packages/embark-20250423.1650.tar: Not found
+ ■  Error (use-package): Failed to install embark-consult: https://melpa.org/packages/consult-20250504.2026.tar: Not found
+ ■  Error (use-package): Failed to install corfu: https://melpa.org/packages/corfu-20250422.745.tar: Not found
+ ■  Error (use-package): corfu/:init: Symbol’s function definition is void: global-corfu-mode
+ ■  Error (use-package): Cannot load corfu
+ ■  Error (use-package): Failed to install cape: https://melpa.org/packages/cape-20250315.855.tar: Not found
+ ■  Error (use-package): Cannot load cape
+ ■  Error (use-package): Failed to install cape: https://melpa.org/packages/cape-20250315.855.tar: Not found
+ ■  Error (use-package): Failed to install yasnippet: https://melpa.org/packages/yasnippet-20250403.1926.tar: Not found
+ ■  Error (use-package): Cannot load yasnippet
+ ■  Error (use-package): Failed to install minions: https://melpa.org/packages/minions-20250428.1253.tar: Not found
+ ■  Error (use-package): Cannot load minions
+ ■  Warning (emacs): ‘undo-tree’: No compression found for undo history files; install ‘zstd’ (preferred) or ‘gzip’ to enable compression of ‘undo-tree’ history files.
+ ■  Warning (emacs): Emacs cannot find optional exe: ‘terraform’
+ ■  Error (use-package): Failed to install sln-mode: Package ‘sln-mode’ is unavailable
+ ■  Error (use-package): Failed to install hurl-mode: Package ‘hurl-mode’ is unavailable
+ ■  Warning (treesit): Cannot activate tree-sitter, because language grammar for json is unavailable (not-found): The specified module could not be found. The specified module could not be found. The specified module could not be found. The specified module could not be found.
+#+end_example
+
+Restart emacs.
+  - much better.
+
+#+begin_example
+ ■  Warning (emacs): The package embark-consult should be installed if you use both Embark and Consult
+ ■  Warning (emacs): The package embark-consult should be installed if you use both Embark and Consult
+ ■  Warning (emacs): ‘undo-tree’: No compression found for undo history files; install ‘zstd’ (preferred) or ‘gzip’ to enable compression of ‘undo-tree’ history files.
+ ■  Warning (emacs): Emacs cannot find optional exe: ‘terraform’
+#+end_example
+
+these are fine for now.
+Could install zstd maybe.
+  - done.
+
+* ├DONE───┤ add gptel packages
+CLOSED: [2025-12-16 Tue 22:03]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-16 Tue 22:03]
+- State "├CURRENT┤"  from              [2025-12-16 Tue 17:27]
+:END:
+
+https://melpa.org/#/gptel-magit
+https://melpa.org/#/gptel-fn-complete
+
 * -- U R HERE --
 <<here>>
+
+* ├WAITING┤ GPT 5.2
+:LOGBOOK:
+- State "├WAITING┤"  from              [2025-12-16 Tue 16:01] \\
+  wait for gptel to add 5.2 to their models
+:END:
+
+Switch ~gptel~ to 5.2?
+
+Don't have it in ~gptel~ yet?
+  - ver: 2025-12-14
 
 * ├CURRENT┤ imp-mux: mux keyword for imp
 :LOGBOOK:
@@ -4773,19 +5075,267 @@ I think this wins:
      :path "init.el")
 #+end_example
 
-* init: use mux
+Make path understand mux.
+  - normalizer or handler?
+    - handler
 
-...what do I need it for again?
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  (imp test
+    :mux hash
+    :path (imp-mux-path nil "init.el"))))
+#+end_src
 
-* terraform: format on save
+#+begin_src elisp
+(imp-mux-system)
+#+end_src
 
-add ~terraform-format-buffer~ to ~before-save-hook~
+#+RESULTS:
+: imp-e7013c-2d003b-mux
 
-* init: delay some packages instead of defer
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  (imp secret:/init
+    :mux hash
+    :path (imp-mux-path "~/redacted" "init.el"))))
+#+end_src
+Mh.
+Might need to fix it to not try to load
+"~/redacted/work-2025-lap_imp-e7013c-2d003b-mux/init.el/????"
 
-Like which-key and helpful?
+#+begin_src elisp
+(imp-parser-normalize-path-feature 'init :path (imp-mux-path "~/redacted" "init.el"))
+#+end_src
 
-* pull latest in Win10VM
+#+RESULTS:
+: ~/redacted/imp-dabb1e-babb1e-mux/init.el/init
+
+yeah.....
+but how....?
+Might need to simplify path parsing a bit cuz it seems like people will want to do stuff like this.
+
+#+begin_src elisp
+(imp-parser-normalize-path-feature 'init :path (imp-mux-path "~/redacted" nil))
+#+end_src
+that works for now....
+
+#+begin_src elisp
+(pp-to-string
+ (macroexpand-1
+  (imp secret:/init
+    :mux hash
+    :path (imp-mux-path "~/redacted" "init.el"))))
+#+end_src
+
+
+
+* custom.el @ /dev/null
+* elisp autocomplete / LSP?
+
+Think this is what eldoc was originally born for...
+
+
+
+* imp path
+
+** do in imp branch
+** delay path eval until macro eval
+
+return forms with func
+
+** refactor
+
+make a hook var for imp-path?
+order it somehow?
+
+Turn the parsing funcs into funcs to put into the hook var?
+
+So that path parsing is more straightforward?
+
+
+
+** mux
+
+make `:mux` just add another func to the path hook
+
+** git
+
+add something for git paths like ~repo:/path~
+
+** bump imp version
+
+
+* fill hydra
+* alignment hydra
+
+get my alignment commands hydra from sn004
+
+* ├WAITING┤ TRAMP into Win10 VM
+:LOGBOOK:
+- State "├WAITING┤"  from "├CURRENT┤"  [2025-12-11 Thu 14:12]
+- State "├CURRENT┤"  from              [2025-12-10 Wed 23:13]
+:END:
+
+** ├DONE───┤ Win10VM: run ssh server
+CLOSED: [2025-12-10 Wed 23:12]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-12-10 Wed 23:12]
+:END:
+I probably need an ssh server running or something.
+
+I think Windows comes with OpenSSH now?
+  - Does it come with server?
+  - Else what should I use for the server?
+    - Putty?
+
+done. Used Window's OpenSSH server.
+
+** ├DONE───┤ add win10vm to ssh config
+CLOSED: [2025-12-10 Wed 23:26]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-10 Wed 23:26]
+- State "├CURRENT┤"  from              [2025-12-10 Wed 23:15]
+:END:
+
+rename computer to ~Win10VM~ on windows
+  - [X] k
+
+add to ssh config
+  - [[file:~/.ssh/config::Host win10vm][here]]
+  - [X] k
+
+
+** ├WAITING┤ Tramp It
+:LOGBOOK:
+- State "├WAITING┤"  from "├CURRENT┤"  [2025-12-11 Thu 14:12]
+- State "├CURRENT┤"  from "├TODO───┤"  [2025-12-11 Thu 14:02]
+- State "├CURRENT┤"  from              [2025-12-10 Wed 23:13]
+:END:
+
+How to tramp to Win10 files?
+
+open file:
+/ssh:USER@win10vm:~/Desktop/hello.txt
+
+annnd.... doesn't work
+Tramp: Opening connection for USER using ssh...failed
+
+(tramp-get-completion-function "ssh")
+
+Did I have any TRAMP setup in sn004?
+  - no
+
+try this one?
+  - /ssh:USER@win10vm:Desktop/hello.txt
+well, auto-complete works up until ~/ssh:USER@win10vm:~
+Then the fan kicks into high gear and nothing happens until cancel.
+The same bunch of messages show up:
+#+begin_quote
+Tramp: Opening connection for cole@win10vm using ssh...failed
+Cleaning up the recentf list...
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/42.org"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/ssh/config"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/load.el"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/parser.el"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/settings.el"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/mux.el"
+Wrong type argument: "Wrong type argument", "tramp-file-name /home/main/.config/emacs/source/core/packages/imp/init.el"
+...
+#+end_quote
+
+...or are all those from ~recentf~?
+
+I do have this, but not exact match?
+#+begin_src elisp
+  (defun --/recentf/handler/file/truename (file)
+    "Proudly nicked from Doom's 'core/core-editor.el'."
+    (if (or (not (file-remote-p file))
+            (equal "sudo" (file-remote-p file 'method)))
+        (abbreviate-file-name
+         (file-truename
+          (if (fboundp #'tramp-file-name-localname)
+              (tramp-file-name-localname file)
+            file)))
+      file))
+#+end_src
+  - [[file:source/user/config/files.el::defun --/recentf/handler/file/truename (file][config/files.el]]
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Waiting on [[*recentf w/ TRAMP conf bug][recentf w/ TRAMP conf bug]]...
+  - [ ] k
+
+** try this?
+
+Google AI:
+#+begin_quote
+Troubleshooting Tips
+If you experience connection issues or Emacs hangs, consider these configurations in your Emacs setup (init.el or ~/.emacs):
+
+    Disable ControlMaster: Windows OpenSSH implementations might have issues with SSH ControlMaster features.
+    emacs-lisp
+
+(setq tramp-use-ssh-controlmaster-options nil)
+```
+
+Force TTY Allocation: If the remote shell prompt isn't recognized, forcing a pseudo-terminal (TTY) allocation can help.
+emacs-lisp
+
+(add-to-list 'tramp-connection-properties
+             (list (regexp-quote "/ssh:") "login-args"
+                   '(("-tt") ("-l" "%u") ("-p" "%p") ("%c") ("-e" "none") ("%h"))))
+```
+
+Debug Connection Issues: Increase TRAMP verbosity to diagnose problems. Check the *tramp/windows-host-ip* and *debug tramp/windows-host-ip* buffers for details.
+emacs-lisp
+
+(setq tramp-verbose 6)
+#+end_quote
+
+
+** can I make it log into a powershell?
+
+It's probably a setting that goes in sshd_config
+
+** try putty?
+* output:squelch/unless
+
+~:interactive? t~ doesn't seem to be working...
+
+I have this advice:
+#+begin_example elisp
+  (define-advice recentf-cleanup (:around (fn &rest args) --/advice/recentf/squelch)
+    "`recentf-auto-cleanup' should not allow `recentf-cleanup' to be chatty."
+    ;; NOTE: `recentf-auto-cleanup' just sets up a timer to call
+    ;; `recentf-cleanup', which I do want to output messages when called
+    ;; interactively... so only squelch if it's _not_ called interactively.
+    (output:squelch/unless :interactive? t
+                           :allow-message? t
+                           (apply fn args)))
+#+end_example
+  - [[file:source/user/config/files.el::define-advice recentf-cleanup (:around (fn &rest args) --/advice/recentf/squelch][here]]
+
+But if I ~M-x recentf-cleanup~, I don't see anything in the minibuffer.
+
+...yeah I think that macro is fucked up.
+Needs to emit more code - like the interactive check.
+  - [[help:output:squelch/unless][here]]
+
+* repo buffer names
+
+TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
+
+* ascii box art
+
+make a better... hydra? minor mode?
+
+Make a rectangle edit insert/surround-with box command?
+
 * org: inline quote & code tweaks
 
 ~code~
@@ -4799,12 +5349,17 @@ Do:
       - burnt orange sorta color
       - lighter background (already have this for code; quote is darker tho)
 
-* various debugs
+* eval after
 
-Use (which-function) to determine func's name?
-http://yummymelon.com/devnull/writing-better-elisp-docstrings.html
+Find ~(when (imp-feature?~
+example
+  - [[file:source/user/config/help.el::;; TODO: change to eval-after:][here]]
 
-* ├WAITING┤ source/_todo/secret
+Fix to eval after said feature.
+
+
+
+* ├TODO───┤ source/_todo/secret
 :LOGBOOK:
 - State "├WAITING┤"  from              [2025-11-19 Wed 21:53] \\
   multiplexer first
@@ -4831,7 +5386,7 @@ find todos:
 
 use Omnisharp for csharp.
 
-* ├HOLDING┤ csharp & treesit?
+* ├TODO───┤ csharp & treesit?
 :LOGBOOK:
 - State "├HOLDING┤"  from "├CURRENT┤"  [2025-11-18 Tue 16:51]
 - State "├CURRENT┤"  from              [2025-10-08 Wed 23:01]
@@ -4880,7 +5435,6 @@ reinstall
 Maybe look at this first:
 https://www.reddit.com/r/emacs/comments/1gjhe5a/is_developing_c_in_emacs_viable_without_obsolete/
 
-
 Maybe try ~tree-sitter-langs~ package instead of manual?
 https://github.com/emacs-tree-sitter/tree-sitter-langs
 
@@ -4896,35 +5450,65 @@ TODO: put ~treesit-language-source-alist~ recipe in config file?
 
 M-x report-bug or something
 
-* repo buffernames
+* daemonp
 
-TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
+is this used to tell if a server is running?
 
-* TRAMP into Win10 VM
+#+begin_quote
+Return non-nil if the current emacs process is a daemon.
 
-I probably need an ssh server running or something.
-
-I think Windows comes with OpenSSH now?
-  - Does it come with server?
-  - Else what should I use for the server?
-    - Putty?
-
-* org-babel no confirm
-
-write a func that ~org-confirm-babel-evaluate~ can use to decide
-whether to prompt with ~y-or-n-p~
-
-by source type (major-mode)?
-
-* eval after
-
-Find ~(when (imp-feature?~
-example
-  - [[file:source/user/config/help.el::;; TODO: change to eval-after:][here]]
-
-Fix to eval after said feature.
+If the daemon was given a name argument, return that name.
+#+end_quote
 
 
+* init: use mux
+
+...what do I need it for again?
+
+* imp exe checks
+
+#+begin_src elisp
+
+  ;; TODO(imp): make required/optional exe check an imp thing?
+  ;;---
+  ;; Lodge a complaint if 'terraform' isn't installed on the system. But don't
+  ;; skip the `terraform-mode' `use-package', since it only needs the exe for the
+  ;; compile stuff.
+  (--/exe/optional "hurl")
+  (--/exe/optional "terraform")
+#+end_src
+  - [[file:init.el::--/exe/optional "hurl"][here]]
+
+liiike....?
+#+begin_example elisp
+(imp user:/config/languages/hurl
+     :exe "hurl")
+(imp user:/config/languages/hurl
+     :exe (warn . "hurl"))
+(imp user:/config/languages/hurl
+     :exe (optional . "hurl"))
+
+(imp user:/config/languages/hurl
+     :exe (assert . "hurl"))
+(imp user:/config/languages/hurl
+     :exe (error . "hurl"))
+(imp user:/config/languages/hurl
+     :exe (require . "hurl"))
+#+end_example
+
+Just these?
+#+begin_example elisp
+(imp user:/config/languages/hurl
+     :exe "hurl")
+(imp user:/config/languages/hurl
+     :exe (optional . "hurl"))
+
+(imp user:/config/languages/hurl
+     :exe (require . "hurl"))
+#+end_example
+
+Set the default somewhere...
+Like those ~use-package-always-...~ vars?
 
 * imp-mux: by system-type, distro, etc?
 
@@ -5139,6 +5723,32 @@ put that in my init
 
 deadgrep for "int<" in namespaced dir.
 replace all ~int<NAME>:...~ with ~_:$NAME:...~
+
+* imp-loading var?
+
+So I can also do exe/version/system-type checks
+in the file?
+
+init.el
+#+begin_src elisp
+(imp user:/config/languages/hurl
+     :exe "hurl")
+#+end_src
+
+hurl.el
+#+begin_src elisp
+(unless imp-loading
+  (--/exe/optional "hurl"))
+#+end_src
+
+or even with state checks?
+#+begin_src elisp
+(unless (imp-loading :exe "hurl")
+  (--/exe/optional "hurl"))
+#+end_src
+That seems complicated since that state might be a few imp loads up above you...
+
+
 
 * source/core/packages/_todo
 
@@ -5376,6 +5986,11 @@ Or just like a generic ~:vars~ or ~:custom~?
 
 Add to ~imp-parser~ docstr
   - [[file:source/core/packages/imp/parser.el:::optional OPT Load NAME if it exists; do nothing if it does not.][here]]
+
+* various debugs
+
+Use (which-function) to determine func's name?
+http://yummymelon.com/devnull/writing-better-elisp-docstrings.html
 
 * imp-load keyword: flag
 Make it an eventual imp-load keyword?
