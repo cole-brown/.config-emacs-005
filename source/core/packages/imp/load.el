@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-12-18
+;; Timestamp:  2025-12-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -421,9 +421,7 @@ next value for the STATE."
                     arg)))
 
      ;; TODO?: look for "FEATURE-ROOT:/..."
-     ;; TODO?:   - get root of FEATURE
-     ;; TODO?: look for "REPO:/..."
-     ;; TODO?:   - ask magit / git
+     ;; TODO?: get root of FEATURE
 
      ;; otherwise, leave path string as-is
      (t arg))))
@@ -536,6 +534,7 @@ what to say to end user."
     (let* ((funcname 'imp-parser-normalize-path-feature)
            (append-to-path (imp-feature-split feature)))
       (unless path
+        (message "path00: %S\nappend: %S" path append-to-path)
         ;; No path. We need to get an absolute path from FEATURE.
         ;; If we can't get one, we'll have to error.
         (cond
@@ -558,6 +557,7 @@ what to say to end user."
          ;; So... just leave path as nil.
          (t
           nil)))
+      (message "path01: %S\nappend: %S" path append-to-path)
 
       ;; Should we append FEATURE to path?
       (when (and (stringp path)
@@ -609,6 +609,7 @@ If the path is relative, root it in one of:
                   paths
                   path))
 
+    (message "NORMAL PATH: %S" path)
     path))
 ;; (imp-parser-normalize/:path 'user :path '("/foo/bar"))
 ;; (imp-parser-normalize/:path 'user :path '("foo/bar"))
@@ -624,6 +625,7 @@ If the path is relative, root it in one of:
     (setq arg (imp--mux-path-find arg)))
 
   (setq state (imp-parser-plist-maybe-put state keyword arg))
+  (message "HANDLED PATH: %S" arg)
 
   (if-let ((path-load (imp-path-load-file arg)))
       (setq state (imp-parser-plist-maybe-put state :path-load path-load))
