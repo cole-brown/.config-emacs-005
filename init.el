@@ -36,7 +36,7 @@
 ;;; Code:
 
 ;;------------------------------------------------------------------------------
-;; In the beginning there was `imp'
+;; In the beginning there was an `imp'
 ;;------------------------------------------------------------------------------
 ;; Let this load error; imps are fundamental to this init.
 (load (expand-file-name "source/core/packages/imp/init.el" user-emacs-directory))
@@ -101,6 +101,12 @@
 ;; Put the rest of user Emacs init under the `:emacs.d' namespace.
 (imp-timing 'emacs.d
     (imp-path-current-file)
+
+  ;;----------------------------------------------------------------------------
+  ;; Before Packages
+  ;;----------------------------------------------------------------------------
+  (imp user:/config/emacs/custom)
+
 
   ;;----------------------------------------------------------------------------
   ;; Packages: `package' & `use-package'
