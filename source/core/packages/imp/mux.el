@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-12-10
+;; Timestamp:  2025-12-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -54,7 +54,7 @@ Even if it's buried in a dir name.")
 ;; (string-match-p imp--mux-hash-rx (imp--mux-hash-truncate (system-name) system-type))
 
 
-(defconst imp--mux-system-rx
+(defun imp--mux-system-rx ()
   (concat
    (rx-to-string 'word-boundary :no-group)
    (string-replace imp--mux-hash-identifiers-join
@@ -65,6 +65,7 @@ Even if it's buried in a dir name.")
                                        (imp-mux-system))
                      (imp-mux-system)))
    (rx-to-string 'word-boundary :no-group)))
+;; (imp--mux-system-rx)
 
 
 (defconst imp--mux-placeholder
@@ -255,7 +256,7 @@ If no imp-mux system hash in PATH, return just '(PATH)"
                (nth 1 mux-path) ; path is mux'd
                (file-exists-p (nth 0 mux-path))) ; path root exists in file system
       (imp-path-join (nth 0 mux-path)
-                     (nth 0 (directory-files (nth 0 mux-path) nil imp--mux-system-rx t))
+                     (nth 0 (directory-files (nth 0 mux-path) nil (imp--mux-system-rx) t))
                      (nth 2 mux-path)))))
 ;; (imp--mux-path-find (concat "/path/to/secret/mux/" imp--mux-placeholder))
 
