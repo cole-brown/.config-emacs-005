@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2025-12-11
+;; Timestamp:  2025-12-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -346,11 +346,11 @@
  '(org-fold-catch-invisible-edits 'show-and-error nil nil "Customized with use-package org")
  '(package-selected-packages
    '(cape colorful-mode corfu csproj-mode deadgrep elisp-demos embark-consult
-          git-gutter-fringe git-modes gptel hc-zenburn-theme helpful
-          highlight-quoted hurl-mode hydra macrostep magit major-mode-hydra
-          marginalia minions no-littering orderless ox-gfm rainbow-delimiters
-          sharper sln-mode terraform-mode undo-tree vertico ws-butler yaml-mode
-          yasnippet zenburn-theme))
+          git-gutter-fringe git-modes gptel gptel-fn-complete gptel-magit
+          hc-zenburn-theme helpful highlight-quoted hurl-mode hydra macrostep
+          magit major-mode-hydra marginalia minions no-littering orderless
+          ox-gfm rainbow-delimiters sharper sln-mode terraform-mode undo-tree
+          vertico ws-butler yaml-mode yasnippet zenburn-theme))
  '(package-vc-selected-packages
    '((sln-mode :vc-backend Git :url "https://github.com/sensorflo/sln-mode")
      (hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode"))))
