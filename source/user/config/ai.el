@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2025-12-16
+;; Timestamp:  2026-01-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -103,7 +103,7 @@
   ;; See variable help ("C-h v") or customize info for valid values.
   ;; Upgrade package to get updated options.
   ;; (setq gptel-model 'gpt-5.2)
-  (gptel-model 'gpt-4o)
+  (gptel-model 'gpt-5.1)
 
   ;; `gptel-default-mode'
   ;;---------------------
