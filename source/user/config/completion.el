@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-20
-;; Timestamp:  2026-01-08
+;; Timestamp:  2026-01-09
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -338,24 +338,24 @@
    ("C-c k" . consult-kmacro)
    ;; C-x bindings (ctl-x-map)
    ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-   ("C-x b"   . consult-buffer)                ;; orig. switch-to-buffer
+   ("C-x b"   . consult-buffer)              ;; orig. switch-to-buffer
    ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
    ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
    ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
    ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
    ;; Custom M-# bindings for fast register access
    ("M-#"   . consult-register-load)
-   ("M-'"   . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+   ("M-'"   . consult-register-store)        ;; orig. abbrev-prefix-mark (unrelated)
    ("C-M-#" . consult-register)
    ;; Other custom bindings
-   ("M-y"      . consult-yank-pop)                ;; orig. yank-pop
+   ("M-y"      . consult-yank-pop)           ;; orig. yank-pop
    ("<help> a" . consult-apropos)            ;; orig. apropos-command
    ;; M-g bindings (goto-map)
    ("M-g e"   . consult-compile-error)
-   ("M-g f"   . consult-flymake)               ;; Alternative: consult-flycheck
-   ("M-g g"   . consult-goto-line)             ;; orig. goto-line
+   ("M-g f"   . consult-flymake)             ;; Alternative: consult-flycheck
+   ("M-g g"   . consult-goto-line)           ;; orig. goto-line
    ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-   ("M-g o"   . consult-outline)               ;; Alternative: consult-org-heading
+   ("M-g o"   . consult-outline)             ;; Alternative: consult-org-heading
    ("M-g m"   . consult-mark)
    ("M-g k"   . consult-global-mark)
    ("M-g i"   . consult-imenu)
@@ -413,8 +413,6 @@
 
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
-  ;; TODO: EVIL???
-  ;; TODO-meow: MEOW???
   (setq consult-narrow-key "<") ;; "C-+"
 
   ;; Optionally make narrowing help available in the minibuffer.
