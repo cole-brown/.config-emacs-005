@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-29
-;; Timestamp:  2026-01-08
+;; Timestamp:  2026-01-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -195,6 +195,43 @@
   ;; ;;   - `deadgrep-project-root-overrides'
   ;; ;;   - `deadgrep-project-root-function'
   )
+
+
+(use-package csv-mode
+  :mode ("\\.tsv\\'" "\\.csv\\'" "\\.tabular\\'" "\\.vcf\\'")
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (defun --/hook/csv/settings ()
+    "Settings for Comma Separated Value files."
+    ;; disable line wrap
+    (setq truncate-lines t)
+
+    ;; Automatically align fields on load
+    (csv-align-mode +1)
+
+    ;; Treat the first line as a header
+    (setq-local csv-header-line t))
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+
+  (csv-mode-hook . --/hook/csv/settings)
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; `csv-align-max-width'
+  ;;----------------------
+  ;; Max width of columns in `csv-align-mode'.
+  ;; default 40
+  (csv-align-max-width 120))
+
+
 
 
 ;;------------------------------------------------------------------------------
