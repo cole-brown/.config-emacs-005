@@ -4950,22 +4950,10 @@ CLOSED: [2025-12-16 Tue 22:03]
 https://melpa.org/#/gptel-magit
 https://melpa.org/#/gptel-fn-complete
 
-* -- U R HERE --
-<<here>>
-
-* ├WAITING┤ GPT 5.2
+* ├DONE───┤ imp-mux: mux keyword for imp
+CLOSED: [2025-12-16 Tue 22:47]
 :LOGBOOK:
-- State "├WAITING┤"  from              [2025-12-16 Tue 16:01] \\
-  wait for gptel to add 5.2 to their models
-:END:
-
-Switch ~gptel~ to 5.2?
-
-Don't have it in ~gptel~ yet?
-  - ver: 2025-12-14
-
-* ├CURRENT┤ imp-mux: mux keyword for imp
-:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-16 Tue 22:47]
 - State "├CURRENT┤"  from              [2025-12-10 Wed 15:17]
 :END:
 
@@ -5060,8 +5048,10 @@ I think this wins:
      :path "init.el")
 #+end_example
 
-** ├CURRENT┤ implement
+** ├DONE───┤ implement
+CLOSED: [2025-12-16 Tue 22:47]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-16 Tue 22:47]
 - State "├CURRENT┤"  from              [2025-12-10 Wed 15:17]
 :END:
 
@@ -5129,16 +5119,308 @@ that works for now....
     :path (imp-mux-path "~/redacted" "init.el"))))
 #+end_src
 
+#+RESULTS:
+: t
+
+did it actually load?
+  - [X] message
+    - =Loading ’mux/init.el’ for 1 time...=
+  - [X] var > 0
+    - test-secret-mux == 1
 
 
-* custom.el @ /dev/null
-* elisp autocomplete / LSP?
+* ├DONE───┤ elisp autocomplete / LSP?
+CLOSED: [2025-12-16 Tue 23:03]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2025-12-16 Tue 23:03]
+:END:
 
 Think this is what eldoc was originally born for...
 
+oh its already on.
+  - [[file:source/user/config/languages/common.el::(use-package eldoc][here]] languages/common.el
+    - same as sn004 [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/dev-env/languages/common.el::(imp:use-package eldoc][here]]
+
+well... do I want to add any settings?
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Programming-Language-Doc.html
+
+mmh... nah
+* ├DONE───┤ custom.el @ /dev/null
+CLOSED: [2025-12-16 Tue 23:25]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-16 Tue 23:25]
+- State "├CURRENT┤"  from              [2025-12-16 Tue 23:07]
+:END:
+
+do not want ~custom-set-variables~
+  - [[file:init.el::(custom-set-variables][init.el]]
 
 
-* imp path
+file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/core/boot/10-init/01-bootstrap.el
+
+[[file:source/user/config/emacs/custom.el]]
+
+* ├DONE───┤ auto complete sources
+CLOSED: [2026-01-08 Thu 23:06]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-01-08 Thu 23:06]
+:END:
+
+ain't autocompleting from other buffers, ATM.
+
+cape-dabbrev
+
+k; now it works
+
+* ├KILLED─┤ add recentf to C-x C-f like in C-x b
+CLOSED: [2026-01-09 Fri 15:43]
+:LOGBOOK:
+- State "├KILLED─┤"  from              [2026-01-09 Fri 15:43] \\
+  doesn't work like that; use ~consult-recent-file~
+:END:
+
+~consult~ binds ~consult-buffer~ over top of ~switch-buffer~
+
+But there is no equivalent for ~find-file~...
+And so far I haven't found anything in google.
+
+* ├DONE───┤ csv-mode
+CLOSED: [2026-01-16 Fri 15:26]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-01-16 Fri 15:26]
+:END:
+
+(use-package csv-mode
+  :mode ("\\.csv\\'" . csv-mode)
+  :mode ("\\.tsv\\'" "\\.csv\\'" "\\.tabular\\'" "\\.vcf\\'")
+  :config
+  ;; Optional: Customize default behaviors or add hooks
+  (setq csv-default-separator ?\,) ;; Ensures comma is the default separator
+  (csv-align-mode t)              ;; Automatically align fields on load
+  (toggle-truncate-lines 1)       ;; Prevent long lines from wrapping
+  (csv-header-line t))            ;; Treat the first line as a header
+
+
+[[file:source/user/config/files.el::(use-package csv-mode]]
+
+* -- U R HERE --
+<<here>>
+
+* ├WAITING┤ GPT 5.2
+:LOGBOOK:
+- State "├WAITING┤"  from              [2025-12-16 Tue 16:01] \\
+  wait for gptel to add 5.2 to their models
+:END:
+
+Switch ~gptel~ to 5.2?
+
+Don't have it in ~gptel~ yet.
+  - ver: 2025-12-14
+  - ver: 20260105.2359 (gptel-version "0.9.9.3")
+
+Switch to 5.1 for now.
+
+* ├CURRENT┤ imp path
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2025-12-18 Thu 22:49]
+:END:
+
+** ├DONE───┤ what all does it do right now?
+CLOSED: [2025-12-18 Thu 23:53]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2025-12-18 Thu 23:53]
+- State "├CURRENT┤"  from              [2025-12-18 Thu 22:49]
+:END:
+
+~imp-path-...~ funcs used:
+  - ~imp-path-current-dir~
+  - ~imp-path-root-get~
+  - ~imp-path-join~
+
+imp-parser-normalize/:path
+  - ~imp-parser-normalize-paths~ (list of separate paths)
+    - ~imp-parser-normalize-path-args-list~ (list of separate paths)
+      - ~imp-parser-normalize-path-one-arg~
+        - ~imp-parser-normalize-path-symbol~
+          - input validation (~symbolp~)
+          - translate from known symbols to their paths
+          - prefix "./" and ":/" -> ~imp-parser-normalize-path-string~ (see below)
+          - get value from symbol
+          - nil for "i dunno"
+        - ~imp-parser-normalize-path-string~
+          - input validation (~stringp~)
+          - prefix "./" and ":/"
+            - ~imp-path-current-dir~ and ~imp-path-root-get~, respectively
+        - recursion for form/func input
+        - input validation (error for unknown)
+      - input validation (sanity check ~sequencep~)
+    - input validation (sanity check (list of ~stringp~))
+  - ~imp-parser-normalize-path-feature~
+  - path sanity checks
+
+imp-parser-handler/:path
+  - ~imp--mux-path-find~ to find actual mux path from placeholder
+  - Any checks for actual files/dirs should happen here.
+  - path sanity checks
+
+** ├HOLDING┤ audit imp/path.el funcs
+:LOGBOOK:
+- State "├HOLDING┤"  from              [2025-12-18 Thu 23:54]
+:END:
+
+deadgrep rx:
+#+begin_example
+^\(def.*\bimp--?path
+#+end_example
+
+#+begin_quote
+path.el
+38   (defun imp-path (&rest path)
+53   (defun imp-path-canonical (path &optional root)
+68   (defun imp-path-abbreviate (&rest path)
+76   (defun imp--path-relative (root path &optional error?)
+199  (defun imp-path-relative (root &rest path)
+241  (defun imp--path-root-valid? (caller path &rest kwargs)
+332  (defun imp--path-dir? (path)
+343  (defun imp-path-parent (path)
+375  (defun imp--path-filename (path)
+383  (defun imp-path-current-file ()
+453  (defun imp-path-current-dir ()
+526  (defvar imp--path-path-platform-case-insensitive
+535  (defun imp--path-platform-agnostic (path)
+560  (defun imp--path-to-str (input)
+596  (defun imp--path-append (parent next)
+624  (defun imp-path-join (&rest path)
+639  (defun imp-path-split (path)
+659  (defun imp-path-sans-extension (&rest path)
+669  (defun imp-path-with-extension (path ext)
+700  (defun imp-path-has-load-extension (path)
+711  (defun imp-path-load-file (path-absolute)
+727  (defun imp-path-root-set (feature dirpath)
+769  (defun imp-path-root-get (feature &optional no-error?)
+793  (defun imp-path-root-delete (feature &optional no-error?)
+#+end_quote
+
+
+Which are used/unused?
+Which should remain/deleted?
+
+| func                                       | in use? | note                                      |
+|--------------------------------------------+---------+-------------------------------------------|
+| ~imp-path~                                 | yes     | user's func to construct paths            |
+| add ~imp-path-???~                         |         | user's func to understand what ~imp~ does |
+| ~imp-path-canonical~                       | yes     | rename ~imp-path-expand~                  |
+| ~imp-path-abbreviate~                      | yes     |                                           |
+| ~imp--path-relative~                       | eh      | combine with ~imp-path-relative~          |
+| ~imp-path-relative~                        | eh      | combine with ~imp--path-relative~         |
+| ~imp--path-root-valid?~                    | once    | keep                                      |
+| ~imp--path-dir?~                           | once    | comment wants to delete this              |
+| add ~imp--path-type~                       |         | replace ~imp--path-dir?~                  |
+| ~imp-path-parent~                          | yes     |                                           |
+| ~imp--path-filename~                       |         | rename to ~imp--path-name~? basename?     |
+| ~imp-path-current-file~                    | yes     |                                           |
+| ~imp-path-current-dir~                     | yes     |                                           |
+| ~imp-file-current~                         | yes     |                                           |
+| ~imp--path-path-platform-case-insensitive~ | no      | delete                                    |
+| ~imp--path-platform-agnostic~              | no      | delete? move func into some other func?   |
+| ~imp--path-to-str~                         | once    | used by ~imp--path-append~                |
+| ~imp--path-append~                         | once    | used by ~imp-path-join~                   |
+| ~imp-path-join~                            | yes     |                                           |
+| ~imp-path-split~                           | yes     |                                           |
+| ~imp-path-sans-extension~                  | yes     |                                           |
+| ~imp-path-with-extension~                  | no but  | keep so sans-extension has its reverse    |
+| ~imp-path-has-load-extension~              | once    | used by ~imp-path-load-file~              |
+| ~imp-path-load-file~                       | yes     |                                           |
+| ~imp-path-root-set~                        | yes     |                                           |
+| ~imp-path-root-get~                        | yes     |                                           |
+| ~imp-path-root-delete~                     | no but  | keep it for dev & test                    |
+
+
+
+*** imp-path
+
+Function that users use to build paths?
+  - should not touch file system
+
+#+begin_example elisp
+(imp-path-root-set 'user
+                   (imp-path user-emacs-directory 'source 'user))
+#+end_example
+
+#+begin_example elisp
+  (imp namespaced
+    :root
+    :path (imp-path user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
+#+end_example
+
+*** imp-path-???
+
+function that users can use to test out how ~imp~ deals with paths
+
+params: FEATURE &rest PATH
+
+
+*** imp-path-relative
+
+Is only being used like:
+
+#+begin_example elisp
+(imp-provide user (imp-path-relative 'user (imp-path-sans-extension (imp-path-current-file))))
+#+end_example
+
+Make ~imp-provide-auto~ or something for that?
+
+#+begin_example elisp
+(imp-provide-auto user)
+#+end_example
+
+
+
+*** imp-path-join & friends
+
+~imp--path-to-str~ is only used by ~imp--path-append~.
+  - can a parser.el func be used instead?
+
+~imp--path-append~ is only used by this func.
+  - combine into ~imp-path-join~
+
+
+
+*** audit again for scope (public vs private)
+
+Wait til the first audit is dealt with.
+
+** ├CURRENT┤ refactor path tests
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-01-09 Fri 15:44]
+:END:
+
+Whither?
+
+https://github.com/jwiegley/use-package/blob/master/use-package-tests.el
+
+[[file:source/core/packages/imp/test/path.el]]
+
+** what do I want?
+
+path.el: consistentcy with the errors/no-errors
+  - some var that can be lexically bound?
+  - cl-defun w/ a key for error?
+
+No shenanigans with ~default-directory~.
+It shouldn't be used at all in ~path.el~, I think.
+
+I want anything that touches the file system to wait until imp macro is eval'd.
+  - so... handler should return a form eg ~`(imp-path-finalize "...")~
+
+hook vars & hooks
+  - or handlers?...
+
+Be nice if I could just call ~imp-path~?
+  - or maybe I call eg ~imp-path-normalize~ in the normalizer and ~imp-path-finalize~ in the handler?
+    - and ~imp-path~ calls both in one go?
+
+ert tests for all the funcs
 
 ** do in imp branch
 ** delay path eval until macro eval
@@ -5167,10 +5449,70 @@ add something for git paths like ~repo:/path~
 ** bump imp version
 
 
-* fill hydra
-* alignment hydra
+* fill & alignment shortcuts
 
-get my alignment commands hydra from sn004
+file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/keybinds/text.el
+  - oh this has alignment stuff too
+    - yay
+
+oh it's not a hydra
+It's all my keybind junk I made to fight ~meow~
+
+Convert to just a keymap, probably.
+  - [ ] bind keys?
+  - [ ] general?
+
+What key to put all my keybinds under?
+  - unassigned
+    - =C-' ...=
+  - Somewhere in =C-c=?
+    - =C-c a ...=
+
+Use bind-keys?
+
+#+begin_example elisp
+(bind-keys
+ :prefix "C-c m"
+ :prefix-map my-prefix-map
+ :prefix-docstring "My personal keybindings."
+ ("f" . my-command-foo)
+ ("b" . my-command-bar))
+#+end_example
+
+[[file:source/user/config/emacs/keybinds.el::;; My Personal Keymap]]
+
+[[file:source/user/config/emacs/text.el]]
+
+[[file:source/user/config/keybinds.el]]
+
+use-package general
+
+Make:
+  - [ ] config/keybinds dir
+  - [ ] config/keybinds/init.el?
+    - Need to install general somewhere...
+  - [ ] config/keybinds/text.el
+
+
+* LSP
+
+Get language server stuff set up?
+
+
+Grab LSP config from sn004
+
+find todos:
+#+begin_src elisp
+;; TODO(lsp): uncomment:
+#+end_src
+  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
+
+use Omnisharp for csharp.
+
+* treemacs?
+
+https://melpa.org/#/treemacs
+https://melpa.org/#/lsp-treemacs
 
 * ├WAITING┤ TRAMP into Win10 VM
 :LOGBOOK:
@@ -5370,21 +5712,6 @@ delete or use?
 oh. this requires ~multiplexer~
 
 well ~imp~ ate ~mux~, so...
-
-* LSP
-
-Get language server stuff set up?
-
-
-Grab LSP config from sn004
-
-find todos:
-#+begin_src elisp
-;; TODO(lsp): uncomment:
-#+end_src
-  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
-
-use Omnisharp for csharp.
 
 * ├TODO───┤ csharp & treesit?
 :LOGBOOK:
