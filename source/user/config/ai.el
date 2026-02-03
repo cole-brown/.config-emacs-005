@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-01-08
+;; Timestamp:  2026-02-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -188,6 +188,16 @@
   ;;
   ;; (global-set-key (kbd "C-c .") my-xref-map)
   )
+
+
+;;------------------------------------------------------------------------------
+;; `gptel-agent'
+;;------------------------------------------------------------------------------
+;; https://github.com/karthink/gptel-agent
+;; Tools and prompts for "agentic" use of LLMs.
+
+(use-package gptel-agent
+  :config (gptel-agent-update))
 
 
 ;;------------------------------------------------------------------------------
