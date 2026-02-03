@@ -1,10 +1,10 @@
-;;; modules/dev-env/taskspace/taskspace.el --- Extremely Simple Taskspace/Workspace Management -*- lexical-binding: t; -*-
+;;; taskspace/taskspace.el --- Extremely Simple Taskspace/Workspace Management -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2023-09-13
+;; Timestamp:  2026-02-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,16 +21,15 @@
 ;;--                   Simple Taskspace / Task Management                     --
 ;;------------------------------------------------------------------------------
 
-;; §-TODO-§ [2020-02-25]: cleanup pass?
-;; §-TODO-§ [2020-02-25]: find/do the todos here?
+;; TODO [2020-02-25]: cleanup pass?
+;; TODO [2020-02-25]: find/do the todos here?
 
 (require 'cl-lib)
 (require 'org) ; org-element
 
-(imp:require :dlv)
-(imp:require :nub)
-(imp:require :taskspace 'group)
-(imp:require :taskspace 'prompt)
+(imp-require taskspace:/group)
+(imp-require taskspace:/path)
+(imp-require taskspace:/prompt)
 
 
 ;;------------------------------------------------------------------------------
@@ -41,8 +40,8 @@
 ;; Notes
 ;;------------------------------
 
-(defun int<taskspace>:notes:open (group taskpath &optional no-error no-message)
-  "Open the GROUP:TASKPATH's notes file.
+(defun taskspace--notes-open (group taskpath &optional no-error no-message)
+  "Open the GROUP/TASKPATH's notes file.
 
 If NO-ERROR, returns nil instead of raising an error signal.
 
@@ -50,31 +49,30 @@ If NO-MESSAGE, skips output message."
 
   ;; Ok - find and open the notes file. Don't want to just assume they are
   ;; where the settings now indicate new ones will be created; people can
-  ;; change their settings. Old ones could be :self-contained and new
-  ;; :notesless, for example.
+  ;; change their settings. Old ones could be `:self-contained' and new
+  ;; `:notesless', for example.
 
-  ;; Assume local/:self-contained first.
-  (setq notespath (int<taskspace>:path:notes group taskpath :self-contained))
+  ;; Assume local/`:self-contained' first.
+  (setq notespath (taskspace--path-notes group taskpath :self-contained))
 
   ;; Does it exist?
   (unless (path:exists? notespath :file)
-    ;; Nope; try remote/:noteless.
-    (setq notespath (int<taskspace>:path:notes group taskpath :noteless)))
+    ;; Nope; try remote/`:noteless'.
+    (setq notespath (taskspace--path-notes group taskpath :noteless)))
 
   ;; There is no third try.
   (if (not (path:exists? notespath :file))
       (if no-error
           nil
-        (nub:error
-            :taskspace
-            "int<taskspace>:notes:open"
+        (taskspace--error
+            'taskspace--notes-open
           "No notes file found! Look for it: %s, %s"
-          (int<taskspace>:path:notes group taskpath :self-contained)
-          (int<taskspace>:path:notes group taskpath :noteless)))
+          (taskspace--path-notes group taskpath :self-contained)
+          (taskspace--path-notes group taskpath :noteless)))
 
     ;; Exists; message and visit it.
     (unless no-message
-      (message "Opening taskspace notes: %s" notespath))
+      (message "Opening taskspace notes- %s" notespath))
     (find-file notespath)))
 
 
@@ -82,7 +80,7 @@ If NO-MESSAGE, skips output message."
 ;; Org-Mode Helpers
 ;;------------------------------
 
-(defun int<taskspace>:org:keywords:list (&optional to-lower)
+(defun taskspace--org-keywords-list (&optional to-lower)
   "Get keyword elements from this org document.
 
 Elements (return value) will be an alist of (key . value).
@@ -103,7 +101,7 @@ If TO-LOWER is not nil, converts all keys to lowercase. DOES NOT CHANGE VALUES!"
                        (org-element-property :value keyword)))))
 
 
-(defun int<taskspace>:org:keyword:get (keyword &optional to-lower)
+(defun taskspace--org-keyword-get (keyword &optional to-lower)
   "Get the specified KEYWORD from this `org-mode' document.
 
 Will be case insensitive if TO-LOWER is non-nil.
@@ -118,7 +116,7 @@ So in the non-nil TO-LOWER case, we will return 'value' if asked for:
   (alist-get (if to-lower
                  (downcase keyword)
                keyword)
-             (int<taskspace>:org:keywords:list to-lower)
+             (taskspace--org-keywords-list to-lower)
              nil nil
              #'string=))
 
@@ -127,7 +125,7 @@ So in the non-nil TO-LOWER case, we will return 'value' if asked for:
 ;; Kill Ring (Copy/Paste)
 ;;------------------------------
 
-(defun int<taskspace>:kill-and-return (string &optional msg msg-args)
+(defun taskspace--kill-and-return (string &optional msg msg-args)
   "Copy STRING to kill ring and also return STRING.
 
 Optionally output MSG via `message' with MSG-ARGS."
@@ -138,8 +136,8 @@ Optionally output MSG via `message' with MSG-ARGS."
     (message msg msg-args))
   ;; return it
   string)
-;; (int<taskspace>:kill-and-return "hello")
-;; (int<taskspace>:kill-and-return "hello" "hey, %s" "there")
+;; (taskspace--kill-and-return "hello")
+;; (taskspace--kill-and-return "hello" "hey, %s" "there")
 
 
 ;;----------------------------------Taskspace-----------------------------------
@@ -147,7 +145,7 @@ Optionally output MSG via `message' with MSG-ARGS."
 ;;------------------------------------------------------------------------------
 
 ;;;###autoload
-(defun taskspace:dwim:name ()
+(defun taskspace-dwim-name ()
   "DWIM with the taskspace in order to save task name to kill ring and return it.
 
 Create if none.
@@ -156,7 +154,7 @@ Prompt to choose from multiple."
   (interactive)
 
   ;; Get task's full path, reduce to just task directory...
-  (let* ((fullpath (call-interactively #'taskspace:dwim:dir))
+  (let* ((fullpath (call-interactively #'taskspace-dwim-dir))
          (taskname (file:name fullpath)))
 
     ;; copy to kill-ring
@@ -164,12 +162,12 @@ Prompt to choose from multiple."
 
     ;; return it
     taskname))
-;; (taskspace:dwim:name)
-;; M-x taskspace:dwim:name
+;; (taskspace-dwim-name)
+;; M-x taskspace-dwim-name
 
 
 ;;;###autoload
-(defun taskspace:dwim:dir (date-input)
+(defun taskspace-dwim-dir (date-input)
   "DWIM with taskspace in order to save task dir to kill ring and return it.
 
 DATE-INPUT is prefix arg:
@@ -189,31 +187,31 @@ Else:
   (interactive (list current-prefix-arg))
 
   ;; Try to get group from context.
-  (let ((group (int<taskspace>:group:auto t))
+  (let ((group (taskspace--group-auto t))
         task-dir-shortcut
         task-msg-shortcut)
 
     ;; Prompt for group if we couldn't guess it.
     (unless group
-      (setq group (int<taskspace>:prompt:group 'auto t)))
+      (setq group (taskspace--prompt-group 'auto t)))
 
     ;; Check for a taskspace keyword if we're in an org-mode buffer. Just use
     ;; that and skip the rest if we find it and it's a directory that exists and
     ;; stuff.
     (when (eq major-mode 'org-mode)
-      (let ((task-dir (int<taskspace>:org:keyword:get
-                       (int<taskspace>:config group :dir/tasks/org/keyword))))
+      (let ((task-dir (taskspace--org-keyword-get
+                       (taskspace--config group :dir/tasks/org/keyword))))
         (when (and (not (null task-dir))
                    (path:exists? task-dir :dir))
           (setq task-dir-shortcut (path:canonicalize:dir task-dir))
           (setq task-msg-shortcut
                 (format "Got Taskspace from org-mode keyword (#+%s). %s"
-                        (int<taskspace>:config group :dir/tasks/org/keyword)
+                        (taskspace--config group :dir/tasks/org/keyword)
                         task-dir-shortcut)))))
 
     ;; Do we have a shortcut out, or do we go looking for the task-dir?
     (if (not (null task-dir-shortcut))
-        (int<taskspace>:kill-and-return task-dir-shortcut task-msg-shortcut)
+        (taskspace--kill-and-return task-dir-shortcut task-msg-shortcut)
 
       ;; No short cut. Start looking at DWIM things in DWIM-y order...
 
@@ -229,16 +227,15 @@ Else:
                           ((numberp date-input) date-input)
                           ;; default to... today/0 I guess?
                           (t 0)))
-             (date (int<taskspace>:naming:get:date group date-input))
-             (taskspaces (int<taskspace>:dir:list:date group date))
+             (date (taskspace--naming-get-date group date-input))
+             (taskspaces (taskspace--dir-list-date group date))
              (length-ts (length taskspaces)))
 
         (cond
          ;; error out if we have no idea what date to dwim with...
          ((null date)
-          (nub:error
-              :taskspace
-              "taskspace:dwim:dir"
+          (taskspace--error
+              'taskspace-dwim-dir
             "Date string is nil: %s"
             date))
 
@@ -248,7 +245,7 @@ Else:
           ;; etc. as if they called themselves.
           (funcall #'taskspace:create
                    group
-                   (int<taskspace>:prompt:name group)))
+                   (taskspace--prompt-name group)))
 
          ;; If just one, return it.
          ;; How to create second in that case? Use a non-dwim create func?
@@ -256,7 +253,7 @@ Else:
          ((= length-ts 1)
 
           ;; copy & return
-          (int<taskspace>:kill-and-return (cl-first taskspaces)
+          (taskspace--kill-and-return (cl-first taskspaces)
                                           "Existing taskspace: %s"
                                           (cl-first taskspaces)))
 
@@ -265,19 +262,19 @@ Else:
          ((> length-ts 1)
 
           ;; list available choices to user, get the taskspace they chose
-          (let ((choice (int<taskspace>:prompt:task/existing group
+          (let ((choice (taskspace--prompt-task-existing group
                                                              taskspaces
                                                              'nondirectory)))
-            (int<taskspace>:kill-and-return choice
+            (taskspace--kill-and-return choice
                                             "Chose taskspace: %s"
                                             choice)))
 
          ;; Don't need a default case... Fall through with nil.
          ;;(t nil)
          )))))
-;; M-x taskspace:dwim:dir
-;; (taskspace:dwim:dir)
-;; (taskspace:dwim:dir -1 :home)
+;; M-x taskspace-dwim-dir
+;; (taskspace-dwim-dir)
+;; (taskspace-dwim-dir -1 :home)
 
 
 ;;;###autoload
@@ -285,34 +282,32 @@ Else:
   "Create a new taskspace for today with the supplied GROUP & DESCRIPTION."
   ;; Do we need a max len? Leaving out until I feel otherwise.
   (interactive
-   (let ((group-prompt (int<taskspace>:prompt:group 'auto t)))
+   (let ((group-prompt (taskspace--prompt-group 'auto t)))
      (list group-prompt
-           (int<taskspace>:prompt:name group-prompt))))
+           (taskspace--prompt-name group-prompt))))
 
   ;; Is DESCRIPTION ok as description part?
-  (unless (int<taskspace>:naming:verify group description)
+  (unless (taskspace--naming-verify group description)
       ;; Error out; we are up to the interactive level now.
-      (nub:error
-          :taskspace
-          "taskspace:create"
+      (taskspace--error
+          'taskspace:create
         "Invalid description: %s"
         description))
 
   ;; Create the dir/project for today.
-  (let ((taskpath (int<taskspace>:dir:create group description 'today)))
+  (let ((taskpath (taskspace--dir-create group description 'today)))
     (when (null taskpath)
       ;; Couldn't create it for some reason...
       ;; TODO: Better reasons if known. "already exists" would be nice for
       ;; that case.
-      (nub:error
-          :taskspace
-          "taskspace:create"
+      (taskspace--error
+          'taskspace:create
         "Error creating taskspace directory for: %s"
         description))
 
     ;; Copy files into new taskspace.
-    (when (path:exists? (int<taskspace>:config group :file/new/copy) :dir)
-      (apply #'int<taskspace>:file:copy
+    (when (path:exists? (taskspace--config group :file/new/copy) :dir)
+      (apply #'taskspace--file-copy
              ;; arg 1: our new taskpath
              taskpath
              ;; arg &rest: all the files to copy with:
@@ -321,21 +316,20 @@ Else:
              ;;     - no '.', '..'
              ;;     - yes actual dotfiles somehow?
              ;;     - This is what I want, so... ok.
-             (path:children (int<taskspace>:config group :file/new/copy)
+             (path:children (taskspace--config group :file/new/copy)
                             :absolute-paths
                             nil
                             path:rx:dirs:not-parent-or-current-dot)))
 
     ;; Generate files into new taskspace.
-    (when (int<taskspace>:config group :file/new/generate)
-      (let ((gen-errors (int<taskspace>:file:generate
+    (when (taskspace--config group :file/new/generate)
+      (let ((gen-errors (taskspace--file-generate
                          group
                          taskpath
-                         (int<taskspace>:config group :file/new/generate))))
+                         (taskspace--config group :file/new/generate))))
         (when gen-errors
-          (nub:error
-              :taskspace
-              "taskspace:create"
+          (taskspace--error
+              'taskspace:create
             "Taskspace errors while generating file(s): %s"
             gen-errors))))
 
@@ -353,7 +347,7 @@ Else:
     ;; (message "Created taskspace: %s" taskpath)
 
     ;; Open the notes file.
-    (int<taskspace>:notes:open group taskpath nil t)
+    (taskspace--notes-open group taskpath nil t)
 
     ;; Return the path.
     taskpath))
@@ -369,17 +363,17 @@ If in a :noteless file, go to that note's task dir, if possible.
 If in a file or sub-dir of the task dir, go to the task's dir."
   (interactive)
 
-  (let* ((group (or (int<taskspace>:group:auto t)
-                    (int<taskspace>:prompt:group 'auto t)))
-         (taskpath (int<taskspace>:org:keyword:get
-                    (int<taskspace>:config group :dir/tasks/org/keyword))))
+  (let* ((group (or (taskspace--group-auto t)
+                    (taskspace--prompt-group 'auto t)))
+         (taskpath (taskspace--org-keyword-get
+                    (taskspace--config group :dir/tasks/org/keyword))))
 
     ;; Can short-cut past this if we were in an org file and found the keyword
     ;; link to the task's dir.
     (unless taskpath
       ;; Deduce group or prompt for it.
-      (let ((path (int<taskspace>:path:current))
-            (root (int<taskspace>:config group :dir/tasks)))
+      (let ((path (taskspace--path-current))
+            (root (taskspace--config group :dir/tasks)))
 
         (setq taskpath
               ;; If we are in a dir/file under a task, get the topmost dir that
@@ -403,9 +397,8 @@ If in a file or sub-dir of the task dir, go to the task's dir."
 
     (if (not (path:exists? taskpath :dir))
         ;; Not a dir - error out.
-        (nub:error
-            :taskspace
-            "taskspace:dired:task"
+        (taskspace--error
+            'taskspace:dired:task
           "'%s' taskspace directory doesn't exist?: '%s'"
           group taskpath)
 
@@ -423,23 +416,22 @@ If in a file or sub-dir of the task dir, go to the task's dir."
 ;;;###autoload
 (defun taskspace:dired:root (group)
   "Open the root directory of GROUP's taskspaces in an Emacs (Dired?) buffer."
-  (interactive (list (int<taskspace>:prompt:group 'auto t)))
+  (interactive (list (taskspace--prompt-group 'auto t)))
 
-  (if (not (file:exists? (int<taskspace>:config group :dir/tasks) :dir))
+  (if (not (file:exists? (taskspace--config group :dir/tasks) :dir))
       ;; not a dir - error out
-      (nub:error
-          :taskspace
-          "taskspace:dired:root"
+      (taskspace--error
+          'taskspace:dired:root
         "Can't find taskspace root directory: '%s'"
-        (int<taskspace>:config group :dir/tasks))
+        (taskspace--config group :dir/tasks))
 
     ;; ok - message and open (probably in dired but let emacs decide)
-    (find-file (int<taskspace>:config group :dir/tasks))
+    (find-file (taskspace--config group :dir/tasks))
     ;; say something
     (message "Opening taskspace parent: %s"
-             (file:name (int<taskspace>:config group :dir/tasks)))
+             (file:name (taskspace--config group :dir/tasks)))
     ;; return the top dir?
-    (int<taskspace>:config group :dir/tasks)))
+    (taskspace--config group :dir/tasks)))
 ;; (taskspace:dired:root :home)
 ;; M-x taskspace:dired:root
 
@@ -449,27 +441,25 @@ If in a file or sub-dir of the task dir, go to the task's dir."
   "Open GROUP's root taskspace directory in an Emacs shell buffer.
 
 Shell opened can be set by modifying:
-  (int<taskspace>:config group :function/shell)."
-  ;; §-TODO-§ [2020-08-18]: If in a taskspace folder or a remote notes file,
+  (taskspace--config group :function/shell)."
+  ;; TODO [2020-08-18]: If in a taskspace folder or a remote notes file,
   ;; just let the shell open without prompts.
-  (interactive (list (int<taskspace>:prompt:group 'auto t)))
+  (interactive (list (taskspace--prompt-group 'auto t)))
 
-  (let ((shell-fn (int<taskspace>:config group :function/shell)))
+  (let ((shell-fn (taskspace--config group :function/shell)))
     (if (not (functionp shell-fn))
-        (nub:error
-            :taskspace
-            "taskspace:shell"
+        (taskspace--error
+            'taskspace:shell
           "`:function/shell' in taskspace settings for group `%S' is not bound to a fuction: %s"
           shell-fn)
 
       ;; prompt user for the taskspace with an attempt at DWIM
-      (let ((task (call-interactively #'taskspace:dwim:dir)))
+      (let ((task (call-interactively #'taskspace-dwim-dir)))
         ;; expecting a path from task-dir/dwim
         (if (not (path:exists? task :dir))
             ;; not a dir - error out
-            (nub:error
-                :taskspace
-                "taskspace:shell"
+            (taskspace--error
+                'taskspace:shell
               "Can't find taskspace (not a directory?): '%s'"
               task)
 
@@ -504,7 +494,7 @@ DWIM-ish actions:
   ;; Numeric arg but don't let lower case "p" auto-magic nothing (no prefix arg)
   ;; into 1. Nothing/0/nil is today. 1 is tomorrow.
   (interactive (list current-prefix-arg
-                     (int<taskspace>:prompt:group 'auto t)))
+                     (taskspace--prompt-group 'auto t)))
 
   ;; Default to "today" if date-input isn't parsable string,
   ;; then get date, taskspaces, etc. for that numerical relative day.
@@ -518,10 +508,10 @@ DWIM-ish actions:
                        ((numberp date-input) date-input)
                        ;; default to... today/0 I guess?
                        (t 0)))
-         (date        (int<taskspace>:naming:get:date group date-parsed))
-         (taskspaces  (int<taskspace>:dir:list:date group date))
+         (date        (taskspace--naming-get-date group date-parsed))
+         (taskspaces  (taskspace--dir-list-date group date))
          (taskspaces  (or taskspaces
-                          (int<taskspace>:dir:list:all group)))
+                          (taskspace--dir-list-all group)))
          (length-ts   (length taskspaces))
          taskpath)
 
@@ -530,9 +520,8 @@ DWIM-ish actions:
     (cond
      ;; error out if we have no idea what date to dwim with...
      ((null date)
-      (nub:error
-          :taskspace
-          "taskspace:notes"
+      (taskspace--error
+          'taskspace:notes
         "Date string is nil: %s"
         date))
 
@@ -546,7 +535,7 @@ DWIM-ish actions:
      ((> length-ts 1)
 
       ;; list available choices to user, get the taskspace they chose
-      (let ((choice (int<taskspace>:prompt:task/existing group taskspaces 'nondirectory)))
+      (let ((choice (taskspace--prompt-task-existing group taskspaces 'nondirectory)))
         (setq taskpath choice)
         (message "Chose taskspace: %s" choice)))
 
@@ -554,17 +543,16 @@ DWIM-ish actions:
      (t nil))
 
     (if (null taskpath)
-        (nub:error
-            :taskspace
-            "taskspace:notes"
+        (taskspace--error
+            'taskspace:notes
           "No taskspace notes found for date: %s"
           date)
 
       ;; Exists; message and visit it.
-      (int<taskspace>:notes:open group taskpath))))
+      (taskspace--notes-open group taskpath))))
 ;; M-x taskspace:notes
 ;; (taskspace:notes)
-;; (taskspace:notes -1 (int<taskspace>:prompt:group 'auto t))
+;; (taskspace:notes -1 (taskspace--prompt-group 'auto t))
 
 
 ;;------------------------------------------------------------------------------
