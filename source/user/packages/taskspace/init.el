@@ -1,14 +1,14 @@
-;;; modules/dev-env/taskspace/init.el --- Per-task notes & files. -*- lexical-binding: t; -*-
+;;; taskspace/init.el --- Per-task notes & files. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2023-09-13
-;; Version:    2.3
+;; Timestamp:  2026-02-03
+;; Version:    2.4
 ;;
 ;; TODO: Requirements: cl-lib, seq, dash, org,
-;; TODO: Requirements (imp):  nub, dlv, elisp:util:units,
+;; TODO: Requirements (imp):  dlv, elisp:util:units,
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -197,53 +197,41 @@
 ;;
 ;;; Code:
 
+(require 'cl-lib)
+(require 'dash)
+(require 'seq)
+
+(imp-require dlv)
+(imp-require path)
+(imp-require unit)
+
 
 ;;------------------------------------------------------------------------------
 ;; Set imp Root.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root/set :taskspace
-                   (imp:path:current:dir)
-                   "init.el")
+(imp-path-root-set 'taskspace
+                   (imp-path-current-dir))
 
 
 ;;------------------------------------------------------------------------------
 ;; Load Files
 ;;------------------------------------------------------------------------------
 
-(imp:timing
-    '(:taskspace)
-    (imp:file:current)
-    (imp:path:current:dir)
+(imp-timing
+    taskspace
+    (imp-path-current-file)
 
-  (imp:load :feature  '(:taskspace nub)
-            :filename "nub")
-  ;; Initialize nub before going any further for debug/error/etc output.
-  (int<taskspace>:nub:init)
-
-  (imp:load :feature  '(:taskspace group)
-            :filename "group")
-
-  (imp:load :feature  '(:taskspace naming)
-            :filename "naming")
-
-  (imp:load :feature  '(:taskspace path)
-            :filename "path")
-
-  (imp:load :feature  '(:taskspace prompt)
-            :filename "prompt")
-
-  (imp:load :feature  '(:taskspace taskspace)
-            :filename "taskspace")
-
-  (imp:load :feature  '(:taskspace keybinds)
-            :filename "keybinds")
-
-  ;; End load timing.
-  )
+  (imp ./debug)
+  (imp ./group)
+  (imp ./naming)
+  (imp ./path)
+  (imp ./prompt)
+  (imp ./taskspace)
+  (imp ./keybinds))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :taskspace)
+(imp-provide taskspace)

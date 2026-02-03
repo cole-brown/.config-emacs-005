@@ -1,10 +1,10 @@
-;;; modules/dev-env/taskspace/group.el --- Taskspace Groups -*- lexical-binding: t; -*-
+;;; taskspace/group.el --- Taskspace Groups -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-06
-;; Timestamp:  2023-09-13
+;; Timestamp:  2026-01-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -23,8 +23,7 @@
 
 (require 'dash)
 
-(imp:require :nub)
-(imp:require :dlv)
+(imp-require dlv)
 
 
 ;;------------------------------------------------------------------------------
@@ -43,8 +42,8 @@ bug investigation, log munging, or whatever."
 ;; Multiple Separate Taskspaces
 ;;------------------------------------------------------------------------------
 
-(defcustom taskspace:groups
-  '((:default "Taskspace" taskspace:group:default))
+(defcustom taskspace-groups
+  '((:default "Taskspace" taskspace-group-default))
   "Definitions for multiple task spaces. Each will have its own settings.
 Each entry in the alist is a list of: (keyword string settings-variable)
 
@@ -53,17 +52,17 @@ Each entry in the alist is a list of: (keyword string settings-variable)
 'string' is a name used for display purposes.
 
 'settings-variable' should be the big settings alist (see
-`taskspace:group:default' for the default's settings)."
+`taskspace-group-default' for the default's settings)."
   :group 'taskspace
-  :type '(alist :key-type symbol
-                :value-type string))
+  :type '(alist :key-type   symbol
+                :value-type string)) ;; TODO: value is list, not string?
 
 
 ;;------------------------------------------------------------------------------
 ;; Per-Taskspace Settings
 ;;------------------------------------------------------------------------------
 
-(defcustom taskspace:group:default
+(defcustom taskspace-group-default
   '((:type/notes :self-contained
      (concat
       "What kind of taskspace to create by default.\n"
@@ -84,7 +83,7 @@ Each entry in the alist is a list of: (keyword string settings-variable)
     (:format/datetime "%Y-%m-%d"
      "Date format for parsing/naming taskspace directory names.")
 
-    (:function/shell  #'shell
+    (:function/shell  #'eshell
      (concat
       "Function to call to open shell buffer. `shell' and `eshell' work. "
       "Opens the current taskspace's top dir in an emacs shell buffer."))
@@ -99,11 +98,11 @@ Each entry in the alist is a list of: (keyword string settings-variable)
       "User's folder for all notes that are in `:noteless' taskspaces. "
       "Unused in `:self-contained' taskspaces."))
 
-    (:file/new/copy (path:absolute:dir (int<taskspace>:config :default :dir/tasks)
+    (:file/new/copy (path:absolute:dir (taskspace--config :default :dir/tasks)
                                        "taskspace-new")
      "User's folder for files to copy into new taskspaces.")
 
-    (:file/new/generate (((int<taskspace>:config :default :file/notes) "") ;; empty file
+    (:file/new/generate (((taskspace--config :default :file/notes) "") ;; empty file
                          (".projectile" "")) ;; also empty
      (concat
       "Files to generate for new taskspaces. Expects an alist like:\n"
@@ -134,7 +133,7 @@ Each entry in the alist is a list of: (keyword string settings-variable)
      ;; probably since regexes are just strings?
      ("." ".."
       "00_archive"
-      (path:absolute:file (int<taskspace>:config :default :file/new/copy)))
+      (path:absolute:file (taskspace--config :default :file/new/copy)))
      (concat
       "Always ignore these when getting/determining a taskspace directory. "
       "Can be strings or functions."))
@@ -172,22 +171,20 @@ Each entry in the alist is a list of: (keyword string settings-variable)
       "\n"
       "e.g.: if this line is in the '_notes.org':"
       "#+TASKSPACE: ~/path/to/taskspace/2020-03-17_0_example"
-      "...then `int<taskspace>:org:keyword:get' can be used to get it for"
+      "...then `taskspace--org:keyword:get' can be used to get it for"
       "`taskspace:dwim:dir'.")))
 
   "Alist of custom settings (name/value/docstr) for default taskspace."
-  :group 'taskspace
-  ;; :type no idea so I'm leaving it out... sexp?
-  )
+  :group 'taskspace)
 
 
 ;;------------------------------------------------------------------------------
 ;; Per-Group Config/Settings Helpers
 ;;------------------------------------------------------------------------------
 
-(defun int<taskspace>:config (group key &optional field)
-  "Get the FIELD of KEY from GROUP's settings alist in `taskspace:groups'.
-If GROUP doesn't exist in `taskspace:groups', this will look for `:default'.
+(defun taskspace--config (group key &optional field)
+  "Get the FIELD of KEY from GROUP's settings alist in `taskspace-groups'.
+If GROUP doesn't exist in `taskspace-groups', this will look for `:default'.
 Errors if nothing is found in GROUP or `:default' settings.
 
 If FIELD is nil or `:setting', gets the setting's value.
@@ -197,59 +194,59 @@ If FIELD is `:docstr', gets the setting's docstr.
 If FIELD is `:key', gets the setting's key, which is KEY. Almost
 useless, but does validate entry's exists."
   (let ((entry nil)
-        (settings (int<taskspace>:config:group:get/settings group)))
+        (settings (taskspace--config-group-get-settings group)))
     ;; First, try to get from group's settings (if we found group's settings).
     (when settings
-      (setq entry (int<taskspace>:config:get key settings)))
+      (setq entry (taskspace--config-get key settings)))
 
     ;; Second, if needed, try to get from default/fallback settings.
     (when (null entry)
       ;; Didn't find the requested group... use defaults.
       (setq entry
-            (int<taskspace>:config:get
+            (taskspace--config-get
              key
-             (int<taskspace>:config:group:get/settings :default))))
+             (taskspace--config-group-get-settings :default))))
 
     ;; Now we can finally either reduce down to the value or error out.
     (if (null entry)
         ;; Not found anywhere; error out.
-        (nub:error
-            :taskspace
-            "int<taskspace>:config"
+        (taskspace--error
+            "taskspace--config"
           "Taskspace: Could not find setting '%S' in group '%S' or default"
-          key group)
+          key
+          group)
 
       ;; Got group; return value of requested field.
       ;; Entry should be: (key value docstr)
       ;; Now figure out which is requested, what it actually is, and return it.
       (cond ((eq field :key)
-             (int<taskspace>:config:entry:get/key entry))
+             (taskspace--config-entry-get-key entry))
 
             ((eq field :docstr)
-             (int<taskspace>:config:entry:get/docstr entry))
+             (taskspace--config-entry-get-docstr entry))
 
             (t
-             (int<taskspace>:config:entry:get/setting entry))))))
-;; (int<taskspace>:config :home :format/datetime)
-;; (int<taskspace>:config :home :format/datetime :setting)
-;; (int<taskspace>:config :home :format/datetime :docstr)
-;; (int<taskspace>:config :home :format/datetime :key)
-;; (int<taskspace>:config :home :type/notes)
-;; (int<taskspace>:config :home :dir/tasks)
-;; (int<taskspace>:config :home :dir/tasks/ignore)
-;; (int<taskspace>:config :home :naming/parts-alists)
-;; (int<taskspace>:config :home :file/new/copy)
+             (taskspace--config-entry-get-setting entry))))))
+;; (taskspace--config :home :format/datetime)
+;; (taskspace--config :home :format/datetime :setting)
+;; (taskspace--config :home :format/datetime :docstr)
+;; (taskspace--config :home :format/datetime :key)
+;; (taskspace--config :home :type/notes)
+;; (taskspace--config :home :dir/tasks)
+;; (taskspace--config :home :dir/tasks/ignore)
+;; (taskspace--config :home :naming/parts-alists)
+;; (taskspace--config :home :file/new/copy)
 
 
-(defun int<taskspace>:config:entry:get/key (entry)
-  "Helper for int<taskspace>:config.
+(defun taskspace--config-entry-get-key (entry)
+  "Helper for taskspace--config.
 
 Given an ENTRY from a group's settings alist, returns its key or nil."
   (nth 0 entry))
 
 
-(defun int<taskspace>:config:entry:get/setting (entry)
-  "Helper for int<taskspace>:config.
+(defun taskspace--config-entry-get-setting (entry)
+  "Helper for taskspace--config.
 
 Given an ENTRY from a group's settings alist, turn it into an actual setting.
 
@@ -298,29 +295,29 @@ function that needs called, etc."
      ;; Else just return it.
      (t
       setting))))
-;; (int<taskspace>:config:entry:get/setting '(jeff (+ 4 1) "list function"))
-;; (int<taskspace>:config:entry:get/setting '(jeff (4 1)   "just a list"))
-;; (int<taskspace>:config:entry:get/setting '(jeff #'ignore "a function"))
-;; (int<taskspace>:config:entry:get/setting '(jeff jeff "symbol, no value"))
-;; (let ((a 42)) (int<taskspace>:config:entry:get/setting '(jeff a "symbol w/ value")))
+;; (taskspace--config-entry-get-setting '(jeff (+ 4 1) "list function"))
+;; (taskspace--config-entry-get-setting '(jeff (4 1)   "just a list"))
+;; (taskspace--config-entry-get-setting '(jeff #'ignore "a function"))
+;; (taskspace--config-entry-get-setting '(jeff jeff "symbol, no value"))
+;; (let ((a 42)) (taskspace--config-entry-get-setting '(jeff a "symbol w/ value")))
 
 
-(defun int<taskspace>:config:entry:get/docstr (entry)
-  "Helper for int<taskspace>:config.
+(defun taskspace--config-entry-get-docstr (entry)
+  "Helper for taskspace--config.
 
 Given an ENTRY from a group's settings alist, returns its docstr or nil."
   (nth 2 entry))
 
 
-(defun int<taskspace>:config:group:get/settings (group)
-  "Helper for int<taskspace>:config.
+(defun taskspace--config-group-get-settings (group)
+  "Helper for taskspace--config.
 
-Get settings from `taskspace:groups' using GROUP as alist key.
+Get settings from `taskspace-groups' using GROUP as alist key.
 Return just the settings - not the full assoc value.
 Can return nil."
   ;; Group entry is: (keyword display-name settings)
   ;; Return only settings, or just nil if assoc/nth don't find anything.
-  (let ((settings (int<taskspace>:group:settings group)))
+  (let ((settings (taskspace--group-settings group)))
     (cond ((listp settings)
            settings)
 
@@ -329,11 +326,11 @@ Can return nil."
 
           (t
            nil))))
-;; (int<taskspace>:config:group:get/settings :default)
+;; (taskspace--config-group-get-settings :default)
 
 
-(defun int<taskspace>:config:get (key settings)
-  "Helper for int<taskspace>:config.
+(defun taskspace--config-get (key settings)
+  "Helper for taskspace--config.
 
 Gets value for KEY from settings. Returns nil if not found.
 Returns assoc value if found (key's full entry in SETTINGS alist)."
@@ -345,7 +342,7 @@ Returns assoc value if found (key's full entry in SETTINGS alist)."
 ;;------------------------------------------------------------------------------
 
 ;; TODO: use this to validate group in code places.
-(defun int<taskspace>:group:valid? (group)
+(defun taskspace--group-valid? (group)
   "Return non-nil if GROUP is a valid group keyword/name."
   (keywordp group))
 
@@ -354,52 +351,51 @@ Returns assoc value if found (key's full entry in SETTINGS alist)."
 ;; Group DLV
 ;;------------------------------------------------------------------------------
 
-(defun taskspace:group:dlv (group directory)
+(defun taskspace-group-dlv (group directory)
   "Create a directory-local-variable for GROUP and DIRECTORY.
 This sets the automatic group for that dir (and sub-dirs) to GROUP."
-  (if (imp:provided? :dlv)
+  (if (imp-provided? :dlv)
       (dlv:set directory
                nil ;; global mode
-               (list 'int<taskspace>:dlv:group
+               (list 'taskspace--dlv-group
                      group
                      :safe))
-    (nub:error
-        :taskspace
-        "taskspace:group:dlv"
+    (taskspace--error
+        "taskspace-group-dlv"
       "Requires `dlv' feature/package/module; didn't find them. Group: %s, Directory: %s"
       group directory)))
 
 
-(defun int<taskspace>:group:dlv ()
-  "Try to get the directory-local-variable `taskspace:group:dlv'.
+(defun taskspace--group-dlv ()
+  "Try to get the directory-local-variable `taskspace-group-dlv'.
 
-`taskspace:group:dlv' is not expected to exist, generally.
+`taskspace-group-dlv' is not expected to exist, generally.
 This will return its value or nil."
   ;; Cannot use `condition-case-unless-debug' here... it just doesn't catch
   ;; `void-variable' signal.
   (condition-case nil
-      int<taskspace>:dlv:group
-    ;; `int<taskspace>:dlv:group' does not exist; return nil.
+      taskspace--dlv-group
+    ;; `taskspace--dlv-group' does not exist; return nil.
     (void-variable nil)
     ;; Generic error signal...?
     ;; (error nil)
     ;; All signals?
     ;; (t nil)
     ))
-;; (int<taskspace>:group:dlv)
+;; (taskspace--group-dlv)
 
 
 ;;------------------------------------------------------------------------------
 ;; Group Getters
 ;;------------------------------------------------------------------------------
 
-(defun int<taskspace>:group:current (&optional quiet)
+(defun taskspace--group-current (&optional quiet)
   "Try to figure out current group given currently visited buffer.
 
 Set QUIET to non-nil for nil return on error, else will signal an error.
 QUIET also suppresses the \"Current Taskspace Group: ...\" message."
-  ;; `int<taskspace>:path:current' can return nil, so make sure to account for it.
-  (let ((path (int<taskspace>:path:current))
+  ;; `taskspace--path-current' can return nil, so make sure to account for it.
+  (let ((path (taskspace--path-current))
         (current-root nil)
         (current-group nil))
 
@@ -409,11 +405,11 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
       (setq current-root
             (car
              ;; Start by getting our group keywords...
-             (->> (-map #'car taskspace:groups)
+             (->> (-map #'car taskspace-groups)
                   ;; and turning into task and notes dirs...
                   (-map (lambda (g) (list
-                                     (int<taskspace>:config g :dir/tasks)
-                                     (int<taskspace>:config g :dir/notes))))
+                                     (taskspace--config g :dir/tasks)
+                                     (taskspace--config g :dir/notes))))
                   ;; Have list of tuple lists now; want flat list.
                   (-flatten)
                   ;; Figure out which one is our current root.
@@ -434,11 +430,10 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
         ;; Complain if interactive; return nil if not.
         (if quiet
             nil
-          (nub:error
-              :taskspace
-              "int<taskspace>:group:current"
-            "Could not find a taskspace root for currently visited buffer dir: %s"
-            path))
+          (taskspace--error
+              "taskspace--group-current"
+           "Could not find a taskspace root for currently visited buffer dir: %s"
+           path))
 
       ;; Normalize the path.
       (setq current-root (path:absolute:dir current-root))
@@ -454,107 +449,106 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
                       ;; If we match one of this group's roots, return the
                       ;; group keyword.
                       (if (or
-                           (path:equal? (int<taskspace>:config (nth 0 entry)
-                                                               :dir/tasks)
+                           (path:equal? (taskspace--config (nth 0 entry)
+                                                           :dir/tasks)
                                         current-root)
-                           (path:equal? (int<taskspace>:config (nth 0 entry)
-                                                               :dir/notes)
+                           (path:equal? (taskspace--config (nth 0 entry)
+                                                           :dir/notes)
                                         current-root))
                           (nth 0 entry)
                         nil))
-                    taskspace:groups))))
+                    taskspace-groups))))
       ;; Inform it and return it.
       (unless quiet
         (message "Current Taskspace Group: %s" current-group))
       current-group)))
-;; (int<taskspace>:group:current)
+;; (taskspace--group-current)
 
 
-(defun int<taskspace>:group:auto (&optional quiet)
+(defun taskspace--group-auto (&optional quiet)
   "Try to get either the auto-group or the current-group.
 
 Prefer the auto-group.
 
 Set QUIET to non-nil for nil return on error, else will signal an error.
 QUIET also suppresses the \"Current Taskspace Group: ...\" message."
-  (or (int<taskspace>:group:dlv)
-      (int<taskspace>:group:current quiet)))
-;; (int<taskspace>:group:auto)
+  (or (taskspace--group-dlv)
+      (taskspace--group-current quiet)))
+;; (taskspace--group-auto)
 
 
-(defun int<taskspace>:group (group)
-  "Return the `assoc' from `taskspace:groups' for GROUP.
+(defun taskspace--group (group)
+  "Return the `assoc' from `taskspace-groups' for GROUP.
 
 If GROUP is a keyword, get the assoc and then return it.
 If GROUP is a list, assume it is already the assoc list and return it.
 Else signal an error."
   ;; Keyword? Get the assoc for that group.
   (cond ((keywordp group)
-         (assoc group taskspace:groups))
+         (assoc group taskspace-groups))
 
-        ;; List? Assume it's already the group assoc from `taskspace:groups',
+        ;; List? Assume it's already the group assoc from `taskspace-groups',
         ;; and return it.
         ((listp group)
          group)
 
         (t
-         (nub:error
-             :taskspace
-             "int<taskspace>:group"
-           "Cannot understand type '%S'; need a keyword or list! Group: %S"
-           (type-of group)
-           group))))
-;; (int<taskspace>:group :default)
-;; (int<taskspace>:group '(:default "Defaults" taskspace:group:default))
+         (taskspace--error
+             "taskspace--group"
+          "Cannot understand type '%S'; need a keyword or list! Group: %S"
+          (type-of group)
+          group))))
+;; (taskspace--group :default)
+;; (taskspace--group '(:default "Defaults" taskspace-group-default))
 
 
-(defun int<taskspace>:group:keyword (group)
+(defun taskspace--group-keyword (group)
   "Given GROUP keyword/list, return group's keyword.
 
-GROUP should be return value from `int<taskspace>:group' (assoc from
-`taskspace:groups')."
-  (nth 0 (int<taskspace>:group group)))
-;; (int<taskspace>:group:keyword '(:default "Taskspace of Default" this-dne))
+GROUP should be return value from `taskspace--group' (assoc from
+`taskspace-groups')."
+  (nth 0 (taskspace--group group)))
+;; (taskspace--group-keyword '(:default "Taskspace of Default" this-dne))
 
 
-(defun int<taskspace>:group:name/display (group)
+(defun taskspace--group-name-display (group)
   "Given GROUP keyword/list, return GROUP's display name.
 
-GROUP should be either a keyword or the return value from `int<taskspace>:group'
-\(assoc from `taskspace:groups')."
-  (let ((group-list (int<taskspace>:group group)))
+GROUP should be either a keyword or the return value from `taskspace--group'
+\(assoc from `taskspace-groups')."
+  (let ((group-list (taskspace--group group)))
     (if (null (nth 1 group-list)) ;; Does the group even have a display name?
-        (symbol-name (int<taskspace>:group:keyword group-list))
+        (symbol-name (taskspace--group-keyword group-list))
       (nth 1 group-list))))
-;; (int<taskspace>:group:name/display '(:default "Taskspace of Default" this-dne))
-;; (int<taskspace>:group:name/display '(:default nil this-dne))
-;; (int<taskspace>:group:name/display :default)
+;; (taskspace--group-name-display '(:default "Taskspace of Default" this-dne))
+;; (taskspace--group-name-display '(:default nil this-dne))
+;; (taskspace--group-name-display :default)
 
 
-(defun int<taskspace>:group:settings (group)
+(defun taskspace--group-settings (group)
   "Given GROUP symbol/list, return group's settings.
 
-GROUP should be return value from `int<taskspace>:group' (assoc from
-`taskspace:groups')."
-  (nth 2 (int<taskspace>:group group)))
-;; (int<taskspace>:group:settings '(:default "Taskspace of Default" this-dne))
-;; (int<taskspace>:group:settings :default)
+GROUP should be return value from `taskspace--group' (assoc from
+`taskspace-groups')."
+  (nth 2 (taskspace--group group)))
+;; (taskspace--group-settings '(:default "Taskspace of Default" this-dne))
+;; (taskspace--group-settings :default)
 
 
 ;;------------------------------------------------------------------------------
 ;; Directory Local Variables
 ;;------------------------------------------------------------------------------
 
-(defvar int<taskspace>:dlv:group nil
+(defvar taskspace--dlv-group nil
   "This should always be nil unless used via Directory Local Variables.
 
-It should only be set via `taskspace:group:dlv'")
+It should only be set via `taskspace-group-dlv'")
 
 ;; Mark our DLV variable as safe for DLV use.
-(dlv:var:safe/predicate 'int<taskspace>:dlv:group #'int<taskspace>:group:valid?)
+(dlv:var:safe/predicate 'taskspace--dlv-group #'taskspace--group-valid?)
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :taskspace 'group)
+(imp-provide taskspace:/group)
