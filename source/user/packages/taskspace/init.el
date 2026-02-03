@@ -200,6 +200,7 @@
 (require 'cl-lib)
 (require 'dash)
 (require 'seq)
+(require 'org)
 
 (imp-require dlv)
 (imp-require path)

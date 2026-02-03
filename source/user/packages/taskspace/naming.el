@@ -24,8 +24,6 @@
 (require 'seq)
 (require 'dash)
 
-(imp-require dlv)
-(imp-require path)
 (imp-require unit)
 
 (imp-require taskspace:/group)

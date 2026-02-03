@@ -1,10 +1,10 @@
-;;; modules/dev-env/taskspace/keybinds.el --- Keybinds -*- lexical-binding: t; -*-
+;;; taskspace/keybinds.el --- Keybinds -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-06
-;; Timestamp:  2023-09-13
+;; Timestamp:  2026-02-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,25 +21,22 @@
 ;;--                   Simple Taskspace / Task Management                     --
 ;;------------------------------------------------------------------------------
 
-(imp:require :dlv)
-(imp:require :nub)
-(imp:require :taskspace 'taskspace)
+(imp-require taskspace:/taskspace)
 
 
 ;;------------------------------------------------------------------------------
 ;; DOOM!
 ;;------------------------------------------------------------------------------
 
-(defun taskspace:keybind:doom ()
+(defun taskspace-keybind-doom ()
   "Create keybinds in Doom, or raise an error if not in Doom.
 
 Create keybinds using Doom's `map!' macro.
 
 Creates the taskspace keymap under the doom leader key (default SPC)"
   (if (null (symbolp 'doom!)) ;; Doom's loading function should mean this is doom?
-      (nub:error
-       :taskspace
-       "taskspace:keybind:doom"
+      (taskspace--error
+          'taskspace-keybind-doom
        "We are not in a Doom Emacs environment..? Cannot set Doom Emacs keybinds.")
 
     ;; Map under the Doom leader, probably.
@@ -51,27 +48,27 @@ Creates the taskspace keymap under the doom leader key (default SPC)"
           (:prefix ("T" . "taskspace")
 
            ;; Top level commands...
-           :desc "Create new..."  "T" #'taskspace:create
-           :desc "Visit notes..." "v" #'taskspace:notes
-           :desc "Shell..."       "s" #'taskspace:shell
+           :desc "Create new..."  "T" #'taskspace-create
+           :desc "Visit notes..." "v" #'taskspace-notes
+           :desc "Shell..."       "s" #'taskspace-shell
 
            ;; 'Copy to kill ring' functions:
            (:prefix ("k" . "Kill...")
 
-            :desc "dir"  "k" #'taskspace:dwim:dir
-            :desc "name" "n" #'taskspace:dwim:name)
+            :desc "dir"  "k" #'taskspace-dwim-dir
+            :desc "name" "n" #'taskspace-dwim-name)
 
            ;; 'Open a dired buffer' functions:
            (:prefix ("d" . "dired")
-            :desc "task dired buffer" "d" #'taskspace:dired:task
-            :desc "root dired buffer" "r" #'taskspace:dired:root)))))
+            :desc "task dired buffer" "d" #'taskspace-dired-task
+            :desc "root dired buffer" "r" #'taskspace-dired-root)))))
 
 
 ;;------------------------------------------------------------------------------
 ;; General
 ;;------------------------------------------------------------------------------
 
-(defmacro taskspace:keybind:general (&rest args)
+(defmacro taskspace-keybind-general (&rest args)
   "Create keybinds using the supplied `general' ARGS.
 
 If using `evil', consider placing this in your config:
@@ -88,14 +85,13 @@ If using `evil', consider placing this in your config:
                                   replace))
 
 Call this function with the desired keybind settings:
-  (taskspace:keybind:general
+  (taskspace-keybind-general
     :prefix  \"SPC n\"
     :states  '(normal visual motion)
     :keymaps 'override)"
   (unless (featurep 'general)
-    (nub:error
-     :taskspace
-     "taskspace:keybind:general"
+    (taskspace--error
+        'taskspace-keybind-general
      "`General' keybind feature is not loaded/defined! Cannot create keybinds."))
 
   `(progn
@@ -115,9 +111,9 @@ Call this function with the desired keybind settings:
                          :infix "t"
                          "" (list nil :which-key "Taskspace...") ;; Infix Title
 
-                         "t" (list #'taskspace:create :which-key "New")
-                         "v" (list #'taskspace:notes  :which-key "Visit")
-                         "s" (list #'taskspace:shell  :which-key "Shell"))
+                         "t" (list #'taskspace-create :which-key "New")
+                         "v" (list #'taskspace-notes  :which-key "Visit")
+                         "s" (list #'taskspace-shell  :which-key "Shell"))
 
      ;;---
      ;; 'Copy to Kill Ring' Functions:
@@ -126,8 +122,8 @@ Call this function with the desired keybind settings:
                          :infix "t k"
                          "" (list nil :which-key "Copy/Kill...") ;; Infix Title
 
-                         "k" (list #'taskspace:dwim:dir  :which-key "dir")
-                         "n" (list #'taskspace:dwim:name :which-key "name"))
+                         "k" (list #'taskspace-dwim-dir  :which-key "dir")
+                         "n" (list #'taskspace-dwim-name :which-key "name"))
 
      ;;---
      ;; 'Open a Dired Buffer' Functions:
@@ -135,9 +131,9 @@ Call this function with the desired keybind settings:
      (general-define-key ,@args
                          :infix "t d"
                          "" (list nil :which-key "Dired...") ;; Infix Title
-                         "d" (list #'taskspace:dired:task :which-key "task's dired buffer")
-                         "r" (list #'taskspace:dired:root :which-key "root's dired buffer"))))
-;; (taskspace:keybind:general
+                         "d" (list #'taskspace-dired-task :which-key "task's dired buffer")
+                         "r" (list #'taskspace-dired-root :which-key "root's dired buffer"))))
+;; (taskspace-keybind-general
 ;;     :prefix  "SPC n"
 ;;     :states  '(normal visual motion)
 ;;     :keymaps 'override)
@@ -147,9 +143,8 @@ Call this function with the desired keybind settings:
 ;; Transient
 ;;------------------------------------------------------------------------------
 
-
-(defmacro taskspace:keybind:transient/def (&rest args)
-  "Define a `transient' prefix named: `taskspace:keybind:transient'.
+(defmacro taskspace-keybind-transient-def (&rest args)
+  "Define a `transient' prefix named: `taskspace-keybind-transient'.
 
 Check for `transient' feature first and error if not provided. Done this way so
 that `transient' itself isn't a dependency package.
@@ -159,29 +154,28 @@ Example:
   (use-package taskspace
     ;; ...
     :config
-    (taskspace:keybind:transient/def)
-    (bind-key \"C-c C-t\" taskspace:keybind:transient))"
+    (taskspace-keybind-transient-def)
+    (bind-key \"C-c C-t\" taskspace-keybind-transient))"
   (unless (featurep 'transient)
-    (nub:error
-     :taskspace
-     "taskspace:keybind:transient"
+    (taskspace--error
+        'taskspace-keybind-transient
      "`transient' feature is not loaded/defined! Cannot create keybinds."))
 
-  `(transient-define-prefix taskspace:keybind:transient ()
+  `(transient-define-prefix taskspace-keybind-transient ()
     "Taskspace Menu"
     [["Taskspace..."
-     ("t" "New"   taskspace:create)
-     ("v" "Visit" taskspace:notes)
-     ("s" "Shell" taskspace:shell)]
+     ("t" "New"   taskspace-create)
+     ("v" "Visit" taskspace-notes)
+     ("s" "Shell" taskspace-shell)]
 
      ["Copy/Kill..."
-      ("k" "dir"   taskspace:dwim:dir)
-      ("n" "name"  taskspace:dwim:name)]
+      ("k" "dir"   taskspace-dwim-dir)
+      ("n" "name"  taskspace-dwim-name)]
 
      ["Dired..."
-      ("d" "task's dired buffer" taskspace:dired:task)
-      ("r" "root's dired buffer" taskspace:dired:root)]]))
-;; (taskspace:keybind:transient
+      ("d" "task's dired buffer" taskspace-dired-task)
+      ("r" "root's dired buffer" taskspace-dired-root)]]))
+;; (taskspace-keybind-transient
 ;;     :prefix  "SPC n"
 ;;     :states  '(normal visual motion)
 ;;     :keymaps 'override)
@@ -190,4 +184,4 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :taskspace 'keybinds)
+(imp-provide taskspace:/keybinds)
