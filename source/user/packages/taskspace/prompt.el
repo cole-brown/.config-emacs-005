@@ -1,10 +1,10 @@
-;;; modules/dev-env/taskspace/prompt.el --- Helpers for Prompting Users -*- lexical-binding: t; -*-
+;;; taskspace/prompt.el --- Helpers for Prompting Users -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2023-09-13
+;; Timestamp:  2026-02-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,9 +24,7 @@
 (require 'seq)
 (require 'dash)
 
-(imp:require :dlv)
-(imp:require :nub)
-(imp:require :taskspace 'group)
+(imp-require taskspace:/group)
 
 
 ;;------------------------------------------------------------------------------
@@ -37,34 +35,34 @@
 ;; Prompt: Group
 ;;------------------------------
 
-(defun int<taskspace>:prompt:group:name (group-assoc)
+(defun taskspace--prompt-group-name (group-assoc)
   "Get displayable groups for prompting user.
 
-GROUP-ASSOC shoud be an entry from `taskspace:groups'.
+GROUP-ASSOC shoud be an entry from `taskspace-groups'.
 
 Returns a cons of:
   - A string containing both the display name and the keyword.
   - The keyword."
   (cons
    ;; Display string first, since that's what `completing-read' shows to user.
-   (concat (format "%-10s" (int<taskspace>:group:keyword group-assoc))
+   (concat (format "%-10s" (taskspace--group-keyword group-assoc))
            " - "
-           (int<taskspace>:group:name/display group-assoc))
+           (taskspace--group-name-display group-assoc))
    ;; Group keyword second so we can get back to it from user's choice of
    ;; display strings.
-   (int<taskspace>:group:keyword group-assoc)))
-;; (int<taskspace>:prompt:group:name '(:default "Jeff!" taskspace:group:default))
+   (taskspace--group-keyword group-assoc)))
+;; (taskspace--prompt-group-name '(:default "Jeff!" taskspace-group-default))
 
 
-(defun int<taskspace>:prompt:group:get (choices)
+(defun taskspace--prompt-group-get (choices)
   "Interactive prompt for user to input/choose group name.
 Provides both the keyword name and the display string for user to
 complete against. Returns keyword name chosen.
 
-CHOICES should be filtered down keyword names from `taskspace:groups'."
-  (let ((display-choices (-map #'int<taskspace>:prompt:group:name choices)))
+CHOICES should be filtered down keyword names from `taskspace-groups'."
+  (let ((display-choices (-map #'taskspace--prompt-group-name choices)))
     (alist-get
-     (completing-read "Taskspace Group: "
+     (completing-read "Taskspace Group- "
                       ;; Build the names for the options list...
                       display-choices
                       nil
@@ -73,25 +71,25 @@ CHOICES should be filtered down keyword names from `taskspace:groups'."
      display-choices
      nil nil
      #'string=)))
-;; (int<taskspace>:prompt:group:get '((:a "aaa" nil) (:b "b" nil)))
+;; (taskspace--prompt-group-get '((:a "aaa" nil) (:b "b" nil)))
 
 
-(defun int<taskspace>:prompt:group (&optional auto quiet)
+(defun taskspace--prompt-group (&optional auto quiet)
   "Filter groups down to options available to user.
 
 If only one, uses that. If only `:default' available, uses that. If multiple
-user groups, prompts user via `int<taskspace>:prompt:group' for which to use.
+user groups, prompts user via `taskspace--prompt-group' for which to use.
 
 AUTO can be a few things:
   - nil: No auto-guessing the group unless there is only one non-default.
-  - dlv: `int<taskspace>:group:dlv'
-  - current: `int<taskspace>:group:current'
-  - auto: `int<taskspace>:group:auto'
+  - dlv: `taskspace--group-dlv'
+  - current: `taskspace--group-current'
+  - auto: `taskspace--group-auto'
     - Combines `dlv' and `current', preferring `dlv'.
 
 If QUIET is non-nil, return nil on error instead of raising error signal.
 
-Return group keyword (aka 0th element of entry in `taskspace:groups')."
+Return group keyword (aka 0th element of entry in `taskspace-groups')."
   ;; `or' will give us either:
   ;;   1) the auto group,
   ;;   2) or the prompted group.
@@ -100,24 +98,23 @@ Return group keyword (aka 0th element of entry in `taskspace:groups')."
    (cond ((eq nil auto)
           nil)
          ((eq 'auto auto)
-          (int<taskspace>:group:auto quiet))
+          (taskspace--group-auto quiet))
          ((eq 'dlv auto)
-          (int<taskspace>:group:dlv))
+          (taskspace--group-dlv))
          ((eq 'current auto)
-          (int<taskspace>:group:current quiet))
+          (taskspace--group-current quiet))
          ((not (null auto))
           (if quiet
               nil
-            (nub:error
-                :taskspace
-                "int<taskspace>:prompt:group"
+            (taskspace--error
+                'taskspace--prompt-group
               "Unknown AUTO option `%S'"
               auto))))
    ;; 2) No luck on the auto-group... Check the groups and prompt as needed.
    (let ((groups-sans-default
           ;; Filter down to just non-defaults...
-          (-filter (lambda (group) (not (eq (int<taskspace>:group:keyword group) :default)))
-                   taskspace:groups)))
+          (-filter (lambda (group) (not (eq (taskspace--group-keyword group) :default)))
+                   taskspace-groups)))
      ;; Just one group? Return it.
      (cond ((= (length groups-sans-default) 1)
             ;; Get the only group there...
@@ -125,23 +122,23 @@ Return group keyword (aka 0th element of entry in `taskspace:groups')."
 
            ;; Multiple groups? That's what we're actually here for - prompt user!
            ((> (length groups-sans-default) 1)
-            (int<taskspace>:prompt:group:get groups-sans-default))
+            (taskspace--prompt-group-get groups-sans-default))
 
            ;; 0 or less groups.
            (t
             ;; Try to use the default, I guess...
-            (int<taskspace>:group :default))))))
-;; (int<taskspace>:prompt:group)
+            (taskspace--group :default))))))
+;; (taskspace--prompt-group)
 
 
 ;;------------------------------
 ;; Prompt: Task Name (Description)
 ;;------------------------------
-(defun int<taskspace>:prompt:name (group)
+(defun taskspace--prompt-name (group)
   "Convert minibuffer input into taskspace name.
 
-GROUP should be return value from `int<taskspace>:group' (assoc from
-`taskspace:groups').
+GROUP should be return value from `taskspace--group' (assoc from
+`taskspace-groups').
 
 Prompt in minibuffer for input, read and format to string, then return."
   ;; Replace all whitespace with hyphens.
@@ -149,7 +146,7 @@ Prompt in minibuffer for input, read and format to string, then return."
                     "-"
                     (read-from-minibuffer
                      (format "New `%s` Task Desc.: "
-                             (int<taskspace>:group:name/display group)))))
+                             (taskspace--group-name-display group)))))
 
 
 ;;------------------------------
@@ -160,15 +157,15 @@ Prompt in minibuffer for input, read and format to string, then return."
 ;;   https://emacs.stackexchange.com/questions/32248/how-to-write-a-function-with-an-interactive-choice-of-the-value-of-the-argument
 ;; I was not finding any usable help/tutorials/documentation
 ;; for my knowledge/skill level until I found that.
-(defun int<taskspace>:prompt:task/existing (group taskspaces &optional display)
+(defun taskspace--prompt-task-existing (group taskspaces &optional display)
   "Prompt user for existing taskspace.
 
-Given a list of taskspaces from e.g. `int<taskspace>:dir:list:date', prompt user
+Given a list of taskspaces from e.g. `taskspace--dir-list-date', prompt user
 with list of choices, take the user's input, and match back up with an entry in
 the list of taskspaces.
 
-GROUP should be return value from `int<taskspace>:group' (assoc from
-`taskspace:groups').
+GROUP should be return value from `taskspace--group' (assoc from
+`taskspace-groups').
 
 DISPLAY can be:
 - nil: Pass taskspaces as-is to completion. AKA display as-is.
@@ -192,9 +189,8 @@ Return nil or a string in TASKSPACES."
 
      ;; unexpected -> error?
      (t
-      (nub:error
-          :taskspace
-          "int<taskspace>:prompt:task/existing"
+      (taskspace--error
+          'taskspace--prompt-task-existing
         "Unknown display option `%s'"
         display)))
 
@@ -203,7 +199,7 @@ Return nil or a string in TASKSPACES."
     ;; With helm at the wheel, this goes to helm--completing-read-default.
     ;; `confirm' to force completion to one complete choice.
     (let ((choice (completing-read (format "Choose %s: "
-                                           (int<taskspace>:group:name/display group))
+                                           (taskspace--group-name-display group))
                                    display-names nil 'confirm)))
 
       ;; ...and match their choice back up with a taskname.
@@ -212,12 +208,10 @@ Return nil or a string in TASKSPACES."
                     (lambda (input taskname)
                       "Check substring match of user's input against taskname."
                       (string-match-p (regexp-quote input) taskname))))))
-;; (int<taskspace>:prompt:task/existing :home (int<taskspace>:dir:list:all :home) 'nondirectory)
-
-
+;; (taskspace--prompt-task-existing :home (taskspace--dir-list-all :home) 'nondirectory)
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :taskspace 'prompt)
+(imp-provide taskspace:/prompt)

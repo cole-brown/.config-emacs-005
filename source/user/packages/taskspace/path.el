@@ -121,7 +121,7 @@ file will be elsewhere."
   "Generate each file in FILE-ALIST into the new taskpath.
 
 GROUP should be return value from `taskspace--group' (assoc from
-`taskspace:groups').
+`taskspace-groups').
 
 Expect FILE-ALIST entries to be:
   (filename . string-or-func)
@@ -220,7 +220,7 @@ Return nil or an errors alist.
   "Create a taskspace directory.
 
 GROUP should be return value from `taskspace--group' (assoc from
-`taskspace:groups').
+`taskspace-groups').
 
 DATE-ARG must be nil, 'today (for today), or an number for a relative day.
 
@@ -316,7 +316,7 @@ increasing) serial number."
   "Is NAME equal to a certain PART of DIR?
 
 GROUP should be return value from `taskspace--group' (assoc from
-`taskspace:groups').
+`taskspace-groups').
 
 PART should be one of: 'date 'number 'description
 
@@ -339,7 +339,7 @@ Return nil/non-nil."
   "List all children directories in a taskspace.
 
 GROUP should be return value from `taskspace--group' (assoc from
-`taskspace:groups').
+`taskspace-groups').
 
 Get children directories of taskspace/dir, ignoring:
   (taskspace--config group :dir/tasks/ignore)."
@@ -365,7 +365,7 @@ Get children directories of taskspace/dir, ignoring:
   "Get any/all taskspaces for today.
 
 GROUP should be return value from `taskspace--group' (assoc from
-`taskspace:groups').
+`taskspace-groups').
 
 DATE-STR should be a string of the date."
   (unless (null date-str)
