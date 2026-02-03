@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2025-10-28
+;; Timestamp:  2026-01-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -305,7 +305,9 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
 
   (show-paren-highlight-openparen     t)
   (show-paren-when-point-inside-paren t)
-  (show-paren-when-point-in-periphery t))
+  (show-paren-when-point-in-periphery t)
+
+  (show-paren-context-when-offscreen 'overlay))
 
 
 ;;------------------------------------------------------------------------------
