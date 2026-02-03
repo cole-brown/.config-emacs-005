@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-29
-;; Timestamp:  2026-01-16
+;; Timestamp:  2026-01-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -230,8 +230,6 @@
   ;; Max width of columns in `csv-align-mode'.
   ;; default 40
   (csv-align-max-width 120))
-
-
 
 
 ;;------------------------------------------------------------------------------
