@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-02-02
+;; Timestamp:  2026-02-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -168,7 +168,7 @@
 ;;------------------------------------------------------------------------------
 
 (use-package gptel-magit
-  :hook (magit-mode . gptel-magit-install))
+  :hook (magit-mode-hook . gptel-magit-install))
 
 
 ;;------------------------------------------------------------------------------
