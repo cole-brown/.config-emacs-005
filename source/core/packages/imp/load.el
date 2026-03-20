@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-12-16
+;; Timestamp:  2025-12-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -421,7 +421,9 @@ next value for the STATE."
                     arg)))
 
      ;; TODO?: look for "FEATURE-ROOT:/..."
-     ;; TODO?: get root of FEATURE
+     ;; TODO?:   - get root of FEATURE
+     ;; TODO?: look for "REPO:/..."
+     ;; TODO?:   - ask magit / git
 
      ;; otherwise, leave path string as-is
      (t arg))))
