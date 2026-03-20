@@ -297,6 +297,7 @@
   (imp user:/config/languages/elisp)
   (imp user:/config/languages/hurl)
   (imp user:/config/languages/json)
+  (imp user:/config/languages/rust)
   (imp user:/config/languages/terraform)
   (imp user:/config/languages/yaml)
 
