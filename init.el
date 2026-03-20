@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2026-01-08
+;; Timestamp:  2026-03-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -327,10 +327,18 @@
   ;; TODO: saved quote or something.
   (message "hello there")
 
+  ;;----------------------------
+  ;; Re-enable Garbage Collection
+  ;;----------------------------
+  ;; Use `gcmh' or just clean up `gc-cons-threshold', which was set high in
+  ;; `early-init.el' so that no GC happens during init.
+  ;; TODO(core): move to core
+  (imp user:/config/emacs/garbage)
 
-  ;;------------------------------------------------------------------------------
+
+  ;;----------------------------------------------------------------------------
   ;; The End of Time.
-  ;;------------------------------------------------------------------------------
+  ;;----------------------------------------------------------------------------
   ) ;; END: imp-timing
 
 

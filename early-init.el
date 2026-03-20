@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-14
-;; Timestamp:  2025-03-14
+;; Timestamp:  2026-03-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -19,10 +19,33 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Bootstrap
+;;------------------------------------------------------------------------------
+
+;;------------------------------
+;; [Speed]: Garbage Collection
+;;------------------------------
+
+;; TODO(gc): Do we need this still?
+;;    - Start-up times on Linux with SSD are great (<3 seconds).
+;;    - TODO(gc): How is start-up affected on Windows/SSD?
+;;    - TODO(gc): How is start-up affected on Windows/HDD?
+;;    - TODO(gc): How is start-up affected on Linux/HDD?
+;;
+;; A (big?) contributor to startup times is garbage collection. We up the gc
+;; threshold to temporarily prevent it from running, then reset it later by
+;; either enabling `gcmh-mode' or reverting `gc-cons-threshold'. Not resetting
+;; it will cause stuttering/freezes.
+;;
+;; See `user:/config/emacs/garbage'
+(setq gc-cons-threshold most-positive-fixnum)
+
+
+;;------------------------------------------------------------------------------
 ;; Frame
 ;;------------------------------------------------------------------------------
 
-;; TODO: Initial size / position should depend on what system we're on...
+;; TODO(frame): Initial size / position should depend on what system we're on...
 
 ;;----------------------------
 ;; Initial Frame Size
