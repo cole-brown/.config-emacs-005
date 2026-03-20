@@ -5203,8 +5203,243 @@ CLOSED: [2026-01-16 Fri 15:26]
 
 [[file:source/user/config/files.el::(use-package csv-mode]]
 
+* ├DONE───┤ gptel packages
+CLOSED: [2026-02-02 Mon 14:28]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-02-02 Mon 14:28]
+- State "├CURRENT┤"  from              [2026-02-02 Mon 14:23]
+:END:
+
+https://github.com/karthink/gptel-agent/tree/2e6ba04c393ad95973a48483147046683454af86
+https://melpa.org/#/gptel-agent
+
+
+* ├DONE───┤ rust
+CLOSED: [2026-02-05 Thu 16:50]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-02-05 Thu 16:50]
+- State "├CURRENT┤"  from              [2026-02-05 Thu 15:21]
+:END:
+
+** Emacs treesitter is giving me a warning.
+
+I did the following.
+
+1. Stopped/restarted emacs server
+   - stopped with  ~M-x kill-emacs~
+
+2. Evaluated this:
+#+begin_src elisp
+(add-to-list 'treesit-language-source-alist
+             '(rust "https://github.com/tree-sitter/tree-sitter-rust"))
+#+end_src
+
+3. Ran ~M-x treesit-install-language-grammar RET rust RET~
+
+4. Got this warning
+#+begin_quote
+⛔ Warning (treesit): The installed language grammar for rust cannot be located or has problems (version-mismatch): 15
+#+end_quote
+
+** ├DONE───┤ what fucking version of treesit do I fucking have even?!
+CLOSED: [2026-02-05 Thu 16:26]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-02-05 Thu 16:26]
+:END:
+
+ChatGPT has no fucking clues. 😖
+
+#+begin_quote
+~/Downloads/emacs-30.2
+❯ ldconfig -p | grep tree
+        libtree-sitter.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libtree-sitter.so.0
+        libostree-1.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libostree-1.so.1
+        libostree-1.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libostree-1.so
+#+end_quote
+
+#+begin_quote
+~/Downloads/emacs-30.2
+❯ dpkg -l | grep tree-sitter
+ii  libtree-sitter0:amd64                   0.20.3-1                                                        amd64        incremental parsing system for programming tools
+#+end_quote
+
+so try v0.20.3?
+
+
+** ├DONE───┤ Try v0.20.3
+CLOSED: [2026-02-05 Thu 16:48]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-02-05 Thu 16:48]
+:END:
+
+#+begin_src elisp
+(require 'treesit)
+(setq treesit-language-source-alist nil)
+(add-to-list 'treesit-language-source-alist
+             ;; (LANG . (URL REVISION SOURCE-DIR CC C++))
+             '(rust
+               "https://github.com/tree-sitter/tree-sitter-rust"
+               "v0.20.3"))
+(treesit-install-language-grammar 'rust)
+#+end_src
+
+..didn't work.
+
+...Restart emacs? 🤞
+
+#+begin_src elisp
+(require 'treesit)
+(setq treesit-language-source-alist nil)
+(add-to-list 'treesit-language-source-alist
+             ;; (LANG . (URL REVISION SOURCE-DIR CC C++))
+             '(rust
+               "https://github.com/tree-sitter/tree-sitter-rust"
+               "v0.20.3"))
+(treesit-install-language-grammar 'rust)
+#+end_src
+
+#+RESULTS:
+| https://github.com/tree-sitter/tree-sitter-rust | v0.20.3 |
+
+yay
+  - [[file:~/ocean/repositories/pacenotes/source/pacenotes_engine/src/main.rs][main.rs]]
+
+* ├DONE───┤ GCMH
+CLOSED: [2026-03-20 Fri 16:06]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-03-20 Fri 16:06]
+:END:
+
+#+begin_src bash
+cd ~/ocean/vault/.config/emacs/2023-07-23_sn004/
+rg gcmh
+#+end_src
+
+one of these:
+file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/boot/00-early/01-bootstrap.el
+file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/boot/10-init/01-bootstrap.el
+
+[[file:source/user/config/emacs/garbage.el]]
+
+
 * -- U R HERE --
 <<here>>
+
+* font-awesome helper funcs
+* ├CURRENT┤ LSP
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-02-10 Tue 13:08]
+:END:
+
+Get language server stuff set up?
+
+** ├CURRENT┤ Grab LSP config from sn004
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-02-10 Tue 13:08]
+:END:
+
+sn004: [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/dev-env/languages/lsp.el::;;; mantle/config/dev-env/languages/lsp.el --- Serve Languages over a Protocol. -*- lexical-binding: t; -*-][here]]
+
+copy/paste to: [[file:source/user/config/languages/lsp.el::(defvar-local lsp-modeline-icon nil][here]]
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+U R [[file:source/user/config/languages/lsp.el::(defvar-local lsp-modeline-icon nil][here]]
+
+need func:
+~mantle:user:icon/font-awesome~
+file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/fonts-and-icons.el
+
+Do I need nerd font?
+  - It sorta looks like I installed one manually?
+  - [[file:~/ocean/vault/documents/lily.d/taskspace/work/2021-07-19_1_hardware-and-software.notes.org::*emacs 30.1][hardware&software: emacs 30.1]]
+
+https://pastebin.com/RzwUWeDm
+https://emacs-lsp.github.io/lsp-mode/page/installation/
+
+** Update rust.el
+
+example
+https://pastebin.com/RzwUWeDm
+  - from https://www.reddit.com/r/rust/comments/1ga5ben/emacs_configs_for_rust/
+
+
+
+** use Omnisharp for csharp
+
+** find todos:
+
+#+begin_src elisp
+;; TODO(lsp): uncomment:
+#+end_src
+  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
+
+
+* config files: user/config -> core/config
+
+Some stuff should be moved to core, like
+file:user/config/emacs/package.el
+
+there is at least one:
+#+begin_example elisp
+  ;; TODO(core): move to core
+#+end_example
+
+[[file:source/user/config/emacs/garbage.el]]
+
+* ├CURRENT┤ taskspace
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-01-21 Wed 16:51]
+:END:
+
+** ├CURRENT┤ refactor
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-01-21 Wed 16:51]
+:END:
+
+remove nub
+  - where are my replacements for other packages?
+    - try this: file:./source/core/packages/namespaced/dlv/debug.el
+
+[[file:source/user/packages/taskspace/group.el]]
+[[file:source/user/packages/taskspace/init.el]]
+
+#+begin_src elisp
+(pp-to-string (macroexpand-1 '(taskspace--debug 'test "Hello %s %s" '("foo" "bar"))))
+#+end_src
+
+#+begin_src elisp
+(taskspace--debug 'test "Hello %s %s" '("foo" "bar"))
+#+end_src
+
+naming.el: remove ~nub~
+  - [[file:source/user/packages/taskspace/naming.el::(nub:debug:func/start][u r here]]
+  - [X] k
+
+file:source/user/packages/taskspace/init.el
+
+** Get it working?
+
+** replace dash with seq?
+
+
+* Set bash $EDITOR
+
+I should have what to set it to.... somewhere?
+In my bash stuff?
+Or my other bash stuff?
+
+It should be in a script in .emacs.d though.
+
+* global-hl-line-mode?
+
+(setopt global-hl-line-sticky-flag 'window)
+https://www.reddit.com/r/emacs/comments/1qfylx5/suggestions_wanted_for_the_next_version_of_bedrock/?share_id=BXb-g8-4q186WHr32UM-F&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=17
+
+Did I use it in sn004?
 
 * ├WAITING┤ GPT 5.2
 :LOGBOOK:
@@ -5493,21 +5728,6 @@ Make:
     - Need to install general somewhere...
   - [ ] config/keybinds/text.el
 
-
-* LSP
-
-Get language server stuff set up?
-
-
-Grab LSP config from sn004
-
-find todos:
-#+begin_src elisp
-;; TODO(lsp): uncomment:
-#+end_src
-  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
-
-use Omnisharp for csharp.
 
 * treemacs?
 
