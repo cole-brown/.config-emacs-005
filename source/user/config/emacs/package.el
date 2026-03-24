@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2025-11-17
+;; Timestamp:  2026-03-24
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -23,6 +23,37 @@
 
 (require 'package)
 
+(defun --/package/update (&optional async?)
+  "Run `package-refresh-contents' with info messages."
+  (unless async?
+    (message "[INFO] %s: %s"
+             "package.el"
+             "Updating package metadata..."))
+
+  (package-refresh-contents async?)
+
+  (unless async?
+    (message "[INFO] %s: %s"
+             "package.el"
+             "Updated package metadata")))
+
+(defun --/package/update/auto ()
+  "Run `package-refresh-contents'.
+
+`package-refresh-contents' takes seconds to complete.
+Run it immediately (and sync) if no package contents exist.
+Else wait until Emacs is started and idle, then run async."
+  (if package-archive-contents
+      ;; Need it immediately!
+      (--/package/update)
+    ;; Delay until after init.
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                ;; Run this after Emacs has been idle for 3 minutes
+                (run-with-idle-timer (* 3 60)
+                                     nil
+                                     (--/package/update :async))))))
+
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
@@ -30,12 +61,7 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 
 (package-initialize)
-
-(unless package-archive-contents
-  (message "[INFO] %s: %s"
-           "init.el"
-           "Update packages list...")
-  (package-refresh-contents))
+(--/package/update/auto)
 
 
 ;;------------------------------------------------------------------------------
