@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2026-03-20
+;; Timestamp:  2026-03-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -190,7 +190,6 @@
   ;; It's just...... good.
   (imp user:/config/theme/zenburn/init.el)
 
-
   ;;----------------------------------------------------------------------------
   ;; The Binding of Emacs
   ;;----------------------------------------------------------------------------
@@ -256,6 +255,7 @@
   (imp user:/config/color)
   (imp user:/config/emacs)
   (imp user:/config/help)
+  (imp user:/config/emacs/font.el) ;; Nerd Icons et al
   (imp user:/config/emacs/timestamp.el)
   (imp user:/config/undo)
   (imp user:/config/whitespace)
