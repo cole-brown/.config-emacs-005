@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2026-03-23
+;; Timestamp:  2026-03-24
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -275,6 +275,11 @@
   ;;----------------------------------------------------------------------------
   ;; dev-env: Taking the "I" out of IDE.
   ;;----------------------------------------------------------------------------
+
+  ;;------------------------------
+  ;; dev-env: LSP & DAP
+  ;;------------------------------
+  (imp user:/config/languages/lsp)
 
   ;;------------------------------
   ;; dev-env: Languages
