@@ -5322,32 +5322,41 @@ file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/boot/10-init/01-bootstrap
 [[file:source/user/config/emacs/garbage.el]]
 
 
-* -- U R HERE --
-<<here>>
-
-* font-awesome helper funcs
-* ├CURRENT┤ LSP
+* ├DONE───┤ font-awesome helper funcs
+CLOSED: [2026-03-23 Mon 17:16]
 :LOGBOOK:
-- State "├CURRENT┤"  from              [2026-02-10 Tue 13:08]
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-03-23 Mon 17:16]
+- State "├CURRENT┤"  from              [2026-03-20 Fri 16:41]
 :END:
 
-Get language server stuff set up?
-
-** ├CURRENT┤ Grab LSP config from sn004
-:LOGBOOK:
-- State "├CURRENT┤"  from              [2026-02-10 Tue 13:08]
-:END:
-
-sn004: [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/dev-env/languages/lsp.el::;;; mantle/config/dev-env/languages/lsp.el --- Serve Languages over a Protocol. -*- lexical-binding: t; -*-][here]]
-
-copy/paste to: [[file:source/user/config/languages/lsp.el::(defvar-local lsp-modeline-icon nil][here]]
+[[file:source/user/config/emacs/font.el]]
 
 ╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ╠══TODO══╣            ║                                                                                                          ║
 ╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
 ╠══TODO══╣            ║                                                                                                          ║
 ╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-U R [[file:source/user/config/languages/lsp.el::(defvar-local lsp-modeline-icon nil][here]]
+u r [[file:source/user/config/emacs/font.el::;; TODO(nerd-icons): What nerd font did I install?][here]]
+
+* ├DONE───┤ LSP
+CLOSED: [2026-03-25 Wed 14:35]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-03-25 Wed 14:35]
+- State "├CURRENT┤"  from              [2026-02-10 Tue 13:08]
+:END:
+
+Get language server stuff set up?
+
+** ├DONE───┤ Copy & refactor LSP config from sn004
+CLOSED: [2026-03-24 Tue 22:30]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-03-24 Tue 22:30]
+- State "├CURRENT┤"  from              [2026-02-10 Tue 13:08]
+:END:
+
+sn004: [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/dev-env/languages/lsp.el::;;; mantle/config/dev-env/languages/lsp.el --- Serve Languages over a Protocol. -*- lexical-binding: t; -*-][here]]
+
+copy/paste to: [[file:source/user/config/languages/lsp.el::(defvar-local lsp-modeline-icon nil][here]]
 
 need func:
 ~mantle:user:icon/font-awesome~
@@ -5357,26 +5366,216 @@ Do I need nerd font?
   - It sorta looks like I installed one manually?
   - [[file:~/ocean/vault/documents/lily.d/taskspace/work/2021-07-19_1_hardware-and-software.notes.org::*emacs 30.1][hardware&software: emacs 30.1]]
 
+#+begin_src elisp
+(icon-font-awesome "nf-fa-rocket" "")
+#+end_src
+
+#+RESULTS:
+: 
+
+
+[[file:source/user/config/languages/lsp.el::;; TODO(refactor): U R HERE][U R HERE]]
+
 https://pastebin.com/RzwUWeDm
 https://emacs-lsp.github.io/lsp-mode/page/installation/
 
-** Update rust.el
+** ├DONE───┤ Update rust.el
+CLOSED: [2026-03-24 Tue 22:46]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-03-24 Tue 22:46]
+:END:
 
 example
 https://pastebin.com/RzwUWeDm
   - from https://www.reddit.com/r/rust/comments/1ga5ben/emacs_configs_for_rust/
 
+** ├DONE───┤ fix error(s)
+CLOSED: [2026-03-25 Wed 14:26]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-03-25 Wed 14:26]
+- State "├CURRENT┤"  from              [2026-03-24 Tue 22:46]
+:END:
 
+#+begin_quote
+Error running timer: (void-function font--face-icon)
+LSP :: rust-analyzer has exited (exited abnormally with code 1)
+error in process sentinel: lsp--handle-process-exit: Wrong number of arguments: #[nil ((let* ((workspaces (lsp-workspaces)) (face (if workspaces 'success 'warning)) (label (if workspaces "LSP Connected" "LSP Disconnected"))) (setq lsp-modeline-icon (concat " " (propertize (let ((icon (icon-font-awesome "nf-fa-rocket" "" :face face :v-adjust -0.0575))) (if (str:empty? icon :full) (propertize "LSP-TODO-THIS" 'face face) icon)) 'help-echo label) " ")) (add-to-list 'global-mode-string '(t (:eval lsp-modeline-icon)) 'append))) (t) nil "Update modeline with LSP state."], 1
+error in process sentinel: Wrong number of arguments: #[nil ((let* ((workspaces (lsp-workspaces)) (face (if workspaces 'success 'warning)) (label (if workspaces "LSP Connected" "LSP Disconnected"))) (setq lsp-modeline-icon (concat " " (propertize (let ((icon (icon-font-awesome "nf-fa-rocket" "" :face face :v-adjust -0.0575))) (if (str:empty? icon :full) (propertize "LSP-TODO-THIS" 'face face) icon)) 'help-echo label) " ")) (add-to-list 'global-mode-string '(t (:eval lsp-modeline-icon)) 'append))) (t) nil "Update modeline with LSP state."], 1
+#+end_quote
 
-** use Omnisharp for csharp
+*** ├DONE───┤ error running timer
+CLOSED: [2026-03-25 Wed 13:38]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-03-25 Wed 13:38]
+:END:
 
-** find todos:
+Fix func names in font.el:
+  s/(font-/(icon-/g
+
+*** ├DONE───┤ wrong number of arguments
+CLOSED: [2026-03-25 Wed 14:17]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-03-25 Wed 14:17]
+- State "├CURRENT┤"  from              [2026-03-25 Wed 13:42]
+:END:
+
+#+begin_quote
+LSP :: Connected to [rust-analyzer:134588/starting /home/main/ocean/repositories/pacenotes/source/pacenotes_engine].
+LSP :: rust-analyzer has exited (exited abnormally with code 1)
+error in process sentinel: lsp--handle-process-exit: Wrong number of arguments: #[nil ((let* ((workspaces (lsp-workspaces)) (face (if workspaces 'success 'warning)) (label (if workspaces "LSP Connected" "LSP Disconnected"))) (setq lsp-modeline-icon (concat " " (propertize (let ((icon (icon-font-awesome "nf-fa-rocket" "" :face face :v-adjust -0.0575))) (if (str:empty? icon :full) (propertize "LSP-TODO-THIS" 'face face) icon)) 'help-echo label) " ")) (add-to-list 'global-mode-string '(t (:eval lsp-modeline-icon)) 'append))) (t) nil "Update modeline with LSP state."], 1
+#+end_quote
+
+#+begin_quote
+error in process sentinel:
+lsp--handle-process-exit:
+Wrong number of arguments:
+#[nil
+((let* ((workspaces (lsp-workspaces)) (face (if workspaces 'success 'warning)) (label (if workspaces "LSP Connected" "LSP Disconnected"))) (setq lsp-modeline-icon (concat " " (propertize (let ((icon (icon-font-awesome "nf-fa-rocket" "" :face face :v-adjust -0.0575))) (if (str:empty? icon :full) (propertize "LSP-TODO-THIS" 'face face) icon)) 'help-echo label) " ")) (add-to-list 'global-mode-string '(t (:eval lsp-modeline-icon)) 'append)))
+(t) nil "Update modeline with LSP state."
+], 1
+#+end_quote
 
 #+begin_src elisp
-;; TODO(lsp): uncomment:
+((let* ((workspaces (lsp-workspaces))
+        (face (if workspaces 'success 'warning))
+        (label (if workspaces "LSP Connected" "LSP Disconnected")))
+   (setq lsp-modeline-icon
+         (concat " "
+                 (propertize
+                  (let ((icon (icon-font-awesome "nf-fa-rocket" "" :face face :v-adjust -0.0575)))
+                    (if (str:empty? icon :full)
+                        (propertize "LSP-TODO-THIS" 'face face)
+                      icon))
+                  'help-echo label)
+                 " "))
+   (add-to-list 'global-mode-string '(t (:eval lsp-modeline-icon)) 'append)))
 #+end_src
-  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
 
+Code is ~--/hook/lsp/modeline/update~
+  - [[file:source/user/config/languages/lsp.el::defun --/hook/lsp/modeline/update (][here]]
+
+What is ~lsp--handle-process-exit~?
+
+Oh. I need a ~workspace~ arg:
+#+begin_src elisp
+    (run-hook-with-args 'lsp-after-uninitialized-functions workspace)
+#+end_src
+
+Check other hooks for args:
+#+begin_src elisp
+   ((lsp-before-initialize-hook
+     lsp-after-initialize-hook
+     lsp-after-uninitialized-functions
+     lsp-before-open-hook
+     lsp-after-open-hook)
+    . --/hook/lsp/modeline/update)
+#+end_src
+check:
+  - [X] lsp-before-initialize-hook
+    - no args
+  - [X] lsp-after-initialize-hook
+    - no args
+  - [X] lsp-after-uninitialized-functions
+    - args: workspace
+  - [X] lsp-before-open-hook
+    - no args
+  - [X] lsp-after-open-hook
+    - no args
+
+*** ├DONE───┤ error: unknown binary
+CLOSED: [2026-03-25 Wed 14:26]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-03-25 Wed 14:26]
+- State "├CURRENT┤"  from              [2026-03-25 Wed 14:17]
+:END:
+
+#+begin_quote
+error: Unknown binary 'rust-analyzer' in official toolchain 'stable-x86_64-unknown-linux-gnu'.
+#+end_quote
+
+Installed ~rust-analyzer~
+  - [[file:~/ocean/vault/documents/lily.d/taskspace/work/2021-07-19_1_hardware-and-software.notes.org::*rust-analyzer][here]]
+
+** ├DONE───┤ fix E0432/E0433
+CLOSED: [2026-04-01 Wed 14:47]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-04-01 Wed 14:47]
+:END:
+
+After much chatting with GPTs, it was flymake.
+This fixed it:
+#+begin_src elisp
+    ;; Flymake is making up errors in rust. Spamming E0432 & E0433 all over.
+    ;; Use rust-analyzer diagnostics via lsp-mode; disable rust-ts-mode's
+    ;; standalone Flymake backend, which doesn't understand Cargo deps.
+    (remove-hook 'flymake-diagnostic-functions #'rust-ts-flymake t)
+#+end_src
+  - [[file:source/user/config/languages/rust.el::remove-hook 'flymake-diagnostic-functions #'rust-ts-flymake t][here]]
+
+* ├DONE───┤ LSP(rust): check for rust-analyzer
+CLOSED: [2026-04-03 Fri 16:54]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-04-03 Fri 16:54]
+:END:
+
+If `lsp-mode` exists...
+And if `rust-analyzer` exe not found...
+Warn & tell how to fix
+
+* -- U R HERE --
+<<here>>
+
+* fill & alignment shortcuts
+
+file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/keybinds/text.el
+  - oh this has alignment stuff too
+    - yay
+
+oh it's not a hydra
+It's all my keybind junk I made to fight ~meow~
+
+Convert to just a keymap, probably.
+  - [ ] bind keys?
+  - [ ] general?
+
+What key to put all my keybinds under?
+  - unassigned
+    - =C-' ...=
+  - Somewhere in =C-c=?
+    - =C-c a ...=
+
+Use bind-keys?
+
+#+begin_example elisp
+(bind-keys
+ :prefix "C-c m"
+ :prefix-map my-prefix-map
+ :prefix-docstring "My personal keybindings."
+ ("f" . my-command-foo)
+ ("b" . my-command-bar))
+#+end_example
+
+[[file:source/user/config/emacs/keybinds.el::;; My Personal Keymap]]
+
+[[file:source/user/config/emacs/text.el]]
+
+[[file:source/user/config/keybinds.el]]
+
+use-package general
+
+Make:
+  - [ ] config/keybinds dir
+  - [ ] config/keybinds/init.el?
+    - Need to install general somewhere...
+  - [ ] config/keybinds/text.el
+
+
+* treemacs?
+
+https://melpa.org/#/treemacs
+https://melpa.org/#/lsp-treemacs
+
+Pretty sure I have treemacs in =sn004=
 
 * config files: user/config -> core/config
 
@@ -5389,7 +5588,6 @@ there is at least one:
 #+end_example
 
 [[file:source/user/config/emacs/garbage.el]]
-
 * ├CURRENT┤ taskspace
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2026-01-21 Wed 16:51]
@@ -5425,6 +5623,64 @@ file:source/user/packages/taskspace/init.el
 
 ** replace dash with seq?
 
+
+* LSP(C#): use Omnisharp for csharp
+
+Is there any support for .NET Framework 4.8?
+
+* LSP: find & fix TODO(lsp)
+
+#+begin_src elisp
+;; TODO(lsp): uncomment:
+#+end_src
+  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
+
+
+* package: flycheck?
+
+LSP does stuff about it.
+  - [[file:source/user/config/languages/lsp.el]]
+
+I think I had it in sn004.
+  - oh; yes. it is in that file.
+#+begin_quote
+;; TODO(lsp): add flycheck
+#+end_quote
+  - [[file:source/user/config/languages/lsp.el::;; TODO(lsp): add flycheck][here]]
+
+
+* package: lsp-docker
+
+https://github.com/emacs-lsp/lsp-docker
+
+* package: lsp-mssql?
+
+https://melpa.org/#/lsp-mssql
+https://github.com/emacs-lsp/lsp-mssql
+
+* error when installing package
+
+Just started showing up recently.
+Around when [[*GCMH][GCMH]] showed up.
+
+eg:
+#+begin_quote warning
+⛔ Error (use-package): Failed to install lsp-mode: Maximum buffer size exceeded
+⛔ Error (use-package): Cannot load lsp-mode
+⛔ Error (use-package): Failed to install lsp-ui: Maximum buffer size exceeded
+⛔ Error (use-package): Cannot load lsp-ui
+#+end_quote
+
+~use-package~ installs it fine the second time it's tried.
+If not, its another issue (like I need to run ~package-refresh-contents~)
+
+
+* Fix or drop nerd-icons-completion?
+
+#+begin_src elisp
+;; TODO: This package ruined the ordering of the completion list for buffers.
+#+end_src
+  - [[file:source/user/config/emacs/font.el::o][here]]
 
 * Set bash $EDITOR
 
@@ -5684,56 +5940,6 @@ add something for git paths like ~repo:/path~
 ** bump imp version
 
 
-* fill & alignment shortcuts
-
-file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/keybinds/text.el
-  - oh this has alignment stuff too
-    - yay
-
-oh it's not a hydra
-It's all my keybind junk I made to fight ~meow~
-
-Convert to just a keymap, probably.
-  - [ ] bind keys?
-  - [ ] general?
-
-What key to put all my keybinds under?
-  - unassigned
-    - =C-' ...=
-  - Somewhere in =C-c=?
-    - =C-c a ...=
-
-Use bind-keys?
-
-#+begin_example elisp
-(bind-keys
- :prefix "C-c m"
- :prefix-map my-prefix-map
- :prefix-docstring "My personal keybindings."
- ("f" . my-command-foo)
- ("b" . my-command-bar))
-#+end_example
-
-[[file:source/user/config/emacs/keybinds.el::;; My Personal Keymap]]
-
-[[file:source/user/config/emacs/text.el]]
-
-[[file:source/user/config/keybinds.el]]
-
-use-package general
-
-Make:
-  - [ ] config/keybinds dir
-  - [ ] config/keybinds/init.el?
-    - Need to install general somewhere...
-  - [ ] config/keybinds/text.el
-
-
-* treemacs?
-
-https://melpa.org/#/treemacs
-https://melpa.org/#/lsp-treemacs
-
 * ├WAITING┤ TRAMP into Win10 VM
 :LOGBOOK:
 - State "├WAITING┤"  from "├CURRENT┤"  [2025-12-11 Thu 14:12]
@@ -5897,6 +6103,11 @@ TODO groot or w/e for Project Rooted File Buffer Names (PRooFBuN)
 make a better... hydra? minor mode?
 
 Make a rectangle edit insert/surround-with box command?
+
+* package: org-download
+
+https://www.reddit.com/r/emacs/s/W8SEIUQP0Q
+
 
 * org: inline quote & code tweaks
 
@@ -6171,6 +6382,17 @@ loading namespaced...
 │ └─00.0083 seconds
 ├─loading \./str/init...
 #+end_src
+
+** Treemacs as a tree renderer?
+
+If treemacs exists, use it?
+
+idea from https://github.com/emacs-lsp/lsp-treemacs#summary
+#+begin_quote
+Integration between lsp-mode and treemacs and implementation of treeview
+controls using treemacs as a tree renderer.
+#+end_quote
+
 
 ** dedup
 #+begin_quote
