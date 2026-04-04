@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-03
-;; Timestamp:  2026-04-01
+;; Timestamp:  2026-04-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -76,15 +76,6 @@
     (setq fill-column --/fill-column/wide))
 
   (defun --/hook/lsp/rust/enable ()
-    ;; TODO(lsp): put in their own use-package? or like:
-    ;;    (with-eval-after-load 'lsp-rust
-    ;;      (setq ...))
-    (setq lsp-rust-server 'rust-analyzer)
-    (setq lsp-disabled-clients '(rls))
-    (setq lsp-rust-analyzer-cargo-watch-command "clippy") ; or "check"
-    ;; (setq lsp-rust-analyzer-cargo-load-out-dirs-from-check t)
-    ;; (setq lsp-rust-analyzer-proc-macro-enable t)
-
     ;; Flymake is making up errors in rust. Spamming E0432 & E0433 all over.
     ;; Use rust-analyzer diagnostics via lsp-mode; disable rust-ts-mode's
     ;; standalone Flymake backend, which doesn't understand Cargo deps.
@@ -99,6 +90,20 @@
   ;;------------------------------
   ((rust-ts-mode-hook . --/hook/rust/settings)
    (rust-ts-mode-hook . --/hook/lsp/rust/enable)))
+
+
+;;------------------------------------------------------------------------------
+;; Rust + LSP
+;;------------------------------------------------------------------------------
+
+(eval-after-load 'lsp-rust
+  (setq lsp-rust-server 'rust-analyzer)
+  (setq lsp-disabled-clients '(rls))
+  (setq lsp-rust-analyzer-cargo-watch-command "clippy") ; or "check"
+  ;; (setq lsp-rust-analyzer-cargo-load-out-dirs-from-check t)
+  ;; (setq lsp-rust-analyzer-proc-macro-enable t)
+
+  (--/exe/require "rust-analyzer"))
 
 
 ;;------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2026-03-24
+;; Timestamp:  2026-04-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -77,17 +77,22 @@
 
 (require 'cl-macs)
 
-(defun --/exe/require (exe)
+(defun --/exe/require (exe &optional message)
   "Assert EXE can be found by Emacs."
   (cl-assert (executable-find exe)
              t
-             "Emacs cannot find required exe: `%s'"))
+             "Cannot find required exe: `%s'. %s"
+             exe
+             (or message "")))
+;; (--/exe/require "something-that-doesnt-exist.exe" "Required for doing nothing.")
 
 
-(defun --/exe/optional (exe)
+(defun --/exe/optional (exe &optional message)
   "Warn if EXE cannot be found by Emacs."
   (unless (executable-find exe)
-    (warn "Emacs cannot find optional exe: `%s'" exe )))
+    (warn "Cannot find optional exe: `%s'"
+          exe
+          (or message ""))))
 
 
 (--/exe/require "git")
@@ -285,7 +290,7 @@
   ;; dev-env: Languages
   ;;------------------------------
 
-  ;; TODO(imp): make required/optional exe check an imp thing?
+  ;; TODO(imp): make required/optional exe check an imp thing.
   ;;---
   ;; Lodge a complaint if 'terraform' isn't installed on the system. But don't
   ;; skip the `terraform-mode' `use-package', since it only needs the exe for the
