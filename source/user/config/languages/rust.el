@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-03
-;; Timestamp:  2026-04-03
+;; Timestamp:  2026-04-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -96,7 +96,7 @@
 ;; Rust + LSP
 ;;------------------------------------------------------------------------------
 
-(eval-after-load 'lsp-rust
+(with-eval-after-load 'lsp-rust
   (setq lsp-rust-server 'rust-analyzer)
   (setq lsp-disabled-clients '(rls))
   (setq lsp-rust-analyzer-cargo-watch-command "clippy") ; or "check"
