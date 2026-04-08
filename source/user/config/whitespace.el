@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2025-10-28
+;; Timestamp:  2026-04-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -25,6 +25,7 @@
 ;;------------------------------------------------------------------------------
 ;; A measuring stick:
 ;;                                                                              80                                      120                 140       150
+
 (defconst --/fill-column/standard 80
   "Ye olde default 80 columns.")
 
@@ -323,20 +324,26 @@ Add to `whitespace-enable-predicate' via `add-function'."
     (unless (featurep 'ws-butler)
       (whitespace-cleanup)))
 
+  (defun --/hook/whitespace/disable ()
+    "Disable global whitespace mode for a mode."
+    (whitespace-mode -1))
+
 
   ;;------------------------------
   :hook
   ;;------------------------------
-  ((org-mode-hook    . --/hook/whitespace/settings/wide)
+  ((before-save-hook . --/hook/whitespace/before-save)
+   (org-mode-hook    . --/hook/whitespace/settings/wide)
    (yaml-mode-hook   . --/hook/whitespace/settings/wide)
-   (before-save-hook . --/hook/whitespace/before-save))
+   (dired-mode-hook  . --/hook/whitespace/disable))
 
 
   ;;------------------------------
   :custom
   ;;------------------------------
 
-  ;; Set 'lines-tail/'lines in `whitespace-style' to base off of `fill-column' instead of just hard-coded `80'.
+  ;; Set 'lines'/'lines-tail'/'lines-char' in `whitespace-style' to base off of
+  ;; `fill-column' instead of just hard-coded `80'.
   (whitespace-line-column nil)
 
   ;; Enable specific styles:
