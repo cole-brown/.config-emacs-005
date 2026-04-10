@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-03-23
+;; Timestamp:  2026-03-25
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -58,6 +58,7 @@
 ;;----------------------------
 ;; https://github.com/rainstormstudio/nerd-icons-completion/
 
+;; TODO: This package ruined the ordering of the completion list for buffers.
 (use-package nerd-icons-completion
   :after nerd-icons
   :config
@@ -154,8 +155,8 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Only bother propertizing if we need to.
-  (let ((face-icon (font--face-icon plist))
-        (face-text (font--face-text plist)))
+  (let ((face-icon (icon--face-icon plist))
+        (face-text (icon--face-text plist)))
     (concat
      (nerd-icons-faicon icon
                         :face face-icon
@@ -167,8 +168,9 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
        str))))
 ;; (nerd-icons-insert)
 ;; (nerd-icons-faicon "nf-fa-spotify")
-;; (font-icon-font-awesome "nf-fa-spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
-;; (insert (font-icon-font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05))
+;; (icon-font-awesome "nf-fa-spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
+;; (insert (icon-font-awesome "nf-fa-spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05))
+
 
 (defun icon-file-icon (icon str &rest plist)
   "Return string of File ICON and STR.
@@ -180,7 +182,7 @@ Optional PLIST's optional keys:
   - `:face'       - FACE
   - `:help:echo'  - HELP-ECHO
 
-HEIGHT and V-ADJUST are sent to `nerd-icons-fileicon'.
+HEIGHT and V-ADJUST are sent to `nerd-icons-flicon'.
 
 ICON-COLOR is used to color only the icon character.
 
@@ -190,13 +192,13 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Only bother propertizing if we need to.
-  (let ((face-icon (font--face-icon plist))
-        (face-text (font--face-text plist)))
+  (let ((face-icon (icon--face-icon plist))
+        (face-text (icon--face-text plist)))
     (concat
-     (nerd-icons-fileicon icon
-                          :face face-icon
-                          :v-adjust (or (plist-get plist :v-adjust) 0)
-                          :height (or (plist-get plist :height) 1))
+     (nerd-icons-flicon icon
+                        :face face-icon
+                        :v-adjust (or (plist-get plist :v-adjust) 0)
+                        :height (or (plist-get plist :height) 1))
      " "
      (if face-text
          (propertize str 'face face-text)
@@ -223,8 +225,8 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Only bother propertizing if we need to.
-  (let ((face-icon (font--face-icon plist))
-        (face-text (font--face-text plist)))
+  (let ((face-icon (icon--face-icon plist))
+        (face-text (icon--face-text plist)))
     (concat
      (nerd-icons-octicon icon
                          :face face-icon
@@ -246,7 +248,7 @@ Optional PLIST's optional keys:
   - `:face'       - FACE
   - `:help:echo'  - HELP-ECHO
 
-HEIGHT and V-ADJUST are sent to `nerd-icons-material'.
+HEIGHT and V-ADJUST are sent to `nerd-icons-mdicon'.
 
 ICON-COLOR is used to color only the icon character.
 
@@ -256,13 +258,13 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Only bother propertizing if we need to.
-  (let ((face-icon (font--face-icon plist))
-        (face-text (font--face-text plist)))
+  (let ((face-icon (icon--face-icon plist))
+        (face-text (icon--face-text plist)))
     (concat
-     (nerd-icons-material icon
-                          :face face-icon
-                          :v-adjust (or (plist-get plist :v-adjust) 0)
-                          :height (or (plist-get plist :height) 1))
+     (nerd-icons-mdicon icon
+                        :face face-icon
+                        :v-adjust (or (plist-get plist :v-adjust) 0)
+                        :height (or (plist-get plist :height) 1))
      " "
      (if face-text
          (propertize str 'face face-text)
@@ -284,11 +286,11 @@ SEPARATOR, a string to use to separate the icon and STR. Defaults to \" \".
 If no separator is desired, supply something that is not a string, like `:none'
 or (an explicit) nil.
   Space Separator (default):
-    (font-icon-for-mode 'emacs-lisp \"Emacs Lisp\")
-    (font-icon-for-mode 'emacs-lisp \"Emacs Lisp\" :separator \" \")
+    (icon-for-mode 'emacs-lisp \"Emacs Lisp\")
+    (icon-for-mode 'emacs-lisp \"Emacs Lisp\" :separator \" \")
   No Separator:
-    (font-icon-for-mode 'emacs-lisp \"Emacs Lisp\" :separator :none)
-    (font-icon-for-mode 'emacs-lisp \"Emacs Lisp\" :separator nil)
+    (icon-for-mode 'emacs-lisp \"Emacs Lisp\" :separator :none)
+    (icon-for-mode 'emacs-lisp \"Emacs Lisp\" :separator nil)
 
 Currently, defaults to setting V-ADJUST based on... `major-mode' variable???
   - `emacs-lisp-mode' gets V-ADJUST of 0.0
@@ -310,8 +312,8 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                         (if (eq major-mode 'emacs-lisp-mode)
                             0.0
                           0.05)))
-         (face-icon (font--face-icon plist))
-         (face-text (font--face-text plist))
+         (face-icon (icon--face-icon plist))
+         (face-text (icon--face-text plist))
          (separator (if (stringp (plist-get plist :separator))
                         (plist-get plist :separator)
                       " "))
