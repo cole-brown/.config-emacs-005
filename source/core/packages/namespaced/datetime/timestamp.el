@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2025-10-28
+;; Timestamp:  2026-04-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -40,14 +40,14 @@ Timestamp is of current time and is inserted into current buffer at point."
 ;; Interactive: Prompt for Timestamp
 ;;------------------------------------------------------------------------------
 
-(defvar _:datetime:timestamp:insert/prompt:history nil
-  "History variable for `datetime:cmd:timestamp:insert/prompt'.
+(defvar _:datetime:timestamp:insert:prompt:history nil
+  "History variable for `datetime:cmd:timestamp:insert:prompt'.
 
 Just a bucket to hold history for datetime commands to keep segregated from general
 history.")
 
 
-(defun datetime:cmd:timestamp:insert/prompt ()
+(defun datetime:cmd:timestamp:insert:prompt ()
   "Insert a timestamp into current buffer at point.
 
 Timestamp format will be prompted with auto-complete based on stored `datetime'
@@ -61,7 +61,7 @@ formats."
                     nil
                     t ; Must get a match.
                     nil
-                    _:datetime:timestamp:insert/prompt:history
+                    _:datetime:timestamp:insert:prompt:history
                     nil) ; No default value?
    ))
 

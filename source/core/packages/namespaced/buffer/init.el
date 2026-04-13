@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2025-11-05
+;; Timestamp:  2026-04-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -64,9 +64,9 @@
   ;; Optional
   ;;------------------------------
 
-  (imp buffer:/+commands)
+  (imp buffer:/commands)
 
-  (imp buffer:/+line-hydra
+  (imp buffer:/line-hydra
     :after hydra))
 
 
