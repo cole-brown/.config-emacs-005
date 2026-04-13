@@ -1,10 +1,10 @@
-;;; namespaced/buffer/+commands.el --- Interactive Buffer Functions -*- lexical-binding: t; -*-
+;;; namespaced/buffer/commands.el --- Interactive Buffer Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-22
-;; Timestamp:  2025-11-05
+;; Timestamp:  2026-04-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -225,4 +225,4 @@ Borrowed from Doom's `doom/toggle-narrow-buffer' in \"core/autoload/ui.el\"."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide buffer +commands)
+(imp-provide buffer commands)

@@ -1,10 +1,10 @@
-;;; namespaced/buffer/+line-hydra.el --- Join Lines Hydra -*- lexical-binding: t; -*-
+;;; namespaced/buffer/line-hydra.el --- Join Lines Hydra -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-28
-;; Timestamp:  2025-11-05
+;; Timestamp:  2026-04-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -88,4 +88,4 @@ _O_: ?O?     _t_: ?t?"
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide buffer +line-hydra)
+(imp-provide buffer line-hydra)
