@@ -5522,10 +5522,21 @@ If `lsp-mode` exists...
 And if `rust-analyzer` exe not found...
 Warn & tell how to fix
 
-* -- U R HERE --
-<<here>>
+* ├DONE───┤ dired & whitespace mode
+CLOSED: [2026-04-10 Fri 16:39]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-04-10 Fri 16:39]
+- State "├CURRENT┤"  from              [2026-04-08 Wed 14:03]
+:END:
 
-* fill & alignment shortcuts
+Disable whitespace-mode in dired-mode
+
+* ├DONE───┤ fill & alignment shortcuts
+CLOSED: [2026-04-13 Mon 12:43]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-04-13 Mon 12:43]
+- State "├CURRENT┤"  from              [2026-04-10 Fri 16:53]
+:END:
 
 file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/keybinds/text.el
   - oh this has alignment stuff too
@@ -5535,7 +5546,7 @@ oh it's not a hydra
 It's all my keybind junk I made to fight ~meow~
 
 Convert to just a keymap, probably.
-  - [ ] bind keys?
+  - [X] bind keys?
   - [ ] general?
 
 What key to put all my keybinds under?
@@ -5563,20 +5574,61 @@ Use bind-keys?
 
 use-package general
 
-Make:
-  - [ ] config/keybinds dir
-  - [ ] config/keybinds/init.el?
-    - Need to install general somewhere...
-  - [ ] config/keybinds/text.el
+Hm... ~general~ integrates with ~which-key~ better.
+Get from sn004: [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/boot/10-init/20-packages.el::;; General Keybinds Package][here]]
+added to: file:source/user/config/emacs/keybinds.el
+
+Use new `keymap` funcs?
+
+#+begin_src elisp
+(defvar-keymap --/keymap/leader
+  :doc "Leader keymap.")
+
+(keymap-global-set --/keymap/leader/prefix --/keymap/leader)
+#+end_src
 
 
-* treemacs?
+#+begin_src elisp
+(defvar-keymap --/keymap/leader/files
+  :doc "File commands."
+  "f" '("Find file" . find-file)
+  "s" '("Save buffer" . save-buffer)
+  "r" '("Recent files" . recentf-open-files))
 
-https://melpa.org/#/treemacs
-https://melpa.org/#/lsp-treemacs
+(keymap-set --/keymap/leader "f"
+            (cons "Files" --/keymap/leader/files))
+#+end_src
 
-Pretty sure I have treemacs in =sn004=
+ok; fill in from [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/keybinds/text.el][sn004]]
 
+
+** ├DONE───┤ todos
+CLOSED: [2026-04-13 Mon 12:43]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-04-13 Mon 12:43]
+:END:
+
+#+begin_src elisp
+  ;; TODO: Join Lines Hydra
+  ;; TODO: "j" `("Join Lines..." . ,(elisp:cmd (hydra:call 'buffer:hydra:join-lines)))
+#+end_src
+  - [[file:source/user/config/keybinds.el::;; TODO: Join Lines Hydra][here]]
+
+#+begin_src elisp
+  ;; TODO: "a" '("Align Before" . buffer:cmd:align/before)
+  ;; TODO: "o" '("Align After" . buffer:cmd:align/after)
+#+end_src
+  - [[file:source/user/config/keybinds.el::;; TODO: "a" '("Align Before" . buffer:cmd:align/before)][here]]
+
+#+begin_src elisp
+  ;; TODO: "c" `("Center at 40 (80 width)" . (elisp:cmd (buffer:cmd:center/width 80)))
+  ;; TODO: "t" '("Center to Column..." . #'buffer:cmd:center/to)
+  ;; TODO: "w" '("Center at Width..." . #'buffer:cmd:center/width)
+#+end_src
+  - [[file:source/user/config/keybinds.el::(defvar-keymap --/keymap/leader/text/center][here]]
+
+* -- U R HERE --
+<<here>>
 * config files: user/config -> core/config
 
 Some stuff should be moved to core, like
@@ -5588,6 +5640,25 @@ there is at least one:
 #+end_example
 
 [[file:source/user/config/emacs/garbage.el]]
+
+
+* ├TODO───┤ nerd-icons-completion fix/disable
+
+#+begin_src elisp
+;; TODO: This package ruined the ordering of the completion list for buffers.
+(use-package nerd-icons-completion
+#+end_src
+  - [[file:source/user/config/emacs/font.el::;; TODO: This package ruined the ordering of the completion list for buffers.][here]]
+
+TODO: get repro case
+
+* treemacs?
+
+https://melpa.org/#/treemacs
+https://melpa.org/#/lsp-treemacs
+
+Pretty sure I have treemacs in =sn004=
+
 * ├CURRENT┤ taskspace
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2026-01-21 Wed 16:51]
@@ -5636,6 +5707,10 @@ Is there any support for .NET Framework 4.8?
   - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
 
 
+* imp: silent failure to load filenames starting with '+'
+
+~buffer/+commands.el~ had to be renamed to ~buffer/commands.el~
+
 * package: flycheck?
 
 LSP does stuff about it.
@@ -5675,13 +5750,6 @@ eg:
 If not, its another issue (like I need to run ~package-refresh-contents~)
 
 
-* Fix or drop nerd-icons-completion?
-
-#+begin_src elisp
-;; TODO: This package ruined the ordering of the completion list for buffers.
-#+end_src
-  - [[file:source/user/config/emacs/font.el::o][here]]
-
 * Set bash $EDITOR
 
 I should have what to set it to.... somewhere?
@@ -5696,20 +5764,6 @@ It should be in a script in .emacs.d though.
 https://www.reddit.com/r/emacs/comments/1qfylx5/suggestions_wanted_for_the_next_version_of_bedrock/?share_id=BXb-g8-4q186WHr32UM-F&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=17
 
 Did I use it in sn004?
-
-* ├WAITING┤ GPT 5.2
-:LOGBOOK:
-- State "├WAITING┤"  from              [2025-12-16 Tue 16:01] \\
-  wait for gptel to add 5.2 to their models
-:END:
-
-Switch ~gptel~ to 5.2?
-
-Don't have it in ~gptel~ yet.
-  - ver: 2025-12-14
-  - ver: 20260105.2359 (gptel-version "0.9.9.3")
-
-Switch to 5.1 for now.
 
 * ├CURRENT┤ imp path
 :LOGBOOK:
