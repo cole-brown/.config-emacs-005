@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2026-04-14
+;; Timestamp:  2026-04-17
 ;; Version:    2.4
 ;;
 ;; TODO: Requirements: cl-lib, seq, dash, org,
@@ -220,7 +220,7 @@
 ;;------------------------------------------------------------------------------
 
 (imp-timing
-    taskspace
+    'taskspace
     (imp-path-current-file)
 
   (imp ./debug)
