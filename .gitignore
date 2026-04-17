@@ -56,10 +56,12 @@ var/
 
 # [2023-05-02] Currently, not all my packages are separate repos...
 # So just ignore these that _are_ their own Git repos:
-/packages/user/smudge
-/packages/user/groot
+/source/user/packages/smudge
+/source/user/packages/groot
 
 /temp/
+
+.codex
 
 
 # ╠═══════════════════════════════╗          ╔═══════════════════════════════╣ #
