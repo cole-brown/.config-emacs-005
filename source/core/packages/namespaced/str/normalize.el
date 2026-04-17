@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-27
-;; Timestamp:  2025-11-20
+;; Timestamp:  2026-04-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -31,6 +31,8 @@ Return string or nil."
   ;; Accept more than we promised while still being KISS compared to `str:normalize:any'.
   (cond ((stringp symbol)
          symbol)
+        ((keywordp symbol)
+         (string-trim (symbol-name symbol) ":" nil))
         ((symbolp symbol)
          (symbol-name symbol))
         (t
