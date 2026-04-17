@@ -5627,45 +5627,38 @@ CLOSED: [2026-04-13 Mon 12:43]
 #+end_src
   - [[file:source/user/config/keybinds.el::(defvar-keymap --/keymap/leader/text/center][here]]
 
-* -- U R HERE --
-<<here>>
-* config files: user/config -> core/config
-
-Some stuff should be moved to core, like
-file:user/config/emacs/package.el
-
-there is at least one:
-#+begin_example elisp
-  ;; TODO(core): move to core
-#+end_example
-
-[[file:source/user/config/emacs/garbage.el]]
-
-
-* ├TODO───┤ nerd-icons-completion fix/disable
-
-#+begin_src elisp
-;; TODO: This package ruined the ordering of the completion list for buffers.
-(use-package nerd-icons-completion
-#+end_src
-  - [[file:source/user/config/emacs/font.el::;; TODO: This package ruined the ordering of the completion list for buffers.][here]]
-
-TODO: get repro case
-
-* treemacs?
-
-https://melpa.org/#/treemacs
-https://melpa.org/#/lsp-treemacs
-
-Pretty sure I have treemacs in =sn004=
-
-* ├CURRENT┤ taskspace
+* ├DONE───┤ username & email
+CLOSED: [2026-04-15 Wed 14:09]
 :LOGBOOK:
+- State "├DONE───┤"  from "├TODO───┤"  [2026-04-15 Wed 14:09]
+:END:
+
+Do I want ~signature~ stuff?
+  - [[file:source/user/config/taskspace.el::signature:string 'id 'name :default (user-full-name)][taskspace config]]
+
+Or do I just want to define some vars in secret?
+
+--/pii/name/full
+--/pii/email/work
+
+secrets: [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el::defun /secret/pii (&rest keys][here]]
+#+begin_src elisp
+(/secret/pii :work :name)
+#+end_src
+
+
+
+* ├DONE───┤ taskspace
+CLOSED: [2026-04-17 Fri 15:51]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-04-17 Fri 15:51]
 - State "├CURRENT┤"  from              [2026-01-21 Wed 16:51]
 :END:
 
-** ├CURRENT┤ refactor
+** ├DONE───┤ refactor
+CLOSED: [2026-04-14 Tue 17:29]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-04-14 Tue 17:29]
 - State "├CURRENT┤"  from              [2026-01-21 Wed 16:51]
 :END:
 
@@ -5688,12 +5681,97 @@ naming.el: remove ~nub~
   - [[file:source/user/packages/taskspace/naming.el::(nub:debug:func/start][u r here]]
   - [X] k
 
+taskspace.el
+  - [[file:source/user/packages/taskspace/taskspace.el::defun taskspace-dwim-dir (date-input][u r here]]
+  - [X] k
+
 file:source/user/packages/taskspace/init.el
 
-** Get it working?
+k
 
-** replace dash with seq?
 
+** ├DONE───┤ make config
+CLOSED: [2026-04-17 Fri 15:11]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-04-17 Fri 15:11]
+- State "├CURRENT┤"  from              [2026-04-14 Tue 17:29]
+:END:
+
+file:source/user/packages/taskspace/init.el
+
+Do I have a config for it yet?
+sn004: [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/mantle/config/dev-env/taskspace.el::;;; mantle/config/dev-env/taskspace.el --- Config Taskspace -*- lexical-binding: t; -*-][here]]
+sn005:
+
+u r [[file:source/user/config/taskspace.el::when (and (system:secret:has][here]]
+
+add to init
+  - k
+
+** ├DONE───┤ taskspace keybinds
+CLOSED: [2026-04-17 Fri 15:11]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-04-17 Fri 15:11]
+:END:
+
+Make a ~taskspace-keybind-keymap~ in [[file:source/user/packages/taskspace/keybinds.el][taskspace:/keybinds.el]]
+  - k
+
+Call ~taskspace-keybind-keymap~ during config.
+
+(taskspace-keybind-keymap --/keymap/leader "n")
+
+
+** ├KILLED─┤ replace dash with seq?
+CLOSED: [2026-04-17 Fri 15:12]
+:LOGBOOK:
+- State "├KILLED─┤"  from              [2026-04-17 Fri 15:12] \\
+  used for more than just trivial seq funcs
+:END:
+
+Don't know of a replacement for dash's ~->>~ function.
+
+* -- U R HERE --
+<<here>>
+* mux secrets
+
+#+begin_src elisp
+;; TODO(secret): set defaults in system-specific init.
+#+end_src
+  - [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el][here]]
+    - and others
+
+* config files: user/config -> core/config
+
+Some stuff should be moved to core, like
+file:user/config/emacs/package.el
+
+there is at least one:
+#+begin_example elisp
+  ;; TODO(core): move to core
+#+end_example
+
+[[file:source/user/config/emacs/garbage.el]]
+
+Probably all of `emacs` dir?
+
+
+* ├TODO───┤ nerd-icons-completion fix/disable
+
+#+begin_src elisp
+;; TODO: This package ruined the ordering of the completion list for buffers.
+(use-package nerd-icons-completion
+#+end_src
+  - [[file:source/user/config/emacs/font.el::;; TODO: This package ruined the ordering of the completion list for buffers.][here]]
+
+TODO: get repro case
+
+* treemacs?
+
+https://melpa.org/#/treemacs
+https://melpa.org/#/lsp-treemacs
+
+Pretty sure I have treemacs in =sn004=
 
 * LSP(C#): use Omnisharp for csharp
 
