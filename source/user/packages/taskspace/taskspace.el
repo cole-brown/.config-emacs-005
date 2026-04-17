@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2026-02-03
+;; Timestamp:  2026-04-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -20,9 +20,6 @@
 ;;---------------------------------taskspace------------------------------------
 ;;--                   Simple Taskspace / Task Management                     --
 ;;------------------------------------------------------------------------------
-
-;; TODO [2020-02-25]: cleanup pass?
-;; TODO [2020-02-25]: find/do the todos here?
 
 (require 'cl-lib)
 (require 'org) ; org-element
@@ -65,10 +62,10 @@ If NO-MESSAGE, skips output message."
       (if no-error
           nil
         (taskspace--error
-            'taskspace--notes-open
-          "No notes file found! Look for it: %s, %s"
-          (taskspace--path-notes group taskpath :self-contained)
-          (taskspace--path-notes group taskpath :noteless)))
+         'taskspace--notes-open
+         "No notes file found! Look for it: %s, %s"
+         (taskspace--path-notes group taskpath :self-contained)
+         (taskspace--path-notes group taskpath :noteless)))
 
     ;; Exists; message and visit it.
     (unless no-message
@@ -235,15 +232,15 @@ Else:
          ;; error out if we have no idea what date to dwim with...
          ((null date)
           (taskspace--error
-              'taskspace-dwim-dir
-            "Date string is nil: %s"
-            date))
+           'taskspace-dwim-dir
+           "Date string is nil: %s"
+           date))
 
          ;; if none, create one.
          ((null taskspaces)
           ;; call-interactively will give user prompt for description,
           ;; etc. as if they called themselves.
-          (funcall #'taskspace:create
+          (funcall #'taskspace-create
                    group
                    (taskspace--prompt-name group)))
 
@@ -254,8 +251,8 @@ Else:
 
           ;; copy & return
           (taskspace--kill-and-return (cl-first taskspaces)
-                                          "Existing taskspace: %s"
-                                          (cl-first taskspaces)))
+                                      "Existing taskspace: %s"
+                                      (cl-first taskspaces)))
 
          ;; For now, only give existing choices. User can use a non-dwim create
          ;; func if they want new.
@@ -263,11 +260,11 @@ Else:
 
           ;; list available choices to user, get the taskspace they chose
           (let ((choice (taskspace--prompt-task-existing group
-                                                             taskspaces
-                                                             'nondirectory)))
+                                                         taskspaces
+                                                         'nondirectory)))
             (taskspace--kill-and-return choice
-                                            "Chose taskspace: %s"
-                                            choice)))
+                                        "Chose taskspace: %s"
+                                        choice)))
 
          ;; Don't need a default case... Fall through with nil.
          ;;(t nil)
@@ -278,7 +275,7 @@ Else:
 
 
 ;;;###autoload
-(defun taskspace:create (group description)
+(defun taskspace-create (group description)
   "Create a new taskspace for today with the supplied GROUP & DESCRIPTION."
   ;; Do we need a max len? Leaving out until I feel otherwise.
   (interactive
@@ -288,11 +285,11 @@ Else:
 
   ;; Is DESCRIPTION ok as description part?
   (unless (taskspace--naming-verify group description)
-      ;; Error out; we are up to the interactive level now.
-      (taskspace--error
-          'taskspace:create
-        "Invalid description: %s"
-        description))
+    ;; Error out; we are up to the interactive level now.
+    (taskspace--error
+     'taskspace-create
+     "Invalid description: %s"
+     description))
 
   ;; Create the dir/project for today.
   (let ((taskpath (taskspace--dir-create group description 'today)))
@@ -301,9 +298,9 @@ Else:
       ;; TODO: Better reasons if known. "already exists" would be nice for
       ;; that case.
       (taskspace--error
-          'taskspace:create
-        "Error creating taskspace directory for: %s"
-        description))
+       'taskspace-create
+       "Error creating taskspace directory for: %s"
+       description))
 
     ;; Copy files into new taskspace.
     (when (path:exists? (taskspace--config group :file/new/copy) :dir)
@@ -329,9 +326,9 @@ Else:
                          (taskspace--config group :file/new/generate))))
         (when gen-errors
           (taskspace--error
-              'taskspace:create
-            "Taskspace errors while generating file(s): %s"
-            gen-errors))))
+           'taskspace-create
+           "Taskspace errors while generating file(s): %s"
+           gen-errors))))
 
     ;; Either of those can put a projectile file into the taskspace.
     ;; Just name it: .projectile
@@ -351,12 +348,12 @@ Else:
 
     ;; Return the path.
     taskpath))
-;; M-x taskspace:create
-;; (taskspace:create "testing-create")
+;; M-x taskspace-create
+;; (taskspace-create "testing-create")
 
 
 ;;;###autoload
-(defun taskspace:dired:task ()
+(defun taskspace-dired-task ()
   "Open the current taskspace's root dir in an Emacs (Dired?) buffer.
 
 If in a :noteless file, go to that note's task dir, if possible.
@@ -398,9 +395,9 @@ If in a file or sub-dir of the task dir, go to the task's dir."
     (if (not (path:exists? taskpath :dir))
         ;; Not a dir - error out.
         (taskspace--error
-            'taskspace:dired:task
-          "'%s' taskspace directory doesn't exist?: '%s'"
-          group taskpath)
+         'taskspace-dired-task
+         "'%s' taskspace directory doesn't exist?: '%s'"
+         group taskpath)
 
       ;; Ok - message and open (probably in dired but let emacs decide).
       (find-file taskpath)
@@ -409,21 +406,21 @@ If in a file or sub-dir of the task dir, go to the task's dir."
                (file:name taskpath))
       ;; Return the task's path?
       taskpath)))
-;; (taskspace:dired:task)
-;; M-x taskspace:dired:task
+;; (taskspace-dired-task)
+;; M-x taskspace-dired-task
 
 
 ;;;###autoload
-(defun taskspace:dired:root (group)
+(defun taskspace-dired-root (group)
   "Open the root directory of GROUP's taskspaces in an Emacs (Dired?) buffer."
   (interactive (list (taskspace--prompt-group 'auto t)))
 
   (if (not (file:exists? (taskspace--config group :dir/tasks) :dir))
       ;; not a dir - error out
       (taskspace--error
-          'taskspace:dired:root
-        "Can't find taskspace root directory: '%s'"
-        (taskspace--config group :dir/tasks))
+       'taskspace-dired-root
+       "Can't find taskspace root directory: '%s'"
+       (taskspace--config group :dir/tasks))
 
     ;; ok - message and open (probably in dired but let emacs decide)
     (find-file (taskspace--config group :dir/tasks))
@@ -432,12 +429,12 @@ If in a file or sub-dir of the task dir, go to the task's dir."
              (file:name (taskspace--config group :dir/tasks)))
     ;; return the top dir?
     (taskspace--config group :dir/tasks)))
-;; (taskspace:dired:root :home)
-;; M-x taskspace:dired:root
+;; (taskspace-dired-root :home)
+;; M-x taskspace-dired-root
 
 
 ;;;###autoload
-(defun taskspace:shell (group)
+(defun taskspace-shell (group)
   "Open GROUP's root taskspace directory in an Emacs shell buffer.
 
 Shell opened can be set by modifying:
@@ -449,9 +446,9 @@ Shell opened can be set by modifying:
   (let ((shell-fn (taskspace--config group :function/shell)))
     (if (not (functionp shell-fn))
         (taskspace--error
-            'taskspace:shell
-          "`:function/shell' in taskspace settings for group `%S' is not bound to a fuction: %s"
-          shell-fn)
+         'taskspace-shell
+         "`:function/shell' in taskspace settings for group `%S' is not bound to a fuction: %s"
+         shell-fn)
 
       ;; prompt user for the taskspace with an attempt at DWIM
       (let ((task (call-interactively #'taskspace-dwim-dir)))
@@ -459,9 +456,9 @@ Shell opened can be set by modifying:
         (if (not (path:exists? task :dir))
             ;; not a dir - error out
             (taskspace--error
-                'taskspace:shell
-              "Can't find taskspace (not a directory?): '%s'"
-              task)
+             'taskspace-shell
+             "Can't find taskspace (not a directory?): '%s'"
+             task)
 
           ;; open with shell-fn
           (funcall shell-fn)
@@ -469,12 +466,12 @@ Shell opened can be set by modifying:
           (message "Opening taskspace shell: %s" (file:name task))
           ;; return the chosen task's dir?
           task)))))
-;; (taskspace:shell :work)
-;; M-x taskspace:shell
+;; (taskspace-shell :work)
+;; M-x taskspace-shell
 
 
 ;;;###autoload
-(defun taskspace:notes (date-input group)
+(defun taskspace-notes (date-input group)
   "Open a taskspace's notes file.
 
 DATE-INPUT is prefix arg:
@@ -521,9 +518,9 @@ DWIM-ish actions:
      ;; error out if we have no idea what date to dwim with...
      ((null date)
       (taskspace--error
-          'taskspace:notes
-        "Date string is nil: %s"
-        date))
+       'taskspace-notes
+       "Date string is nil: %s"
+       date))
 
      ;; If just one, open its notes file.
      ((= length-ts 1)
@@ -544,15 +541,15 @@ DWIM-ish actions:
 
     (if (null taskpath)
         (taskspace--error
-            'taskspace:notes
-          "No taskspace notes found for date: %s"
-          date)
+         'taskspace-notes
+         "No taskspace notes found for date: %s"
+         date)
 
       ;; Exists; message and visit it.
       (taskspace--notes-open group taskpath))))
-;; M-x taskspace:notes
-;; (taskspace:notes)
-;; (taskspace:notes -1 (taskspace--prompt-group 'auto t))
+;; M-x taskspace-notes
+;; (taskspace-notes)
+;; (taskspace-notes -1 (taskspace--prompt-group 'auto t))
 
 
 ;;------------------------------------------------------------------------------
@@ -567,4 +564,4 @@ DWIM-ish actions:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :taskspace 'taskspace)
+(imp-provide taskspace:/taskspace)

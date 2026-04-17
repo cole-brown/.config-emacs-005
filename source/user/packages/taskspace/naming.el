@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2026-02-03
+;; Timestamp:  2026-04-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -242,4 +242,4 @@ Return the requested PART. PART can be one of: 'date 'number 'description"
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp-provide :taskspace 'naming)
+(imp-provide taskspace:/naming)

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-06
-;; Timestamp:  2026-01-21
+;; Timestamp:  2026-04-17
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -192,7 +192,7 @@ If FIELD is nil or `:setting', gets the setting's value.
 If FIELD is `:docstr', gets the setting's docstr.
 
 If FIELD is `:key', gets the setting's key, which is KEY. Almost
-useless, but does validate entry's exists."
+useless, but does validate that KEY exists."
   (let ((entry nil)
         (settings (taskspace--config-group-get-settings group)))
     ;; First, try to get from group's settings (if we found group's settings).

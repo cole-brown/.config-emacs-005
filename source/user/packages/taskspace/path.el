@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-06
-;; Timestamp:  2026-02-03
+;; Timestamp:  2026-04-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -381,4 +381,4 @@ DATE-STR should be a string of the date."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :taskspace 'path)
+(imp-provide taskspace:/path)

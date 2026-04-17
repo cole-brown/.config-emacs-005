@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-06
-;; Timestamp:  2026-02-03
+;; Timestamp:  2026-04-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -16,12 +16,40 @@
 ;;
 ;;; Code:
 
+(imp-require taskspace:/taskspace)
 
-;;---------------------------------taskspace------------------------------------
-;;--                   Simple Taskspace / Task Management                     --
+
+;;------------------------------------------------------------------------------
+;; keymap
 ;;------------------------------------------------------------------------------
 
-(imp-require taskspace:/taskspace)
+(defun taskspace-keybind-keymap (keymap key)
+  "Create keybinds via `defvar-keymap' & `keymap-set'.
+
+KEYMAP should be the parent keymap or nil (for global keymap).
+
+KEY should be a string which can be passed to `kbd'."
+  (require 'keymap)
+
+  (defvar-keymap taskspace--keymap
+    :doc "Taskspace Keymap"
+
+    ;; Top level commands...
+    "n" '("Create new..."  . taskspace-create)
+    "v" '("Visit notes..." . taskspace-notes)
+    "s" '("Shell..."       . taskspace-shell)
+
+    "k" `("Kill..." . ,(define-keymap
+                          "k" '("dir"  . taskspace-dwim-dir)
+                          "n" '("name" . taskspace-dwim-name)))
+
+    "d" `("Dired..." . ,(define-keymap
+                          "d" '("Task Dired Buffer" . taskspace-dired-task)
+                          "r" '("Root Dired Buffer" . taskspace-dired-root))))
+
+  (keymap-set keymap key
+              (cons "Taskspace..." taskspace--keymap)))
+;; (taskspace-keybind-keymap --/keymap/leader "n")
 
 
 ;;------------------------------------------------------------------------------

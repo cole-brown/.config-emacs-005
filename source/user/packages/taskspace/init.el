@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2026-02-03
+;; Timestamp:  2026-04-14
 ;; Version:    2.4
 ;;
 ;; TODO: Requirements: cl-lib, seq, dash, org,
@@ -53,7 +53,7 @@
 ;; Commands:
 ;;------------------------------
 ;;   The Main Command:
-;;     `taskspace:create'
+;;     `taskspace-create'
 ;;       - Create a new taskspace. Will prompt for the short description.
 ;;         - e.g. description of "2019-01-01_2_some-task-name" is
 ;;           "some-task-name".
@@ -67,23 +67,23 @@
 ;;       - If none for date: Create.
 ;;       - If just one existing: Return it.
 ;;       - If multiple: Choose from prompt of options.
-;;     `taskspace:dwim:dir'
+;;     `taskspace-dwim-dir'
 ;;       - Returns fully qualified path to taskspace.
 ;;         - e.g. "c:/home/user/taskspace/2019-01-01_2_some-task-name"
-;;     `taskspace:dwim:name'
+;;     `taskspace-dwim-name'
 ;;       - Returns taskspace (directory) name only.
 ;;         - e.g. "2019-01-01_2_some-task-name"
 ;;
 ;;   Other Commands:
-;;     `taskspace:dired:task'
+;;     `taskspace-dired-task'
 ;;       - Opens the directory of a task in emacs
 ;;         (uses find-file, so defaults to dired-mode buffer).
-;;     `taskspace:dired:root'
-;;       - Opens the directory of all tasks in emacs (aka `(int<taskspace>:config group :dir/tasks)')
+;;     `taskspace-dired-root'
+;;       - Opens the directory of all tasks in emacs (aka `(taskspace--config group :dir/tasks)')
 ;;         (uses find-file, so defaults to dired-mode buffer).
-;;     `taskspace:shell'
+;;     `taskspace-shell'
 ;;       - Opens a shell.
-;;       - Use `taskspace:dwim:dir' to determine which taskspace is
+;;       - Use `taskspace-dwim-dir' to determine which taskspace is
 ;;         intended from the context.
 ;;
 ;;
