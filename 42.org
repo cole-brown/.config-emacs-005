@@ -5733,7 +5733,15 @@ Don't know of a replacement for dash's ~->>~ function.
 
 * -- U R HERE --
 <<here>>
-* mux secrets
+* ├CURRENT┤ mux secrets
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-04-22 Wed 21:56]
+:END:
+
+** ├CURRENT┤ mux secrets for linux laptop
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-04-27 Mon 16:59]
+:END:
 
 #+begin_src elisp
 ;; TODO(secret): set defaults in system-specific init.
@@ -5741,107 +5749,60 @@ Don't know of a replacement for dash's ~->>~ function.
   - [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el][here]]
     - and others
 
-* config files: user/config -> core/config
+[[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; TODO: more paths from ~/ocean/vault/.config/secret/emacs/2022-03-23_sn004/system/work-2021-lap_e29fbd-0d21c7/init.el][u r here]]
+  - [[file:~/ocean/vault/.config/secret/emacs/2022-03-23_sn004/system/work-2021-lap_e29fbd-0d21c7/init.el][old paths]]
 
-Some stuff should be moved to core, like
-file:user/config/emacs/package.el
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Need func ~system:multiplexer:dlv:add~ or equivalent
+  - [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; TODO(secret): figure out func `system:multiplexer:dlv:add'][work secrets]]
 
-there is at least one:
-#+begin_example elisp
-  ;; TODO(core): move to core
-#+end_example
+Signature pkg or KISS?
+  - [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; TODO(secret): `signature' was deleted in sn005...][work signatures]]
 
-[[file:source/user/config/emacs/garbage.el]]
-
-Probably all of `emacs` dir?
+** mux secrets for Win10VM?
 
 
-* ├TODO───┤ nerd-icons-completion fix/disable
 
-#+begin_src elisp
-;; TODO: This package ruined the ordering of the completion list for buffers.
-(use-package nerd-icons-completion
+* whitespace tweak
+
+Disable too long lines highlight for markdown mode.
+
+* git modeline info
+
+move to topline?
+
+* copy buffer's file's path to kill/clipboard
+
+leader -> Kill -> Kill and/or Copy blah
+
+* tabs?!
+* dired
+
+Make it open buffers in same window instead of other window?
+
+* org babel: add `md`
+
+I want this to be pretty colors:
+#+begin_src md
+# title
+lorem ipsum dolor
+
+## hello
 #+end_src
-  - [[file:source/user/config/emacs/font.el::;; TODO: This package ruined the ordering of the completion list for buffers.][here]]
 
-TODO: get repro case
+like this is:
+#+begin_src markdown
+# title
+lorem ipsum dolor
 
-* treemacs?
-
-https://melpa.org/#/treemacs
-https://melpa.org/#/lsp-treemacs
-
-Pretty sure I have treemacs in =sn004=
-
-* LSP(C#): use Omnisharp for csharp
-
-Is there any support for .NET Framework 4.8?
-
-* LSP: find & fix TODO(lsp)
-
-#+begin_src elisp
-;; TODO(lsp): uncomment:
+## hello
 #+end_src
-  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
 
-
-* imp: silent failure to load filenames starting with '+'
-
-~buffer/+commands.el~ had to be renamed to ~buffer/commands.el~
-
-* package: flycheck?
-
-LSP does stuff about it.
-  - [[file:source/user/config/languages/lsp.el]]
-
-I think I had it in sn004.
-  - oh; yes. it is in that file.
-#+begin_quote
-;; TODO(lsp): add flycheck
-#+end_quote
-  - [[file:source/user/config/languages/lsp.el::;; TODO(lsp): add flycheck][here]]
-
-
-* package: lsp-docker
-
-https://github.com/emacs-lsp/lsp-docker
-
-* package: lsp-mssql?
-
-https://melpa.org/#/lsp-mssql
-https://github.com/emacs-lsp/lsp-mssql
-
-* error when installing package
-
-Just started showing up recently.
-Around when [[*GCMH][GCMH]] showed up.
-
-eg:
-#+begin_quote warning
-⛔ Error (use-package): Failed to install lsp-mode: Maximum buffer size exceeded
-⛔ Error (use-package): Cannot load lsp-mode
-⛔ Error (use-package): Failed to install lsp-ui: Maximum buffer size exceeded
-⛔ Error (use-package): Cannot load lsp-ui
-#+end_quote
-
-~use-package~ installs it fine the second time it's tried.
-If not, its another issue (like I need to run ~package-refresh-contents~)
-
-
-* Set bash $EDITOR
-
-I should have what to set it to.... somewhere?
-In my bash stuff?
-Or my other bash stuff?
-
-It should be in a script in .emacs.d though.
-
-* global-hl-line-mode?
-
-(setopt global-hl-line-sticky-flag 'window)
-https://www.reddit.com/r/emacs/comments/1qfylx5/suggestions_wanted_for_the_next_version_of_bedrock/?share_id=BXb-g8-4q186WHr32UM-F&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=17
-
-Did I use it in sn004?
+I've got several already.
 
 * ├CURRENT┤ imp path
 :LOGBOOK:
@@ -6022,7 +5983,10 @@ Whither?
 
 https://github.com/jwiegley/use-package/blob/master/use-package-tests.el
 
-[[file:source/core/packages/imp/test/path.el]]
+[[file:source/core/packages/imp/test/_old/path.el]]
+
+
+
 
 ** what do I want?
 
@@ -6071,6 +6035,108 @@ add something for git paths like ~repo:/path~
 
 ** bump imp version
 
+
+* config files: user/config -> core/config
+
+Some stuff should be moved to core, like
+file:user/config/emacs/package.el
+
+there is at least one:
+#+begin_example elisp
+  ;; TODO(core): move to core
+#+end_example
+
+[[file:source/user/config/emacs/garbage.el]]
+
+Probably all of `emacs` dir?
+
+
+* ├TODO───┤ nerd-icons-completion fix/disable
+
+#+begin_src elisp
+;; TODO: This package ruined the ordering of the completion list for buffers.
+(use-package nerd-icons-completion
+#+end_src
+  - [[file:source/user/config/emacs/font.el::;; TODO: This package ruined the ordering of the completion list for buffers.][here]]
+
+Asterisk buffers (*Messages*, etc) are not hidden.
+
+* treemacs?
+
+https://melpa.org/#/treemacs
+https://melpa.org/#/lsp-treemacs
+
+Pretty sure I have treemacs in =sn004=
+
+* LSP(C#): use Omnisharp for csharp
+
+Is there any support for .NET Framework 4.8?
+
+* LSP: find & fix TODO(lsp)
+
+#+begin_src elisp
+;; TODO(lsp): uncomment:
+#+end_src
+  - [[file:source/user/config/languages/csharp.el::;; TODO(lsp): uncomment:][here]]
+
+
+* imp: silent failure to load filenames starting with '+'
+
+~buffer/+commands.el~ had to be renamed to ~buffer/commands.el~
+
+* package: flycheck?
+
+LSP does stuff about it.
+  - [[file:source/user/config/languages/lsp.el]]
+
+I think I had it in sn004.
+  - oh; yes. it is in that file.
+#+begin_quote
+;; TODO(lsp): add flycheck
+#+end_quote
+  - [[file:source/user/config/languages/lsp.el::;; TODO(lsp): add flycheck][here]]
+
+
+* package: lsp-docker
+
+https://github.com/emacs-lsp/lsp-docker
+
+* package: lsp-mssql?
+
+https://melpa.org/#/lsp-mssql
+https://github.com/emacs-lsp/lsp-mssql
+
+* error when installing package
+
+Just started showing up recently.
+Around when [[*GCMH][GCMH]] showed up.
+
+eg:
+#+begin_quote warning
+⛔ Error (use-package): Failed to install lsp-mode: Maximum buffer size exceeded
+⛔ Error (use-package): Cannot load lsp-mode
+⛔ Error (use-package): Failed to install lsp-ui: Maximum buffer size exceeded
+⛔ Error (use-package): Cannot load lsp-ui
+#+end_quote
+
+~use-package~ installs it fine the second time it's tried.
+If not, its another issue (like I need to run ~package-refresh-contents~)
+
+
+* Set bash $EDITOR
+
+I should have what to set it to.... somewhere?
+In my bash stuff?
+Or my other bash stuff?
+
+It should be in a script in .emacs.d though.
+
+* global-hl-line-mode?
+
+(setopt global-hl-line-sticky-flag 'window)
+https://www.reddit.com/r/emacs/comments/1qfylx5/suggestions_wanted_for_the_next_version_of_bedrock/?share_id=BXb-g8-4q186WHr32UM-F&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=17
+
+Did I use it in sn004?
 
 * ├WAITING┤ TRAMP into Win10 VM
 :LOGBOOK:
