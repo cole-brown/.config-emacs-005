@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2026-04-17
+;; Timestamp:  2026-04-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -48,27 +48,6 @@
 ;; (pp imp-roots)
 (imp-path-root-set 'user
                    (imp-path user-emacs-directory 'source 'user))
-
-
-;;------------------------------------------------------------------------------
-;; Init Settings
-;;------------------------------------------------------------------------------
-
-;; (defvar --/init/debugging nil
-;;   "Flag for extra output during init.")
-
-;; (defvar --/init/log/level
-;;   '((debug . t)
-;;     ...todo
-;;     )
-;;   "todo")
-
-;; (defun --/init/message/debug (format-string &rest args)
-;;   "If `--/init/debugging' is non-nil, output via `message'."
-;;   (when --/init/debugging
-;;     (message format-string args)))
-
-;; (--/init/message "%s: %b" '--/init/debugging --/init/debugging)
 
 
 ;;------------------------------------------------------------------------------
