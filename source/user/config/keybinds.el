@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-04-13
+;; Timestamp:  2026-04-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -90,7 +90,7 @@
   "a" '("Align Before" . buffer:cmd:align/before)
   "o" '("Align After" . buffer:cmd:align/after)
   ";" '("Align Regex" . align-regexp)
-  "q" '("C-u Align Regex" . (elisp:cmd
+  "q" `("C-u Align Regex" . ,(elisp:cmd
                              (setq current-prefix-arg '(4))
                              (call-interactively #'align-regexp)))
   "'" '("Align" . align)
@@ -106,7 +106,7 @@
 (defvar-keymap --/keymap/leader/text/center
   :doc "Text Centering Keymap"
 
-  "c" `("Center at 40 (80 width)" . (elisp:cmd (buffer:cmd:center/width 80)))
+  "c" `("Center at 40 (80 width)" . ,(elisp:cmd (buffer:cmd:center/width 80)))
   "t" '("Center to Column..." . #'buffer:cmd:center/to)
   "w" '("Center at Width..." . #'buffer:cmd:center/width))
 
