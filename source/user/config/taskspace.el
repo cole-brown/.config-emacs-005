@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2026-04-14
-;; Timestamp:  2026-04-17
+;; Timestamp:  2026-04-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -97,11 +97,11 @@
                                 "_"))
                   (capitalize filename/no-ext)))
               ;; AUTHOR:
-              (or (/secret/pii group :name)
+              (or (/secret/get --/secret/pii group :name)
                   (user-full-name)
                   "TODO: Set name")
               ;; EMAIL:
-              (or (/secret/pii group :email)
+              (or (/secret/get --/secret/pii group :email)
                   (message-user-mail-address)
                   "TODO: Set email")
               ;; DATE:
