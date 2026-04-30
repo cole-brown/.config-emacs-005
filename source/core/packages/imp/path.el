@@ -50,8 +50,6 @@ non-nil - ignore errors; return nil")
 ;; Path Builders
 ;;------------------------------------------------------------------------------
 
-;; TODO(path):
-;; TODO(path): Used in one func. Delete? Use imp-parser func or imp-feature func?
 (defun imp--path-to-str (input)
   "Ensure INPUT is a string.
 
@@ -81,6 +79,7 @@ Return a string."
 ;; (imp--path-to-str nil)
 ;; (imp--path-to-str :foo)
 ;; (imp--path-to-str :f:o:o)
+;; (imp--path-to-str :D:/foo)
 ;; (imp--path-to-str 'foo)
 ;; (imp--path-to-str "foo")
 ;; (imp--path-to-str :/bar)
@@ -88,7 +87,6 @@ Return a string."
 ;; (imp--path-to-str "/bar")
 
 
-;; TODO(path): Only used in `imp-path-join`. Roll this into that func then delete.
 (defun imp--path-append (parent next)
   "Append NEXT element to PARENT, adding dir separator if needed."
   (let ((parent (imp--path-to-str parent))
@@ -115,6 +113,8 @@ Return a string."
           (t
            (concat (file-name-as-directory parent) next)))))
 ;; (imp--path-append :/foo 'bar)
+;; (imp--path-append nil nil)
+;; (let (imp-path-error?) (imp--path-append nil nil))
 
 
 (defun imp-path-join (&rest path)
@@ -122,14 +122,22 @@ Return a string."
 
 (imp-path-join \"jeff\" \"jill.el\")
   ->\"jeff/jill.el\""
-  (seq-reduce #'imp--path-append
-              ;; flatten and convert to strings.
-              (imp--list-flatten path)
-              nil))
+  (if-let ((flattened (imp--list-flatten path)))
+    (seq-reduce #'imp--path-append
+                flattened
+                nil)
+    (imp--path-error 'imp-path-join
+                     "Cannot join nothing. PATH = %S => %S"
+                     path
+                     flattened)))
+;; (imp--list-flatten '(:foo bar))
+;; (imp--list-flatten '(nil nil))
 ;; (imp-path-join "/foo" "bar.el")
 ;; (imp-path-join '("/foo" ("bar.el")))
 ;; (imp-path-join "foo" "bar.el")
 ;; (imp-path-join "foo")
+;; (imp-path-join nil nil)
+;; (let (imp-path-error?) (imp-path-join nil))
 
 
 (defun imp-path-split (path)
@@ -140,15 +148,22 @@ Return a string."
 
 Split on forward or backward slash if `system-type' is `windows-nt'.
 Else split on forward slash only."
-  (string-split path
-                ;; Only backslashes if Windows path.
-                (if (eq system-type 'windows-nt)
-                    (rx (any "/" "\\"))
-                  (rx "/"))
-                t))
+  (if (stringp path)
+      (string-split path
+                    ;; Only backslashes if Windows path.
+                    (if (eq system-type 'windows-nt)
+                        (rx (any "/" "\\"))
+                      (rx "/"))
+                    t)
+    (imp--path-error 'imp-path-split
+                     "PATH must be a string; got '%s'. PATH = %S"
+                     (type-of path)
+                     path)))
 ;; (imp-path-split (imp-path-current-file))
 ;; (imp-path-split "/path/to/some/where.txt")
 ;; (imp-path-split "C:\\path\\to\\some\\where.txt")
+;; (imp-path-split :foo)
+;; (let (imp-path-error?) (imp-path-split :foo))
 
 
 ;;------------------------------------------------------------------------------

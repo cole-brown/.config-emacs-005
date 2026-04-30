@@ -54,9 +54,41 @@
               (lambda () ,dir)))
      ,@body))
 
-(ert-deftest imp-path-test-join-flattens-and-normalizes-symbols ()
+;;------------------------------------------------------------------------------
+;; TESTS
+;;------------------------------------------------------------------------------
+
+(ert-deftest imp-path-test:/join/flattens-and-normalizes-symbols ()
   (should (equal (imp-path-join "/tmp" '("alpha" (:beta gamma)) "delta.el")
                  "/tmp/alpha/beta/gamma/delta.el")))
+
+(ert-deftest imp-path-test:/join/simple-cases ()
+  (should (string= (imp-path-join "/foo" "bar.el")
+                   "/foo/bar.el"))
+  (should (string= (imp-path-join '("/foo" ("bar.el")))
+                   "/foo/bar.el"))
+  (should (string= (imp-path-join "foo" "bar.el")
+                   "foo/bar.el"))
+  (should (string= (imp-path-join "foo")
+                   "foo"))
+
+  (should-error (imp-path-join nil nil))
+  (should (eq (let (imp-path-error?) (imp-path-join nil))
+              nil)))
+
+(ert-deftest imp-path-test:/split/simple-cases ()
+  (should (equal (imp-path-split "/path/to/some/where.txt")
+                 '("path" "to" "some" "where.txt")))
+
+  (let ((system-type 'windows-nt))
+    (should (string= (imp-path-split "C:\\path\\to\\some\\where.txt")
+                     '("C:" "path" "to" "some" "where.txt"))))
+
+  (should-error (imp-path-split :foo))
+  (should (eq (let (imp-path-error?) (imp-path-split :foo))
+              nil)))
+
+
 
 (ert-deftest imp-path-test-normalizes-relative-paths-from-current-dir ()
   (imp-path-test--with-temp-dir root
