@@ -60,6 +60,7 @@ INPUT should be a string, keyword, or symbol.
     - :foo -> \"foo\"
 
 Return a string."
+  (declare (side-effect-free t))
   (cond ((null input) ;; Let nil through so `imp-path-join` functions correctly.
          nil)
 
@@ -89,6 +90,7 @@ Return a string."
 
 (defun imp--path-append (parent next)
   "Append NEXT element to PARENT, adding dir separator if needed."
+  (declare (side-effect-free t))
   (let ((parent (imp--path-to-str parent))
         (next   (imp--path-to-str next)))
     ;; Error checks first.
@@ -122,6 +124,7 @@ Return a string."
 
 (imp-path-join \"jeff\" \"jill.el\")
   ->\"jeff/jill.el\""
+  (declare (side-effect-free t))
   (if-let ((flattened (imp--list-flatten path)))
     (seq-reduce #'imp--path-append
                 flattened
@@ -148,6 +151,7 @@ Return a string."
 
 Split on forward or backward slash if `system-type' is `windows-nt'.
 Else split on forward slash only."
+  (declare (side-effect-free t))
   (if (stringp path)
       (string-split path
                     ;; Only backslashes if Windows path.
@@ -170,43 +174,39 @@ Else split on forward slash only."
 ;; Normalize Paths
 ;;------------------------------------------------------------------------------
 
-;; TODO(path): make this use all the shenanigans that `imp-parser-normalize/:path' uses?
-(defun imp-path (&rest path)
-  "Get an imp standard path.
-
-1. Join PATH into a path string.
-2. Get the absolute path.
-   - If path is relative, root with func `imp-path-current-dir'.
-3. Follow symlinks to 'true' file path.
-4. Remove trailing slashes.
-5. Abbreviate path (for '~/' paths instead of '/home/user/')."
-  (declare (pure t) (side-effect-free t))
-  (let ((default-directory (imp-path-current-dir)))
-    (convert-standard-filename
-     (apply #'imp-path-abbreviate path))))
-
-
-(defun imp-path-canonical (path &optional root)
-  "Expand PATH to a full/absolute/canonical path, based off of ROOT if relative.
-
-Follow symlinks to find true path.
-
-If ROOT is nil, `default-directory' is used if needed."
-  (declare (pure t) (side-effect-free t))
-  ;; remove trailing slash
+(defun imp-path-absolute (&rest path)
+  "Join PATH and expand it to an absolute path."
+  (declare (side-effect-free t))
+  ;; Remove trailing slash.
   (directory-file-name
-   ;; follow symlinks, remove ".."
-   (file-truename
-    ;; get absolute path
-    (expand-file-name path root))))
+   ;; Get absolute path.
+   ;; Ignore default-directory for `expand-file-name'.
+   (expand-file-name (apply #'imp-path-join path) nil)))
+;; (imp-path-absolute "/foo/bar" :baz)
+;; (imp-path-absolute "/foo/bar" :baz/)
+
+
+(defun imp-path-canonical (&rest path)
+  "Join PATH and make it a canonical path.
+
+A canonical path in `imp' means:
+  - An absolute path. See `imp-path-absolute'.
+  - Follow symlinks to find true path."
+  (declare (side-effect-free t))
+  ;; Follow symlinks, remove ".."
+  (file-truename (apply #'imp-path-absolute path)))
+;; (imp-path-canonical "/foo/bar" :baz)
+;; (imp-path-canonical "/foo/bar" :baz/)
 
 
 (defun imp-path-abbreviate (&rest path)
-  "Join & canonicalize PATH, then shortened using `abbreviate-file-name'.
+  "Join & canonicalize PATH, then shorten using `abbreviate-file-name'.
+
+This is mainly useful for converting '/home/USER/...' into '~/...'.
 
 Return an absolute path."
-  (declare (pure t) (side-effect-free t))
-  (abbreviate-file-name (imp-path-canonical (apply #'imp-path-join path))))
+  (declare (side-effect-free t))
+  (abbreviate-file-name (apply #'imp-path-canonical path)))
 
 
 (defun imp--path-relative (root path)
@@ -819,6 +819,26 @@ Return path string from `imp-roots' or nil."
   (imp--alist-delete (imp-feature-first feature) imp-roots))
 ;; imp-roots
 ;; (imp-path-root-delete 'imp)
+
+
+;;------------------------------------------------------------------------------
+;; /The/ Path Function
+;;------------------------------------------------------------------------------
+
+;; TODO(path): make this use all the shenanigans that `imp-parser-normalize/:path' uses?
+(defun imp-path (&rest path)
+  "Get an imp standard path.
+
+1. Join PATH into a path string.
+2. Get the absolute path.
+   - If path is relative, root with func `imp-path-current-dir'.
+3. Follow symlinks to 'true' file path.
+4. Remove trailing slashes.
+5. Abbreviate path (for '~/' paths instead of '/home/user/')."
+  (declare (pure t) (side-effect-free t))
+  (let ((default-directory (imp-path-current-dir)))
+    (convert-standard-filename
+     (apply #'imp-path-abbreviate path))))
 
 
 ;;------------------------------------------------------------------------------
