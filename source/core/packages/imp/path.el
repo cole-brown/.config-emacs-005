@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-12-04
+;; Timestamp:  2026-04-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,6 +28,110 @@
 
 
 (require 'seq)
+
+;;------------------------------------------------------------------------------
+;; Path Builders
+;;------------------------------------------------------------------------------
+
+;; TODO(path):
+;; TODO(path): Used in one func. Delete? Use imp-parser func or imp-feature func?
+(defun imp--path-to-str (input)
+  "Ensure INPUT is a string.
+
+INPUT should be a string, keyword, or symbol.
+  - If it's a string, use as-is.
+  - If it's a keyword/symbol, use the symbol's name sans \":\".
+    - 'foo -> \"foo\"
+    - :foo -> \"foo\"
+
+Return a string."
+  (cond ((null input) ;; Let nil through so `imp-path-join` functions correctly.
+         nil)
+
+        ((stringp input) ;; String good. Want string.
+         input)
+
+        ;; Symbol? Use its name.
+        ((symbolp input)
+         ;; But strip the keyword colon.
+         (replace-regexp-in-string ":" "" (symbol-name input)))
+
+        (t
+         (imp--error "imp--path-to-str"
+                     "INPUT must be string or keyword/symbol. Got %S: %S"
+                     (type-of input)
+                     input))))
+;; (imp--path-to-str nil)
+;; (imp--path-to-str :foo)
+;; (imp--path-to-str :f:o:o)
+;; (imp--path-to-str 'foo)
+;; (imp--path-to-str "foo")
+;; (imp--path-to-str :/bar)
+;; (imp--path-to-str '/bar)
+;; (imp--path-to-str "/bar")
+
+
+;; TODO(path): Only used in `imp-path-join`. Roll this into that func then delete.
+(defun imp--path-append (parent next)
+  "Append NEXT element to PARENT, adding dir separator if needed."
+  (let ((parent (imp--path-to-str parent))
+        (next   (imp--path-to-str next)))
+    ;; Error checks first.
+    (cond ((and parent
+                (not (stringp parent)))
+           (imp--error "imp--path-append"
+                       "Paths to append must be strings. Parent is: %S"
+                       parent))
+          ((or (null next)
+               (not (stringp next)))
+           (imp--error "imp--path-append"
+                       "Paths to append must be strings. Next is: %S"
+                       next))
+
+          ;;---
+          ;; Append or not?
+          ;;---
+          ;; Expected initial case for appending: nil parent, non-nil next.
+          ((null parent)
+           next)
+
+          (t
+           (concat (file-name-as-directory parent) next)))))
+;; (imp--path-append :/foo 'bar)
+
+
+(defun imp-path-join (&rest path)
+  "Combine PATH elements together into a path.
+
+(imp-path-join \"jeff\" \"jill.el\")
+  ->\"jeff/jill.el\""
+  (seq-reduce #'imp--path-append
+              ;; flatten and convert to strings.
+              (imp--list-flatten path)
+              nil))
+;; (imp-path-join "/foo" "bar.el")
+;; (imp-path-join '("/foo" ("bar.el")))
+;; (imp-path-join "foo" "bar.el")
+;; (imp-path-join "foo")
+
+
+(defun imp-path-split (path)
+  "Split PATH into a list of dir/file names.
+
+(imp-path-split \"/path/to/some/where.txt\")
+  => (\"path\" \"to\" \"some\" \"where.txt\")
+
+Split on forward or backward slash if `system-type' is `windows-nt'.
+Else split on forward slash only."
+  (string-split path
+                ;; Only backslashes if Windows path.
+                (if (eq system-type 'windows-nt)
+                    (rx (any "/" "\\"))
+                  (rx "/"))
+                t))
+;; (imp-path-split (imp-path-current-file))
+;; (imp-path-split "/path/to/some/where.txt")
+;; (imp-path-split "C:\\path\\to\\some\\where.txt")
 
 
 ;;------------------------------------------------------------------------------
@@ -553,106 +657,6 @@ Downcases path on case-insensitive OSes."
 ;; (imp--path-platform-agnostic "/Foo/Bar")
 ;; (imp--path-platform-agnostic "C:/Foo/Bar")
 ;; (imp--path-platform-agnostic "C:\\Foo\\Bar")
-
-
-;; TODO(path):
-;; TODO(path): Used in one func. Delete? Use imp-parser func or imp-feature func?
-(defun imp--path-to-str (input)
-  "Ensure INPUT is a string.
-
-INPUT should be a string, keyword, or symbol.
-  - If it's a string, use as-is.
-  - If it's a keyword/symbol, use the symbol's name sans \":\".
-    - 'foo -> \"foo\"
-    - :foo -> \"foo\"
-
-Return a string."
-  (cond ((null input) ;; Let nil through so `imp-path-join` functions correctly.
-         nil)
-
-        ((stringp input) ;; String good. Want string.
-         input)
-
-        ;; Symbol? Use its name.
-        ((symbolp input)
-         ;; But strip the keyword colon.
-         (replace-regexp-in-string ":" "" (symbol-name input)))
-
-        (t
-         (imp--error "imp--path-to-str"
-                     "INPUT must be string or keyword/symbol. Got %S: %S"
-                     (type-of input)
-                     input))))
-;; (imp--path-to-str nil)
-;; (imp--path-to-str :foo)
-;; (imp--path-to-str 'foo)
-;; (imp--path-to-str "foo")
-;; (imp--path-to-str :/bar)
-;; (imp--path-to-str '/bar)
-;; (imp--path-to-str "/bar")
-
-
-;; TODO(path): Only used in `imp-path-join`. Roll this into that func then delete.
-(defun imp--path-append (parent next)
-  "Append NEXT element to PARENT, adding dir separator if needed."
-  (let ((parent (imp--path-to-str parent))
-        (next   (imp--path-to-str next)))
-    ;; Error checks first.
-    (cond ((and parent
-                (not (stringp parent)))
-           (imp--error "imp--path-append"
-                       "Paths to append must be strings. Parent is: %S"
-                       parent))
-          ((or (null next)
-               (not (stringp next)))
-           (imp--error "imp--path-append"
-                       "Paths to append must be strings. Next is: %S"
-                       next))
-
-          ;;---
-          ;; Append or not?
-          ;;---
-          ;; Expected initial case for appending: nil parent, non-nil next.
-          ((null parent)
-           next)
-
-          (t
-           (concat (file-name-as-directory parent) next)))))
-;; (imp--path-append :/foo 'bar)
-
-
-(defun imp-path-join (&rest path)
-  "Combine PATH elements together into a path.
-
-(imp-path-join \"jeff\" \"jill.el\")
-  ->\"jeff/jill.el\""
-  (seq-reduce #'imp--path-append
-              ;; flatten and convert to strings.
-              (imp--list-flatten path)
-              nil))
-;; (imp-path-join "/foo" "bar.el")
-;; (imp-path-join '("/foo" ("bar.el")))
-;; (imp-path-join "foo" "bar.el")
-;; (imp-path-join "foo")
-
-
-(defun imp-path-split (path)
-  "Split PATH into a list of dir/file names.
-
-(imp-path-split \"/path/to/some/where.txt\")
-  => (\"path\" \"to\" \"some\" \"where.txt\")
-
-Split on forward or backward slash if `system-type' is `windows-nt'.
-Else split on forward slash only."
-  (string-split path
-                ;; Only backslashes if Windows path.
-                (if (eq system-type 'windows-nt)
-                    (rx (any "/" "\\"))
-                  (rx "/"))
-                t))
-;; (imp-path-split (imp-path-current-file))
-;; (imp-path-split "/path/to/some/where.txt")
-;; (imp-path-split "C:\\path\\to\\some\\where.txt")
 
 
 ;; TODO(path): change to pass in EXT, check for EXT, remove if matching.
