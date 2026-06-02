@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-27
-;; Timestamp:  2026-03-25
+;; Timestamp:  2026-05-12
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -413,7 +413,7 @@ From Doom's `+lsp-defer-server-shutdown-a' in \"modules/tools/lsp/lsp.el\"."
   ;; When set to line the actions will be updated when user
   ;; changes current line otherwise the actions will be updated
   ;; when user changes current point.
-  (lsp-ui-sideline-update-mode 'line) ; default `point'
+  ;; (lsp-ui-sideline-update-mode 'point) ; default `point'
 
   ;; `lsp-ui-sideline-delay'
   ;;-----------------------------
@@ -425,7 +425,7 @@ From Doom's `+lsp-defer-server-shutdown-a' in \"modules/tools/lsp/lsp.el\"."
   ;; Maximum number of lines to show of diagnostics in sideline.
   ;;
   ;; Increase for more verbose messages, decrease if flickering occurs.
-  ;; (lsp-ui-sideline-diagnostic-max-lines 1) ; default 1
+  (lsp-ui-sideline-diagnostic-max-lines 10) ; default 1
 
   ;; `lsp-ui-sideline-ignore-duplicate'
   ;;-----------------------------
@@ -446,7 +446,7 @@ From Doom's `+lsp-defer-server-shutdown-a' in \"modules/tools/lsp/lsp.el\"."
   ;; `lsp-ui-peek-enable'
   ;;-----------------------------
   ;; Whether or not to enable ‘lsp-ui-peek’.
-  ;; (lsp-ui-peek-enable nil) ; default t
+  (lsp-ui-peek-enable t) ; default t
 
   ;; `lsp-ui-peek-show-directory'
   ;;-----------------------------
