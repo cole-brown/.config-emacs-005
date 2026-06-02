@@ -201,7 +201,6 @@
            system-name
            (imp-mux-system))
 
-  ;; TODO: for now, this way.
   (imp secret.d
     :root
     :path (pcase system-type
@@ -256,7 +255,7 @@
   ;; Org-Mode
   (imp user:/config/org/init)
 
-  (imp user:/config/keybinds)
+  (imp user:/config/keybinds/config)
 
   ;; `taskspace'
   (imp user:/config/taskspace)
