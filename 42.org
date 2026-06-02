@@ -5731,15 +5731,103 @@ CLOSED: [2026-04-17 Fri 15:12]
 
 Don't know of a replacement for dash's ~->>~ function.
 
-* -- U R HERE --
-<<here>>
-* ├CURRENT┤ mux secrets
+* ├DONE───┤ mux secrets for linux
+CLOSED: [2026-06-02 Tue 16:09]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-02 Tue 16:09]
 - State "├CURRENT┤"  from              [2026-04-22 Wed 21:56]
 :END:
 
-** ├CURRENT┤ mux secrets for linux laptop
+** ├DONE───┤ Need func ~system:multiplexer:dlv:add~ or equivalent
+CLOSED: [2026-06-02 Tue 15:19]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-02 Tue 15:19]
+- State "├CURRENT┤"  from              [2026-06-02 Tue 12:59]
+:END:
+
+For [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; TODO(secret): figure out func `system:multiplexer:dlv:add'][work secrets]]
+
+~system:multiplexer:dlv:add~ @:
+file:/home/main/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/system/multiplexer/dlv.el
+
+system:multiplexer:dlv:add
+  - system:multiplexer:dlv/args
+    - system:multiplexer:dlv:domain
+      - system:multiplexer:dlv/functions
+        - init/10-settings.el
+          - jerky:dlv:namespace/set
+            - dlv:set
+system:multiplexer:dlv:domain/all
+  - config/10-system.el
+
+#+begin_src elisp
+(dlv:set directory
+         nil ;; global mode
+         (list 'int<jerky>:dlv:namespace/local
+               namespace
+               :safe))
+#+end_src
+  - [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/core/modules/elisp/jerky/+dlv.el::(dlv:set directory]]
+
+Might want/need this too?
+#+begin_src elisp
+(defvar int<jerky>:dlv:namespace/local nil
+  "Directory Local Variable for holding the directory's namespace.")
+
+;; Mark our DLV variable as safe for DLV use.
+(dlv:var:safe/predicate 'int<jerky>:dlv:namespace/local
+                        #'int<jerky>:namespace:valid?)
+;; (get 'int<jerky>:dlv:namespace/local 'safe-local-variable)
+#+end_src
+
+And this?
+#+begin_src elisp
+(defun int<jerky>:namespace:valid? (namespace &optional quiet)
+  "Validates NAMESPACE.
+
+Doesn't care if it exists or not; just if it's a good
+possible-or-current-or-whatever namespace.
+
+Returns t/nil if QUIET is non-nil, else it signals error on failure."
+  (if (keywordp namespace)
+      t
+    (if quiet
+        nil
+      (nub:error
+          :jerky
+          "int<jerky>:namespace:valid?"
+        "namespace must be a keyword; got: %S"
+        namespace))))
+;; (int<jerky>:namespace:valid? :jeff)
+;; (int<jerky>:namespace:valid? 'jeff t)
+;; (int<jerky>:namespace:valid? 'jeff)
+;; (int<jerky>:namespace:valid? 'not-keyword)
+#+end_src
+
+
+
+
+
+
+
+** ├DONE───┤ Signature pkg or KISS?
+CLOSED: [2026-06-02 Tue 16:03]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-02 Tue 16:03]
+- State "├CURRENT┤"  from              [2026-06-02 Tue 15:23]
+:END:
+
+[[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; TODO(secret): `signature' was deleted in sn005...][work signatures]]
+
+Mmh... Let's try KISSing.
+
+** ├DONE───┤ mux secrets for linux laptop
+CLOSED: [2026-06-02 Tue 16:06]
+:LOGBOOK:
+- State "├DONE───┤"  from "├WAITING┤"  [2026-06-02 Tue 16:06]
+- State "├WAITING┤"  from "├CURRENT┤"  [2026-06-02 Tue 15:23]
+- State "├CURRENT┤"  from "├WAITING┤"  [2026-06-02 Tue 15:20]
+- State "├WAITING┤"  from "├CURRENT┤"  [2026-06-02 Tue 12:59]
 - State "├CURRENT┤"  from              [2026-04-27 Mon 16:59]
 :END:
 
@@ -5752,39 +5840,48 @@ Don't know of a replacement for dash's ~->>~ function.
 [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; TODO: more paths from ~/ocean/vault/.config/secret/emacs/2022-03-23_sn004/system/work-2021-lap_e29fbd-0d21c7/init.el][u r here]]
   - [[file:~/ocean/vault/.config/secret/emacs/2022-03-23_sn004/system/work-2021-lap_e29fbd-0d21c7/init.el][old paths]]
 
-╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-╠══TODO══╣            ║                                                                                                          ║
-╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
-╠══TODO══╣            ║                                                                                                          ║
-╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-Need func ~system:multiplexer:dlv:add~ or equivalent
-  - [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; TODO(secret): figure out func `system:multiplexer:dlv:add'][work secrets]]
+signature shit...
+  - [[file:~/ocean/vault/.config/secret/emacs/2022-03-23_sn004/system/work-2021-lap_e29fbd-0d21c7/init.el::;; User, Identity, Signatures, etc.]]
+  - [X] wait for [[*Signature pkg or KISS?][Signature pkg or KISS?]]
 
-Signature pkg or KISS?
-  - [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; TODO(secret): `signature' was deleted in sn005...][work signatures]]
+* -- U R HERE --
+<<here>>
+* mux secrets for Win10VM
 
-** mux secrets for Win10VM?
+What is Win10VM's mux hash?
+  - [X] Add print out of it to emacs init.
+  - [ ] pull latest .emacs.d on Win10VM
+  - [ ] fix broken shit?
+
+copy/paste [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el][work-2025-lap]]
+
+* keybinds & secrets
+
+Define top-level keymaps earlier?
+
+#+begin_src elisp
+;; This should probably go in the `--/keymap/leader/insert' keymap.
+;; However, we init before that keymap is defined, so...
+#+end_src
+  - [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el::;; This should probably go in the `--/keymap/leader/insert' keymap.][here]]
+
+Move the ~defvar-keymap~ earlier than [[file:source/user/config/keybinds.el::(defvar-keymap --/keymap/leader/insert][this]]?
+  - So we can do them just after [[file:init.el::imp user:/config/emacs/keybinds][here]]?
 
 
 
-* whitespace tweak
+* LSP(Rust): tweaks
+
+less in right-side overlay info
+
+Full warn/error message instead of only 1st line?
+
+* markdown mode
+** whitespace tweak
 
 Disable too long lines highlight for markdown mode.
 
-* git modeline info
-
-move to topline?
-
-* copy buffer's file's path to kill/clipboard
-
-leader -> Kill -> Kill and/or Copy blah
-
-* tabs?!
-* dired
-
-Make it open buffers in same window instead of other window?
-
-* org babel: add `md`
+** org babel: add `md`
 
 I want this to be pretty colors:
 #+begin_src md
@@ -5803,6 +5900,24 @@ lorem ipsum dolor
 #+end_src
 
 I've got several already.
+
+** md live(?) previews
+
+that also works on windows?
+
+
+* git modeline info
+
+move to topline?
+
+* copy buffer's file's path to kill/clipboard
+
+leader -> Kill -> Kill and/or Copy blah
+
+* tabs?!
+* dired
+
+Make it open buffers in same window instead of other window?
 
 * ├CURRENT┤ imp path
 :LOGBOOK:
@@ -5974,8 +6089,15 @@ Make ~imp-provide-auto~ or something for that?
 
 Wait til the first audit is dealt with.
 
-** ├CURRENT┤ refactor path tests
+** ├DONE───┤ do in imp branch
+CLOSED: [2026-04-27 Mon 18:04]
 :LOGBOOK:
+- State "├DONE───┤"  from              [2026-04-27 Mon 18:04]
+:END:
+** ├DONE───┤ refactor path tests
+CLOSED: [2026-04-27 Mon 18:04]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-04-27 Mon 18:04]
 - State "├CURRENT┤"  from              [2026-01-09 Fri 15:44]
 :END:
 
@@ -5985,12 +6107,79 @@ https://github.com/jwiegley/use-package/blob/master/use-package-tests.el
 
 [[file:source/core/packages/imp/test/_old/path.el]]
 
+new:
+[[file:source/core/packages/imp/test/path.el]]
+
+
+** ├CURRENT┤ wtf all does the macros do?
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-05-07 Thu 22:25]
+:END:
+
+Start [[file:source/core/packages/imp/load.el::;;;; `:path'][here]] in imp/load.el
+
+for making sense of [[*what do I want?][what do I want?]]
+#+begin_quote
+imp--path-builder-hook
+  - imp--path-h-truename
+  - imp--path-h-abbreviate
+  - +imp--path-h-relative+
+  - ...wtf all does the macros do?
+
+imp--path-build
+  - imp-path-join
+  - run-hooks imp--path-builder-hook
+#+end_quote
+
+imp/load.el path funcs
+  - imp-parser-normalize-path-symbol
+    - special symbols -> special paths
+    - TODO: simplify, move some logic to only be in string version
+  - imp-parser-normalize-path-string
+    - special strings -> special paths
+  - imp-parser-normalize-path-one-arg
+    - imp-parser-normalize-path-symbol
+    - imp-parser-normalize-path-string
+    - eval arg in case of function/value
+  - imp-parser-normalize-path-args-list
+    - seq-map imp-parser-normalize-path-one-arg
+    - Do we want path lists?
+      - Should probably only take a path.
+  - imp-parser-normalize-paths
+    - imp-parser-normalize-path-args-list
+      - validate; error if any nils
+    - seq-map imp-path
+  - imp-parser-normalize-path-feature
+    - imp-path-load-file
+      - This checks for path's existance.
+        - todo: don't check for path's existance
+      - if a load file path, done. else:
+    - imp-feature-split
+    - imp-feature-root
+    - imp-path-root-get
+    - imp-feature-unrooted
+    - This is the _third_ function that deals with "./"!?
+    - imp-path-current-dir
+    - add suffix ".el"?
+    - combine path and feature?
+  - imp-parser-normalize/:path
+    - todo: don't check for path's existance
+    - imp-parser-normalize-paths
+    - imp-feature-split
+    - imp-parser-normalize-path-feature
+    - filename-absolute-p
+  - imp-parser-handler/:path
+    - todo: return unevaluated forms (that will check for path's existance)
+    - imp--mux-path-find
+    - imp-path-load-file
+    - set :path in state
+    - set :path-load in state
 
 
 
 ** what do I want?
 
-path.el: consistentcy with the errors/no-errors
+path.el: consistenty with the errors/no-errors
   - some var that can be lexically bound?
   - cl-defun w/ a key for error?
 
@@ -6009,7 +6198,24 @@ Be nice if I could just call ~imp-path~?
 
 ert tests for all the funcs
 
-** do in imp branch
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+[[file:source/core/packages/imp/test/path.el::;; todo here][more tests]]
+[[file:source/core/packages/imp/path.el::;; TODO U R HERE][more path func tweaking]]
+
+imp--path-builder-hook
+  - imp--path-h-truename
+  - imp--path-h-abbreviate
+  - +imp--path-h-relative+
+  - ...wtf all does the macros do?
+
+imp--path-build
+  - imp-path-join
+  - run-hooks imp--path-builder-hook
+
 ** delay path eval until macro eval
 
 return forms with func
