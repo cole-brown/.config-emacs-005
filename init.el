@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2026-04-22
+;; Timestamp:  2026-06-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -189,19 +189,18 @@
   ;;----------------------------------------------------------------------------
   ;; Shhh!...
 
-  ;; TODO: paths per computer machine host
-  ;; use (system-name)?
-  ;; system-type and system-name?
-  ;; What does the multiplexing do in sn004?
   (message (mapconcat
             #'identity
             '("System:"
-              "  - system-type: %s"
-              "  - system-name: %s"
+              "  - system-type:  %s"
+              "  - system-name:  %s"
+              "  - imp mux hash: %s"
               )
             "\n")
            system-type
-           system-name)
+           system-name
+           (imp-mux-system))
+
   ;; TODO: for now, this way.
   (imp secret.d
     :root
