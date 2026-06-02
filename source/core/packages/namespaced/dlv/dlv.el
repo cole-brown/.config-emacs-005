@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-10
-;; Timestamp:  2025-11-13
+;; Timestamp:  2026-06-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -519,7 +519,7 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
         (valid t))
     (_:dlv:debug func/name
                  "args: DIRECTORY:%S ERROR?:%S"
-                 dir
+                 directory
                  error?)
 
     ;;------------------------------
