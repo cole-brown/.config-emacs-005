@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2026-06-02
-;; Timestamp:  2026-06-02
+;; Timestamp:  2026-06-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,13 +28,17 @@
   :mode ("README\\.md\\'" . gfm-mode)
 
   ;;------------------------------
-  :init
+  :custom
   ;;------------------------------
-  (setq markdown-command "multimarkdown")
 
-  ;; ;;------------------------------
-  ;; :custom
-  ;; ;;------------------------------
+  ;; `markdown-command'
+  ;;-------------------
+  ;; For markdown live previews.
+  ;; (markdown-command "pandoc") ; default: "pandoc"
+  ;; pandoc: https://pandoc.org
+  ;;   - Debian/Ubuntu: `apt get pandoc`
+  ;;   - Windows: `winget install --source winget --exact --id JohnMacFarlane.Pandoc`
+  ;;     - https://pandoc.org/installing.html#windows
 
   ;;------------------------------
   :bind

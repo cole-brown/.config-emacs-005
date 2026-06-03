@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2026-01-20
+;; Timestamp:  2026-06-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -37,10 +37,12 @@ Good for start/end line comment languages like:
 
 `aligned' is like (default) `indent' but also aligns end-of-line comment chars
 if the language has them."
-  (setq 'comment-style 'aligned))
+  (setq comment-style 'aligned))
 
 
 ;; TODO: Move to "languages/html.el"
+;; TODO: `eww' (emacs browser) enable HTML mode, but it renders the HTML. Is
+;;   `html-mode' for the HTML code or for the rendered HTML document?
 ;; `html-mode-hook' (HTML mode) or `mhtml-mode-hook' (HTML+ mode (derived from HTML mode))?
 (add-hook 'html-mode-hook '--/hook/comments/block-align)
 
