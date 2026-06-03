@@ -5844,18 +5844,12 @@ signature shit...
   - [[file:~/ocean/vault/.config/secret/emacs/2022-03-23_sn004/system/work-2021-lap_e29fbd-0d21c7/init.el::;; User, Identity, Signatures, etc.]]
   - [X] wait for [[*Signature pkg or KISS?][Signature pkg or KISS?]]
 
-* -- U R HERE --
-<<here>>
-* mux secrets for Win10VM
-
-What is Win10VM's mux hash?
-  - [X] Add print out of it to emacs init.
-  - [ ] pull latest .emacs.d on Win10VM
-  - [ ] fix broken shit?
-
-copy/paste [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el][work-2025-lap]]
-
-* keybinds & secrets
+* ├DONE───┤ keybinds & secrets
+CLOSED: [2026-06-02 Tue 17:48]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-02 Tue 17:48]
+- State "├CURRENT┤"  from              [2026-06-02 Tue 16:20]
+:END:
 
 Define top-level keymaps earlier?
 
@@ -5868,20 +5862,66 @@ Define top-level keymaps earlier?
 Move the ~defvar-keymap~ earlier than [[file:source/user/config/keybinds.el::(defvar-keymap --/keymap/leader/insert][this]]?
   - So we can do them just after [[file:init.el::imp user:/config/emacs/keybinds][here]]?
 
+** ├DONE───┤ keybinds.el -> keybinds/config.el
+CLOSED: [2026-06-02 Tue 16:25]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-02 Tue 16:25]
+:END:
 
 
-* LSP(Rust): tweaks
 
-less in right-side overlay info
+** ├DONE───┤ keybinds/init.el
+CLOSED: [2026-06-02 Tue 17:25]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-02 Tue 17:25]
+:END:
 
-Full warn/error message instead of only 1st line?
 
-* markdown mode
-** whitespace tweak
+
+* ├DONE───┤ mux secrets for Win10VM
+CLOSED: [2026-06-02 Tue 18:16]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-02 Tue 18:16]
+- State "├CURRENT┤"  from              [2026-06-02 Tue 17:54]
+:END:
+
+What is Win10VM's mux hash?
+  - [X] Add print out of it to emacs init.
+  - [X] pull latest .emacs.d on Win10VM
+  - [X] fix broken shit?
+    - fixed-ish
+
+copy/paste [[file:~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/work-2025-lap_imp-e7013c-2d003b-mux/init.el][work-2025-lap]]
+
+#+begin_quote
+System:
+  - system-type:  windows-nt
+  - system-name:  Win10VM
+  - imp mux hash: imp-d1a44a-fd17eb-mux
+#+end_quote
+
+* ├DONE───┤ markdown mode
+CLOSED: [2026-06-03 Wed 15:10]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-03 Wed 15:10]
+- State "├CURRENT┤"  from              [2026-06-02 Tue 18:40]
+:END:
+** ├DONE───┤ whitespace tweak
+CLOSED: [2026-06-02 Tue 18:40]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-02 Tue 18:40]
+:END:
+
+Make config file for markdown
 
 Disable too long lines highlight for markdown mode.
 
-** org babel: add `md`
+
+** ├DONE───┤ org babel: add `md`
+CLOSED: [2026-06-02 Tue 18:41]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-02 Tue 18:41]
+:END:
 
 I want this to be pretty colors:
 #+begin_src md
@@ -5901,10 +5941,121 @@ lorem ipsum dolor
 
 I've got several already.
 
-** md live(?) previews
+** ├DONE───┤ md live(?) previews
+CLOSED: [2026-06-03 Wed 15:02]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-03 Wed 15:02]
+- State "├CURRENT┤"  from              [2026-06-02 Tue 18:44]
+:END:
 
-that also works on windows?
+~C-c C-c l~ == ~markdown-live-preview-mode~
 
+It just says:
+#+begin_quote
+File mode specification error: (wrong-type-argument symbolp 'comment-style)
+progn: Wrong type argument: symbolp, 'comment-style
+#+end_quote
+
+#+begin_src elisp
+
+#+end_src
+
+#+begin_src backtrace
+Debugger entered--Lisp error: (wrong-type-argument symbolp 'comment-style)
+  signal(wrong-type-argument (symbolp 'comment-style))
+  (progn (signal 'wrong-type-argument (list 'symbolp ''comment-style)))
+  --/hook/comments/block-align()
+  run-hooks(change-major-mode-after-body-hook text-mode-hook sgml-mode-hook html-mode-hook prog-mode-hook mhtml-mode-hook)
+  apply(run-hooks change-major-mode-after-body-hook (text-mode-hook sgml-mode-hook html-mode-hook prog-mode-hook mhtml-mode-hook))
+  run-mode-hooks(mhtml-mode-hook)
+  mhtml-mode()
+  set-auto-mode-0(mhtml-mode nil)
+  set-auto-mode--apply-alist((("README\\.md\\'" . gfm-mode) ("\\.rs\\'" . rust-ts-mode) ("\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'" . json-ts-mode) ("\\.sln\\'" . sln-mode) ("\\.org.txt$" . org-mode) ("\\.vcf\\'" . csv-mode) ("\\.tabular\\'" . csv-mode) ("\\.csv\\'" . csv-mode) ("\\.tsv\\'" . csv-mode) ("\\.[^.]*proj\\'" . csproj-mode) ("\\.tsv\\'" . tsv-mode) ("\\.[Cc][Ss][Vv]\\'" . csv-mode) ("/git/ignore\\'" . gitignore-mode) ("/info/exclude\\'" . gitignore-mode) ("/\\.gitignore\\'" . gitignore-mode) ("/etc/gitconfig\\'" . gitconfig-mode) ("/\\.gitmodules\\'" . gitconfig-mode) ("/git/config\\'" . gitconfig-mode) ("/modules/.*/config\\'" . gitconfig-mode) ("/\\.git/config\\'" . gitconfig-mode) ("/\\.gitconfig\\'" . gitconfig-mode) ("/git/attributes\\'" . gitattributes-mode) ("/info/attributes\\'" . gitattributes-mode) ("/\\.gitattributes\\'" . gitattributes-mode) ("\\.hurl\\'" . hurl-mode) ("/git-rebase-todo\\'" . git-rebase-mode) ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\|mdx\\)\\'" . markdown-mode) ("\\.t\\(f\\(vars\\)?\\|ofu\\)\\'" . terraform-mode) ("\\.nomad\\'" . hcl-mode) ("\\.hcl\\'" . hcl-mode) ("\\.\\(e?ya?\\|ra\\)ml\\'" . yaml-mode) ("\\.gpg\\(~\\|\\.~[0-9]+~\\)?\\'" nil epa-file) ("\\.elc\\'" . elisp-byte-code-mode) ("\\.zst\\'" nil jka-compr) ("\\.dz\\'" nil jka-compr) ("\\.xz\\'" nil jka-compr) ("\\.lzma\\'" nil jka-compr) ("\\.lz\\'" nil jka-compr) ("\\.g?z\\'" nil jka-compr) ("\\.bz2\\'" nil jka-compr) ("\\.Z\\'" nil jka-compr) ("\\.vr[hi]?\\'" . vera-mode) ("\\(?:\\.\\(?:rbw?\\|ru\\|rake\\|thor\\|axlsx\\|jbuilder\\|rabl\\|gemspec\\|podspec\\)\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Puppet\\|Berks\\|Brew\\|Fast\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . ruby-mode) ("\\.re?st\\'" . rst-mode) ("/\\(?:Pipfile\\|\\.?flake8\\)\\'" . conf-mode) ("\\.py[iw]?\\'" . python-mode) ("\\.m\\'" . octave-maybe-mode) ("\\.less\\'" . less-css-mode) ("\\.editorconfig\\'" . editorconfig-conf-mode) ("\\.scss\\'" . scss-mode) ...) nil nil)
+  set-auto-mode()
+  normal-mode(t)
+  after-find-file(t t)
+  find-file-noselect-1(#<buffer markdown.html> "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/languages/markdown.html" nil nil "~/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/languages/markdown.html" nil)
+  find-file-noselect("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/languages/markdown.html")
+  markdown-export("/home/main/ocean/vault/.config/emacs/2025-03-13_sn005/source/user/config/languages/markdown.html")
+  markdown-live-preview-export()
+  markdown-live-preview-mode(toggle)
+  funcall-interactively(markdown-live-preview-mode toggle)
+  call-interactively(markdown-live-preview-mode record nil)
+  command-execute(markdown-live-preview-mode record)
+  execute-extended-command(nil "markdown-live-preview-mode" nil)
+  funcall-interactively(execute-extended-command nil "markdown-live-preview-mode" nil)
+  call-interactively(execute-extended-command nil nil)
+  command-execute(execute-extended-command)
+#+end_src
+
+Fix was:
+#+begin_src diff
+-  (setq 'comment-style 'aligned))
++  (setq comment-style 'aligned))
+#+end_src
+
+
+
+** ├DONE───┤ md live(?) previews that also works on windows?
+CLOSED: [2026-06-03 Wed 15:10]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-03 Wed 15:10]
+:END:
+
+https://pandoc.org/installing.html#windows
+
+* ├DONE───┤ rust mode
+CLOSED: [2026-06-03 Wed 16:32]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-03 Wed 16:32]
+- State "├CURRENT┤"  from              [2026-06-03 Wed 15:51]
+:END:
+
+Change so that ~rust-mode~ uses ~rust-ts-mode~ if its able.
+  - That way the fallback is ~rust-mode~.
+    - Rather than ~rust-ts-mode~ or die trying.
+
+** ├DONE───┤ pkg: treesit-auto
+CLOSED: [2026-06-03 Wed 15:51]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-03 Wed 15:51]
+:END:
+
+MMmh...
+~treesit-auto~ package?
+https://github.com/renzmann/treesit-auto
+
+no... that's for installing treesitter grammer libs.
+
+** ├DONE───┤ rust-mode config?
+CLOSED: [2026-06-03 Wed 16:12]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-03 Wed 16:12]
+:END:
+
+Just, like, copy/paste use-package for ~rust-ts-mode~ into ~rust-mode~?
+
+
+
+
+* -- U R HERE --
+<<here>>
+* Win10VM: treesit
+
+Do I need to install treesit itself?
+  - it's a shared lib on Linux
+
+Need to install rust treesit DLL.
+#+begin_quote
+ ■  Warning (treesit): Error encountered when installing language grammar: (file-missing Searching for program No such file or directory cc)
+#+end_quote
+
+* LSP(Rust): tweaks
+
+less in right-side overlay info
+
+Full warn/error message instead of only 1st line?
+  - this is from flyspell(?)/flycheck
 
 * git modeline info
 
@@ -6241,6 +6392,9 @@ add something for git paths like ~repo:/path~
 
 ** bump imp version
 
+* rust: use rustic instead?
+
+https://github.com/emacs-rustic/rustic
 
 * config files: user/config -> core/config
 
