@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-02
-;; Timestamp:  2025-12-16
+;; Timestamp:  2026-06-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -249,9 +249,7 @@
   (push '("azure-log-query"         . kusto)      org-src-lang-modes)
   (push '("azure-app-insight-query" . kusto)      org-src-lang-modes)
 
-  ;; NOTE: Some ((very?) few?) packages add themselves to this variable; e.g.
-  ;; `markdown' must add itself as "md" since I certainly don't.
-  ;; (push '("md"                   . markdown)   org-src-lang-modes)
+  (push '("md"                      . markdown)   org-src-lang-modes)
   (push '("markdown"                . markdown)   org-src-lang-modes)
 
   (push '("python"                  . python)     org-src-lang-modes)
@@ -269,8 +267,6 @@
   (push '("web"                     . web)        org-src-lang-modes)
   (push '("html"                    . web)        org-src-lang-modes)
 
-  ;; TODO: how to decide between `json' and `json-ts'?
-  ;; TODO: ...config var? `--/foo/bar/use-treesit'???
   (push '("json"                    . json-ts)    org-src-lang-modes)
   (push '("yaml"                    . yaml)       org-src-lang-modes)
   (push '("toml"                    . toml)       org-src-lang-modes)
