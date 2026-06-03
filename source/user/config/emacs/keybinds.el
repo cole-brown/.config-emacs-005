@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-04-13
+;; Timestamp:  2026-06-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -94,38 +94,6 @@
 ;;     - NOTE: To anyone who can't see this anymore:
 ;;       "C-x 0" is different. That's `delete-window'.
 ;;   - `text-scale-adjust' (text-scale-adjust 0)
-
-
-;;------------------------------------------------------------------------------
-;; Personal Keymap
-;;------------------------------------------------------------------------------
-
-(defvar --/keymap/leader/prefix "C-'"
-  "Where to put keybinds?
-   - `C-c' is supposed to be the user's space for keybinds, but...
-     It has the 'home dir' / 'My Documents' problem: It's the user's place to
-     put things, therefore everything puts their shit in there, therefore
-     there's hardly any room to put your own shit.
-  - `C-'' is unbound (as of 2026-01-12 / Emacs 30.2).
-    It may get bound to something eventually, but for now we can use it.")
-
-(defvar-keymap --/keymap/leader
-  :doc "Personal Keymap")
-
-(keymap-global-set --/keymap/leader/prefix --/keymap/leader)
-
-
-;;----------------------------
-;; To create keybindings:
-;;----------------------------
-;;   (defvar-keymap --/keymap/leader/files
-;;     :doc "File commands."
-;;     "f" '("Find file" . find-file)
-;;     "s" '("Save buffer" . save-buffer)
-;;     "r" '("Recent files" . recentf-open-files))
-;;
-;;   (keymap-set --/keymap/leader "f"
-;;               (cons "Files" --/keymap/leader/files))
 
 
 ;;------------------------------------------------------------------------------

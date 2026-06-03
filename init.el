@@ -183,12 +183,14 @@
 
   (imp user:/config/emacs/keybinds)
 
+  (imp user:/config/keybinds/init)
 
   ;;----------------------------------------------------------------------------
   ;; Secret: Init
   ;;----------------------------------------------------------------------------
   ;; Shhh!...
 
+  ;; TODO: Isn't there an imp function for system info? Use that?
   (message (mapconcat
             #'identity
             '("System:"

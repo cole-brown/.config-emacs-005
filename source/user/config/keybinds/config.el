@@ -1,10 +1,10 @@
-;;; user/config/keybinds.el --- my keybinds -*- lexical-binding: t; -*-
+;;; user/config/keybinds/config.el --- my keybinds -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-04-27
+;; Timestamp:  2026-06-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,18 +24,15 @@
 (require 'hydra)
 (require 'keymap)
 
-;; NOTE: `user:/config/emacs/keybinds.el' defines
-;; `--/keymap/leader' & `--/keymap/leader/prefix'
+;; NOTE: `user:/config/keybinds/init.el' defines
+;;   - keymap: `--/keymap/leader'
+;;   - string: `--/keymap/leader/prefix'
+;;   - keymap: `--/keymap/leader/insert'
+;;     - and other `--/keymap/leader' direct children keymaps
 
 ;;------------------------------------------------------------------------------
 ;; 'insert'
 ;;------------------------------------------------------------------------------
-
-(defvar-keymap --/keymap/leader/insert
-  :doc "Insert Keymap")
-
-(keymap-set --/keymap/leader "i"
-            (cons "Insert..." --/keymap/leader/insert))
 
 ;;----------------------------
 ;; 'insert' -> 'datetime'
@@ -57,28 +54,30 @@
 
   "p" '("Datetime Format..." . datetime:cmd:timestamp:insert:prompt))
 
-(keymap-set --/keymap/leader/insert "d"
-            (cons "Datetime..." --/keymap/leader/insert/datetime))
+(keymap-set --/keymap/leader/insert
+            "d"
+            `("Datetime..." . ,--/keymap/leader/insert/datetime))
 
 
 ;;------------------------------------------------------------------------------
 ;; 'text'
 ;;------------------------------------------------------------------------------
 
-(defvar-keymap --/keymap/leader/text
-  :doc "Text Keymap"
-
-  ;; ASCII/Unicode Lines Box Art Hydra
-  "b" '("Unicode Box..." . /art/cmd/box/draw)
+;; ASCII/Unicode Lines Box Art Hydra
+(keymap-set --/keymap/leader/text
+            "b"
+            '("Unicode Box..." . /art/cmd/box/draw))
 
   ;; Join Lines Hydra
-  "j" `("Join Lines..." . ,(elisp:cmd (hydra:call 'buffer:hydra:join-lines)))
+(keymap-set --/keymap/leader/text
+            "j"
+            `("Join Lines..." . ,(elisp:cmd (hydra:call 'buffer:hydra:join-lines))))
 
-  ;; Case Conversion Hydra
-  "'" `("Case Conversion..." . ,(elisp:cmd (hydra:call 'str:hydra:case))))
+;; Case Conversion Hydra
+(keymap-set --/keymap/leader/text
+            "'"
+            `("Case Conversion..." . ,(elisp:cmd (hydra:call 'str:hydra:case))))
 
-(keymap-set --/keymap/leader "t"
-            (cons "Text..." --/keymap/leader/text))
 
 ;;----------------------------
 ;; 'text' -> 'alignment'
@@ -96,8 +95,9 @@
   "'" '("Align" . align)
   "," '("Align Current" . align-current))
 
-(keymap-set --/keymap/leader/text "a"
-            (cons "Alignment..." --/keymap/leader/text/alignment))
+(keymap-set --/keymap/leader/text
+            "a"
+            `("Alignment..." . ,--/keymap/leader/text/alignment))
 
 ;;----------------------------
 ;; 'text' -> 'center'
@@ -110,8 +110,9 @@
   "t" '("Center to Column..." . #'buffer:cmd:center/to)
   "w" '("Center at Width..." . #'buffer:cmd:center/width))
 
-(keymap-set --/keymap/leader/text "c"
-            (cons "Center..." --/keymap/leader/text/center))
+(keymap-set --/keymap/leader/text
+            "c"
+            `("Center..." . ,--/keymap/leader/text/center))
 
 ;;------------------------------
 ;; 'text' -> 'fill'
@@ -142,8 +143,9 @@
   ;; Unfill
   "u" '("Unfill ¶" . buffer:cmd:fill/paragraph/unfill))
 
-(keymap-set --/keymap/leader/text "f"
-            (cons "Fill..." --/keymap/leader/text/fill))
+(keymap-set --/keymap/leader/text
+            "f"
+            `("Fill..." . ,--/keymap/leader/text/fill))
 
 ;;------------------------------
 ;; 'text' -> 'transpose'
@@ -165,8 +167,9 @@
   "e" '("Org-Mode Elements" . org-transpose-element)
   "t" '("Org-Mode Table"    . org-table-transpose-table-at-point))
 
-(keymap-set --/keymap/leader/text "t"
-            (cons "Transpose..." --/keymap/leader/text/transpose))
+(keymap-set --/keymap/leader/text
+            "t"
+            `("Transpose..." . ,--/keymap/leader/text/transpose))
 
 
 ;;------------------------------------------------------------------------------
