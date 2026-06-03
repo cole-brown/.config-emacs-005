@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2026-04-08
+;; Timestamp:  2026-06-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -332,10 +332,11 @@ Add to `whitespace-enable-predicate' via `add-function'."
   ;;------------------------------
   :hook
   ;;------------------------------
-  ((before-save-hook . --/hook/whitespace/before-save)
-   (org-mode-hook    . --/hook/whitespace/settings/wide)
-   (yaml-mode-hook   . --/hook/whitespace/settings/wide)
-   (dired-mode-hook  . --/hook/whitespace/disable))
+  ((before-save-hook   . --/hook/whitespace/before-save)
+   (org-mode-hook      . --/hook/whitespace/settings/wide)
+   (yaml-mode-hook     . --/hook/whitespace/settings/wide)
+   (markdown-mode-hook . --/hook/whitespace/settings/wide)
+   (dired-mode-hook    . --/hook/whitespace/disable))
 
 
   ;;------------------------------
