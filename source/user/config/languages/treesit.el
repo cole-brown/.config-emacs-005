@@ -16,10 +16,35 @@
 ;;
 ;;; Code:
 
+;; TODO: Don't need this anymore due to `treesit-auto' pkg?
+;; TODO: Update lib to newer version?
+;;------------------------------------------------------------------------------
+;; Tree-Sitter Version
+;;------------------------------------------------------------------------------
+;; Emacs uses the OS's version of tree-sitter.
+;; To find out what that version is so that you can set it in `treesit-language-source-alist'
+;; run one or both of these:
+;;   > dpkg-query --show --showformat='${Version}\n' libtree-sitter0
+;;   0.20.3-1
+;;
+;;   > ldconfig -p | grep tree
+;;   libtree-sitter.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libtree-sitter.so.0
+;;   libostree-1.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libostree-1.so.1
+;;   libostree-1.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libostree-1.so
+;;   > dpkg -l | grep libtree-sitter
+;;   ii  libtree-sitter0:amd64                   0.20.3-1    [...]
+;;
+;; In this case, I want rust's grammer for tree-sitter v0.20.3.
+
+;; (defvar --/lib/version/treesit "v0.20.3"       ;;
+;;   "Installed version of treesit in Ubuntu 24.") ;;
+
 
 ;;------------------------------------------------------------------------------
 ;; Treesit-Auto
 ;;------------------------------------------------------------------------------
+;; Automatically install and use tree-sitter major modes in Emacs 29+. If the
+;; tree-sitter version can’t be used, fall back to the original major mode.
 
 ;; https://github.com/renzmann/treesit-auto
 (use-package treesit-auto
