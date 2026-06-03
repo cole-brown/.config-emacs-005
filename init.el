@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2026-06-02
+;; Timestamp:  2026-06-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -286,6 +286,7 @@
 
   ;; Load common first.
   (imp user:/config/languages/common)
+  (imp user:/config/languages/treesit)
 
   ;; Alphabetical
   (imp user:/config/languages/conf)
@@ -293,6 +294,7 @@
   (imp user:/config/languages/elisp)
   (imp user:/config/languages/hurl)
   (imp user:/config/languages/json)
+  (imp user:/config/languages/markdown)
   (imp user:/config/languages/rust)
   (imp user:/config/languages/terraform)
   (imp user:/config/languages/yaml)
