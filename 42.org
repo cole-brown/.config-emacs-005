@@ -6038,9 +6038,11 @@ Just, like, copy/paste use-package for ~rust-ts-mode~ into ~rust-mode~?
 
 
 
-* -- U R HERE --
-<<here>>
-* Win10VM: treesit
+* ├DONE───┤ Win10VM: treesit
+CLOSED: [2026-06-03 Wed 18:49]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-03 Wed 18:49]
+:END:
 
 Do I need to install treesit itself?
   - it's a shared lib on Linux
@@ -6050,6 +6052,29 @@ Need to install rust treesit DLL.
  ■  Warning (treesit): Error encountered when installing language grammar: (file-missing Searching for program No such file or directory cc)
 #+end_quote
 
+* ├DONE───┤ Win10VM: rust lsp fails to start
+CLOSED: [2026-06-03 Wed 19:12]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-03 Wed 19:12]
+:END:
+
+#+begin_quote
+error: Unknown binary 'rust-analyzer.exe' in official toolchain 'stable-x86_64-pc-windows-msvc'.
+
+Process rust-analyzer stderr finished
+error: Unknown binary 'rust-analyzer.exe' in official toolchain 'stable-x86_64-pc-windows-msvc'.
+
+Process rust-analyzer stderr finished
+#+end_quote
+
+Turns out you have to install it:
+#+begin_src sh
+rustup component add rust-analyzer
+#+end_src
+
+
+* -- U R HERE --
+<<here>>
 * LSP(Rust): tweaks
 
 less in right-side overlay info
