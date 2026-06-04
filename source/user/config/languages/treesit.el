@@ -113,7 +113,7 @@
          ;; :ts-mode 'rust-ts-mode                    ;;
          ;; :remap '(js2-mode js-mode javascript-mode) ;;
          :url "https://github.com/tree-sitter/tree-sitter-rust"
-         :abi14-revision "v0.23.3")
+         :abi14-revision "v0.21.2"))
 
   (add-to-list 'treesit-auto-recipe-list --/treesit-auto/recipe/rust)
 
