@@ -6075,16 +6075,16 @@ rustup component add rust-analyzer
 
 * -- U R HERE --
 <<here>>
+* git modeline info
+
+move to topline?
+
 * LSP(Rust): tweaks
 
 less in right-side overlay info
 
 Full warn/error message instead of only 1st line?
   - this is from flyspell(?)/flycheck
-
-* git modeline info
-
-move to topline?
 
 * copy buffer's file's path to kill/clipboard
 
@@ -7395,7 +7395,6 @@ actual:/todo/penis
                              O TODO TODO TODO TODO TODO TODO TODO TODO
                              TODO TODO
 
-* treesitter
 * org
 
 imp works* now.
