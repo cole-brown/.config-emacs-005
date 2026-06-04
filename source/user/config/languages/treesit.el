@@ -88,9 +88,9 @@
       (setenv "PATH" (concat "C:\\msys64\\ucrt64\\bin;" (getenv "PATH")))
       (add-to-list 'exec-path "C:/msys64/ucrt64/bin")
 
-      (cond ((file-exists-p "C:/msys64/ucrt64/bin/cc")) ;; `cc` exists; leave env var "CC" alone.
+      (cond ((file-exists-p "C:/msys64/ucrt64/bin/cc.exe")) ;; `cc` exists; leave env var "CC" alone.
 
-            ((file-exists-p "C:/msys64/ucrt64/bin/gcc")
+            ((file-exists-p "C:/msys64/ucrt64/bin/gcc.exe")
              (setenv "CC" "gcc"))
 
             (t
