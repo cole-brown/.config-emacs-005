@@ -70,11 +70,10 @@
   ;;------------------------------
 
   ;; WINDOWS INSTALL DEPENDENCIES
-  ;; ---------------
+  ;; ----------------------------
   ;; 1. Download and install "MSYS2".
   ;; 2. Open "MSYS2 MinGW UCRT64 x64".
   ;; 3. `pacman -Syu mingw-w64-ucrt-x86_64-toolchain git make`
-
   (when (eq system-type 'windows-nt)
     (let ((path-here-rel (path:join "user"
                                     (imp-path-relative 'user
@@ -98,6 +97,31 @@
                     path-here-rel
                     "MSYS MinGW UCRT x64"
                     "pacman -Syu mingw-w64-ucrt-x86_64-toolchain git make")))))
+
+  ;; treesit lib version vs language grammer version
+  ;;------------------------------------------------
+  ;; For:
+  ;;   > Warning (treesit): The installed language grammar for rust cannot be located or has problems (version-mismatch): 15
+  ;;   > Warning (treesit): Cannot activate tree-sitter, because language grammar for rust is unavailable (version-mismatch): 15
+  ;;------------------------------------------------
+  ;; (treesit-library-abi-version)
+  ;; Emacs 30.2: treesit ABI v14
+
+  (setq --/treesit-auto/recipe/rust
+        (make-treesit-auto-recipe
+         :lang 'rust
+         ;; :ts-mode 'rust-ts-mode                    ;;
+         ;; :remap '(js2-mode js-mode javascript-mode) ;;
+         :url "https://github.com/tree-sitter/tree-sitter-rust"
+         :abi14-revision "v0.23.3")
+
+  (add-to-list 'treesit-auto-recipe-list --/treesit-auto/recipe/rust)
+
+  ;; (add-to-list 'treesit-language-source-alist
+  ;;              ;; (LANG . (URL REVISION SOURCE-DIR CC C++))
+  ;;              `(rust
+  ;;                "https://github.com/tree-sitter/tree-sitter-rust"
+  ;;                ,--/lib/version/treesit))
 
   (global-treesit-auto-mode))
 
