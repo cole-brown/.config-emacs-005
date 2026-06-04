@@ -18,20 +18,6 @@
 
 (require 'treesit)
 
-;; TODO: Made redundant by `treesit-auto', I think?
-;; ;;------------------------------------------------------------------------------ ;;
-;; ;; Rust Treesitter Grammer                                                      ;;
-;; ;;------------------------------------------------------------------------------ ;;
-;;                                                                                 ;;
-;; (add-to-list 'treesit-language-source-alist                                     ;;
-;;              ;; (LANG . (URL REVISION SOURCE-DIR CC C++))                       ;;
-;;              `(rust                                                             ;;
-;;                "https://github.com/tree-sitter/tree-sitter-rust"                ;;
-;;                ,--/lib/version/treesit))                                        ;;
-;;                                                                                 ;;
-;; (unless (treesit-language-available-p 'rust)                                    ;;
-;;   (treesit-install-language-grammar 'rust))                                      ;;
-
 
 ;;------------------------------------------------------------------------------
 ;; Hooks for `rust-ts-mode' and `rust-mode'
@@ -88,9 +74,50 @@
 ;; Rust + LSP
 ;;------------------------------------------------------------------------------
 
+;; Sanity check for the Rust LSP `rust-analyzer':
+;;   > error: Unknown binary 'rust-analyzer.exe' in official toolchain 'stable-x86_64-pc-windows-msvc'.
+;; Install `rust-analyzer':
+;;
+;; Check asynchronously during init.
+;; TODO: Put this on a timer that runs after emacs init is finished?
+(let ((path-here-rel (path:join "user"
+                                (imp-path-relative 'user
+                                                   (imp-path-current-file)))))
+  (make-process
+   :name "rust-analyzer-check"
+   :buffer "*rust-analyzer-check*"
+   :command '("rust-analyzer" "-h")
+   :stderr (generate-new-buffer " *rust-analyzer-check-stderr*")
+   :sentinel
+   (lambda (proc _event)
+     (when (eq (process-status proc) 'exit)
+       (let* ((code (process-exit-status proc))
+              (stderr-buf (process-get proc 'stderr-buf))
+              (stderr (when (buffer-live-p stderr-buf)
+                        (with-current-buffer stderr-buf (buffer-string)))))
+         (cond
+          ((= code 0)) ;; Good!
+          ((and stderr
+                (string-match
+                 "error: Unknown binary 'rust-analyzer"
+                 stderr))
+           (warn "%s: Install Rust LSP: `%s`"
+                 path-here-rel
+                 "rustup component add rust-analyzer"))
+          (t
+           (warn "%s: rust-analyzer check failed: %s"
+                 path-here-rel
+                 stderr)))
+         (when (buffer-live-p stderr-buf)
+           (kill-buffer stderr-buf)))))
+   :file-handler t))
+
+;; Actually set up LSP for Rust.
 (with-eval-after-load 'lsp-rust
+  ;; Set Rust LSP to `rust-analyzer'.
   (setq lsp-rust-server 'rust-analyzer)
   (setq lsp-disabled-clients '(rls))
+  ;; Use Rust Clippy instead of Rust Check.
   (setq lsp-rust-analyzer-cargo-watch-command "clippy") ; or "check"
   ;; (setq lsp-rust-analyzer-cargo-load-out-dirs-from-check t)
   ;; (setq lsp-rust-analyzer-proc-macro-enable t)

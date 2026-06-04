@@ -16,30 +16,6 @@
 ;;
 ;;; Code:
 
-;; TODO: Don't need this anymore due to `treesit-auto' pkg?
-;; TODO: Update lib to newer version?
-;;------------------------------------------------------------------------------
-;; Tree-Sitter Version
-;;------------------------------------------------------------------------------
-;; Emacs uses the OS's version of tree-sitter.
-;; To find out what that version is so that you can set it in `treesit-language-source-alist'
-;; run one or both of these:
-;;   > dpkg-query --show --showformat='${Version}\n' libtree-sitter0
-;;   0.20.3-1
-;;
-;;   > ldconfig -p | grep tree
-;;   libtree-sitter.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libtree-sitter.so.0
-;;   libostree-1.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libostree-1.so.1
-;;   libostree-1.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libostree-1.so
-;;   > dpkg -l | grep libtree-sitter
-;;   ii  libtree-sitter0:amd64                   0.20.3-1    [...]
-;;
-;; In this case, I want rust's grammer for tree-sitter v0.20.3.
-
-;; (defvar --/lib/version/treesit "v0.20.3"       ;;
-;;   "Installed version of treesit in Ubuntu 24.") ;;
-
-
 ;;------------------------------------------------------------------------------
 ;; Treesit-Auto
 ;;------------------------------------------------------------------------------
@@ -110,18 +86,10 @@
   (setq --/treesit-auto/recipe/rust
         (make-treesit-auto-recipe
          :lang 'rust
-         ;; :ts-mode 'rust-ts-mode                    ;;
-         ;; :remap '(js2-mode js-mode javascript-mode) ;;
          :url "https://github.com/tree-sitter/tree-sitter-rust"
          :abi14-revision "v0.21.2"))
 
   (add-to-list 'treesit-auto-recipe-list --/treesit-auto/recipe/rust)
-
-  ;; (add-to-list 'treesit-language-source-alist
-  ;;              ;; (LANG . (URL REVISION SOURCE-DIR CC C++))
-  ;;              `(rust
-  ;;                "https://github.com/tree-sitter/tree-sitter-rust"
-  ;;                ,--/lib/version/treesit))
 
   (global-treesit-auto-mode))
 
