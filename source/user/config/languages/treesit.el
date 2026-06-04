@@ -68,6 +68,37 @@
   ;;------------------------------
   :config
   ;;------------------------------
+
+  ;; WINDOWS INSTALL DEPENDENCIES
+  ;; ---------------
+  ;; 1. Download and install "MSYS2".
+  ;; 2. Open "MSYS2 MinGW UCRT64 x64".
+  ;; 3. `pacman -Syu mingw-w64-ucrt-x86_64-toolchain git make`
+
+  (when (eq system-type 'windows-nt)
+    (let ((path-here-rel (path:join "user"
+                                    (imp-path-relative 'user
+                                                       (imp-path-current-file)))))
+
+      (unless (file-directory-p "C:/msys64/ucrt64/bin")
+        (error "%s: MSYS2 must be installed. https://www.msys2.org/"
+               path-here-rel))
+
+      ;; Dir exists; add to path.
+      (setenv "PATH" (concat "C:\\msys64\\ucrt64\\bin;" (getenv "PATH")))
+      (add-to-list 'exec-path "C:/msys64/ucrt64/bin")
+
+      (cond ((file-exists-p "C:/msys64/ucrt64/bin/cc")) ;; `cc` exists; leave env var "CC" alone.
+
+            ((file-exists-p "C:/msys64/ucrt64/bin/gcc")
+             (setenv "CC" "gcc"))
+
+            (t
+             (error "%s: No compiler exists. In '%s', run `%s`"
+                    path-here-rel
+                    "MSYS MinGW UCRT x64"
+                    "pacman -Syu mingw-w64-ucrt-x86_64-toolchain git make")))))
+
   (global-treesit-auto-mode))
 
 
