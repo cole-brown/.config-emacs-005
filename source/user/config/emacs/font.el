@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-03-25
+;; Timestamp:  2026-06-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -105,7 +105,8 @@
 ;;------------------------------------------------------------------------------
 ;; Helper Functions, Actual
 ;;------------------------------------------------------------------------------
-;; TODO(icons): move helpers to separate file?
+;; TODO(icons): Move helpers to separate file?
+;; TODO(icons): Rename funcs to `/icon/...' style?
 
 (defun icon--face-icon (plist)
   "Get face to use for icon from PLIST.
@@ -137,6 +138,8 @@ Return nil if no face found."
 
 (defun icon-font-awesome (icon str &rest plist)
   "Return string of Font Awesome ICON and STR.
+
+For ICON strings see: https://www.nerdfonts.com/cheat-sheet
 
 Optional PLIST's optional keys:
   - `:height'     - HEIGHT
@@ -175,6 +178,8 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 (defun icon-file-icon (icon str &rest plist)
   "Return string of File ICON and STR.
 
+For ICON strings see: https://www.nerdfonts.com/cheat-sheet
+
 Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
@@ -208,6 +213,8 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 (defun icon-octicon (icon str &rest plist)
   "Return string of Octicon ICON and STR.
 
+For ICON strings see: https://www.nerdfonts.com/cheat-sheet
+
 Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
@@ -240,6 +247,8 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 (defun icon-material (icon str &rest plist)
   "Return string of Material ICON and STR.
+
+For ICON strings see: https://www.nerdfonts.com/cheat-sheet
 
 Optional PLIST's optional keys:
   - `:height'     - HEIGHT
@@ -334,7 +343,6 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
             (if face-text
                 (propertize str 'face face-text)
               str))))
-
 
 
 ;;------------------------------------------------------------------------------
