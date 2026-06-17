@@ -6073,28 +6073,37 @@ rustup component add rust-analyzer
 #+end_src
 
 
-* -- U R HERE --
-<<here>>
-* git modeline info
+* ├DONE───┤ treesit grammers
+CLOSED: [2026-06-16 Tue 17:31]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-16 Tue 17:31]
+- State "├CURRENT┤"  from "├DONE───┤"  [2026-06-16 Tue 17:03]
+- State "├DONE───┤"  from              [2026-06-16 Tue 16:50]
+:END:
+
+⛔ Warning (treesit): The installed language grammar for c-sharp cannot be located or has problems (version-mismatch): 15
+
+csharp, js, c
+
+grammers:
+  - [X] js
+  - [X] csharp
+  - [X] c
+  - [X] bash
+  - [X] json
+  - [X] html
+
+
+* ├DONE───┤ git modeline info
+CLOSED: [2026-06-16 Tue 18:38]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-16 Tue 18:38]
+:END:
 
 move to topline?
 
-* LSP(Rust): tweaks
-
-less in right-side overlay info
-
-Full warn/error message instead of only 1st line?
-  - this is from flyspell(?)/flycheck
-
-* copy buffer's file's path to kill/clipboard
-
-leader -> Kill -> Kill and/or Copy blah
-
-* tabs?!
-* dired
-
-Make it open buffers in same window instead of other window?
-
+* -- U R HERE --
+<<here>>
 * ├CURRENT┤ imp path
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2025-12-18 Thu 22:49]
@@ -6287,6 +6296,10 @@ new:
 [[file:source/core/packages/imp/test/path.el]]
 
 
+** merge imp branches
+
+feature/imp-ai-tests -> feature/imp
+
 ** ├CURRENT┤ wtf all does the macros do?
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2026-05-07 Thu 22:25]
@@ -6417,6 +6430,35 @@ add something for git paths like ~repo:/path~
 
 ** bump imp version
 
+* package: flycheck?
+
+LSP does stuff about it.
+  - [[file:source/user/config/languages/lsp.el]]
+
+I think I had it in sn004.
+  - oh; yes. it is in that file.
+#+begin_quote
+;; TODO(lsp): add flycheck
+#+end_quote
+  - [[file:source/user/config/languages/lsp.el::;; TODO(lsp): add flycheck][here]]
+
+
+* LSP(Rust): tweaks
+
+less in right-side overlay info
+
+Full warn/error message instead of only 1st line?
+  - this is from flyspell(?)/flycheck
+
+* copy buffer's file's path to kill/clipboard
+
+leader -> Kill -> Kill and/or Copy blah
+
+* tabs?!
+* dired
+
+Make it open buffers in same window instead of other window?
+
 * rust: use rustic instead?
 
 https://github.com/emacs-rustic/rustic
@@ -6468,19 +6510,6 @@ Is there any support for .NET Framework 4.8?
 * imp: silent failure to load filenames starting with '+'
 
 ~buffer/+commands.el~ had to be renamed to ~buffer/commands.el~
-
-* package: flycheck?
-
-LSP does stuff about it.
-  - [[file:source/user/config/languages/lsp.el]]
-
-I think I had it in sn004.
-  - oh; yes. it is in that file.
-#+begin_quote
-;; TODO(lsp): add flycheck
-#+end_quote
-  - [[file:source/user/config/languages/lsp.el::;; TODO(lsp): add flycheck][here]]
-
 
 * package: lsp-docker
 
