@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2026-06-03
+;; Timestamp:  2026-06-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -106,14 +106,47 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
   ;; whatever modes it supports.
   (which-function-mode +1)
 
-  ;; Display which-function info in a header line instead of in the mode line.
+  ;; TODO: This isn't just for `which-func' anymore. Move header line & mode line tweaking somewhere else?
+  ;; Move `which-function' info from mode-line to header-line.
+  ;; Move `vc-mode' info from mode-line to header-line (right aligned.
   (setq-default header-line-format
-                '((which-func-mode ("" which-func-format " "))))
+                '(;; Left Side Info
+                  (which-func-mode ("" which-func-format " "))
+
+                  ;; If you want to separate aligment:
+                  ;; ;; Align to Right Side
+                  ;; (:eval
+                  ;;  (when (bound-and-true-p vc-mode)
+                  ;;    (propertize
+                  ;;     " "
+                  ;;     'display
+                  ;;     `(space :align-to (- right-fringe ,(1+ (length vc-mode))))))
+                  ;;  )
+
+                  ;; Align to Right Side & Right Side Info
+                  (:eval
+                   (when (bound-and-true-p vc-mode)
+                     (let* ((branch (string-trim-left vc-mode))
+                            (icon (if (functionp 'icon-material)
+                                      ;; https://www.nerdfonts.com/cheat-sheet
+                                      (string-trim-right (icon-material "nf-md-source_branch" ""))
+                                    ""))
+                            (text (format "%s%s " icon branch)))
+                       (concat
+                        (propertize
+                         " "
+                         'display
+                         `(space :align-to (- right-fringe ,(length text))))
+                        text))))))
+
+  (setq mode-line-format
+        ;; We moved `vc-mode' to `header-line-format'.
+        (assq-delete-all 'vc-mode mode-line-format))
 
   (setq mode-line-misc-info
         ;; Remove the current function name from the mode line, because it's
         ;; mostly invisible here anyway.
-        (assq-delete-all 'which-func-mode mode-line-misc-info)))
+        (assq-delete-all 'which-function-mode mode-line-misc-info)))
 
 
 ;; ;;------------------------------------------------------------------------------
