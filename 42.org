@@ -6073,9 +6073,301 @@ rustup component add rust-analyzer
 #+end_src
 
 
-* ├DONE───┤ treesit grammers
-CLOSED: [2026-06-16 Tue 17:31]
+* -- U R HERE --
+<<here>>
+* ├CURRENT┤ git modeline info
 :LOGBOOK:
+- State "├CURRENT┤"  from "├DONE───┤"  [2026-06-18 Thu 14:20]
+- State "├DONE───┤"  from              [2026-06-16 Tue 18:38]
+:END:
+
+** ├DONE───┤ move to topline?
+CLOSED: [2026-06-18 Thu 14:20]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-18 Thu 14:20]
+:END:
+
+** ├DONE───┤ replace "git[-:]"
+CLOSED: [2026-06-23 Tue 17:34]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-23 Tue 17:34]
+- State "├CURRENT┤"  from              [2026-06-23 Tue 16:40]
+:END:
+
+have:
+  - 󰘬Git:feature/imp-ai-tests
+  - 󰘬Git-feature/PROD-346-pacenotes-prototype-10
+
+want?
+  - 󰘬feature/imp-ai-tests
+  - feature/imp-ai-tests
+  - feature/imp-ai-tests
+  - 󰘬feature/PROD-346-pacenotes-prototype-10
+
+~vc-mode-line-state~ in file:/usr/share/emacs/30.2/lisp/vc/vc-hooks.el.gz
+#+begin_src elisp
+    (cond ((or (eq state 'up-to-date)
+               (eq state 'needs-update))
+           (setq state-echo "Up to date file")
+           (setq face 'vc-up-to-date-state)
+           (setq indicator "-"))
+          ((stringp state)
+           (setq state-echo (concat "File locked by" state))
+           (setq face 'vc-locked-state)
+           (setq indicator (concat ":" state ":")))
+          ((eq state 'added)
+           (setq state-echo "Locally added file")
+           (setq face 'vc-locally-added-state)
+           (setq indicator "@"))
+          ((eq state 'conflict)
+           (setq state-echo "File contains conflicts after the last merge")
+           (setq face 'vc-conflict-state)
+           (setq indicator "!"))
+          ((eq state 'removed)
+           (setq state-echo "File removed from the VC system")
+           (setq face 'vc-removed-state)
+           (setq indicator "!"))
+          ((eq state 'missing)
+           (setq state-echo "File tracked by the VC system, but missing from the file system")
+           (setq face 'vc-missing-state)
+           (setq indicator "?"))
+          ((eq state 'ignored)
+           (setq state-echo "File tracked by the VC system, but ignored")
+           (setq face 'vc-ignored-state)
+           (setq indicator "!"))
+          (t
+           ;; Not just for the 'edited state, but also a fallback
+           ;; for all other states.  Think about different symbols
+           ;; for 'needs-update and 'needs-merge.
+           (setq state-echo "Locally modified file")
+           (setq face 'vc-edited-state)
+           (setq indicator ":")))
+#+end_src
+
+So something like...
+#+begin_src elisp
+    (cond ((eq state 'up-to-date)
+           "nf-md-source_branch_check" ; 󱓏
+           ;; or this?
+           ;; "nf-md-source_branch" ; 󰘬
+           )
+
+          ((eq state 'needs-update)
+           "nf-md-source_branch_sync" ; 󱓎
+           )
+
+          ((stringp state)
+           ;; file locked by USER
+           "nf-md-lock" ; 󰌾
+           "nf-md-source_branch_remove" ; 󱓌
+           )
+
+          ((eq state 'added)
+           "nf-md-source_branch_plus" ; 󱓊
+           )
+
+          ((eq state 'conflict)
+           "nf-fa-triangle_exclamation" ; 
+           "nf-md-source_branch_remove" ; 󱓌
+           )
+
+          ((eq state 'removed)
+           "nf-md-source_branch_minus" ; 󱓋
+           )
+
+          ((eq state 'missing)
+           "nf-md-call_missed" ; 󰃹
+           "nf-fa-question" ; 
+           ;; "main" vs "?main"
+           "?" ; normal text question mark
+           "nf-cod-question" ; 
+           "nf-md-source_branch_refresh" ; 󱓍
+           "nf-md-source_branch_minus" ; 󱓋
+           )
+
+          ((eq state 'ignored)
+           "nf-seti-ignored" ; 
+           )
+
+          ((eq state 'needs-merge)
+           "nf-oct-git_merge_queue" ; 
+           "nf-md-merge" ; 󰽜
+           "nf-cod-merge" ; 
+           "nf-md-source_merge" ; 󰘭
+           )
+
+          ((eq state 'edited)
+           "nf-md-file_edit" ; 󱇧
+           "nf-md-file_document_edit" ; 󰷈
+           "nf-cod-edit" ; 
+           "nf-fa-edit" ; 
+           )
+
+          (t
+           "nf-md-source_branch" ; 󰘬
+           )
+#+end_src
+
+May want more than one character for some?
+󰘬󱇧
+󰘬󰃹 or 󰘬
+󰘬
+󰘬󰌾
+󱓏
+󰘬_
+
+Symbol for replacing "Git"?
+󰘬󰌾 nf-fa-git
+󰊢󰘬 nf-md-git
+󰊢 nf-md-git
+󰊢󰑐
+󰊢
+󰌾
+
+~vc-git-mode-line-string~ [[file:/usr/share/emacs/30.2/lisp/vc/vc-git.el.gz::defun vc-git-mode-line-string (file][here]]
+~vc-mode-line~ [[file:/usr/share/emacs/30.2/lisp/vc/vc-hooks.el.gz::defun vc-mode-line (file &optional backend][here]]
+
+Advise ~vc-git-mode-line-string~ maybe?
+  - ~:override~ advice https://www.gnu.org/software/emacs/manual/html_node/elisp/Advice-Combinators.html
+
+ok.
+[[file:source/user/config/languages/common.el::define-advice vc-mode-line-state (:around (func state) --/advice/vc/nerd-icons][advice here]]
+
+Still need to replace "git"
+  - ~vc-git-mode-line-string~ [[file:/usr/share/emacs/30.2/lisp/vc/vc-git.el.gz::defun vc-git-mode-line-string (file][here]]
+
+#+begin_src elisp
+(defun vc-git-mode-line-string (file)
+  "Return a string for `vc-mode-line' to put in the mode line for FILE."
+  (pcase-let* ((backend-name "Git")
+               (state (vc-state file))
+               (`(,state-echo ,face ,indicator)
+                (vc-mode-line-state state))
+               (rev (vc-working-revision file 'Git))
+               (disp-rev (or (vc-git--symbolic-ref file)
+                             (and rev (substring rev 0 7))))
+               (state-string (concat (unless (eq vc-display-status 'no-backend)
+                                       backend-name)
+                                     indicator disp-rev)))
+    (propertize state-string 'face face 'help-echo
+                (concat state-echo " under the " backend-name
+                        " version control system"
+                        "\nCurrent revision: " rev))))
+#+end_src
+
+hm. Advice doesn't get called?
+#+begin_src elisp
+  (define-advice vc-git-mode-line-state (:override (file) --/advice/vc/nerd-icons/git)
+    "Use a nerd-font icon instead of the string \"Git\"."
+    ;; Copied/tweaked from: file:/usr/share/emacs/30.2/lisp/vc/vc-git.el.gz::defun vc-git-mode-line-string (file
+    (pcase-let* ((backend-name "Git")
+                 (state (vc-state file))
+                 (`(,state-echo ,face ,indicator)
+                  (vc-mode-line-state state))
+                 (rev (vc-working-revision file 'Git))
+                 (disp-rev (or (vc-git--symbolic-ref file)
+                               (and rev (substring rev 0 7))))
+                 (state-string (concat (unless (eq vc-display-status 'no-backend)
+                                         (icon-material "nf-md-git" nil))
+                                       indicator disp-rev)))
+      (propertize state-string 'face face 'help-echo
+                  (concat state-echo " under the " backend-name
+                          " version control system"
+                          "\nCurrent revision: " rev))))
+#+end_src
+
+re-defining the func works though.
+or not so much.
+  - Probably have to wait until after its defined
+
+~/ocean/vault/.config/emacs/2025-03-13_sn005/42.org
+
+func name typo in advice.
+#+begin_src diff
+-  (define-advice vc-git-mode-line-state (:filter-return (state-display-string) --/advice/vc/nerd-icons/git)
++  (define-advice vc-git-mode-line-string (:filter-return (state-display-string) --/advice/vc/nerd-icons/git)
+#+end_src
+
+ok
+#+begin_src elisp
+  (define-advice vc-git-mode-line-string (:filter-return (state-display-string) --/advice/vc/nerd-icons/git)
+    "Use a nerd-font icon instead of the string \"Git\"."
+    (if-let ((pos (string-match-p "Git" state-display-string)))
+        (concat
+         (substring state-display-string 0 pos)
+         (propertize
+          (concat (icon-material "nf-md-git" nil)
+                  (icon-material "nf-md-source_branch" nil))
+          ;; copy properties from the replaced text
+          'face (get-text-property pos 'face state-display-string)
+          'help-echo (get-text-property pos 'help-echo state-display-string))
+         (substring state-display-string (+ pos 3)))
+      state-display-string))
+#+end_src
+
+
+** ├DONE───┤ commit
+CLOSED: [2026-06-23 Tue 17:38]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-23 Tue 17:38]
+- State "├CURRENT┤"  from              [2026-06-23 Tue 17:36]
+:END:
+** ├DONE───┤ tweak branch/file-status icons
+CLOSED: [2026-06-23 Tue 21:06]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-23 Tue 21:06]
+:END:
+
+don't use branch icons for file status
+" 󰊢󰘬󱓏main"
+
+maybe nf-md-file_check
+" 󰊢󰘬󰈖main"
+" 󰊢󰘬:/main 󰈖"
+" 󰊢󰘬main 󰈖"
+
+nf-md-file_plus
+
+** put file status last?
+
+now:
+" 󰊢󰘬󰈖main"
+
+maybe:
+" 󰊢󰘬:/main 󰈖"
+" 󰊢󰘬main 󰈖"
+
+
+** move header-line/mode-line formatting stuff to own file?
+
+
+
+* elisp block comments
+
+Why is ~M-;~ stuck in block quote mode in elisp?
+
+* titlebar: add ?
+
+nf-custom-emacs
+
+#+begin_src elisp
+(icon-suc "nf-custom-emacs")
+#+end_src
+
+* nerd-icons & icon helper funcs
+
+Icon getter that is smart?
+based on icon class name
+
+eg:
+  - "nf-custom-emacs"
+    - use ~nerd-icons-sucicon~
+  - "nf-fa-rocket"
+    - use ~nerd-icons-faicon~
+
+* ├CURRENT┤ treesit grammers
+:LOGBOOK:
+- State "├CURRENT┤"  from "├DONE───┤"  [2026-06-17 Wed 18:51]
 - State "├DONE───┤"  from "├CURRENT┤"  [2026-06-16 Tue 17:31]
 - State "├CURRENT┤"  from "├DONE───┤"  [2026-06-16 Tue 17:03]
 - State "├DONE───┤"  from              [2026-06-16 Tue 16:50]
@@ -6093,17 +6385,41 @@ grammers:
   - [X] json
   - [X] html
 
-
-* ├DONE───┤ git modeline info
-CLOSED: [2026-06-16 Tue 18:38]
+** ├CURRENT┤ C: find working abi14-revision
 :LOGBOOK:
-- State "├DONE───┤"  from              [2026-06-16 Tue 18:38]
+- State "├CURRENT┤"  from              [2026-06-17 Wed 18:52]
 :END:
 
-move to topline?
+* ├CURRENT┤ treemacs?
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-06-17 Wed 15:39]
+:END:
 
-* -- U R HERE --
-<<here>>
+https://melpa.org/#/treemacs
+https://melpa.org/#/lsp-treemacs
+
+Pretty sure I have treemacs in =sn004=
+  - Nope. Only had it in =sn003= (aka doom) config
+
+sn003:
+  - [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/legacy/sn003-doom/config/treemacs.el][config]]
+  - [[file:~/ocean/vault/.config/emacs/2023-07-23_sn004/legacy/sn003-doom/config/keybinds/treemacs.el][keybinds]]
+
+[[file:source/user/config/treemacs.el:::custom][u r here]]
+
+* package: flycheck?
+
+LSP does stuff about it.
+  - [[file:source/user/config/languages/lsp.el]]
+
+I think I had it in sn004.
+  - oh; yes. it is in that file.
+#+begin_quote
+;; TODO(lsp): add flycheck
+#+end_quote
+  - [[file:source/user/config/languages/lsp.el::;; TODO(lsp): add flycheck][here]]
+
+
 * ├CURRENT┤ imp path
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2025-12-18 Thu 22:49]
@@ -6296,7 +6612,11 @@ new:
 [[file:source/core/packages/imp/test/path.el]]
 
 
-** merge imp branches
+** ├DONE───┤ merge imp branches
+CLOSED: [2026-06-16 Tue 19:01]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-16 Tue 19:01]
+:END:
 
 feature/imp-ai-tests -> feature/imp
 
@@ -6430,19 +6750,6 @@ add something for git paths like ~repo:/path~
 
 ** bump imp version
 
-* package: flycheck?
-
-LSP does stuff about it.
-  - [[file:source/user/config/languages/lsp.el]]
-
-I think I had it in sn004.
-  - oh; yes. it is in that file.
-#+begin_quote
-;; TODO(lsp): add flycheck
-#+end_quote
-  - [[file:source/user/config/languages/lsp.el::;; TODO(lsp): add flycheck][here]]
-
-
 * LSP(Rust): tweaks
 
 less in right-side overlay info
@@ -6487,13 +6794,6 @@ Probably all of `emacs` dir?
   - [[file:source/user/config/emacs/font.el::;; TODO: This package ruined the ordering of the completion list for buffers.][here]]
 
 Asterisk buffers (*Messages*, etc) are not hidden.
-
-* treemacs?
-
-https://melpa.org/#/treemacs
-https://melpa.org/#/lsp-treemacs
-
-Pretty sure I have treemacs in =sn004=
 
 * LSP(C#): use Omnisharp for csharp
 
