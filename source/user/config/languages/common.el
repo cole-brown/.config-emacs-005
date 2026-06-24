@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2026-06-16
+;; Timestamp:  2026-06-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -126,18 +126,95 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
                   ;; Align to Right Side & Right Side Info
                   (:eval
                    (when (bound-and-true-p vc-mode)
-                     (let* ((branch (string-trim-left vc-mode))
-                            (icon (if (functionp 'icon-material)
-                                      ;; https://www.nerdfonts.com/cheat-sheet
-                                      (string-trim-right (icon-material "nf-md-source_branch" ""))
-                                    ""))
-                            (text (format "%s%s " icon branch)))
+                     (let* ((text (string-trim-left vc-mode)))
                        (concat
                         (propertize
                          " "
                          'display
                          `(space :align-to (- right-fringe ,(length text))))
                         text))))))
+
+  (define-advice vc-mode-line-state (:around (func state) --/advice/vc/nerd-icons/state)
+    "Change INDICATOR from ASCII string to nerd-font icons string.
+
+example: \"@\" -> \"󱓊\""
+    ;; destructuring bind of advised func's return values
+    (pcase-let ((`(,state-echo ,face ,indicator) (funcall func state)))
+      ;; Return STATE-ECHO and FACE unchanged
+      (list
+       state-echo
+       face
+       ;; Convert INDICATOR
+       (cond ((eq state 'up-to-date)
+              (icon-material "nf-md-source_branch_check" nil) ; 󱓏
+              ;; "nf-md-source_branch" ; 󰘬
+              )
+
+             ((eq state 'needs-update)
+              (icon-material "nf-md-source_branch_sync" nil)) ; 󱓎
+
+             ((stringp state) ; file locked by USER
+              (icon-material "nf-md-lock" nil) ; 󰌾
+              ;; "nf-md-source_branch_remove" ; 󱓌
+              )
+
+             ((eq state 'added)
+              (icon-material "nf-md-source_branch_plus" nil) ; 󱓊
+              )
+
+             ((eq state 'conflict)
+              (icon-font-awesome "nf-fa-triangle_exclamation" nil) ; 
+              ;; "nf-md-source_branch_remove" ; 󱓌
+              )
+
+             ((eq state 'removed)
+              (icon-material "nf-md-source_branch_minus" nil)) ; 󱓋
+
+             ((eq state 'missing)
+              (icon-material "nf-md-call_missed" nil) ; 󰃹
+              ;; "nf-fa-question" ; 
+              ;; ;; "main" vs "?main"
+              ;; "?" ; normal text question mark
+              ;; "nf-cod-question" ; 
+              ;; "nf-md-source_branch_refresh" ; 󱓍
+              ;; "nf-md-source_branch_minus" ; 󱓋
+              )
+
+             ((eq state 'ignored)
+              (icon-seti "nf-seti-ignored" nil)) ; 
+
+             ((eq state 'needs-merge)
+              (icon-octicon "nf-oct-git_merge_queue" nil) ; 
+              ;; "nf-md-merge" ; 󰽜
+              ;; "nf-cod-merge" ; 
+              ;; "nf-md-source_merge" ; 󰘭
+              )
+
+             ((eq state 'edited)
+              (icon-material "nf-md-file_edit" nil) ; 󱇧
+              ;; "nf-md-file_document_edit" ; 󰷈
+              ;; "nf-cod-edit" ; 
+              ;; "nf-fa-edit" ; 
+              )
+
+             (t
+              "_"
+              ;; (icon-material "nf-md-source_branch" nil) ; 󰘬
+              )))))
+
+  (define-advice vc-git-mode-line-string (:filter-return (state-display-string) --/advice/vc/nerd-icons/git)
+    "Use a nerd-font icon instead of the string \"Git\"."
+    (if-let ((pos (string-match-p "Git" state-display-string)))
+        (concat
+         (substring state-display-string 0 pos)
+         (propertize
+          (concat (icon-material "nf-md-git" nil)
+                  (icon-material "nf-md-source_branch" nil))
+          ;; copy properties from the replaced text
+          'face (get-text-property pos 'face state-display-string)
+          'help-echo (get-text-property pos 'help-echo state-display-string))
+         (substring state-display-string (+ pos 3)))
+      state-display-string))
 
   (setq mode-line-format
         ;; We moved `vc-mode' to `header-line-format'.
