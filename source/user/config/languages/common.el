@@ -146,32 +146,43 @@ example: \"@\" -> \"󱓊\""
        face
        ;; Convert INDICATOR
        (cond ((eq state 'up-to-date)
-              (icon-material "nf-md-source_branch_check" nil) ; 󱓏
+              (icon-material "nf-md-file_check" nil) ; 󰈖
+              ;; (icon-material "nf-md-source_branch_check" nil) ; 󱓏
               ;; "nf-md-source_branch" ; 󰘬
               )
 
              ((eq state 'needs-update)
-              (icon-material "nf-md-source_branch_sync" nil)) ; 󱓎
+              (icon-material "nf-md-file_restore" nil) ; 󰙰
+              ;; (icon-material "nf-md-file_sync" nil) ; 󱈖
+              ;; (icon-material "nf-md-source_branch_sync" nil) ; 󱓎
+              )
 
              ((stringp state) ; file locked by USER
-              (icon-material "nf-md-lock" nil) ; 󰌾
+              (icon-material "nf-md-file_lock" nil) ; 󰈡
+              ;; (icon-material "nf-md-lock" nil) ; 󰌾
               ;; "nf-md-source_branch_remove" ; 󱓌
               )
 
              ((eq state 'added)
-              (icon-material "nf-md-source_branch_plus" nil) ; 󱓊
+              (icon-material "nf-md-file_plus" nil) ; 󰝒
+              ;; (icon-material "nf-md-source_branch_plus" nil) ; 󱓊
               )
 
              ((eq state 'conflict)
-              (icon-font-awesome "nf-fa-triangle_exclamation" nil) ; 
+              (icon-material "nf-md-file_alert" nil) ; 󰩋
+              ;; (icon-font-awesome "nf-fa-triangle_exclamation" nil) ; 
               ;; "nf-md-source_branch_remove" ; 󱓌
               )
 
              ((eq state 'removed)
-              (icon-material "nf-md-source_branch_minus" nil)) ; 󱓋
+              (icon-material "nf-md-file_minus" nil) ; 󱪡
+              ;; (icon-material "nf-md-source_branch_minus" nil) ; 󱓋
+              )
 
              ((eq state 'missing)
-              (icon-material "nf-md-call_missed" nil) ; 󰃹
+              (icon-material "nf-md-file_hidden" nil) ; 󰘓
+              ;; (icon-material "nf-md-file_question" nil) ; 󰡯
+              ;; (icon-material "nf-md-call_missed" nil) ; 󰃹
               ;; "nf-fa-question" ; 
               ;; ;; "main" vs "?main"
               ;; "?" ; normal text question mark
@@ -181,10 +192,13 @@ example: \"@\" -> \"󱓊\""
               )
 
              ((eq state 'ignored)
-              (icon-seti "nf-seti-ignored" nil)) ; 
+              (icon-material "nf-md-file_remove" nil) ; 󰮘
+              ;; (icon-seti "nf-seti-ignored" nil) ; 
+              )
 
              ((eq state 'needs-merge)
-              (icon-octicon "nf-oct-git_merge_queue" nil) ; 
+              (icon-material "nf-md-file_swap" nil) ; 󰾴
+              ;; (icon-octicon "nf-oct-git_merge_queue" nil) ; 
               ;; "nf-md-merge" ; 󰽜
               ;; "nf-cod-merge" ; 
               ;; "nf-md-source_merge" ; 󰘭
@@ -198,7 +212,8 @@ example: \"@\" -> \"󱓊\""
               )
 
              (t
-              "_"
+              (icon-font-awesome "nf-fa-question" nil) ; 
+              ;; "_"
               ;; (icon-material "nf-md-source_branch" nil) ; 󰘬
               )))))
 
