@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-06-16
+;; Timestamp:  2026-06-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -136,6 +136,69 @@ Return nil if no face found."
          nil)))
 
 
+(defun icon--get (nerd-icons-func icon str &rest plist)
+  "Return string of ICON and STR.
+
+For ICON strings see: https://www.nerdfonts.com/cheat-sheet
+
+Optional PLIST's optional keys:
+  - `:height'     - HEIGHT
+  - `:v-adjust'   - V-ADJUST
+  - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
+
+HEIGHT and V-ADJUST are sent to `nerd-icons-mdicon'.
+
+ICON-COLOR is used to color only the icon character.
+
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
+
+[2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
+  ;; Only bother propertizing if we need to.
+  (let ((face-icon (icon--face-icon plist))
+        (face-text (icon--face-text plist)))
+    (concat
+     (funcall nerd-icons-func
+              icon
+              :face face-icon
+              :v-adjust (or (plist-get plist :v-adjust) 0)
+              :height (or (plist-get plist :height) 1))
+     (if (stringp str)
+         " "
+       "")
+     (when (stringp str)
+       (if face-text
+           (propertize str 'face face-text)
+         str)))))
+
+
+(defun icon-seti (icon str &rest plist)
+    "Return string of File ICON and STR.
+
+For ICON strings see: https://www.nerdfonts.com/cheat-sheet
+
+Optional PLIST's optional keys:
+  - `:height'     - HEIGHT
+  - `:v-adjust'   - V-ADJUST
+  - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
+
+HEIGHT and V-ADJUST are sent to `nerd-icons-flicon'.
+
+ICON-COLOR is used to color only the icon character.
+
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
+
+[2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
+    (apply #'icon--get #'nerd-icons-sucicon icon str plist))
+
+
 (defun icon-font-awesome (icon str &rest plist)
   "Return string of Font Awesome ICON and STR.
 
@@ -157,18 +220,7 @@ FACE is used for the icon and label.
 HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
-  ;; Only bother propertizing if we need to.
-  (let ((face-icon (icon--face-icon plist))
-        (face-text (icon--face-text plist)))
-    (concat
-     (nerd-icons-faicon icon
-                        :face face-icon
-                        :v-adjust (or (plist-get plist :v-adjust) 0)
-                        :height (or (plist-get plist :height) 1))
-     " "
-     (if face-text
-         (propertize str 'face face-text)
-       str))))
+    (apply #'icon--get #'nerd-icons-faicon icon str plist))
 ;; (nerd-icons-insert)
 ;; (nerd-icons-faicon "nf-fa-spotify")
 ;; (icon-font-awesome "nf-fa-spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
@@ -196,18 +248,7 @@ FACE is used for the icon and label.
 HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
-  ;; Only bother propertizing if we need to.
-  (let ((face-icon (icon--face-icon plist))
-        (face-text (icon--face-text plist)))
-    (concat
-     (nerd-icons-flicon icon
-                        :face face-icon
-                        :v-adjust (or (plist-get plist :v-adjust) 0)
-                        :height (or (plist-get plist :height) 1))
-     " "
-     (if face-text
-         (propertize str 'face face-text)
-       str))))
+    (apply #'icon--get #'nerd-icons-flicon icon str plist))
 
 
 (defun icon-octicon (icon str &rest plist)
@@ -231,18 +272,7 @@ FACE is used for the icon and label.
 HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
-  ;; Only bother propertizing if we need to.
-  (let ((face-icon (icon--face-icon plist))
-        (face-text (icon--face-text plist)))
-    (concat
-     (nerd-icons-octicon icon
-                         :face face-icon
-                         :v-adjust (or (plist-get plist :v-adjust) 0)
-                         :height (or (plist-get plist :height) 1))
-     " "
-     (if face-text
-         (propertize str 'face face-text)
-       str))))
+    (apply #'icon--get 'nerd-icons-octicon icon str plist))
 
 
 (defun icon-material (icon str &rest plist)
@@ -266,18 +296,7 @@ FACE is used for the icon and label.
 HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
-  ;; Only bother propertizing if we need to.
-  (let ((face-icon (icon--face-icon plist))
-        (face-text (icon--face-text plist)))
-    (concat
-     (nerd-icons-mdicon icon
-                        :face face-icon
-                        :v-adjust (or (plist-get plist :v-adjust) 0)
-                        :height (or (plist-get plist :height) 1))
-     " "
-     (if face-text
-         (propertize str 'face face-text)
-       str))))
+    (apply #'icon--get 'nerd-icons-mdicon icon str plist))
 
 
 (defun icon-for-mode (mode str &rest plist)
