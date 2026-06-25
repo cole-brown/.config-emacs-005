@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2026-06-23
+;; Timestamp:  2026-06-24
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -146,43 +146,43 @@ example: \"@\" -> \"󱓊\""
        face
        ;; Convert INDICATOR
        (cond ((eq state 'up-to-date)
-              (icon-material "nf-md-file_check" nil) ; 󰈖
-              ;; (icon-material "nf-md-source_branch_check" nil) ; 󱓏
+              (/icon/solo "nf-md-file_check") ; 󰈖
+              ;; (/icon/solo "nf-md-source_branch_check") ; 󱓏
               ;; "nf-md-source_branch" ; 󰘬
               )
 
              ((eq state 'needs-update)
-              (icon-material "nf-md-file_restore" nil) ; 󰙰
-              ;; (icon-material "nf-md-file_sync" nil) ; 󱈖
-              ;; (icon-material "nf-md-source_branch_sync" nil) ; 󱓎
+              (/icon/solo "nf-md-file_restore") ; 󰙰
+              ;; (/icon/solo "nf-md-file_sync") ; 󱈖
+              ;; (/icon/solo "nf-md-source_branch_sync") ; 󱓎
               )
 
              ((stringp state) ; file locked by USER
-              (icon-material "nf-md-file_lock" nil) ; 󰈡
-              ;; (icon-material "nf-md-lock" nil) ; 󰌾
+              (/icon/solo "nf-md-file_lock") ; 󰈡
+              ;; (/icon/solo "nf-md-lock") ; 󰌾
               ;; "nf-md-source_branch_remove" ; 󱓌
               )
 
              ((eq state 'added)
-              (icon-material "nf-md-file_plus" nil) ; 󰝒
-              ;; (icon-material "nf-md-source_branch_plus" nil) ; 󱓊
+              (/icon/solo "nf-md-file_plus") ; 󰝒
+              ;; (/icon/solo "nf-md-source_branch_plus") ; 󱓊
               )
 
              ((eq state 'conflict)
-              (icon-material "nf-md-file_alert" nil) ; 󰩋
-              ;; (icon-font-awesome "nf-fa-triangle_exclamation" nil) ; 
+              (/icon/solo "nf-md-file_alert") ; 󰩋
+              ;; (/icon/solo "nf-fa-triangle_exclamation") ; 
               ;; "nf-md-source_branch_remove" ; 󱓌
               )
 
              ((eq state 'removed)
-              (icon-material "nf-md-file_minus" nil) ; 󱪡
-              ;; (icon-material "nf-md-source_branch_minus" nil) ; 󱓋
+              (/icon/solo "nf-md-file_minus") ; 󱪡
+              ;; (/icon/solo "nf-md-source_branch_minus") ; 󱓋
               )
 
              ((eq state 'missing)
-              (icon-material "nf-md-file_hidden" nil) ; 󰘓
-              ;; (icon-material "nf-md-file_question" nil) ; 󰡯
-              ;; (icon-material "nf-md-call_missed" nil) ; 󰃹
+              (/icon/solo "nf-md-file_hidden") ; 󰘓
+              ;; (/icon/solo "nf-md-file_question") ; 󰡯
+              ;; (/icon/solo "nf-md-call_missed") ; 󰃹
               ;; "nf-fa-question" ; 
               ;; ;; "main" vs "?main"
               ;; "?" ; normal text question mark
@@ -192,29 +192,29 @@ example: \"@\" -> \"󱓊\""
               )
 
              ((eq state 'ignored)
-              (icon-material "nf-md-file_remove" nil) ; 󰮘
-              ;; (icon-seti "nf-seti-ignored" nil) ; 
+              (/icon/solo "nf-md-file_remove") ; 󰮘
+              ;; (/icon/solo "nf-seti-ignored") ; 
               )
 
              ((eq state 'needs-merge)
-              (icon-material "nf-md-file_swap" nil) ; 󰾴
-              ;; (icon-octicon "nf-oct-git_merge_queue" nil) ; 
+              (/icon/solo "nf-md-file_swap") ; 󰾴
+              ;; (/icon/solo "nf-oct-git_merge_queue") ; 
               ;; "nf-md-merge" ; 󰽜
               ;; "nf-cod-merge" ; 
               ;; "nf-md-source_merge" ; 󰘭
               )
 
              ((eq state 'edited)
-              (icon-material "nf-md-file_edit" nil) ; 󱇧
+              (/icon/solo "nf-md-file_edit") ; 󱇧
               ;; "nf-md-file_document_edit" ; 󰷈
               ;; "nf-cod-edit" ; 
               ;; "nf-fa-edit" ; 
               )
 
              (t
-              (icon-font-awesome "nf-fa-question" nil) ; 
+              (/icon/solo "nf-fa-question") ; 
               ;; "_"
-              ;; (icon-material "nf-md-source_branch" nil) ; 󰘬
+              ;; (/icon/solo "nf-md-source_branch") ; 󰘬
               )))))
 
   (define-advice vc-git-mode-line-string (:filter-return (state-display-string) --/advice/vc/nerd-icons/git)
@@ -223,8 +223,8 @@ example: \"@\" -> \"󱓊\""
         (concat
          (substring state-display-string 0 pos)
          (propertize
-          (concat (icon-material "nf-md-git" nil)
-                  (icon-material "nf-md-source_branch" nil))
+          (concat (/icon/solo "nf-md-git")
+                  (/icon/solo "nf-md-source_branch"))
           ;; copy properties from the replaced text
           'face (get-text-property pos 'face state-display-string)
           'help-echo (get-text-property pos 'help-echo state-display-string))

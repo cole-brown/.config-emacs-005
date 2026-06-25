@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-27
-;; Timestamp:  2026-05-12
+;; Timestamp:  2026-06-24
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -157,17 +157,17 @@ TODO(lsp): check for changed: https://github.com/doomemacs/doomemacs/blob/master
       (setq lsp-modeline-icon
             (concat
              " "
-             (icon-material (if (or workspace workspaces)
-                                "nf-md-rocket_launch"
-                              "nf-md-rocket_launch_outline")
-                            ""
-                            :v-adjust  -0.0575
-                            :face      (if (or workspace workspaces)
-                                           'success
-                                         'warning)
-                            :help-echo (if (or workspace workspaces)
-                                           "LSP Connected"
-                                         "LSP Disconnected"))
+             (/icon/solo (if (or workspace workspaces)
+                             "nf-md-rocket_launch"
+                           "nf-md-rocket_launch_outline")
+                         ""
+                         :v-adjust  -0.0575
+                         :face      (if (or workspace workspaces)
+                                        'success
+                                      'warning)
+                         :help-echo (if (or workspace workspaces)
+                                        "LSP Connected"
+                                      "LSP Disconnected"))
              " "))
       (add-to-list 'global-mode-string
                    '(t (:eval lsp-modeline-icon))
