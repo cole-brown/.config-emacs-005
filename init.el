@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-03-13
-;; Timestamp:  2026-06-03
+;; Timestamp:  2026-06-25
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -240,7 +240,8 @@
   (imp user:/config/color)
   (imp user:/config/emacs)
   (imp user:/config/help)
-  (imp user:/config/emacs/font.el) ;; Nerd Icons et al
+  (imp user:/config/emacs/font.el) ; Nerd Icons et al
+  (imp user:/utilities/icons)      ; Nerd Icons utils
   (imp user:/config/emacs/timestamp.el)
 
   (imp user:/config/undo)
