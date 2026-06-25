@@ -6073,8 +6073,83 @@ rustup component add rust-analyzer
 #+end_src
 
 
+* ├KILLED─┤ titlebar: add ?
+CLOSED: [2026-06-23 Tue 21:29]
+:LOGBOOK:
+- State "├KILLED─┤"  from              [2026-06-23 Tue 21:29] \\
+  meh; want "Emacs" in title
+:END:
+
+nf-custom-emacs
+
+#+begin_src elisp
+(icon-suc "nf-custom-emacs")
+#+end_src
+
+* ├KILLED─┤ elisp block comments
+CLOSED: [2026-06-24 Wed 14:55]
+:LOGBOOK:
+- State "├KILLED─┤"  from              [2026-06-24 Wed 14:55] \\
+  problem disappeared
+:END:
+
+Why is ~M-;~ stuck in block quote mode in elisp?
+
+...It isn't anymore?!
+very sus
+
 * -- U R HERE --
 <<here>>
+* ├CURRENT┤ nerd-icons & icon helper funcs
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-06-24 Wed 14:55]
+:END:
+
+Icon getter that is smart?
+based on icon class name
+
+eg:
+  - "nf-custom-emacs"
+    - use ~nerd-icons-sucicon~
+  - "nf-fa-rocket"
+    - use ~nerd-icons-faicon~
+
+[[file:source/user/config/emacs/font.el::defun icon--func-for (icon][icon--func-for]]
+
+beware: emacs has an ~icons~ feature and ~icon-*~ functions already.
+#+begin_src elisp
+(featurep 'icons)
+#+end_src
+
+#+RESULTS:
+: t
+
+Does it belong in namespaced?
+  - its for an external packaged.
+    - so no?
+
+So just somewhere in =source/user=?
+  - [ ] source/user/art
+  - [ ] source/user/helpers/nerd-icons
+  - [X] source/user/utilities/icons
+  - [ ] +source/user/packages/nerd-icons+
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+fix todos
+  - [[file:source/user/utilities/icons.el::;;; user/config/TODO-FILENAME.el --- TODO-SHORT-DESCRIPTION -*- lexical-binding: t; -*-][here]]
+
+
+* Don't show *GNU Emacs* buffer on startup
+
+~inhibit-splash-screen~
+is alias of
+~inhibit-startup-screen~
+
+
 * ├CURRENT┤ git modeline info
 :LOGBOOK:
 - State "├CURRENT┤"  from "├DONE───┤"  [2026-06-18 Thu 14:20]
@@ -6337,33 +6412,12 @@ maybe:
 " 󰊢󰘬:/main 󰈖"
 " 󰊢󰘬main 󰈖"
 
+Will need to fuck with ~vc-git-mode-line-string~ more.
+
 
 ** move header-line/mode-line formatting stuff to own file?
 
 
-
-* elisp block comments
-
-Why is ~M-;~ stuck in block quote mode in elisp?
-
-* titlebar: add ?
-
-nf-custom-emacs
-
-#+begin_src elisp
-(icon-suc "nf-custom-emacs")
-#+end_src
-
-* nerd-icons & icon helper funcs
-
-Icon getter that is smart?
-based on icon class name
-
-eg:
-  - "nf-custom-emacs"
-    - use ~nerd-icons-sucicon~
-  - "nf-fa-rocket"
-    - use ~nerd-icons-faicon~
 
 * ├CURRENT┤ treesit grammers
 :LOGBOOK:
