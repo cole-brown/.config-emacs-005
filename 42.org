@@ -6098,11 +6098,28 @@ Why is ~M-;~ stuck in block quote mode in elisp?
 ...It isn't anymore?!
 very sus
 
-* -- U R HERE --
-<<here>>
-* ├CURRENT┤ nerd-icons & icon helper funcs
+* ├DONE───┤ Don't show *GNU Emacs* buffer on startup
+CLOSED: [2026-06-25 Thu 15:58]
 :LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-25 Thu 15:58]
+:END:
+
+~inhibit-splash-screen~
+is alias of
+~inhibit-startup-screen~
+
+
+* ├DONE───┤ nerd-icons & icon helper funcs
+CLOSED: [2026-06-25 Thu 16:46]
+:LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-06-25 Thu 16:46]
 - State "├CURRENT┤"  from              [2026-06-24 Wed 14:55]
+:END:
+
+** ├DONE───┤ smarter icon getter
+CLOSED: [2026-06-25 Thu 14:34]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-25 Thu 14:34]
 :END:
 
 Icon getter that is smart?
@@ -6116,6 +6133,13 @@ eg:
 
 [[file:source/user/config/emacs/font.el::defun icon--func-for (icon][icon--func-for]]
 
+
+** ├DONE───┤ move icon util functions
+CLOSED: [2026-06-25 Thu 14:34]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-25 Thu 14:34]
+:END:
+
 beware: emacs has an ~icons~ feature and ~icon-*~ functions already.
 #+begin_src elisp
 (featurep 'icons)
@@ -6123,6 +6147,7 @@ beware: emacs has an ~icons~ feature and ~icon-*~ functions already.
 
 #+RESULTS:
 : t
+
 
 Does it belong in namespaced?
   - its for an external packaged.
@@ -6134,22 +6159,25 @@ So just somewhere in =source/user=?
   - [X] source/user/utilities/icons
   - [ ] +source/user/packages/nerd-icons+
 
-╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-╠══TODO══╣            ║                                                                                                          ║
-╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
-╠══TODO══╣            ║                                                                                                          ║
-╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+** ├DONE───┤ fix todos
+CLOSED: [2026-06-25 Thu 16:32]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-25 Thu 16:32]
+:END:
+
 fix todos
   - [[file:source/user/utilities/icons.el::;;; user/config/TODO-FILENAME.el --- TODO-SHORT-DESCRIPTION -*- lexical-binding: t; -*-][here]]
 
+** ├DONE───┤ load utils in icons config?
+CLOSED: [2026-06-25 Thu 16:46]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-25 Thu 16:46]
+:END:
 
-* Don't show *GNU Emacs* buffer on startup
+currently they're loaded in init.
 
-~inhibit-splash-screen~
-is alias of
-~inhibit-startup-screen~
-
-
+* -- U R HERE --
+<<here>>
 * ├CURRENT┤ git modeline info
 :LOGBOOK:
 - State "├CURRENT┤"  from "├DONE───┤"  [2026-06-18 Thu 14:20]
