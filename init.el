@@ -243,8 +243,7 @@
   (imp user:/config/color)
   (imp user:/config/emacs)
   (imp user:/config/help)
-  (imp user:/config/emacs/font.el) ; Nerd Icons et al
-  (imp user:/utilities/icons)      ; Nerd Icons utils
+  (imp user:/config/emacs/font.el) ; Nerd Icons et al + utility functions
   (imp user:/config/emacs/timestamp.el)
 
   (imp user:/config/undo)

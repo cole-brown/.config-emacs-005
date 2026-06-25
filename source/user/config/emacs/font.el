@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2025-11-17
-;; Timestamp:  2026-06-24
+;; Timestamp:  2026-06-25
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -46,7 +46,14 @@
   ;; The Nerd Font you want to use in GUI.
   ;; "Symbols Nerd Font Mono" is the default and is recommended
   ;; but you can use any other Nerd Font if you want.
-  (nerd-icons-font-family "CaskaydiaCove Nerd Font Mono"))
+  (nerd-icons-font-family "CaskaydiaCove Nerd Font Mono")
+
+  ;;----------------------------
+  :config
+  ;;----------------------------
+
+  ;; Nerd Icons utils like function `/icon/solo'.
+  (imp user:/utilities/icons))
 
 
 ;;------------------------------------------------------------------------------
