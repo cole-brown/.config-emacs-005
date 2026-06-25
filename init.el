@@ -94,6 +94,9 @@
   ;; controlled init files.
   (imp user:/config/emacs/custom)
 
+  ;; TODO(init): move to file?
+  (customize-set-variable 'inhibit-startup-screen t)
+
 
   ;;----------------------------------------------------------------------------
   ;; Packages: `package' & `use-package'
