@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-12-16
+;; Timestamp:  2026-06-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -519,7 +519,6 @@ ARGS should be the raw args list from func `imp-parser-normalize-keywords'."
 ;; (imp-parser-normalize-paths :user :path '(user-emacs-directory))
 ;; (imp-parser-normalize-paths :user :path '(foo))
 
-;; TODO(path): move to path.el & rename to `imp-path-apply-feature' w/ params (path feature)
 (defun imp-parser-normalize-path-feature (feature keyword path)
   "Add the relevant parts of FEATURE to PATH.
 
@@ -531,6 +530,7 @@ what to say to end user."
   (if (imp-path-load-file path)
       path
 
+    ;; TODO: use `imp-path-of-feature' here.
     (let* ((funcname 'imp-parser-normalize-path-feature)
            (append-to-path (imp-feature-split feature)))
       (unless path
