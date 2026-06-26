@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2026-06-24
+;; Timestamp:  2026-06-25
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -217,19 +217,29 @@ example: \"@\" -> \"󱓊\""
               ;; (/icon/solo "nf-md-source_branch") ; 󰘬
               )))))
 
-  (define-advice vc-git-mode-line-string (:filter-return (state-display-string) --/advice/vc/nerd-icons/git)
-    "Use a nerd-font icon instead of the string \"Git\"."
-    (if-let ((pos (string-match-p "Git" state-display-string)))
-        (concat
-         (substring state-display-string 0 pos)
-         (propertize
-          (concat (/icon/solo "nf-md-git")
-                  (/icon/solo "nf-md-source_branch"))
-          ;; copy properties from the replaced text
-          'face (get-text-property pos 'face state-display-string)
-          'help-echo (get-text-property pos 'help-echo state-display-string))
-         (substring state-display-string (+ pos 3)))
-      state-display-string))
+  (define-advice vc-git-mode-line-string (:override (file) --/advice/vc/nerd-icons/git)
+    "Use `nerd-icons' icons & change string format ordering.
+
+copy/paste/edit of function `vc-git-mode-line-string' in
+file '/usr/share/emacs/30.2/lisp/vc/vc-git.el.gz'"
+    (pcase-let* ((backend-name "Git")
+                 (state (vc-state file))
+                 (`(,state-echo ,face ,indicator)
+                  (vc-mode-line-state state))
+                 (rev (vc-working-revision file 'Git))
+                 (disp-rev (or (vc-git--symbolic-ref file)
+                               (and rev (substring rev 0 7))))
+                 (state-string (concat (unless (eq vc-display-status 'no-backend)
+                                         (concat (/icon/solo "nf-md-git")
+                                                 (/icon/solo "nf-md-source_branch")))
+                                       disp-rev
+                                       " "
+                                       indicator)))
+      (propertize state-string
+                  'face face
+                  'help-echo (concat state-echo " under the " backend-name
+                                     " version control system"
+                                     "\nCurrent revision: " rev))))
 
   (setq mode-line-format
         ;; We moved `vc-mode' to `header-line-format'.
