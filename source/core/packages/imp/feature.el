@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2025-10-30
+;; Timestamp:  2026-06-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -293,11 +293,19 @@ string or symbol name."
 
 
 (defun imp-feature-first (&rest feature)
-  "Return first symbol in feature, regardless of root."
+  "Return first symbol in FEATURE, regardless of root."
   (imp--feature-symbol (car-safe (apply #'imp--feature-normalize-chain feature))))
 ;; (imp-feature-first nil)
 ;; (imp-feature-first 'imp:/foo/bar/baz)
 ;; (imp-feature-first 'dne/foo/bar/baz)
+
+
+(defun imp-feature-rest (&rest feature)
+  "Return FEATURE without first symbol in feature, regardless of root."
+  (apply #'imp-feature-normalize (cdr-safe (apply #'imp--feature-normalize-chain feature))))
+;; (imp-feature-rest nil)
+;; (imp-feature-rest 'imp:/foo/bar/baz)
+;; (imp-feature-rest 'dne/foo/bar/baz)
 
 
 (defun imp-feature-join (&rest feature)
