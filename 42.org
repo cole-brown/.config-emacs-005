@@ -6431,7 +6431,11 @@ maybe nf-md-file_check
 
 nf-md-file_plus
 
-** put file status last?
+** ├DONE───┤ put file status last?
+CLOSED: [2026-06-25 Thu 17:06]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-06-25 Thu 17:06]
+:END:
 
 now:
 " 󰊢󰘬󰈖main"
@@ -6443,7 +6447,14 @@ maybe:
 Will need to fuck with ~vc-git-mode-line-string~ more.
 
 
-** move header-line/mode-line formatting stuff to own file?
+** ├CURRENT┤ move header-line/mode-line formatting stuff to own file?
+:LOGBOOK:
+- State "├CURRENT┤"  from              [2026-06-25 Thu 17:47]
+:END:
+
+[[file:source/user/config/emacs/line-format.el]]
+
+vc-mode
 
 
 
@@ -6702,71 +6713,104 @@ CLOSED: [2026-06-16 Tue 19:01]
 
 feature/imp-ai-tests -> feature/imp
 
-** ├CURRENT┤ wtf all does the macros do?
+** ├CURRENT┤ simplify path funcs
 :LOGBOOK:
-- State "├CURRENT┤"  from              [2026-05-07 Thu 22:25]
+- State "├CURRENT┤"  from              [2026-06-25 Thu 21:32]
 :END:
 
-Start [[file:source/core/packages/imp/load.el::;;;; `:path'][here]] in imp/load.el
-
-for making sense of [[*what do I want?][what do I want?]]
-#+begin_quote
-imp--path-builder-hook
-  - imp--path-h-truename
-  - imp--path-h-abbreviate
-  - +imp--path-h-relative+
-  - ...wtf all does the macros do?
-
-imp--path-build
-  - imp-path-join
-  - run-hooks imp--path-builder-hook
-#+end_quote
-
-imp/load.el path funcs
-  - imp-parser-normalize-path-symbol
-    - special symbols -> special paths
-    - TODO: simplify, move some logic to only be in string version
-  - imp-parser-normalize-path-string
-    - special strings -> special paths
-  - imp-parser-normalize-path-one-arg
-    - imp-parser-normalize-path-symbol
-    - imp-parser-normalize-path-string
-    - eval arg in case of function/value
-  - imp-parser-normalize-path-args-list
-    - seq-map imp-parser-normalize-path-one-arg
-    - Do we want path lists?
-      - Should probably only take a path.
-  - imp-parser-normalize-paths
-    - imp-parser-normalize-path-args-list
-      - validate; error if any nils
-    - seq-map imp-path
-  - imp-parser-normalize-path-feature
-    - imp-path-load-file
-      - This checks for path's existance.
-        - todo: don't check for path's existance
-      - if a load file path, done. else:
-    - imp-feature-split
-    - imp-feature-root
-    - imp-path-root-get
-    - imp-feature-unrooted
-    - This is the _third_ function that deals with "./"!?
-    - imp-path-current-dir
-    - add suffix ".el"?
-    - combine path and feature?
-  - imp-parser-normalize/:path
-    - todo: don't check for path's existance
-    - imp-parser-normalize-paths
-    - imp-feature-split
-    - imp-parser-normalize-path-feature
-    - filename-absolute-p
-  - imp-parser-handler/:path
-    - todo: return unevaluated forms (that will check for path's existance)
-    - imp--mux-path-find
-    - imp-path-load-file
-    - set :path in state
-    - set :path-load in state
+simplify
+  - [ ] imp--path-to-str (input)
+  - [ ] imp--path-append (parent next)
+  - [ ] imp-path-join (&rest path)
+  - [ ] imp-path-split (path)
+  - [ ] imp-path (&rest path)
+  - [ ] imp-path-canonical (path &optional root)
+  - [ ] imp-path-abbreviate (&rest path)
+  - [ ] imp--path-relative (root path &optional error?)
+  - [ ] imp-path-relative (root &rest path)
+  - [ ] imp--path-file-exists? (root &rest paths)
+  - [ ] imp--path-root-valid? (caller path &rest kwargs)
+  - [ ] imp--path-dir? (path)
+  - [ ] imp-path-parent (path)
+  - [ ] imp--path-filename (path)
+  - [ ] imp-path-current-file ()
+  - [ ] imp-path-current-file-relative (&optional root)
+  - [ ] imp-path-current-dir ()
+  - [ ] imp-path-current-dir-relative (feature/base)
+  - [ ] imp--path-path-platform-case-insensitive
+  - [ ] imp--path-platform-agnostic (path)
+  - [ ] imp-path-sans-extension (&rest path)
+  - [ ] imp-path-with-extension (path ext)
+  - [ ] imp-path-has-load-extension (path)
+  - [ ] imp-path-load-file (path-absolute)
+  - [ ] imp-path-root-set (feature dirpath)
+  - [ ] imp-path-root-get (feature &optional no-error?)
+  - [ ] imp-path-root-delete (feature &optional no-error?)
 
 
+
+** imp paths
+
+Simple
+  - String? No special processing.
+#+begin_src elisp
+;; feature rooted paths
+(imp user:/config/theme/zenburn/init.el) ; == USER_ROOT/config/theme/zenburn/init.el
+(imp user:/config/emacs/custom) ; add ".el"
+
+;; feature relative paths
+(imp ./debug)
+(imp keyword)
+
+;; No changes/additions!
+(imp "/absolute/path/to/file.el") ; no changes
+(imp "relative/path/to/file.el") ; ROOT = imp-path-current-dir
+(imp "./relative/path/to/file.el") ; ROOT = imp-path-current-dir
+#+end_src
+
+Create & use root:
+  - must eval PATH value
+  - no implicit init.el
+#+begin_src elisp
+(imp namespaced
+  :root
+  :path (imp-path user-emacs-directory 'source 'core 'packages 'namespaced 'init.el))
+
+(imp secret.d
+  :root
+  :path (pcase system-type
+          ('gnu/linux
+           "~/ocean/vault/.config/secret/emacs/2025-03-13_sn005/init.el")
+          ('windows-nt
+           "~/.secret.d/emacs/2025-03-13_sn005/init.el")))
+#+end_src
+
+Full path == don't use feature
+#+begin_src elisp
+(imp package:/upgrade/mode ; requires `rx'
+  :path "./upgrade-mode.el")
+#+end_src
+
+
+Delete/fix functionality:
+
+No special keywords.
+#+begin_src elisp
+ (imp keyword :path pwd)
+#+end_src
+
+No implicit "init.el"?
+  - is this a thing?
+
+Plus, etc needs to be handled like any other character.
+#+begin_src elisp
+(imp str:/+case-hydra)
+(imp dlv:/+display)
+#+end_src
+
+Have settings for some stuff?
+  - imp-path-require-file-ext == No adding ".el"/".elc"
+  - imp-path-load-exts : for excluding ".elc" or whatever from consideration
 
 ** what do I want?
 
@@ -6829,6 +6873,72 @@ make `:mux` just add another func to the path hook
 ** git
 
 add something for git paths like ~repo:/path~
+
+** ├INFO───┤ wtf all does the macros do?
+CLOSED: [2026-06-25 Thu 21:28]
+:LOGBOOK:
+- State "├INFO───┤"  from "├CURRENT┤"  [2026-06-25 Thu 21:28]
+- State "├CURRENT┤"  from              [2026-05-07 Thu 22:25]
+:END:
+
+Start [[file:source/core/packages/imp/load.el::;;;; `:path'][here]] in imp/load.el
+
+for making sense of [[*what do I want?][what do I want?]]
+#+begin_quote
+imp--path-builder-hook
+  - imp--path-h-truename
+  - imp--path-h-abbreviate
+  - +imp--path-h-relative+
+  - ...wtf all does the macros do?
+
+imp--path-build
+  - imp-path-join
+  - run-hooks imp--path-builder-hook
+#+end_quote
+
+imp/load.el path funcs
+  - imp-parser-normalize-path-symbol
+    - special symbols -> special paths
+    - TODO: simplify, move some logic to only be in string version
+  - imp-parser-normalize-path-string
+    - special strings -> special paths
+  - imp-parser-normalize-path-one-arg
+    - imp-parser-normalize-path-symbol
+    - imp-parser-normalize-path-string
+    - eval arg in case of function/value
+  - imp-parser-normalize-path-args-list
+    - seq-map imp-parser-normalize-path-one-arg
+    - Do we want path lists?
+      - Should probably only take a path.
+  - imp-parser-normalize-paths
+    - imp-parser-normalize-path-args-list
+      - validate; error if any nils
+    - seq-map imp-path
+  - imp-parser-normalize-path-feature
+    - imp-path-load-file
+      - This checks for path's existance.
+        - todo: don't check for path's existance
+      - if a load file path, done. else:
+    - imp-feature-split
+    - imp-feature-root
+    - imp-path-root-get
+    - imp-feature-unrooted
+    - This is the _third_ function that deals with "./"!?
+    - imp-path-current-dir
+    - add suffix ".el"?
+    - combine path and feature?
+  - imp-parser-normalize/:path
+    - todo: don't check for path's existance
+    - imp-parser-normalize-paths
+    - imp-feature-split
+    - imp-parser-normalize-path-feature
+    - filename-absolute-p
+  - imp-parser-handler/:path
+    - todo: return unevaluated forms (that will check for path's existance)
+    - imp--mux-path-find
+    - imp-path-load-file
+    - set :path in state
+    - set :path-load in state
 
 ** bump imp version
 
