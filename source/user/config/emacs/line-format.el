@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    TODO:(datetime:timestamp:insert :rfc-3339:date)
-;; Timestamp:  2026-06-25
+;; Timestamp:  2026-09-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -155,10 +155,11 @@ file '/usr/share/emacs/30.2/lisp/vc/vc-git.el.gz'"
 
 ;; Enable to align start of header to where line numbers end.
 ;; NOTE: requires `header-line-format' to start with: "" header-line-indent
-;;
-;; TODO: This keeps getting turned off? Do I need to put it in a mode hook or
-;; something?!
-(header-line-indent-mode +1)
+(define-globalized-minor-mode global-header-line-indent-mode
+  header-line-indent-mode
+  header-line-indent-mode)
+
+(global-header-line-indent-mode +1)
 
 ;; Move `which-function' info from mode-line to header-line.
 ;; Move `vc-mode' info from mode-line to header-line (right aligned).
