@@ -43,7 +43,7 @@
 `package-refresh-contents' takes seconds to complete.
 Run it immediately (and sync) if no package contents exist.
 Else wait until Emacs is started and idle, then run async."
-  (if package-archive-contents
+  (if (not package-archive-contents)
       ;; Need it immediately!
       (--/package/update)
     ;; Delay until after init.
