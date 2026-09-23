@@ -1,5 +1,6 @@
+[[here][GOTO U R HERE]]
+
 [[file:source/user/template.el::;;; user/config/TODO-FILENAME.el --- TODO-SHORT-DESCRIPTION -*- lexical-binding: t; -*-][template.el]]
-GOTO [[here][U R HERE]]
 
 * ├DONE───┤ .emacs.d layout
 CLOSED: [2025-06-03 Tue 22:33]
@@ -6176,10 +6177,10 @@ CLOSED: [2026-06-25 Thu 16:46]
 
 currently they're loaded in init.
 
-* -- U R HERE --
-<<here>>
-* ├CURRENT┤ git modeline info
+* ├DONE───┤ git modeline info
+CLOSED: [2026-09-16 Wed 15:34]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-09-16 Wed 15:34]
 - State "├CURRENT┤"  from "├DONE───┤"  [2026-06-18 Thu 14:20]
 - State "├DONE───┤"  from              [2026-06-16 Tue 18:38]
 :END:
@@ -6447,8 +6448,10 @@ maybe:
 Will need to fuck with ~vc-git-mode-line-string~ more.
 
 
-** ├CURRENT┤ move header-line/mode-line formatting stuff to own file?
+** ├DONE───┤ move header-line/mode-line formatting stuff to own file?
+CLOSED: [2026-09-16 Wed 15:33]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-09-16 Wed 15:33]
 - State "├CURRENT┤"  from              [2026-06-25 Thu 17:47]
 :END:
 
@@ -6458,8 +6461,10 @@ vc-mode
 
 
 
-* ├CURRENT┤ treesit grammers
+* ├DONE───┤ treesit grammers
+CLOSED: [2026-09-16 Wed 15:44]
 :LOGBOOK:
+- State "├DONE───┤"  from "├CURRENT┤"  [2026-09-16 Wed 15:44]
 - State "├CURRENT┤"  from "├DONE───┤"  [2026-06-17 Wed 18:51]
 - State "├DONE───┤"  from "├CURRENT┤"  [2026-06-16 Tue 17:31]
 - State "├CURRENT┤"  from "├DONE───┤"  [2026-06-16 Tue 17:03]
@@ -6478,11 +6483,25 @@ grammers:
   - [X] json
   - [X] html
 
-** ├CURRENT┤ C: find working abi14-revision
+** ├KILLED─┤ C: find working abi14-revision
+CLOSED: [2026-09-16 Wed 15:35]
 :LOGBOOK:
+- State "├KILLED─┤"  from "├CURRENT┤"  [2026-09-16 Wed 15:35]
 - State "├CURRENT┤"  from              [2026-06-17 Wed 18:52]
 :END:
 
+** ├DONE───┤ switch to tree-sitter-langs package
+CLOSED: [2026-09-16 Wed 15:42]
+:LOGBOOK:
+- State "├DONE───┤"  from              [2026-09-16 Wed 15:42]
+:END:
+
+
+
+
+* -- U R HERE --
+<<here>>
+* Win10VM: install nerd font
 * ├CURRENT┤ treemacs?
 :LOGBOOK:
 - State "├CURRENT┤"  from              [2026-06-17 Wed 15:39]
