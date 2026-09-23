@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    TODO:(datetime:timestamp:insert :rfc-3339:date)
-;; Timestamp:  2026-06-16
+;; Timestamp:  2026-09-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,6 +17,19 @@
 ;;; Code:
 
 ;;------------------------------------------------------------------------------
+;; `tree-sitter-langs'
+;;------------------------------------------------------------------------------
+
+;; https://github.com/emacs-tree-sitter/tree-sitter-langs
+(use-package tree-sitter-langs
+  :after tree-sitter
+  :config
+  ;; Optional: automatically enable tree-sitter in supported modes
+  (add-hook 'prog-mode-hook #'tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+
+;;------------------------------------------------------------------------------
 ;; Treesit-Auto
 ;;------------------------------------------------------------------------------
 ;; Automatically install and use tree-sitter major modes in Emacs 29+. If the
@@ -24,6 +37,8 @@
 
 ;; https://github.com/renzmann/treesit-auto
 (use-package treesit-auto
+  ;; DISABLED! Using `tree-sitter-langs' instead!
+  :disabled
 
   ;;------------------------------
   :custom
@@ -83,16 +98,17 @@
   ;; (treesit-library-abi-version)
   ;; Emacs 30.2: treesit ABI v14
 
-  (setq --/treesit-auto/recipe/c
-        (make-treesit-auto-recipe
-         :lang 'c
-         :ts-mode 'c-ts-mode
-         :remap 'c-mode
-         :requires 'cpp
-         :url "https://github.com/tree-sitter/tree-sitter-c"
-         :abi14-revision "v0.21.2"
-         :ext "\\.c\\'"))
-  (add-to-list 'treesit-auto-recipe-list --/treesit-auto/recipe/c)
+  ;; TODO: Find correct `abi14-revision'.
+  ;; (setq --/treesit-auto/recipe/c
+  ;;       (make-treesit-auto-recipe
+  ;;        :lang 'c
+  ;;        :ts-mode 'c-ts-mode
+  ;;        :remap 'c-mode
+  ;;        :requires 'cpp
+  ;;        :url "https://github.com/tree-sitter/tree-sitter-c"
+  ;;        :abi14-revision "v0.21.2"
+  ;;        :ext "\\.c\\'"))
+  ;; (add-to-list 'treesit-auto-recipe-list --/treesit-auto/recipe/c)
 
   (setq --/treesit-auto/recipe/csharp
         (make-treesit-auto-recipe
