@@ -561,20 +561,39 @@ Return path string from `imp-roots' or nil."
 ;; /The/ Path Function
 ;;------------------------------------------------------------------------------
 
-;; TODO(path): make this use all the shenanigans that `imp-parser-normalize/:path' uses?
-(defun imp-path (&rest path)
-  "Get an imp standard path.
+;; TODO U R HERE:
+(defmacro imp-path-core (path)
+  "TODO DOC STRING"
+  (declare (indent defun))
+  `(let ((path* (imp-path-join ,path)))
+     (imp-path-normalize path*)))
+;; (macroexpand-1 '(imp-path-core '(/path to foo)))
 
-1. Join PATH into a path string.
-2. Get the absolute path.
-   - If path is relative, root with func `imp-path-current-dir'.
-3. Follow symlinks to 'true' file path.
-4. Remove trailing slashes.
-5. Abbreviate path (for '~/' paths instead of '/home/user/')."
-  (declare (pure t) (side-effect-free t))
-  (let ((default-directory (imp-path-current-dir)))
-    (convert-standard-filename
-     (apply #'imp-path-abbreviate path))))
+
+(defmacro imp-path (&rest path)
+  "TODO DOC STRING"
+  (declare (indent defun))
+  (imp-path-core path))
+;; (macroexpand-1 '(imp-path /path to foo))
+;; (macroexpand-1 '(imp-path "/path" to foo))
+;; (macroexpand-1 '(imp-path (locate-user-emacs-file "init.el")))
+
+
+;; ;; TODO(path): make this use all the shenanigans that `imp-parser-normalize/:path' uses?
+;; (defun imp-path (&rest path)
+;;   "Get an imp standard path.
+;;
+;; 1. Join PATH into a path string.
+;; 2. Get the absolute path.
+;;    - If path is relative, root with func `imp-path-current-dir'.
+;; 3. Follow symlinks to 'true' file path.
+;; 4. Remove trailing slashes.
+;; 5. Abbreviate path (for '~/' paths instead of '/home/user/')."
+;;   (declare (pure t) (side-effect-free t))
+;;   (let ((default-directory (imp-path-current-dir)))
+;;     (convert-standard-filename
+;;      (abbreviate-file-name
+;;       (apply #'imp-path-join path)))))
 
 
 ;;------------------------------------------------------------------------------
