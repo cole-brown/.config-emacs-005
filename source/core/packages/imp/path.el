@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2026-10-01
+;; Timestamp:  2026-10-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -67,6 +67,7 @@ non-nil - ignore errors; return nil")
 ;; Path Builders
 ;;------------------------------------------------------------------------------
 
+;; TODO DELETE
 (defun imp--path-segment-normalize (input)
   "Ensure INPUT is a string.
 
@@ -109,6 +110,7 @@ Return a string."
 ;; (imp--path-segment-normalize "/bar")
 
 
+;; TODO DELETE
 (defun imp--path-segment-append (parent next)
   "Append NEXT element to PARENT, adding dir separator if needed."
   (declare (side-effect-free t))
@@ -140,6 +142,7 @@ Return a string."
 ;; (let (imp-path-error?) (imp--path-segment-append nil nil))
 
 
+;; TODO DELETE
 (defun imp-path-join (&rest path)
   "Combine PATH segments together into a path.
 
@@ -501,6 +504,52 @@ See func `get-load-suffixes' for known load extenstions."
 ;;------------------------------------------------------------------------------
 
 (eval-and-compile
+  ;; TODO: Move to Path Builders section.
+  (defun imp--path-normalize-segment (segment)
+    "Normalize the unevaluated argument syntax SEGMENT for `imp-path'.
+
+Return a literal string for strings, keywords, and quoted strings or symbols.
+Keywords use their symbol names without the leading colon; other quoted symbols
+use their names. Bare variables and other forms are returned unchanged for
+evaluation at runtime, where they must produce strings.
+
+Signal an error for invalid literal arguments, including nil, t, and quoted
+lists. A quoted t is a literal symbol name and becomes the string \"t\".
+
+This function must not evaluate SEGMENT, invoke file-name handlers, or access
+the filesystem."
+    (cond
+     ;; Keep strings as-is.
+     ((stringp segment) segment)
+
+     ;; Remove ':' from keywords.
+     ((keywordp segment) (substring (symbol-name segment) 1))
+
+     ;; Remove `quote' and normalize what's quoted.
+     ((eq (car-safe segment) 'quote)
+      (unless (and (consp (cdr segment))
+                   (null (cddr segment))
+                   (or (stringp (cadr segment))
+                       (and (symbolp (cadr segment))
+                            (cadr segment))))
+        (error "imp-path expects a quoted string or symbol: %S" segment))
+      (let ((literal (cadr segment)))
+        (cond ((stringp literal) literal)
+              ((keywordp literal) (substring (symbol-name literal) 1))
+              (t (symbol-name literal)))))
+
+     ;; Keep variables and functions as-is.
+     ((and segment               ; truthy...
+           (not (eq segment t))  ; and not literal true...
+           (or (symbolp segment) ; and is a symbol or cons/list.
+               (consp segment)))
+      segment)
+
+     ;; default: error
+     (t (error "Invalid imp-path segment (%S): %S"
+               (type-of segment)
+               segment))))
+
   (defun imp--path-expand (segments)
     "Return a standard Elisp expression joining flat path SEGMENTS.
 
@@ -512,28 +561,8 @@ argument forms, invoke file-name handlers, or access the filesystem.
 Invalid segment syntax may signal an error."
     (unless segments
       (error "imp-path requires at least one segment"))
-    (let ((segments
-           (mapcar
-            (lambda (segment)
-              (cond
-               ((stringp segment) segment)
-               ((keywordp segment) (substring (symbol-name segment) 1))
-               ((eq (car-safe segment) 'quote)
-                (unless (and (consp (cdr segment))
-                             (null (cddr segment))
-                             (or (stringp (cadr segment))
-                                 (and (symbolp (cadr segment))
-                                      (cadr segment))))
-                  (error "imp-path expects a quoted string or symbol: %S" segment))
-                (let ((literal (cadr segment)))
-                  (cond ((stringp literal) literal)
-                        ((keywordp literal) (substring (symbol-name literal) 1))
-                        (t (symbol-name literal)))))
-               ((and segment (not (eq segment t))
-                     (or (symbolp segment) (consp segment)))
-                segment)
-               (t (error "Invalid imp-path segment: %S" segment))))
-            segments)))
+
+    (let ((segments (mapcar #'imp--path-normalize-segment segments)))
       ;; Build from the right so adjacent literals become a single suffix.
       ;; Each expression still appears once, in left-to-right evaluation order.
       (let* ((reversed (reverse segments))
