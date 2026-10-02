@@ -6737,22 +6737,27 @@ simplify
   - [X] imp-path-sans-extension (&rest path)
   - [X] imp-path-with-extension (path ext)
   - [X] imp-path-parent (path)
-  - [ ] imp-path-current-file ()
-  - [ ] imp-path-current-file-relative (&optional root)
-  - [ ] imp-path-current-dir ()
-  - [ ] imp-path-current-dir-relative (feature/base)
-  - [ ] imp--path-path-platform-case-insensitive
-  - [ ] imp--path-platform-agnostic (path)
-  - [ ] imp-path-has-load-extension (path)
-  - [ ] imp-path-load-file (path-absolute)
-  - [ ] imp-path-root-set (feature dirpath)
-  - [ ] imp-path-root-get (feature &optional no-error?)
-  - [ ] imp-path-root-delete (feature &optional no-error?)
+  - [X] imp-path-current-file ()
+  - [X] imp-path-current-file-relative (&optional root)
+  - [X] imp-path-current-dir ()
+  - [X] imp-path-current-dir-relative (feature/base)
+  - [X] imp--path-path-platform-case-insensitive
+  - [X] imp--path-platform-agnostic (path)
+  - [X] imp-path-has-load-extension (path)
+  - [X] imp-path-load-file (path-absolute)
+  - [X] imp-path-root-set (feature dirpath)
+  - [X] imp-path-root-get (feature &optional no-error?)
+  - [X] imp-path-root-delete (feature &optional no-error?)
   - [ ] imp-path (&rest path)
 
 
 ~imp-parser-normalize-path-feature~
   - extract the path-from-feature bits into =path.el=.
+
+prompt:
+#+begin_quote
+
+#+end_quote
 
 
 ** ├INFO───┤ wtf all does the macros do?
