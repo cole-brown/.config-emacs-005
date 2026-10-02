@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2026-06-26
+;; Timestamp:  2026-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -220,6 +220,7 @@ next value for the STATE."
           (imp--error 'imp-parser-process-keywords
                       "Keyword handler not defined: %s"
                       handler))))))
+
 
 (defun imp-parser-load (feature state)
   "Actually load the file, maybe."
@@ -954,7 +955,7 @@ no keyword implies `:all'."
        (message "%s" imp-parser--form))
 
      (imp-parser-process-keywords feature* args*)))
-
+;; (macroexpand-1 (imp-core 'user:/config/emacs/custom))
 
 ;;;###autoload
 (defmacro imp (feature &rest args)

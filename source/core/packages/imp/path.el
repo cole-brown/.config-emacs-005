@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2026-06-26
+;; Timestamp:  2026-09-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -289,11 +289,12 @@ ROOT should be:
 PATH should be an absolute path string."
   (declare (side-effect-free t))
   ;; Both ROOT and PATH must be valid (absolute) paths.
-  (when-let* ((root (file-name-directory ; add trailing slash so regex replace is cleaner
+  (when-let* ((root (file-name-as-directory ; add trailing slash so regex replace is cleaner
                      (imp-path-normalize
                       (imp--path-validate (if (and (not (null root))
                                                    (symbolp root))
-                                              (imp-path-of-feature root))))))
+                                              (imp-path-of-feature root)
+                                            root)))))
               (path (imp-path-normalize (imp--path-validate path)))
               ;; Don't like `file-relative-name' as it can return weird things
               ;; when it goes off looking for actual directories and files...
@@ -318,29 +319,71 @@ PATH should be an absolute path string."
                          path-relative)
       path-relative)))
 ;; (imp-path-relative 'imp:/path (imp-path-join (imp-path-current-dir) "path/to/thing"))
+;; (imp-path-relative (imp-path-current-dir) (imp-path-join (imp-path-current-dir) "path/to/thing"))
 ;; (imp-path-relative nil (imp-path-join (imp-path-current-dir) "path/to/thing"))
 
-;; TODO U R HERE
 
 ;;------------------------------------------------------------------------------
 ;; File Helpers
 ;;------------------------------------------------------------------------------
 
-;; TODO: rename `imp-file-name'
-(defun imp--path-filename (path)
-  "Return the filename component of PATH."
+(defun imp-file-name (path &optional no-ext)
+  "Return the filename component of PATH.
+
+If NO-EXT is non-nil, remove one file extenstion."
   (declare (pure t) (side-effect-free t))
-  (file-name-nondirectory path))
-;; (imp--path-filename "/foo/bar/")
-;; (imp--path-filename "/foo/bar.el")
+  (funcall (if no-ext #'imp-path-sans-extension #'identity)
+           (file-name-nondirectory path)))
+;; (imp-file-name "/foo/bar/")
+;; (imp-file-name "/foo/bar.el")
+;; (imp-file-name "/foo/bar.el" t)
 
 
 (defun imp-file-current (&optional no-ext)
-  "Return the filename (no path, just filename) this is called from."
-  (funcall (if no-ext #'imp-path-sans-extension #'identity)
-           (file-name-nondirectory (imp-path-current-file))))
+  "Return the filename (no path, just filename) that this is called from."
+  (imp-file-name (imp-path-current-file) no-ext))
 ;; (imp-file-current)
 ;; (imp-file-current t)
+
+(defun imp-path-sans-extension (path ext)
+  "Remove EXT from PATH, if present.
+
+EXT should be a string or one of these symbols:
+  `t', `any', `:any'
+If EXT is string, only remove PATH's extension if it matches EXT.
+If EXT is a valid symbol, remove whatever extension that PATH has.
+
+(imp-path-sans-extension \"jeff/jill.el\" \".el\")
+  ->\"jeff/jill\""
+  (let ((any-ext '(t any :any)))
+    ;; NOTE: This should work with just about any path/file string,
+    ;; so go easy on input validation.
+    (cond ((and (not (stringp ext))
+                (not (memq ext any-ext)))
+           (imp--path-error 'imp-path-sans-extension
+                            "EXT must be a string. Got %S: %S"
+                            (type-of ext)
+                            ext))
+          ((not (stringp path))
+           (imp--path-error 'imp-path-sans-extension
+                            "PATH must be a string. Got %S: %S"
+                            (type-of path)
+                            path))
+          ;; Remove whatever EXT.
+          ((memq ext any-ext)
+           (file-name-sans-extension path))
+          ;; Remove specific EXT.
+          ((string= (file-name-extension path)
+                    (string-remove-prefix "." ext))
+           (file-name-sans-extension path))
+          ;; EXT not found to remove; return original PATH.
+          (t
+           path))))
+;; (imp-path-sans-extension "foo/bar/" ".el")
+;; (imp-path-sans-extension "foo/bar/" t)
+;; (imp-path-sans-extension "foo/bar/baz.el" ".el")
+;; (imp-path-sans-extension "foo/bar/baz.el" "el")
+;; (imp-path-sans-extension "foo/bar/baz.el" :any)
 
 
 ;;------------------------------------------------------------------------------
@@ -351,11 +394,12 @@ PATH should be an absolute path string."
   "Return the parent directory component of PATH."
   (cond
    ;;------------------------------
-   ;; Errors
+   ;; Validation
    ;;------------------------------
    ((not (stringp path))
     (imp--path-error 'imp-path-parent
-                     "PATH is not a string! %S"
+                     "PATH must be a string. Got %S: %S"
+                     (type-of path)
                      path))
 
    ;;------------------------------
@@ -372,7 +416,7 @@ PATH should be an absolute path string."
 
    ;; File path?
    (t
-    ;; Then get its parent dir:    "/foo/bar.el" -> "/foo/"
+    ;; First get its parent dir:   "/foo/bar.el" -> "/foo/"
     ;; Then get the parent's name: "/foo/"       -> "/foo"
     (directory-file-name (file-name-directory path)))))
 ;; (imp-path-parent "/foo/bar/")
@@ -406,41 +450,6 @@ PATH should be an absolute path string."
 ;; (imp-path-current-file)
 
 
-;; TODO(path): Unused. Delete?
-;; (defun imp-path-current-file-relative (&optional root)
-;;   "Return the relative path of the file this function is called from.
-
-;; ROOT should be:
-;;   - keyword - the `imp' feature's keyword
-;;     - Returned path will be relative to the root directory of the keyword.
-;;     - Will raise an error if the feature does not have a path root.
-;;   - string  - an absolute path
-;;     - Returned path will be relative to this absolute path.
-;;   - nil
-;;     - Returned path will be relative to `user-emacs-directory'.
-
-;; Will raise an error if `imp-path-current-file' (i.e. the absolute path)
-;; has no relation to the determined root path.
-
-;; Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
-;;   ~/.config/emacs/foo/bar.el:
-;;     (imp-path-current-file)
-;;       -> \"/home/<username>/.config/emacs/foo/bar.el\"
-;;     (imp-path-current-file-relative)
-;;       -> \"foo/bar.el\"
-;;     (imp-path-current-file-relative :dot-emacs)
-;;       -> \"foo/bar.el\"
-;;     (imp-path-current-file-relative \"/home/<username>/.config/emacs/foo\")
-;;       -> \"bar.el\""
-;;   (imp--path-relative root
-;;                       (imp-path-current-file)
-;;                       :error))
-;; ;; (imp-path-current-file)
-;; ;; (imp-path-current-file-relative)
-;; ;; (imp-path-root-set :test (imp-path-current-dir))
-;; ;; (imp-path-current-file-relative :test)
-
-
 (defun imp-path-current-dir ()
   "Return the directory path of the file this is called from."
   (when-let (path (imp-path-current-file))
@@ -448,144 +457,8 @@ PATH should be an absolute path string."
 ;; (imp-path-current-dir)
 
 
-;; TODO(path): Unused. Delete?
-;; (defun imp-path-current-dir-relative (feature/base)
-;;   "Return the relative path from feature's path root to the dir this is called.
-
-;; Path will be relative to FEATURE/BASE. If FEATURE/BASE is nil, use
-;; `user-emacs-directory' as the base path.
-
-;; Will raise an error if non-nil FEATURE/BASE does not have a path root.
-
-;; Will raise an error if `imp-path-current-dir' (i.e. the absolute path)
-;; has no relation to FEATURE/BASE's root path.
-
-;; Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
-;;   ~/.config/emacs/foo/bar.el:
-;;     (imp-path-current-dir)
-;;       -> \"/home/<username>/.config/emacs/foo/\"
-;;     (imp-path-current-dir-relative :dot-emacs)
-;;       -> \"foo\"
-;;     (imp-path-current-dir-relative)
-;;       -> \"foo\""
-;;   ;; Make sure both paths are equivalent (directory paths) for the regex replace.
-;;   (let* ((path-root (file-name-as-directory
-;;                      (expand-file-name (if feature/base
-;;                                            (imp-path-root-get feature/base)
-;;                                          user-emacs-directory))))
-;;          (path/here (file-name-as-directory (imp-path-current-dir)))
-;;          ;; Don't like `file-relative-name' as it can return weird things when it
-;;          ;; goes off looking for actual directories and files...
-;;          (path/relative (replace-regexp-in-string
-;;                          ;; Make sure root dir has ending slash.
-;;                          path-root ;; Look for root directory path...
-;;                          ""        ;; Replace with nothing to get a relative path.
-;;                          path/here
-;;                          :fixedcase
-;;                          :literal)))
-;;     ;; End up with the same thing? Not a relative path - signal error.
-;;     (when (string= path/relative path/here)
-;;       ;; Error message gets truncated to oblivion, so... hello again:
-;;       ;; (message (mapconcat #'identity
-;;       ;;                     '("Current directory is not relative to FEATURE/BASE!"
-;;       ;;                       "  FEATURE/BASE: %S"
-;;       ;;                       "  root path:    %s"
-;;       ;;                       "  curr path:    %s"
-;;       ;;                       "---> result:    %s")
-;;       ;;                     "\n")
-;;       ;;          feature/base
-;;       ;;          path-root
-;;       ;;          path/here
-;;       ;;          path/relative)
-;;       (imp--path-error 'imp-path-current-dir-relative
-;;                   '("Current directory is not relative to FEATURE/BASE!\n"
-;;                     "  FEATURE/BASE: %S\n"
-;;                     "  root path:    %s\n"
-;;                     "  curr path:    %s\n"
-;;                     "---> result:    %s")
-;;                   feature/base
-;;                   path-root
-;;                   path/here
-;;                   path/relative))
-;;     ;; Return relative path, sans final slash.
-;;     (directory-file-name path/relative)))
-;; ;; Should be "" since we're at the root dir for imp:
-;; ;;   (imp-path-current-dir-relative :imp)
-
-
-;; TODO(path): Unused. Delete? Wait til `imp` hits the Win10VM first.
-(defvar imp--path-path-platform-case-insensitive
-  '(;; Windows
-    cygwin windows-nt ms-dos
-    ;; MacOS
-    darwin)
-  "These operating systems have case-insensitive paths.")
-
-
-;; TODO(path): Unused. Delete? Wait til `imp` hits the Win10VM first.
-(defun imp--path-platform-agnostic (path)
-  "Convert PATH string into a standardized path for the platform.
-
-Replaces backslash with forward slash.
-Downcases path on case-insensitive OSes."
-  ;; Convert backslashes to forward slashes.
-  (replace-regexp-in-string
-   (rx "\\")
-   "/"
-   ;; Convert path to lowercase if on a case-insensitive OS.
-   (funcall
-    (if (memq system-type imp--path-path-platform-case-insensitive)
-        #'downcase
-      #'identity)
-    path)
-   path))
-;; (imp--path-platform-agnostic "/foo/bar")
-;; (imp--path-platform-agnostic "/FOO/BAR")
-;; (imp--path-platform-agnostic "/Foo/Bar")
-;; (imp--path-platform-agnostic "C:/Foo/Bar")
-;; (imp--path-platform-agnostic "C:\\Foo\\Bar")
-
-
-;; TODO(path): change to pass in EXT, check for EXT, remove if matching.
-(defun imp-path-sans-extension (&rest path)
-  "Join PATH elements together and then remove any extension.
-
-(imp-path-sans-extension \"jeff\" \"jill.el\")
-  ->\"jeff/jill\""
-  (file-name-sans-extension (imp-path-join path)))
-;; (imp-path-sans-extension "foo" "bar/")
-;; (imp-path-sans-extension "foo" "bar/" "baz.el")
-
-
-(defun imp-path-with-extension (path ext)
-  "Ensure PATH has an extension of EXT.
-
-(imp-path-with-extension \"jeff/jill.el\" \".el\")
-  ->\"jeff/jill.el\"
-
-(imp-path-with-extension \"jeff/jill\" \"el\")
-  ->\"jeff/jill.el\"
-
-(imp-path-with-extension \"jeff/jill..\" \"...el\")
-  ->\"jeff/jill.el\""
-  (if (string-suffix-p ext path 'ignore-case)
-      ;; PATH has suffix already. Do nothing.
-      path
-    ;; Clear all periods so we can just glue 'em together with one regardless.
-    (file-name-with-extension
-     (replace-regexp-in-string (rx (one-or-more ".") string-end)
-                               ""
-                               path)
-     (replace-regexp-in-string (rx (one-or-more ".") string-end)
-                               ""
-                               ext))))
-;; (imp-path-with-extension "foo/bar/baz" ".el")
-;; (imp-path-with-extension "foo/bar/baz.el" "el")
-;; (imp-path-with-extension nil "el")
-
-
 ;;------------------------------------------------------------------------------
-;; Load Paths
+;; `load' Paths
 ;;------------------------------------------------------------------------------
 
 (defun imp-path-has-load-extension (path)
@@ -612,7 +485,7 @@ See func `get-load-suffixes' for known load extenstions."
 
 
 ;;------------------------------------------------------------------------------
-;; Public API: Feature Root Directories
+;; Root Paths
 ;;------------------------------------------------------------------------------
 
 (defun imp-path-root-set (feature dirpath)

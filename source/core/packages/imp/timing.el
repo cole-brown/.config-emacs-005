@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-07
-;; Timestamp:  2025-10-29
+;; Timestamp:  2026-06-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -476,7 +476,7 @@ Message depends on `imp--timing-format-load'."
   (imp--timing-message :root
                        imp--timing-format-load
                        (imp-feature-normalize feature)
-                       (imp--path-filename path)
+                       (imp-file-name path)
                        path))
 
 
@@ -502,7 +502,7 @@ Message depends on `imp--timing-format-skip'."
     (imp--timing-message :root
                          imp--timing-format-skip
                          (imp-feature-normalize feature)
-                         (imp--path-filename path)
+                         (imp-file-name path)
                          path)
     ;; Increase indent level for reason.
     (let ((imp--timing-indent (1+ imp--timing-indent)))
@@ -511,7 +511,7 @@ Message depends on `imp--timing-format-skip'."
                            (concat imp--timing-reason
                                    imp--timing-format-skip-already-provided)
                            (imp-feature-normalize feature)
-                           (imp--path-filename path)
+                           (imp-file-name path)
                            path))))
 
 
@@ -524,7 +524,7 @@ Message depends on `imp--timing-format-optional'."
     (imp--timing-message :root
                          imp--timing-format-skip
                          (imp-feature-normalize feature)
-                         (imp--path-filename path)
+                         (imp-file-name path)
                          path)
     ;; Increase indent level for reason.
     (let ((imp--timing-indent (1+ imp--timing-indent)))
@@ -533,7 +533,7 @@ Message depends on `imp--timing-format-optional'."
                            (concat imp--timing-reason
                                    imp--timing-format-skip-optional-dne)
                            (imp-feature-normalize feature)
-                           (imp--path-filename path)
+                           (imp-file-name path)
                            path))))
 
 
