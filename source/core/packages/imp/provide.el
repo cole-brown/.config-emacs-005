@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2025-11-03
+;; Timestamp:  2026-06-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -69,6 +69,37 @@
      feature-norm))
 ;; (imp-provide foo)
 ;; (imp-provide foo bar (imp-file-current :no-ext))
+
+
+;; TODO: use this instead of  (imp-provide user (imp-path-relative 'user (imp-path-sans-extension (imp-path-current-file))))
+;; TODO: Deadgrep for `imp-path-relative`.
+(defmacro imp-provide-from-root (root)
+  `(let ((funcname 'imp-provide)
+          (feature-root (imp-feature-root ',root)))
+     (unless feature-root
+       (imp--error 'imp-provide-from-root
+                   '("ROOT is not a feature root; "
+                     "cannot determine feature name to provide."
+                     "ROOT: %S, feature-root: %S")
+                   ,root
+                   feature-root))
+       ;; Figure out feature symbol from relative path.
+     (let ((feature (imp-feature-normalize
+                     feature-root
+                     (imp-path-split
+                      (imp-path-relative
+                       feature-root
+                       (imp-path-sans-extension (imp-path-current-file) :any))))))
+
+     ;; Provide to `imp-features' tree.
+     (imp--feature-add feature)
+
+     ;; Provide to Emacs `features' list.
+     (provide feature)
+
+     feature)))
+;; (imp-provide-from-root imp)
+;; (imp-provide-from-root 'imp)
 
 
 ;;------------------------------------------------------------------------------
