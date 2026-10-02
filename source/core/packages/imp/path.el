@@ -195,6 +195,132 @@ Else split on forward slash only."
 
 
 ;;------------------------------------------------------------------------------
+;; /The/ Path Macro
+;;------------------------------------------------------------------------------
+
+(eval-and-compile
+  ;; TODO: Move to Path Builders section?
+  (defun imp--path-normalize-segment (segment)
+    "Normalize the unevaluated argument syntax SEGMENT for `imp-path'.
+
+Return a literal string for strings, keywords, and quoted strings or symbols.
+Keywords use their symbol names without the leading colon; other quoted symbols
+use their names. Bare variables and other forms are returned unchanged for
+evaluation at runtime, where they must produce strings.
+
+Signal an error for invalid literal arguments, including nil, t, and quoted
+lists. A quoted t is a literal symbol name and becomes the string \"t\".
+
+This function must not evaluate SEGMENT, invoke file-name handlers, or access
+the filesystem."
+    (cond
+     ;; Keep strings as-is.
+     ((stringp segment) segment)
+
+     ;; Remove ':' from keywords.
+     ((keywordp segment) (substring (symbol-name segment) 1))
+
+     ;; Remove `quote' and normalize what's quoted.
+     ((eq (car-safe segment) 'quote)
+      (unless (and (consp (cdr segment))
+                   (null (cddr segment))
+                   (or (stringp (cadr segment))
+                       (and (symbolp (cadr segment))
+                            (cadr segment))))
+        (error "imp-path expects a quoted string or symbol: %S" segment))
+      (let ((literal (cadr segment)))
+        (cond ((stringp literal) literal)
+              ((keywordp literal) (substring (symbol-name literal) 1))
+              (t (symbol-name literal)))))
+
+     ;; Keep variables and functions as-is.
+     ((and segment               ; truthy...
+           (not (eq segment t))  ; and not literal true...
+           (or (symbolp segment) ; and is a symbol or cons/list.
+               (consp segment)))
+      segment)
+
+     ;; default: error
+     (t (error "Invalid imp-path segment (%S): %S"
+               (type-of segment)
+               segment))))
+
+  ;; TODO: Move to Path Builders section?
+  (defun imp--path-join-segment (joined segment)
+    "Return a path expression with SEGMENT prepended to JOINED.
+
+SEGMENT is argument syntax normalized by `imp--path-normalize-segment'.
+JOINED is the suffix already built by `imp--path-expand', represented by a
+literal string or an unevaluated expression.
+
+If both arguments are strings, fold them into one string using only string
+operations. Otherwise, return a standard Elisp form that converts SEGMENT to
+a directory name and concatenates JOINED at runtime. Each expression appears
+once, with SEGMENT evaluated before JOINED.
+
+Do not call `file-name-as-directory' during expansion: it can dispatch to
+`file-name-handler-alist' handlers, which may perform I/O or signal errors.
+Such calls belong in the generated runtime form. This function must not
+evaluate either argument, invoke file-name handlers, or access the filesystem."
+    (if (and (stringp segment) (stringp joined))
+        ;; Never dispatch to a file-name handler while folding.
+        (let ((directory
+               (if (memq system-type '(windows-nt ms-dos))
+                   (subst-char-in-string ?\\ ?/ segment)
+                 segment)))
+          (when (and (eq system-type 'windows-nt)
+                     (bound-and-true-p w32-downcase-file-names))
+            (setq directory (downcase directory)))
+          (concat directory
+                  (cond ((equal directory "") "./")
+                        ((string-suffix-p "/" directory) "")
+                        (t "/"))
+                  joined))
+      `(concat (file-name-as-directory ,segment) ,joined)))
+
+  ;; TODO: Move to Path Builders section?
+  (defun imp--path-expand (segments)
+    "Return a standard Elisp expression joining flat path SEGMENTS.
+
+Strings, keywords, and quoted symbols are literal segments.  Other symbols
+and forms are expressions whose values must be strings at execution time.
+
+Expansion uses only syntax and string operations. It must not evaluate
+argument forms, invoke file-name handlers, or access the filesystem.
+Invalid segment syntax may signal an error."
+    (unless segments
+      (error "imp-path requires at least one segment"))
+
+    (let ((segments (mapcar #'imp--path-normalize-segment segments)))
+      ;; Build from the right so adjacent literals become a single suffix.
+      ;; Each expression still appears once, in left-to-right evaluation order.
+      (let* ((reversed (reverse segments))
+             (joined (car reversed)))
+        (dolist (segment (cdr reversed))
+          (setq joined (imp--path-join-segment joined segment)))
+        joined))))
+
+
+(defmacro imp-path (&rest segments)
+  "Join flat SEGMENTS and expand to an absolute path without a trailing slash.
+
+Strings, keywords, and quoted symbols denote literal path segments:
+  (imp-path user-emacs-directory \='source :user)
+
+Bare variables and forms are evaluated once, from left to right, and must
+return strings.  Relative paths use `default-directory' at execution time.
+Nested segment lists are not supported; pass each segment separately.
+
+The expansion uses only standard Elisp calls.  It does not follow symlinks
+or abbreviate the resulting path."
+  (declare (debug (&rest form)))
+  `(directory-file-name
+    (expand-file-name ,(imp--path-expand segments))))
+;; (macroexpand-1 '(imp-path user-emacs-directory 'source :user))
+;; (macroexpand-1 '(imp-path (locate-user-emacs-file "init.el")))
+
+
+;;------------------------------------------------------------------------------
 ;; Path Validation
 ;;------------------------------------------------------------------------------
 
@@ -274,14 +400,14 @@ Else path string will be relative."
     (if-let* ((feature-root (imp-feature-root feature))
               (path-root (imp-path-root-get feature-root)))
         ;; Join feature's root path with the rest of feature.
-        (apply #'imp-path-join
-               path-root
-               (imp-feature-unrooted feature))
+        (imp-path path-root
+                  (mapconcat #'symbol-name (imp-feature-unrooted feature) "/"))
 
       ;; Is FEATURE rooted "here"?
       (if (string-prefix-p "./" (symbol-name feature))
-          (apply #'imp-path-join (imp-path-current-dir)
-                 (imp-feature-split (imp-feature-rest feature)))
+          (imp-path (imp-path-current-dir)
+                    (mapconcat #'identity
+                               (imp-feature-split (imp-feature-rest feature)) "/"))
 
         ;; No root; make relative path.
         (apply #'imp-path-join (imp-feature-split feature))))))
@@ -333,9 +459,9 @@ PATH should be an absolute path string."
                          root
                          path-relative)
       path-relative)))
-;; (imp-path-relative 'imp:/path (imp-path-join (imp-path-current-dir) "path/to/thing"))
-;; (imp-path-relative (imp-path-current-dir) (imp-path-join (imp-path-current-dir) "path/to/thing"))
-;; (imp-path-relative nil (imp-path-join (imp-path-current-dir) "path/to/thing"))
+;; (imp-path-relative 'imp:/path (imp-path (imp-path-current-dir) "path/to/thing"))
+;; (imp-path-relative (imp-path-current-dir) (imp-path (imp-path-current-dir) "path/to/thing"))
+;; (imp-path-relative nil (imp-path (imp-path-current-dir) "path/to/thing"))
 
 
 ;;------------------------------------------------------------------------------
@@ -497,130 +623,6 @@ See func `get-load-suffixes' for known load extenstions."
                  '("/") ; Don't use `load-paths'; we have an absolute path.
                  (unless (imp-path-has-load-extension path-absolute)
                    (get-load-suffixes)))))
-
-
-;;------------------------------------------------------------------------------
-;; /The/ Path Macro
-;;------------------------------------------------------------------------------
-
-(eval-and-compile
-  ;; TODO: Move to Path Builders section.
-  (defun imp--path-normalize-segment (segment)
-    "Normalize the unevaluated argument syntax SEGMENT for `imp-path'.
-
-Return a literal string for strings, keywords, and quoted strings or symbols.
-Keywords use their symbol names without the leading colon; other quoted symbols
-use their names. Bare variables and other forms are returned unchanged for
-evaluation at runtime, where they must produce strings.
-
-Signal an error for invalid literal arguments, including nil, t, and quoted
-lists. A quoted t is a literal symbol name and becomes the string \"t\".
-
-This function must not evaluate SEGMENT, invoke file-name handlers, or access
-the filesystem."
-    (cond
-     ;; Keep strings as-is.
-     ((stringp segment) segment)
-
-     ;; Remove ':' from keywords.
-     ((keywordp segment) (substring (symbol-name segment) 1))
-
-     ;; Remove `quote' and normalize what's quoted.
-     ((eq (car-safe segment) 'quote)
-      (unless (and (consp (cdr segment))
-                   (null (cddr segment))
-                   (or (stringp (cadr segment))
-                       (and (symbolp (cadr segment))
-                            (cadr segment))))
-        (error "imp-path expects a quoted string or symbol: %S" segment))
-      (let ((literal (cadr segment)))
-        (cond ((stringp literal) literal)
-              ((keywordp literal) (substring (symbol-name literal) 1))
-              (t (symbol-name literal)))))
-
-     ;; Keep variables and functions as-is.
-     ((and segment               ; truthy...
-           (not (eq segment t))  ; and not literal true...
-           (or (symbolp segment) ; and is a symbol or cons/list.
-               (consp segment)))
-      segment)
-
-     ;; default: error
-     (t (error "Invalid imp-path segment (%S): %S"
-               (type-of segment)
-               segment))))
-
-  (defun imp--path-join-segment (joined segment)
-    "Return a path expression with SEGMENT prepended to JOINED.
-
-SEGMENT is argument syntax normalized by `imp--path-normalize-segment'.
-JOINED is the suffix already built by `imp--path-expand', represented by a
-literal string or an unevaluated expression.
-
-If both arguments are strings, fold them into one string using only string
-operations. Otherwise, return a standard Elisp form that converts SEGMENT to
-a directory name and concatenates JOINED at runtime. Each expression appears
-once, with SEGMENT evaluated before JOINED.
-
-Do not call `file-name-as-directory' during expansion: it can dispatch to
-`file-name-handler-alist' handlers, which may perform I/O or signal errors.
-Such calls belong in the generated runtime form. This function must not
-evaluate either argument, invoke file-name handlers, or access the filesystem."
-    (if (and (stringp segment) (stringp joined))
-        ;; Never dispatch to a file-name handler while folding.
-        (let ((directory
-               (if (memq system-type '(windows-nt ms-dos))
-                   (subst-char-in-string ?\\ ?/ segment)
-                 segment)))
-          (when (and (eq system-type 'windows-nt)
-                     (bound-and-true-p w32-downcase-file-names))
-            (setq directory (downcase directory)))
-          (concat directory
-                  (cond ((equal directory "") "./")
-                        ((string-suffix-p "/" directory) "")
-                        (t "/"))
-                  joined))
-      `(concat (file-name-as-directory ,segment) ,joined)))
-
-  (defun imp--path-expand (segments)
-    "Return a standard Elisp expression joining flat path SEGMENTS.
-
-Strings, keywords, and quoted symbols are literal segments.  Other symbols
-and forms are expressions whose values must be strings at execution time.
-
-Expansion uses only syntax and string operations. It must not evaluate
-argument forms, invoke file-name handlers, or access the filesystem.
-Invalid segment syntax may signal an error."
-    (unless segments
-      (error "imp-path requires at least one segment"))
-
-    (let ((segments (mapcar #'imp--path-normalize-segment segments)))
-      ;; Build from the right so adjacent literals become a single suffix.
-      ;; Each expression still appears once, in left-to-right evaluation order.
-      (let* ((reversed (reverse segments))
-             (joined (car reversed)))
-        (dolist (segment (cdr reversed))
-          (setq joined (imp--path-join-segment joined segment)))
-        joined))))
-
-
-(defmacro imp-path (&rest segments)
-  "Join flat SEGMENTS and expand to an absolute path without a trailing slash.
-
-Strings, keywords, and quoted symbols denote literal path segments:
-  (imp-path user-emacs-directory \='source :user)
-
-Bare variables and forms are evaluated once, from left to right, and must
-return strings.  Relative paths use `default-directory' at execution time.
-Nested segment lists are not supported; pass each segment separately.
-
-The expansion uses only standard Elisp calls.  It does not follow symlinks
-or abbreviate the resulting path."
-  (declare (debug (&rest form)))
-  `(directory-file-name
-    (expand-file-name ,(imp--path-expand segments))))
-;; (macroexpand-1 '(imp-path user-emacs-directory 'source :user))
-;; (macroexpand-1 '(imp-path (locate-user-emacs-file "init.el")))
 
 
 ;;------------------------------------------------------------------------------

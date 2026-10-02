@@ -407,13 +407,13 @@ next value for the STATE."
     (cond
      ;; path == pwd
      ((string-prefix-p "./" arg)
-      (imp-path-join (imp-path-current-dir)
-                     (string-remove-prefix "./" arg)))
+      (imp-path (imp-path-current-dir)
+                (string-remove-prefix "./" arg)))
 
      ;; path == rooted @ FEATURE
      ((string-prefix-p ":/" arg)
       (if-let ((root (imp-path-root-get feature :no-error)))
-          (imp-path-join root (string-remove-prefix ":/" arg))
+          (imp-path root (string-remove-prefix ":/" arg))
         (imp--error 'imp-parser-normalize-path-string
                     "`%S' has no root; `%S' doesn't know what to do with %S in %S"
                     feature
@@ -449,7 +449,7 @@ next value for the STATE."
                 "`%S': `%S' doesn't know what to do %S: %S"
                 feature keyword (type-of arg) arg))
 
-   ;; A func or form? example: (imp-path-join user-emacs-directory "path/to/imp")
+   ;; A func or form? example: (imp-path user-emacs-directory "path/to/imp")
    ((condition-case _
         (let ((arg-eval (eval arg)))
           ;; Require that the eval'd whatever returns a string.
@@ -468,7 +468,7 @@ next value for the STATE."
                 feature keyword (type-of arg) arg))))
 ;; symbol: (imp-parser-normalize-path-one-arg 'test :path 'emacs)
 ;; string: (imp-parser-normalize-path-one-arg 'test :path "/path/to/foo")
-;; form:   (imp-parser-normalize-path-one-arg 'test :path '(imp-path-join user-emacs-directory "path/to/imp"))
+;; form:   (imp-parser-normalize-path-one-arg 'test :path '(imp-path user-emacs-directory "path/to/imp"))
 ;; symbol-value: (imp-parser-normalize-path-one-arg 'user :path 'user-emacs-directory)
 ;; unknown: (imp-parser-normalize-path-one-arg 'test :path 'invalid)
 
@@ -485,7 +485,7 @@ ARGS should be the raw args list from func `imp-parser-normalize-keywords'."
                 feature keyword (type-of args) args)))
 ;; symbol: (imp-parser-normalize-path-args-list 'test :path '(emacs))
 ;; string: (imp-parser-normalize-path-args-list 'test :path '("/path/to/foo"))
-;; form:   (imp-parser-normalize-path-args-list 'test :path '((imp-path-join user-emacs-directory "path/to/imp")))
+;; form:   (imp-parser-normalize-path-args-list 'test :path '((imp-path user-emacs-directory "path/to/imp")))
 ;; symbol-value: (imp-parser-normalize-path-args-list 'user :path '(user-emacs-directory))
 ;; unknown: (imp-parser-normalize-path-args-list 'test :path '(invalid))
 ;; not a list: (imp-parser-normalize-path-args-list 'test :path 'emacs)
@@ -566,9 +566,8 @@ what to say to end user."
                  ;; hack. A better file/dir check should be done (or else none).
                  (not (string-suffix-p ".el" path)))
         ;; Add (the rest of) FEATURE to the end of path.
-        (setq path (apply #'imp-path-join
-                          path
-                          append-to-path)))
+        (setq path (imp-path path
+                            (mapconcat #'imp--feature-string append-to-path "/"))))
 
       path)))
 ;; (imp-parser-normalize-path-feature './foo :path nil)
@@ -985,7 +984,7 @@ Usage:
                      - `root' - `imp-feature-root'
                    - See func `imp-parser-normalize-path-symbol'
                  - A form/function that evaluates to a path string.
-                   - (imp-path-join user-emacs-directory \"path/to/imp\")
+                   - (imp-path user-emacs-directory \"path/to/imp\")
 TODO(path): Do we want this to be the solution for lists?
                  - A list of the above to join into a path.
 TODO(path): Alternative is a list of paths to try for locating the file.
@@ -995,8 +994,8 @@ TODO(path): Alternative is a list of paths to try for locating the file.
                If ROOT is t or a flag (arg-less), use first part of FEATURE.
                Example:
                  (imp imp/init
-                   :path (imp-path-join user-emacs-directory
-                                        \"path/to/imp\")
+                   :path (imp-path user-emacs-directory
+                                   \"path/to/imp\")
                    :root)
                  => imp-roots: '((imp \"~/.config/emacs/path/to/imp\") ...)
 
