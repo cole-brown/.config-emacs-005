@@ -550,6 +550,38 @@ the filesystem."
                (type-of segment)
                segment))))
 
+  (defun imp--path-join-segment (joined segment)
+    "Return a path expression with SEGMENT prepended to JOINED.
+
+SEGMENT is argument syntax normalized by `imp--path-normalize-segment'.
+JOINED is the suffix already built by `imp--path-expand', represented by a
+literal string or an unevaluated expression.
+
+If both arguments are strings, fold them into one string using only string
+operations. Otherwise, return a standard Elisp form that converts SEGMENT to
+a directory name and concatenates JOINED at runtime. Each expression appears
+once, with SEGMENT evaluated before JOINED.
+
+Do not call `file-name-as-directory' during expansion: it can dispatch to
+`file-name-handler-alist' handlers, which may perform I/O or signal errors.
+Such calls belong in the generated runtime form. This function must not
+evaluate either argument, invoke file-name handlers, or access the filesystem."
+    (if (and (stringp segment) (stringp joined))
+        ;; Never dispatch to a file-name handler while folding.
+        (let ((directory
+               (if (memq system-type '(windows-nt ms-dos))
+                   (subst-char-in-string ?\\ ?/ segment)
+                 segment)))
+          (when (and (eq system-type 'windows-nt)
+                     (bound-and-true-p w32-downcase-file-names))
+            (setq directory (downcase directory)))
+          (concat directory
+                  (cond ((equal directory "") "./")
+                        ((string-suffix-p "/" directory) "")
+                        (t "/"))
+                  joined))
+      `(concat (file-name-as-directory ,segment) ,joined)))
+
   (defun imp--path-expand (segments)
     "Return a standard Elisp expression joining flat path SEGMENTS.
 
@@ -568,22 +600,7 @@ Invalid segment syntax may signal an error."
       (let* ((reversed (reverse segments))
              (joined (car reversed)))
         (dolist (segment (cdr reversed))
-          (setq joined
-                (if (and (stringp segment) (stringp joined))
-                    ;; Never dispatch to a file-name handler while folding.
-                    (let ((directory
-                           (if (memq system-type '(windows-nt ms-dos))
-                               (subst-char-in-string ?\\ ?/ segment)
-                             segment)))
-                      (when (and (eq system-type 'windows-nt)
-                                 (bound-and-true-p w32-downcase-file-names))
-                        (setq directory (downcase directory)))
-                      (concat directory
-                              (cond ((equal directory "") "./")
-                                    ((string-suffix-p "/" directory) "")
-                                    (t "/"))
-                              joined))
-                  `(concat (file-name-as-directory ,segment) ,joined))))
+          (setq joined (imp--path-join-segment joined segment)))
         joined))))
 
 
