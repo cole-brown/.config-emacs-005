@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2026-09-23
+;; Timestamp:  2026-10-01
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -22,10 +22,22 @@
 ;;
 ;; Paths. File, directory, relative, absolute...
 ;;
-;; Path Canons.
+;; ---
 ;;
-;; This path library is for theoretical paths. It should never ask the actual
-;; filesystem for anything.
+;; Path construction operates on filenames; the named files and directories
+;; need not exist.
+;;
+;; During macro expansion, path construction must only inspect syntax and
+;; generate code. It must not evaluate argument forms, invoke file-name
+;; handlers, or access the filesystem. Invalid syntax may signal an error.
+;;
+;; At runtime, path construction may evaluate arguments and use standard
+;; filename operations, including file-name handlers. It must not explicitly
+;; check existence, inspect file attributes, or resolve symlinks.
+;;
+;; Filesystem access belongs to explicit runtime operations: validating
+;; directories, resolving symlinks, and locating files to load. Their
+;; documentation must describe that access.
 ;;
 ;;; Code:
 
@@ -485,6 +497,87 @@ See func `get-load-suffixes' for known load extenstions."
 
 
 ;;------------------------------------------------------------------------------
+;; /The/ Path Macro
+;;------------------------------------------------------------------------------
+
+(eval-and-compile
+  (defun imp--path-expand (segments)
+    "Return a standard Elisp expression joining flat path SEGMENTS.
+
+Strings, keywords, and quoted symbols are literal segments.  Other symbols
+and forms are expressions whose values must be strings at execution time.
+
+Expansion uses only syntax and string operations. It must not evaluate
+argument forms, invoke file-name handlers, or access the filesystem.
+Invalid segment syntax may signal an error."
+    (unless segments
+      (error "imp-path requires at least one segment"))
+    (let ((segments
+           (mapcar
+            (lambda (segment)
+              (cond
+               ((stringp segment) segment)
+               ((keywordp segment) (substring (symbol-name segment) 1))
+               ((eq (car-safe segment) 'quote)
+                (unless (and (consp (cdr segment))
+                             (null (cddr segment))
+                             (or (stringp (cadr segment))
+                                 (and (symbolp (cadr segment))
+                                      (cadr segment))))
+                  (error "imp-path expects a quoted string or symbol: %S" segment))
+                (let ((literal (cadr segment)))
+                  (cond ((stringp literal) literal)
+                        ((keywordp literal) (substring (symbol-name literal) 1))
+                        (t (symbol-name literal)))))
+               ((and segment (not (eq segment t))
+                     (or (symbolp segment) (consp segment)))
+                segment)
+               (t (error "Invalid imp-path segment: %S" segment))))
+            segments)))
+      ;; Build from the right so adjacent literals become a single suffix.
+      ;; Each expression still appears once, in left-to-right evaluation order.
+      (let* ((reversed (reverse segments))
+             (joined (car reversed)))
+        (dolist (segment (cdr reversed))
+          (setq joined
+                (if (and (stringp segment) (stringp joined))
+                    ;; Never dispatch to a file-name handler while folding.
+                    (let ((directory
+                           (if (memq system-type '(windows-nt ms-dos))
+                               (subst-char-in-string ?\\ ?/ segment)
+                             segment)))
+                      (when (and (eq system-type 'windows-nt)
+                                 (bound-and-true-p w32-downcase-file-names))
+                        (setq directory (downcase directory)))
+                      (concat directory
+                              (cond ((equal directory "") "./")
+                                    ((string-suffix-p "/" directory) "")
+                                    (t "/"))
+                              joined))
+                  `(concat (file-name-as-directory ,segment) ,joined))))
+        joined))))
+
+
+(defmacro imp-path (&rest segments)
+  "Join flat SEGMENTS and expand to an absolute path without a trailing slash.
+
+Strings, keywords, and quoted symbols denote literal path segments:
+  (imp-path user-emacs-directory \='source :user)
+
+Bare variables and forms are evaluated once, from left to right, and must
+return strings.  Relative paths use `default-directory' at execution time.
+Nested segment lists are not supported; pass each segment separately.
+
+The expansion uses only standard Elisp calls.  It does not follow symlinks
+or abbreviate the resulting path."
+  (declare (debug (&rest form)))
+  `(directory-file-name
+    (expand-file-name ,(imp--path-expand segments))))
+;; (macroexpand-1 '(imp-path user-emacs-directory 'source :user))
+;; (macroexpand-1 '(imp-path (locate-user-emacs-file "init.el")))
+
+
+;;------------------------------------------------------------------------------
 ;; Root Paths
 ;;------------------------------------------------------------------------------
 
@@ -555,45 +648,6 @@ Return path string from `imp-roots' or nil."
   (imp--alist-delete (imp-feature-first feature) imp-roots))
 ;; imp-roots
 ;; (imp-path-root-delete 'imp)
-
-
-;;------------------------------------------------------------------------------
-;; /The/ Path Function
-;;------------------------------------------------------------------------------
-
-;; TODO U R HERE:
-(defmacro imp-path-core (path)
-  "TODO DOC STRING"
-  (declare (indent defun))
-  `(let ((path* (imp-path-join ,path)))
-     (imp-path-normalize path*)))
-;; (macroexpand-1 '(imp-path-core '(/path to foo)))
-
-
-(defmacro imp-path (&rest path)
-  "TODO DOC STRING"
-  (declare (indent defun))
-  (imp-path-core path))
-;; (macroexpand-1 '(imp-path /path to foo))
-;; (macroexpand-1 '(imp-path "/path" to foo))
-;; (macroexpand-1 '(imp-path (locate-user-emacs-file "init.el")))
-
-
-;; ;; TODO(path): make this use all the shenanigans that `imp-parser-normalize/:path' uses?
-;; (defun imp-path (&rest path)
-;;   "Get an imp standard path.
-;;
-;; 1. Join PATH into a path string.
-;; 2. Get the absolute path.
-;;    - If path is relative, root with func `imp-path-current-dir'.
-;; 3. Follow symlinks to 'true' file path.
-;; 4. Remove trailing slashes.
-;; 5. Abbreviate path (for '~/' paths instead of '/home/user/')."
-;;   (declare (pure t) (side-effect-free t))
-;;   (let ((default-directory (imp-path-current-dir)))
-;;     (convert-standard-filename
-;;      (abbreviate-file-name
-;;       (apply #'imp-path-join path)))))
 
 
 ;;------------------------------------------------------------------------------

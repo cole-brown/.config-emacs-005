@@ -30,7 +30,9 @@
 (imp-path-test--load "debug")
 (imp-path-test--load "list")
 (imp-path-test--load "feature")
-(imp-path-test--load "path")
+;; Seed the root to skip registration while loading this exploratory library.
+(let ((imp-roots (list (list 'imp imp-path-test--imp-dir))))
+  (imp-path-test--load "path"))
 
 (defmacro imp-path-test--with-temp-dir (dir &rest body)
   "Bind DIR to a fresh temporary directory for BODY."
@@ -57,6 +59,83 @@
 ;;------------------------------------------------------------------------------
 ;; TESTS
 ;;------------------------------------------------------------------------------
+
+(ert-deftest imp-path-test:/macro/standard-expansion ()
+  (should
+   (equal (macroexpand-1 '(imp-path user-emacs-directory 'source :user))
+          '(directory-file-name
+            (expand-file-name
+             (concat (file-name-as-directory user-emacs-directory)
+                     "source/user"))))))
+
+(ert-deftest imp-path-test:/macro/runtime-variables-and-forms ()
+  (let ((root "/tmp/imp-path-macro/")
+        (name "first.el"))
+    (should (equal (imp-path root 'source :user name)
+                   "/tmp/imp-path-macro/source/user/first.el"))
+    (setq name "second.el")
+    (should (equal (imp-path root (concat "source/" name))
+                   "/tmp/imp-path-macro/source/second.el"))))
+
+(ert-deftest imp-path-test:/macro/expansion-never-invokes-file-name-handlers ()
+  (let ((file-name-handler-alist
+         (list (cons ".*" (lambda (operation &rest _args)
+                            (error "File-name handler invoked during expansion: %S"
+                                   operation))))))
+    (should (equal (macroexpand-1 '(imp-path "/mock:root" "child"))
+                   '(directory-file-name (expand-file-name "/mock:root/child"))))
+    (should (equal (macroexpand-1 '(imp-path root "/mock:directory" "child"))
+                   '(directory-file-name
+                     (expand-file-name
+                      (concat (file-name-as-directory root)
+                              "/mock:directory/child")))))))
+
+(ert-deftest imp-path-test:/macro/literal-folding-preserves-separators ()
+  (dolist (case '((("" "child") "./child")
+                  (("/" "child") "/child")
+                  (("/tmp/" "child") "/tmp/child")
+                  (("/tmp//" "child") "/tmp//child")
+                  (("/tmp" "child/") "/tmp/child/")
+                  (("/tmp" "") "/tmp/")
+                  (("alpha" "" "child") "alpha/./child")))
+    (should (equal (macroexpand-1 (cons 'imp-path (car case)))
+                   `(directory-file-name (expand-file-name ,(cadr case))))))
+  (let ((system-type 'windows-nt))
+    (should (equal (macroexpand-1 '(imp-path "C:\\root\\" "child"))
+                   '(directory-file-name (expand-file-name "C:/root/child"))))))
+
+(ert-deftest imp-path-test:/macro/evaluates-once-in-order ()
+  (let (calls)
+    (should
+     (equal (imp-path (progn (push 'root calls) "/tmp")
+                      (progn (push 'directory calls) "alpha")
+                      (progn (push 'file calls) "beta.el"))
+            "/tmp/alpha/beta.el"))
+    (should (equal (nreverse calls) '(root directory file)))))
+
+(ert-deftest imp-path-test:/macro/defers-expressions-and-relative-base ()
+  (let ((environment (list (cons 'calls 0)))
+        (form '(imp-path (progn (setq calls (1+ calls)) "alpha") "../beta/")))
+    (let ((expansion (macroexpand-1 form)))
+      (should (= (cdr (assq 'calls environment)) 0))
+      (let ((default-directory "/tmp/first/"))
+        (should (equal (eval expansion environment) "/tmp/first/beta")))
+      (let ((default-directory "/tmp/second/"))
+        (should (equal (eval expansion environment) "/tmp/second/beta")))
+      (should (= (cdr (assq 'calls environment)) 2)))))
+
+(ert-deftest imp-path-test:/macro/compiled-call-needs-no-imp-at-runtime ()
+  (let ((compiled (byte-compile '(lambda (root) (imp-path root 'source :user)))))
+    (cl-letf (((symbol-function 'imp-path) nil)
+              ((symbol-function 'imp--path-expand) nil))
+      (should (equal (funcall compiled "/tmp/first/") "/tmp/first/source/user"))
+      (should (equal (funcall compiled "/tmp/second/") "/tmp/second/source/user")))))
+
+(ert-deftest imp-path-test:/macro/rejects-missing-or-nested-segments ()
+  (should-error (macroexpand-1 '(imp-path)))
+  (should-error (macroexpand-1 '(imp-path '("alpha" "beta"))))
+  (should-error (macroexpand-1 '(imp-path 42))))
+
 
 (ert-deftest imp-path-test:/join/flattens-and-normalizes-symbols ()
   (should (equal (imp-path-join "/tmp" '("alpha" (:beta gamma)) "delta.el")
