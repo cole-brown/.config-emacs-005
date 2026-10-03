@@ -67,106 +67,6 @@ non-nil - ignore errors; return nil")
 ;; Path Builders
 ;;------------------------------------------------------------------------------
 
-;; TODO DELETE
-(defun imp--path-segment-normalize (input)
-  "Ensure INPUT is a string.
-
-INPUT should be a string, keyword, or symbol.
-  - If it's a string, use as-is.
-  - If it's a keyword/symbol, use the symbol's name sans \":\".
-    - 'foo -> \"foo\"
-    - :foo -> \"foo\"
-
-Return a string."
-  (declare (side-effect-free t))
-  (cond ((null input) ;; Let nil through so `imp-path-join` functions correctly.
-         nil)
-
-        ((stringp input) ;; String good. Want string.
-         input)
-
-        ;; Keyword? Use its name.
-        ((keywordp input)
-         ;; But strip the keyword's leading colon.
-         (string-remove-prefix ":" (symbol-name input)))
-
-        ;; Symbol? Use its name.
-        ((symbolp input)
-         (symbol-name input))
-
-        (t
-         (imp--path-error 'imp--path-segment-normalize
-                          "INPUT must be string or keyword/symbol. Got %S: %S"
-                          (type-of input)
-                          input))))
-;; (imp--path-segment-normalize nil)
-;; (imp--path-segment-normalize :foo)
-;; (imp--path-segment-normalize :f:o:o)
-;; (imp--path-segment-normalize :D:/foo)
-;; (imp--path-segment-normalize 'foo)
-;; (imp--path-segment-normalize "foo")
-;; (imp--path-segment-normalize :/bar)
-;; (imp--path-segment-normalize '/bar)
-;; (imp--path-segment-normalize "/bar")
-
-
-;; TODO DELETE
-(defun imp--path-segment-append (parent next)
-  "Append NEXT element to PARENT, adding dir separator if needed."
-  (declare (side-effect-free t))
-  (let ((parent (imp--path-segment-normalize parent))
-        (next   (imp--path-segment-normalize next)))
-    ;; Error checks first.
-    (cond ((and parent
-                (not (stringp parent)))
-           (imp--path-error 'imp--path-segment-append
-                            "Paths to append must be strings. PARENT is: %S"
-                            parent))
-          ((or (null next)
-               (not (stringp next)))
-           (imp--path-error 'imp--path-segment-append
-                            "Paths to append must be strings. NEXT is: %S"
-                            next))
-
-          ;;---
-          ;; Append or not?
-          ;;---
-          ;; Expected initial case for appending: nil parent, non-nil next.
-          ((null parent)
-           next)
-
-          (t
-           (concat (file-name-as-directory parent) next)))))
-;; (imp--path-segment-append :/foo 'bar)
-;; (imp--path-segment-append nil nil)
-;; (let (imp-path-error?) (imp--path-segment-append nil nil))
-
-
-;; TODO DELETE
-(defun imp-path-join (&rest path)
-  "Combine PATH segments together into a path.
-
-(imp-path-join \"jeff\" \"jill.el\")
-  ->\"jeff/jill.el\""
-  (declare (side-effect-free t))
-  (if-let ((flattened (imp--list-flatten path)))
-    (seq-reduce #'imp--path-segment-append
-                flattened
-                nil)
-    (imp--path-error 'imp-path-join
-                     "Cannot join nothing. PATH = %S => %S"
-                     path
-                     flattened)))
-;; (imp--list-flatten '(:foo bar))
-;; (imp--list-flatten '(nil nil))
-;; (imp-path-join "/foo" "bar.el")
-;; (imp-path-join '("/foo" ("bar.el")))
-;; (imp-path-join "foo" "bar.el")
-;; (imp-path-join "foo")
-;; (imp-path-join nil nil)
-;; (let (imp-path-error?) (imp-path-join nil))
-
-
 (defun imp-path-split (path)
   "Split PATH into a list of dir/file names.
 
@@ -195,13 +95,13 @@ Else split on forward slash only."
 
 
 ;;------------------------------------------------------------------------------
-;; /The/ Path Macro
+;; Path Macros
 ;;------------------------------------------------------------------------------
 
 (eval-and-compile
   ;; TODO: Move to Path Builders section?
   (defun imp--path-normalize-segment (segment)
-    "Normalize the unevaluated argument syntax SEGMENT for `imp-path'.
+    "Normalize SEGMENT syntax for `imp-path' and `imp-path-join'.
 
 Return a literal string for strings, keywords, and quoted strings or symbols.
 Keywords use their symbol names without the leading colon; other quoted symbols
@@ -213,6 +113,7 @@ lists. A quoted t is a literal symbol name and becomes the string \"t\".
 
 This function must not evaluate SEGMENT, invoke file-name handlers, or access
 the filesystem."
+    (declare (pure t) (side-effect-free t))
     (cond
      ;; Keep strings as-is.
      ((stringp segment) segment)
@@ -262,6 +163,8 @@ Do not call `file-name-as-directory' during expansion: it can dispatch to
 `file-name-handler-alist' handlers, which may perform I/O or signal errors.
 Such calls belong in the generated runtime form. This function must not
 evaluate either argument, invoke file-name handlers, or access the filesystem."
+    ;; The result depends on platform and filename settings, so it is not pure.
+    (declare (side-effect-free t))
     (if (and (stringp segment) (stringp joined))
         ;; Never dispatch to a file-name handler while folding.
         (let ((directory
@@ -288,6 +191,7 @@ and forms are expressions whose values must be strings at execution time.
 Expansion uses only syntax and string operations. It must not evaluate
 argument forms, invoke file-name handlers, or access the filesystem.
 Invalid segment syntax may signal an error."
+    (declare (side-effect-free t))
     (unless segments
       (error "imp-path requires at least one segment"))
 
@@ -301,6 +205,24 @@ Invalid segment syntax may signal an error."
         joined))))
 
 
+(defmacro imp-path-join (&rest segments)
+  "Join flat SEGMENTS without making relative paths absolute.
+
+Use the same argument syntax as `imp-path': strings, keywords, and quoted
+symbols are literal segments; bare variables and forms must produce strings
+at runtime. Evaluate each expression once, from left to right.
+
+Remove trailing slashes, but do not expand tilde prefixes or simplify `.'
+and `..' components. Only `imp-path' calls `expand-file-name'.
+
+The expansion uses only standard Elisp calls and must not evaluate argument
+forms, invoke file-name handlers, or access the filesystem during expansion.
+Nested segment lists and nil segments are not supported."
+  (declare (debug (&rest form)))
+  `(directory-file-name ,(imp--path-expand segments)))
+;; (macroexpand-1 '(imp-path-join root 'source :user))
+
+
 (defmacro imp-path (&rest segments)
   "Join flat SEGMENTS and expand to an absolute path without a trailing slash.
 
@@ -312,7 +234,8 @@ return strings.  Relative paths use `default-directory' at execution time.
 Nested segment lists are not supported; pass each segment separately.
 
 The expansion uses only standard Elisp calls.  It does not follow symlinks
-or abbreviate the resulting path."
+or abbreviate the resulting path. See `imp-path-join' to keep relative paths
+relative instead of calling `expand-file-name'."
   (declare (debug (&rest form)))
   `(directory-file-name
     (expand-file-name ,(imp--path-expand segments))))
@@ -410,7 +333,7 @@ Else path string will be relative."
                                (imp-feature-split (imp-feature-rest feature)) "/"))
 
         ;; No root; make relative path.
-        (apply #'imp-path-join (imp-feature-split feature))))))
+        (imp-path-join (mapconcat #'identity (imp-feature-split feature) "/"))))))
 ;; (imp-path-of-feature 'imp:/foo/bar)
 ;; (imp-path-of-feature 'imp)
 ;; (imp-path-of-feature './foo/bar)

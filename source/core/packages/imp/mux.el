@@ -198,10 +198,12 @@ Return result from regex match: nil or integer (start of match in string)"
 
 
 (defun imp-mux-path (root &optional rest)
-  "Return a path with an imp-mux placeholder."
-  (imp-path-join root
-                 imp--mux-placeholder
-                 rest))
+  "Return a path with an imp-mux placeholder between ROOT and REST.
+
+ROOT and REST may be nil, omitting the corresponding prefix or suffix."
+  (if root
+      (imp-path-join root imp--mux-placeholder (or rest ""))
+    (imp-path-join imp--mux-placeholder (or rest ""))))
 ;; (imp-mux-path "/path/to/mux" "and/then/init.el")
 ;; (imp-mux-path nil "and/then/init.el")
 ;; (imp-mux-path nil "init.el")
@@ -217,6 +219,8 @@ Split on directories.
          \"foo/bar.el\")
 
 If multiple hashes present, split on first hash.
+
+The prefix or postfix is nil if there are no names on that side of the hash.
 
 If no imp-mux system hash in PATH, return just '(PATH)"
   (if (and path
@@ -236,9 +240,9 @@ If no imp-mux system hash in PATH, return just '(PATH)"
                   (push name segments)
                   ;; rest will be added after while loop
                   (setq found? t))
-              (setq prefix (imp-path-join prefix name)))))
+              (setq prefix (if prefix (imp-path-join prefix name) name)))))
         ;; set postfix
-        (push (apply #'imp-path-join names) segments)
+        (push (when names (imp-path-join (mapconcat #'identity names "/"))) segments)
         (nreverse segments))
     ;; Not found. Just return PATH
     (list path)))
@@ -255,9 +259,13 @@ If no imp-mux system hash in PATH, return just '(PATH)"
     (when (and (nth 0 mux-path) ; path root str exists
                (nth 1 mux-path) ; path is mux'd
                (file-exists-p (nth 0 mux-path))) ; path root exists in file system
-      (imp-path-join (nth 0 mux-path)
-                     (nth 0 (directory-files (nth 0 mux-path) nil (imp--mux-system-rx) t))
-                     (nth 2 mux-path)))))
+      (imp-path-join
+        (nth 0 mux-path)
+        (mapconcat #'identity
+                   (delq nil (list (nth 0 (directory-files (nth 0 mux-path) nil
+                                                          (imp--mux-system-rx) t))
+                                   (nth 2 mux-path)))
+                   "/")))))
 ;; (imp--mux-path-find (concat "/path/to/secret/mux/" imp--mux-placeholder))
 
 
