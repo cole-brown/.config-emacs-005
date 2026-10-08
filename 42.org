@@ -6756,8 +6756,45 @@ simplify
 
 prompt:
 #+begin_quote
+imp/path.el: refactoring for macros
 
+source/core/packages/imp/path.el
+
+We are working on simplifying imp's path functions.
+
+I'm currently trying to figure out if we can make `imp-path` a macro that replaces itself completely with standard elisp call. Like how `use-package` does things.
+
+This branch (`feature/imp`) is an exploratory branch. If you want a look at a working `imp` codebase, see the `main` branch.
+
+What are your thoughts?
 #+end_quote
+
+Edit LLM's code.
+
+Can we use imp-path instead of imp-path-join in imp's code?
+  - [X] k
+
+new imp-path-join
+  - [X] k
+
+╔════════╦════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+╠══TODO══╣            ║                                                                                                          ║
+╠══TODO══╬══tomorrow══╣                                            ¡¡¡YOU ARE HERE!!!                                            ║
+╠══TODO══╣            ║                                                                                                          ║
+╚════════╩════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+more simplifying of path.el?
+pull `:path' handler & helpers into path.el?
+
+
+
+Split path.el up into file-path.el and file-system.el?
+
+
+
+
+codex resume 01a0fadf-8637-7173-bed1-293552860df2
+
+** fix imp to be macro expansion like imp-path/use-package
 
 
 ** ├INFO───┤ wtf all does the macros do?

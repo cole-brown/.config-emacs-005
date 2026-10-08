@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2026-10-02
+;; Timestamp:  2026-10-05
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -99,7 +99,7 @@ Else split on forward slash only."
 ;;------------------------------------------------------------------------------
 
 (eval-and-compile
-  ;; TODO: Move to Path Builders section?
+  ;; TODO: Move to Path Builders section? Or Internal Helpers? Macro Helpers?
   (defun imp--path-normalize-segment (segment)
     "Normalize SEGMENT syntax for `imp-path' and `imp-path-join'.
 
@@ -237,8 +237,14 @@ The expansion uses only standard Elisp calls.  It does not follow symlinks
 or abbreviate the resulting path. See `imp-path-join' to keep relative paths
 relative instead of calling `expand-file-name'."
   (declare (debug (&rest form)))
-  `(directory-file-name
-    (expand-file-name ,(imp--path-expand segments))))
+  ;; Convert "/home/USER/" to "~/".
+  `(abbreviate-file-name
+    ;; Follow symlinks, remove ".."
+    (file-truename
+     ;; Remove trailing slash.
+     (directory-file-name
+      ;; Get absolute path. Use `default-directory' to root relative paths.
+      (expand-file-name ,(imp--path-expand segments))))
 ;; (macroexpand-1 '(imp-path user-emacs-directory 'source :user))
 ;; (macroexpand-1 '(imp-path (locate-user-emacs-file "init.el")))
 
@@ -280,6 +286,7 @@ relative instead of calling `expand-file-name'."
 ;; Path Normalization
 ;;------------------------------------------------------------------------------
 
+;; TODO: Delete, use `imp-path' instead.
 (defun imp-path-normalize (path)
   "Normalize PATH string.
 
@@ -324,6 +331,7 @@ Else path string will be relative."
               (path-root (imp-path-root-get feature-root)))
         ;; Join feature's root path with the rest of feature.
         (imp-path path-root
+                  ;; TODO: use `imp-path-join' instead of `mapconcat'?
                   (mapconcat #'symbol-name (imp-feature-unrooted feature) "/"))
 
       ;; Is FEATURE rooted "here"?
